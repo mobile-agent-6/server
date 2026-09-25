@@ -100,7 +100,7 @@ API에는 위 대문자 enum만 전송한다.
 
 | 필드 | 타입 | nullable | 설명 |
 |---|---|---:|---|
-| `id` | UUID string | 아니요 | 서버 생성 |
+| `id` | UUID v4 string | 아니요 | 서버 생성 |
 | `title` | string | 아니요 | trim 후 1~100자 |
 | `scheduledAt` | datetime string | 아니요 | 일정 시각 |
 | `category` | Category | 아니요 | 다섯 enum 중 하나 |
@@ -209,6 +209,14 @@ X-Request-ID: 3f2a85a9-cc84-4ec9-b98d-63edc4d46e30
 2. `status === "ok"`
 3. `apiVersion === "v1"`
 4. RTT midpoint 기준 `serverTime`과 휴대폰 시각의 차이가 60초 이내
+
+RTT midpoint는 다음 방식으로 계산한다.
+
+```text
+RTT = 응답 수신 monotonic 시각 - 요청 시작 monotonic 시각
+기기 기준 중간 시각 = 요청 시작 시 기록한 휴대폰 시각 + RTT / 2
+시각 차이 = |serverTime - 기기 기준 중간 시각|
+```
 
 ## 6. Pi 시스템 시각 동기화
 
@@ -492,6 +500,22 @@ X-Request-ID: {재시도 요청의 새 ID}
 - `405 METHOD_NOT_ALLOWED`: 해당 경로의 정확한 `Allow`
 - `204 No Content`: 본문 없음
 
+### 13.5 임시 timeout과 retry
+
+다음 값은 Orange Pi 실기기 측정 전 사용하는 `BE-FE-AGREED` 임시 기준이다.
+
+| 요청 | timeout | 자동 재시도 |
+|---|---:|---|
+| `GET /health` | 5초 | 1초 후 최대 1회 |
+| Schedule 목록·CRUD | 10초 | timeout·네트워크 오류·503일 때 최대 1회 |
+| `POST /api/v1/system/time-sync` | 15초 | 같은 요청을 즉시 재시도하지 않고 `/health`로 적용 여부 확인 |
+
+- Schedule POST 재시도에는 같은 payload와 `Idempotency-Key`를 사용한다.
+- PATCH는 같은 body, DELETE는 같은 `scheduleId`로만 재시도한다.
+- 4xx, 409와 500 응답은 자동 재시도하지 않는다.
+- 자동 재시도를 반복하지 않는다.
+- 최종 timeout 값과 재시도 세부 조정은 Orange Pi 응답 시간 실측 후 확정한다(`TBD-TEAM`).
+
 ## 14. 로컬 알림 연동
 
 백엔드는 `reminderAt`만 계산하며 실제 알림은 모바일 앱이 관리한다.
@@ -510,10 +534,13 @@ reminderAt > 기기 현재 시각
 | 삭제 | 기존 알림 취소 |
 | `reminderMinutesBefore: null` | 기존 알림 취소 |
 | `scheduledAt` 변경 | 기존 알림 취소 후 재등록 판단 |
+| `title` 변경 | 기존 알림 취소 후 최신 Schedule 제목으로 재등록 판단 |
 | 미완료로 변경 | `reminderAt`이 미래면 등록 |
 
+- 로컬 알림의 제목은 `일정 알림`, 본문은 Schedule의 `title`을 사용한다.
+- `title` 변경이 성공하면 기존 알림을 취소하고, 변경 후 Schedule이 알림 등록 조건을 만족할 때만 새 제목으로 재예약한다.
 - 백엔드는 Expo `notificationIdentifier`를 저장하지 않는다.
-- 프론트는 `scheduleId ↔ notificationIdentifier`를 앱 재실행 후에도 유지되는 로컬 저장소에 보관한다.
+- 프론트는 `scheduleId ↔ notificationIdentifier`를 앱 재실행 후에도 유지되는 로컬 저장소에 보관하며 재예약 후 새 identifier로 갱신한다.
 - 알림 권한이 거부돼도 일정 저장 자체는 성공시키고 로컬 알림만 생략한다.
 
 ## 15. OpenAPI 공개 계약
@@ -563,20 +590,3 @@ ValidationErrorItem
 - HTTPS, rate limiting과 외부 공개 production
 - 변경분 동기화와 server push
 - 재고·폐기·작업 기록 도메인
-
-## 17. 프론트 확인 항목
-
-이 공유본은 다음 항목이 기존 연동 합의와 같은지 프론트 담당자가 확인한다.
-
-- endpoint, method와 성공 status
-- Schedule 요청·응답 필드와 Category enum
-- datetime 입력·UTC 응답 규칙
-- 목록 기본 조회 범위와 최대 92일 규칙
-- 생성 요청의 `Idempotency-Key` 재사용 방식
-- PATCH에 실제 변경 필드만 보내는 방식
-- Problem Details와 오류 code 처리
-- `/health`의 IP 저장 조건
-- time-sync 후 `/health` 재확인과 실패 시 수동 설정 흐름
-- `reminderAt` 기준 로컬 알림 처리
-
-확인 결과 계약 변경이 없으면 GitHub Issue에 확인 사실을 기록한다. 변경 요청이 있으면 관련 영역의 합의를 거쳐 이 문서와 구현 기준을 함께 갱신한다.
