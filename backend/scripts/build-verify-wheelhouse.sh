@@ -113,6 +113,7 @@ docker run --rm \
         python -m pip download \
             --disable-pip-version-check \
             --no-cache-dir \
+            --no-deps \
             --only-binary=:all: \
             --requirement "/source/$2" \
             --dest /wheelhouse

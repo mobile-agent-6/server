@@ -50,6 +50,10 @@ lock_path="${backend_dir}/${LOCK_NAME}"
 output_dir="$(mktemp -d "${TMPDIR:-/tmp}/schedule-api-runtime-lock.XXXXXX")"
 trap 'rm -rf "$output_dir"' EXIT
 
+if [[ -f "$lock_path" ]]; then
+    cp "$lock_path" "${output_dir}/${LOCK_NAME}"
+fi
+
 docker run --rm \
     --platform "$TARGET_PLATFORM" \
     --user "$(id -u):$(id -g)" \

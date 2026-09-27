@@ -4,7 +4,6 @@ import os
 from pathlib import Path
 import re
 import subprocess
-import tomllib
 
 import pytest
 
@@ -15,34 +14,81 @@ SCRIPTS = (
     BACKEND_ROOT / "scripts" / "build-verify-wheelhouse.sh",
 )
 RUNTIME_LOCK = BACKEND_ROOT / "requirements-runtime-linux-aarch64.lock"
+DEVELOPMENT_LOCK = BACKEND_ROOT / "requirements.lock"
 
 
-def _locked_package_names() -> set[str]:
-    names: set[str] = set()
-    for line in RUNTIME_LOCK.read_text(encoding="utf-8").splitlines():
+def _locked_packages(lock_path: Path) -> dict[str, str]:
+    packages: dict[str, str] = {}
+    for line in lock_path.read_text(encoding="utf-8").splitlines():
         if not line or line.startswith((" ", "#", "--")):
             continue
-        match = re.fullmatch(r"([A-Za-z0-9_.-]+)==[^\s]+", line)
-        assert match is not None, f"runtime dependency is not exactly pinned: {line}"
-        names.add(match.group(1).lower().replace("_", "-"))
-    return names
+        match = re.fullmatch(r"([A-Za-z0-9_.-]+)==([^\s]+)", line)
+        assert match is not None, f"dependency is not exactly pinned: {line}"
+        name = re.sub(r"[-_.]+", "-", match.group(1).lower())
+        assert name not in packages, f"duplicate locked dependency: {name}"
+        packages[name] = match.group(2)
+    return packages
 
 
-def test_runtime_lock_contains_greenlet_and_excludes_dev_dependencies() -> None:
-    locked_names = _locked_package_names()
-    pyproject = tomllib.loads(
-        (BACKEND_ROOT / "pyproject.toml").read_text(encoding="utf-8")
+def _fake_docker_environment(tmp_path: Path) -> dict[str, str]:
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    fake_docker = fake_bin / "docker"
+    fake_docker.write_text(
+        """#!/bin/sh
+if [ "$1" = "info" ]; then
+    printf '%s\\n' 'linux/aarch64'
+    exit 0
+fi
+
+wheelhouse=''
+for argument in "$@"; do
+    case "$argument" in
+        *:/wheelhouse)
+            wheelhouse="${argument%:/wheelhouse}"
+            ;;
+    esac
+done
+
+case "${FAKE_WHEELHOUSE_KIND:-}" in
+    macos)
+        : > "$wheelhouse/greenlet-3.5.6-cp311-cp311-macosx_11_0_arm64.whl"
+        ;;
+    x86_64)
+        : > "$wheelhouse/greenlet-3.5.6-cp311-cp311-manylinux_2_24_x86_64.whl"
+        ;;
+    sdist)
+        : > "$wheelhouse/anyio-4.15.1-py3-none-any.whl"
+        : > "$wheelhouse/greenlet-3.5.6.tar.gz"
+        ;;
+    empty|'')
+        ;;
+    *)
+        printf 'unknown fake wheelhouse kind: %s\\n' "$FAKE_WHEELHOUSE_KIND" >&2
+        exit 2
+        ;;
+esac
+""",
+        encoding="utf-8",
     )
-    dev_requirements = pyproject["project"]["optional-dependencies"]["dev"]
-    dev_names = {
-        re.split(r"[<>=!~\[; ]", requirement, maxsplit=1)[0]
-        .lower()
-        .replace("_", "-")
-        for requirement in dev_requirements
-    }
+    fake_docker.chmod(0o755)
+    env = os.environ.copy()
+    env["PATH"] = f"{fake_bin}{os.pathsep}{env['PATH']}"
+    return env
 
-    assert "greenlet" in locked_names
-    assert locked_names.isdisjoint(dev_names)
+
+def test_runtime_lock_matches_development_lock_versions() -> None:
+    runtime_packages = _locked_packages(RUNTIME_LOCK)
+    development_packages = _locked_packages(DEVELOPMENT_LOCK)
+    common_packages = runtime_packages.keys() & development_packages.keys()
+
+    assert common_packages
+    assert {
+        package: (runtime_packages[package], development_packages[package])
+        for package in common_packages
+        if runtime_packages[package] != development_packages[package]
+    } == {}
+    assert runtime_packages.keys() - development_packages.keys() == {"greenlet"}
 
 
 @pytest.mark.parametrize("script", SCRIPTS)
@@ -97,3 +143,62 @@ def test_runtime_dependency_script_rejects_wrong_docker_platform(
 
     assert result.returncode == 1
     assert "Docker daemon platform must be linux/aarch64" in result.stderr
+
+
+@pytest.mark.parametrize(
+    ("wheelhouse_kind", "expected_error"),
+    (
+        ("macos", "incompatible wheel found"),
+        ("x86_64", "incompatible wheel found"),
+        ("sdist", "wheelhouse contains a non-wheel artifact"),
+        ("empty", "no wheels were downloaded"),
+    ),
+)
+def test_wheelhouse_script_rejects_invalid_downloads(
+    wheelhouse_kind: str, expected_error: str, tmp_path: Path
+) -> None:
+    env = _fake_docker_environment(tmp_path)
+    env["FAKE_WHEELHOUSE_KIND"] = wheelhouse_kind
+
+    result = subprocess.run(
+        ["bash", str(BACKEND_ROOT / "scripts" / "build-verify-wheelhouse.sh")],
+        check=False,
+        capture_output=True,
+        env=env,
+        text=True,
+    )
+
+    assert result.returncode == 1
+    assert expected_error in result.stderr
+
+
+@pytest.mark.parametrize("output_kind", ("relative", "repository", "existing"))
+def test_wheelhouse_script_rejects_unsafe_output_paths(
+    output_kind: str, tmp_path: Path
+) -> None:
+    env = _fake_docker_environment(tmp_path)
+    if output_kind == "relative":
+        output_path = "relative-wheelhouse"
+        expected_error = "--output must be an absolute path outside the repository"
+    elif output_kind == "repository":
+        output_path = str(BACKEND_ROOT / ".test-wheelhouse")
+        expected_error = "--output must be outside the repository"
+    else:
+        output_path = str(tmp_path)
+        expected_error = "--output must not already exist"
+
+    result = subprocess.run(
+        [
+            "bash",
+            str(BACKEND_ROOT / "scripts" / "build-verify-wheelhouse.sh"),
+            "--output",
+            output_path,
+        ],
+        check=False,
+        capture_output=True,
+        env=env,
+        text=True,
+    )
+
+    assert result.returncode == 2
+    assert expected_error in result.stderr
