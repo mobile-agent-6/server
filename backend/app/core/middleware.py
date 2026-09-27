@@ -25,6 +25,7 @@ class RequestIdMiddleware:
         state = scope.setdefault("state", {})
         state["request_id"] = request_id
         started = time.monotonic()
+        state["request_started_monotonic"] = started
         status = 500
 
         async def send_with_request_id(message: Message) -> None:

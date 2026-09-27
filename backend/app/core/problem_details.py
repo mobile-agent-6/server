@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 from typing import Any, Literal
+from uuid import UUID
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -54,7 +55,7 @@ class Problem(BaseModel):
     detail: str
     instance: str
     code: str
-    request_id: str = Field(serialization_alias="requestId")
+    request_id: UUID = Field(serialization_alias="requestId")
     errors: list[ValidationErrorItem] | None = None
 
 

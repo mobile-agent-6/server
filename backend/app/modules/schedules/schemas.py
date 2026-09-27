@@ -130,16 +130,21 @@ class ScheduleUpdate(RequestModel):
 class ScheduleResponse(ResponseModel):
     id: UUID
     title: str
-    scheduled_at: datetime
+    scheduled_at: datetime = Field(json_schema_extra={"format": "date-time"})
     category: Category
     completed: bool
     reminder_minutes_before: int | None
-    reminder_at: datetime | None
-    created_at: datetime
-    updated_at: datetime
+    reminder_at: datetime | None = Field(json_schema_extra={"format": "date-time"})
+    created_at: datetime = Field(json_schema_extra={"format": "date-time"})
+    updated_at: datetime = Field(json_schema_extra={"format": "date-time"})
 
-    @field_serializer("scheduled_at", "reminder_at", "created_at", "updated_at")
-    def serialize_datetime(self, value: datetime | None) -> str | None:
+    @field_serializer("scheduled_at", "created_at", "updated_at")
+    def serialize_required_datetime(self, value: datetime) -> str:
+        utc_value = value.astimezone(timezone.utc)
+        return utc_value.isoformat().replace("+00:00", "Z")
+
+    @field_serializer("reminder_at")
+    def serialize_optional_datetime(self, value: datetime | None) -> str | None:
         if value is None:
             return None
         utc_value = value.astimezone(timezone.utc)

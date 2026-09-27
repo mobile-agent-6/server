@@ -53,6 +53,24 @@ class DatabaseUnavailable(ApplicationError):
     detail = "The database is temporarily unavailable."
 
 
+class ClockTimeOutOfRange(ApplicationError):
+    status = 422
+    code = "CLOCK_TIME_OUT_OF_RANGE"
+    detail = "The requested system time is outside the allowed range."
+
+
+class ClockAutoSyncActive(ApplicationError):
+    status = 409
+    code = "CLOCK_AUTO_SYNC_ACTIVE"
+    detail = "Automatic time synchronization is active."
+
+
+class TimeSyncUnavailable(ApplicationError):
+    status = 503
+    code = "TIME_SYNC_UNAVAILABLE"
+    detail = "Time synchronization is temporarily unavailable."
+
+
 class ValidationFailure(ApplicationError):
     status = 422
     code = "VALIDATION_ERROR"

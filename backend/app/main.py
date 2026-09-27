@@ -3,19 +3,23 @@
 from __future__ import annotations
 
 import logging
+import threading
 from typing import Any
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 
-from app.core.clock import SystemClock
+from app.core.clock import SystemClock, SystemMonotonicClock
 from app.core.config import Settings, get_settings
 from app.core.database import create_api_engine, create_session_factory
 from app.core.logging import configure_logging
 from app.core.middleware import RequestIdMiddleware
 from app.core.problem_details import ProblemBoundaryMiddleware, register_exception_handlers
 from app.modules.schedules.router import router as schedules_router
+from app.modules.system.router import router as system_router
+from app.modules.system.service import resolve_expected_head
+from app.modules.system.time_sync import DisabledTimeSyncAdapter
 
 
 def _install_openapi_contract(application: FastAPI) -> None:
@@ -67,8 +71,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     application.state.settings = resolved
     application.state.clock = SystemClock()
+    application.state.monotonic_clock = SystemMonotonicClock()
     application.state.engine = create_api_engine(resolved)
     application.state.session_factory = create_session_factory(application.state.engine)
+    application.state.expected_alembic_head = resolve_expected_head()
+    application.state.time_sync_lock = threading.Lock()
+    application.state.time_sync_adapter = DisabledTimeSyncAdapter(
+        application.state.clock
+    )
 
     application.add_middleware(ProblemBoundaryMiddleware)
     application.add_middleware(RequestIdMiddleware)
@@ -84,6 +94,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     register_exception_handlers(application)
     application.include_router(schedules_router)
+    application.include_router(system_router)
     _install_openapi_contract(application)
     logging.getLogger(__name__).info(
         "application configured",
