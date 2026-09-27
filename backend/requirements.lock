@@ -4,6 +4,8 @@
 #
 #    pip-compile --extra=dev --index-url=https://pypi.org/simple --output-file=requirements.lock --strip-extras pyproject.toml
 #
+alembic==1.20.0
+    # via schedule-api (pyproject.toml)
 annotated-doc==0.0.5
     # via fastapi
 annotated-types==0.8.0
@@ -36,6 +38,10 @@ idna==3.20
     #   httpx2
 iniconfig==2.3.0
     # via pytest
+mako==1.4.3
+    # via alembic
+markupsafe==3.0.3
+    # via mako
 packaging==26.3
     # via
     #   build
@@ -69,6 +75,10 @@ pytest-cov==7.1.0
     # via schedule-api (pyproject.toml)
 python-dotenv==1.2.3
     # via pydantic-settings
+sqlalchemy==2.0.54
+    # via
+    #   alembic
+    #   schedule-api (pyproject.toml)
 starlette==1.7.0
     # via fastapi
 truststore==0.10.4
@@ -77,11 +87,13 @@ truststore==0.10.4
     #   httpx2
 typing-extensions==4.16.0
     # via
+    #   alembic
     #   anyio
     #   fastapi
     #   httpx2
     #   pydantic
     #   pydantic-core
+    #   sqlalchemy
     #   starlette
     #   typing-inspection
 typing-inspection==0.4.4

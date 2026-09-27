@@ -1,0 +1,78 @@
+"""SQLAlchemy queries for Schedule persistence."""
+
+from __future__ import annotations
+
+from datetime import datetime
+from uuid import UUID
+
+import sqlalchemy as sa
+from sqlalchemy.orm import Session
+
+from app.modules.schedules.category import Category
+from app.modules.schedules.model import Schedule
+
+
+def list_active(
+    session: Session,
+    *,
+    from_utc: datetime,
+    to_utc: datetime,
+    category: Category | None,
+    completed: bool | None,
+) -> list[Schedule]:
+    statement = sa.select(Schedule).where(
+        Schedule.deleted_at.is_(None),
+        Schedule.scheduled_at >= from_utc,
+        Schedule.scheduled_at < to_utc,
+    )
+    if category is not None:
+        statement = statement.where(Schedule.category == category)
+    if completed is not None:
+        statement = statement.where(Schedule.completed == completed)
+    statement = statement.order_by(
+        Schedule.scheduled_at.asc(), Schedule.created_at.asc(), Schedule.id.asc()
+    )
+    return list(session.scalars(statement))
+
+
+def get_active_by_id(session: Session, schedule_id: UUID) -> Schedule | None:
+    return session.scalar(
+        sa.select(Schedule).where(
+            Schedule.id == schedule_id, Schedule.deleted_at.is_(None)
+        )
+    )
+
+
+def get_by_id_including_deleted(session: Session, schedule_id: UUID) -> Schedule | None:
+    return session.get(Schedule, schedule_id)
+
+
+def add_schedule(session: Session, schedule: Schedule) -> None:
+    session.add(schedule)
+
+
+def update_active(
+    session: Session,
+    *,
+    schedule_id: UUID,
+    changes: dict[str, object],
+    updated_at: datetime,
+) -> int:
+    values = {**changes, "updated_at": updated_at}
+    result = session.execute(
+        sa.update(Schedule)
+        .where(Schedule.id == schedule_id, Schedule.deleted_at.is_(None))
+        .values(**values)
+    )
+    return int(result.rowcount or 0)
+
+
+def soft_delete_active(
+    session: Session, *, schedule_id: UUID, deleted_at: datetime
+) -> int:
+    result = session.execute(
+        sa.update(Schedule)
+        .where(Schedule.id == schedule_id, Schedule.deleted_at.is_(None))
+        .values(deleted_at=deleted_at, updated_at=deleted_at)
+    )
+    return int(result.rowcount or 0)
