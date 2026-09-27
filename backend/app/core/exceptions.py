@@ -41,6 +41,12 @@ class DateRangeTooLarge(ApplicationError):
     detail = "The date range cannot exceed 92 days."
 
 
+class IdempotencyKeyConflict(ApplicationError):
+    status = 409
+    code = "IDEMPOTENCY_KEY_CONFLICT"
+    detail = "The idempotency key was already used for a different request."
+
+
 class DatabaseUnavailable(ApplicationError):
     status = 503
     code = "DATABASE_UNAVAILABLE"

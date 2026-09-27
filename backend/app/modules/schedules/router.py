@@ -148,14 +148,25 @@ def list_schedules(
 )
 def create_schedule(
     data: ScheduleCreate,
-    response: Response,
-    _key: Annotated[str, Depends(_idempotency_key)],
+    idempotency_key: Annotated[str, Depends(_idempotency_key)],
     session: Annotated[Session, Depends(get_session)],
     clock: Annotated[SystemClock, Depends(_clock)],
-) -> ScheduleResponse:
-    created = service.create_schedule(session, data=data, clock=clock)
-    response.headers["Location"] = f"/api/v1/schedules/{created.id}"
-    return created
+) -> Response:
+    created = service.create_schedule(
+        session,
+        data=data,
+        idempotency_key=idempotency_key,
+        clock=clock,
+    )
+    headers = {"Location": f"/api/v1/schedules/{created.schedule_id}"}
+    if created.replayed:
+        headers["Idempotent-Replayed"] = "true"
+    return Response(
+        content=created.body_json,
+        status_code=status.HTTP_201_CREATED,
+        media_type="application/json",
+        headers=headers,
+    )
 
 
 @router.get(

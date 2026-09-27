@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Protocol
 from uuid import UUID, uuid4
 
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.core.database import is_database_unavailable
@@ -14,13 +15,15 @@ from app.core.exceptions import (
     DatabaseUnavailable,
     DateRangeTooLarge,
     EmptyUpdate,
+    IdempotencyKeyConflict,
     InvalidDateRange,
     ScheduleInThePast,
     ScheduleNotFound,
 )
 from app.modules.schedules import repository
 from app.modules.schedules.category import Category
-from app.modules.schedules.model import Schedule
+from app.modules.schedules.idempotency import canonical_fingerprint
+from app.modules.schedules.model import IdempotencyRecord, Schedule
 from app.modules.schedules.schemas import (
     ScheduleCreate,
     ScheduleListResponse,
@@ -32,6 +35,17 @@ from app.modules.schedules.schemas import (
 
 class Clock(Protocol):
     def now(self) -> datetime: ...
+
+
+@dataclass(frozen=True)
+class CreateScheduleResult:
+    schedule_id: UUID
+    body_json: str
+    replayed: bool
+
+
+IDEMPOTENCY_SCOPE = "default"
+IDEMPOTENCY_TTL = timedelta(hours=24)
 
 
 def _utc(value: datetime) -> datetime:
@@ -58,6 +72,18 @@ def _translate_db_error(session: Session, exc: BaseException) -> None:
     if is_database_unavailable(exc):
         raise DatabaseUnavailable from exc
     raise exc
+
+
+def _idempotency_result(
+    record: IdempotencyRecord, fingerprint: str
+) -> CreateScheduleResult:
+    if record.fingerprint != fingerprint:
+        raise IdempotencyKeyConflict
+    return CreateScheduleResult(
+        schedule_id=record.schedule_id,
+        body_json=record.response_body,
+        replayed=True,
+    )
 
 
 def list_schedules(
@@ -98,9 +124,26 @@ def get_schedule(session: Session, schedule_id: UUID) -> ScheduleResponse:
 
 
 def create_schedule(
-    session: Session, *, data: ScheduleCreate, clock: Clock
-) -> ScheduleResponse:
+    session: Session,
+    *,
+    data: ScheduleCreate,
+    idempotency_key: str,
+    clock: Clock,
+) -> CreateScheduleResult:
     now = _utc(clock.now())
+    fingerprint = canonical_fingerprint(data)
+    try:
+        existing = repository.find_active_idempotency(
+            session,
+            scope=IDEMPOTENCY_SCOPE,
+            idempotency_key=idempotency_key,
+            now=now,
+        )
+    except SQLAlchemyError as exc:
+        _translate_db_error(session, exc)
+    if existing is not None:
+        return _idempotency_result(existing, fingerprint)
+
     if data.scheduled_at < now:
         raise ScheduleInThePast
     schedule = Schedule(
@@ -115,12 +158,47 @@ def create_schedule(
         deleted_at=None,
     )
     response = _from_model(schedule)
+    body_json = response.model_dump_json(by_alias=True)
+    record = IdempotencyRecord(
+        scope=IDEMPOTENCY_SCOPE,
+        idempotency_key=idempotency_key,
+        fingerprint=fingerprint,
+        schedule_id=schedule.id,
+        response_body=body_json,
+        created_at=now,
+        expires_at=now + IDEMPOTENCY_TTL,
+    )
     try:
+        repository.delete_expired_idempotency(
+            session,
+            scope=IDEMPOTENCY_SCOPE,
+            idempotency_key=idempotency_key,
+            now=now,
+        )
         repository.add_schedule(session, schedule)
+        repository.add_idempotency_record(session, record)
         session.commit()
+    except IntegrityError as exc:
+        session.rollback()
+        try:
+            concurrent = repository.find_active_idempotency(
+                session,
+                scope=IDEMPOTENCY_SCOPE,
+                idempotency_key=idempotency_key,
+                now=now,
+            )
+        except SQLAlchemyError as lookup_exc:
+            _translate_db_error(session, lookup_exc)
+        if concurrent is None:
+            raise exc
+        return _idempotency_result(concurrent, fingerprint)
     except SQLAlchemyError as exc:
         _translate_db_error(session, exc)
-    return response
+    return CreateScheduleResult(
+        schedule_id=schedule.id,
+        body_json=body_json,
+        replayed=False,
+    )
 
 
 def update_schedule(

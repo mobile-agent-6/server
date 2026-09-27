@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest.mock import Mock
 from uuid import uuid4
@@ -57,8 +57,13 @@ def test_create_reuses_one_clock_value_and_does_not_reread(
     clock = Mock()
     clock.now.return_value = NOW
     add = Mock()
+    add_record = Mock()
+    delete_expired = Mock()
     read = Mock()
     monkeypatch.setattr(repository, "add_schedule", add)
+    monkeypatch.setattr(repository, "add_idempotency_record", add_record)
+    monkeypatch.setattr(repository, "delete_expired_idempotency", delete_expired)
+    monkeypatch.setattr(repository, "find_active_idempotency", lambda *args, **kwargs: None)
     monkeypatch.setattr(repository, "get_active_by_id", read)
 
     result = service.create_schedule(
@@ -71,14 +76,26 @@ def test_create_reuses_one_clock_value_and_does_not_reread(
                 "reminderMinutesBefore": None,
             }
         ),
+        idempotency_key="create-key",
         clock=clock,
     )
 
     clock.now.assert_called_once_with()
     add.assert_called_once()
+    add_record.assert_called_once()
+    assert add_record.call_args.args[1].created_at == NOW
+    assert add_record.call_args.args[1].expires_at == NOW + timedelta(hours=24)
+    delete_expired.assert_called_once_with(
+        session,
+        scope="default",
+        idempotency_key="create-key",
+        now=NOW,
+    )
     session.commit.assert_called_once_with()
     read.assert_not_called()
-    assert result.created_at == result.updated_at == NOW
+    assert '"createdAt":"2026-09-13T04:30:00Z"' in result.body_json
+    assert '"updatedAt":"2026-09-13T04:30:00Z"' in result.body_json
+    assert result.replayed is False
 
 
 def test_changed_patch_uses_conditional_row_count_and_commits(

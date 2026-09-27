@@ -9,7 +9,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm import Session
 
 from app.modules.schedules.category import Category
-from app.modules.schedules.model import Schedule
+from app.modules.schedules.model import IdempotencyRecord, Schedule
 
 
 def list_active(
@@ -49,6 +49,45 @@ def get_by_id_including_deleted(session: Session, schedule_id: UUID) -> Schedule
 
 def add_schedule(session: Session, schedule: Schedule) -> None:
     session.add(schedule)
+
+
+def find_active_idempotency(
+    session: Session,
+    *,
+    scope: str,
+    idempotency_key: str,
+    now: datetime,
+) -> IdempotencyRecord | None:
+    return session.scalar(
+        sa.select(IdempotencyRecord).where(
+            IdempotencyRecord.scope == scope,
+            IdempotencyRecord.idempotency_key == idempotency_key,
+            IdempotencyRecord.expires_at > now,
+        )
+    )
+
+
+def delete_expired_idempotency(
+    session: Session,
+    *,
+    scope: str,
+    idempotency_key: str,
+    now: datetime,
+) -> int:
+    result = session.execute(
+        sa.delete(IdempotencyRecord).where(
+            IdempotencyRecord.scope == scope,
+            IdempotencyRecord.idempotency_key == idempotency_key,
+            IdempotencyRecord.expires_at <= now,
+        )
+    )
+    return int(result.rowcount or 0)
+
+
+def add_idempotency_record(
+    session: Session, record: IdempotencyRecord
+) -> None:
+    session.add(record)
 
 
 def update_active(
