@@ -270,6 +270,22 @@ def test_body_content_and_validation_contract(client: TestClient) -> None:
     assert wrong_reminder_type.json()["errors"][0]["code"] == "INVALID_TYPE"
 
 
+def test_non_utf8_json_body_is_malformed_request(client: TestClient) -> None:
+    response = client.post(
+        "/api/v1/schedules",
+        content=b'{"title":"\xff"}',
+        headers={"Content-Type": "application/json", "Idempotency-Key": "key"},
+    )
+
+    assert response.status_code == 400
+    assert response.headers["content-type"].startswith("application/problem+json")
+    assert response.json()["status"] == 400
+    assert response.json()["code"] == "MALFORMED_REQUEST"
+    assert response.json()["title"] == "Malformed request"
+    assert "errors" not in response.json()
+    assert_request_id(response)
+
+
 def test_patch_empty_null_past_and_not_found_rules(client: TestClient) -> None:
     schedule_id = create_schedule(client).json()["id"]
     empty = client.patch(f"/api/v1/schedules/{schedule_id}", json={})

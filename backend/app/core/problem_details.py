@@ -230,6 +230,13 @@ async def request_validation_handler(
 
 
 async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> Response:
+    if exc.status_code == 400:
+        return problem_response(
+            request,
+            status=400,
+            code="MALFORMED_REQUEST",
+            detail="The JSON request body is malformed.",
+        )
     if exc.status_code == 404:
         return problem_response(
             request,
