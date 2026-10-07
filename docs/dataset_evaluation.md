@@ -24,7 +24,7 @@
 | --- | --- |
 | 모델 지정값 | `qwen3:4b` |
 | 모델 호출 | 로컬 Ollama의 `http://localhost:11434/api/generate` |
-| 실행 코드 | `qwen_batch_test_100_scored.py` |
+| 실행 코드 | [`datasets/qwen/v0.1_initial/qwen_batch_test_100_scored.py`](../datasets/qwen/v0.1_initial/qwen_batch_test_100_scored.py) |
 | 구현 언어 | Python |
 | 상대 날짜 기준 | `2026-09-25` |
 | 출력 설정 | `format="json"`, `think=false`, `stream=false` |
@@ -153,9 +153,9 @@
 
 | 파일 | 용도 |
 | --- | --- |
-| `qwen_batch_test_100_scored.py` | 100개 문항·정답, 모델 호출, 채점 및 저장 코드 |
-| `qwen_100_scored_results.csv` | 사용자 발화, 예상 정답, 모델 응답 원문 및 개별 판정 |
-| `qwen_100_scored_summary.csv` | 전체 실행 결과와 항목별 일치 수 |
+| [`qwen_batch_test_100_scored.py`](../datasets/qwen/v0.1_initial/qwen_batch_test_100_scored.py) | 100개 문항·정답, 모델 호출, 채점 및 저장 코드 |
+| [`qwen_100_scored_results.csv`](../datasets/qwen/v0.1_initial/qwen_100_scored_results.csv) | 사용자 발화, 예상 정답, 모델 응답 원문 및 개별 판정 |
+| [`qwen_100_scored_summary.csv`](../datasets/qwen/v0.1_initial/qwen_100_scored_summary.csv) | 전체 및 필드별 집계 |
 | `api.md` 3.1절·16절 | 확정된 백엔드 카테고리와 미확정 AI 연동 사항 |
 | `erd.md` 1절·6절 | DB 직접 접근 제한과 Schedule DB의 저장 범위 |
 | `TEAM_GUIDELINES.md` 1절·4절·6절·8절 | 결정 상태, 공유 인터페이스 변경 원칙 및 미확정 운영 사항 |

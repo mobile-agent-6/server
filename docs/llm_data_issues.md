@@ -27,9 +27,9 @@
 | --- | --- |
 | 학습데이터·검증데이터·라벨규칙 자료 | 출력 예시, 기능 유형, 날짜 표현, 분류 및 재질문 규칙 |
 | `물류창고_음성일정_LLM_학습_검증데이터_v0.1.xlsx.inspect.ndjson` | 학습 60건·검증 20건과 규칙의 추출 내용 |
-| `qwen_batch_test_100_scored.py` | 평가 문항 100건, 정답, 프롬프트, 채점 방식 |
-| `qwen_100_scored_results.csv` | 100건 응답 원문과 개별 채점 결과 |
-| `qwen_100_scored_summary.csv` | 전체 및 필드별 집계 |
+| [`qwen_batch_test_100_scored.py`](../datasets/qwen/v0.1_initial/qwen_batch_test_100_scored.py) | 평가 문항 100건, 정답, 프롬프트, 채점 방식 |
+| [`qwen_100_scored_results.csv`](../datasets/qwen/v0.1_initial/qwen_100_scored_results.csv) | 100건 응답 원문과 개별 채점 결과 |
+| [`qwen_100_scored_summary.csv`](../datasets/qwen/v0.1_initial/qwen_100_scored_summary.csv) | 전체 및 필드별 집계 |
 | 수행계획서·`api.md` | 프로젝트 카테고리, 기능 범위, AI 연동 미확정 사항 |
 | `TEAM_GUIDELINES.md` 1절·4절·6절·8절 | 제안·확정 구분, 공유 인터페이스 및 미확정 운영 사항 |
 
@@ -85,7 +85,7 @@
 
 ## 4. 모델 응답에서 관찰한 오류
 
-아래 번호는 `qwen_100_scored_results.csv`의 번호다. 정답은 현재 평가 코드의 기준을 따른다.
+아래 번호는 [`qwen_100_scored_results.csv`](../datasets/qwen/v0.1_initial/qwen_100_scored_results.csv)의 번호다. 정답은 초기 평가 코드의 기준을 따른다.
 
 | 번호 | 사용자 발화 | 정답과 실제 출력의 차이 | 관찰 내용 |
 | --- | --- | --- | --- |
