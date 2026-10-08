@@ -2,6 +2,7 @@
 
 import csv
 import json
+import time
 import urllib.request
 
 MODEL = "qwen3:4b"
@@ -150,15 +151,42 @@ def normalize(value):
     return value.strip() if isinstance(value, str) else value
 
 
-def ask_qwen(sentence):
+# CSV 열 이름과 Ollama 응답 필드. duration의 단위는 나노초이다.
+METRIC_FIELDS = (
+    "요청 소요 시간(초)", "모델 로딩 시간(초)",
+    "입력 토큰 수", "출력 토큰 수", "답변 생성 시간(초)",
+)
+
+
+def ask_qwen(sentence, metrics=None):
+    if metrics is None:
+        metrics = {}
+    metrics.update(dict.fromkeys(METRIC_FIELDS))
     payload = json.dumps({
         "model": MODEL, "prompt": make_prompt(sentence), "format": "json",
         "think": False, "stream": False,
     }).encode("utf-8")
     request = urllib.request.Request("http://localhost:11434/api/generate", data=payload,
                                      headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(request, timeout=300) as response:
-        body = json.loads(response.read().decode("utf-8"))
+    # 요청 직전부터 응답 본문 전체 수신까지 측정한다. 채점/JSON 파싱은 제외한다.
+    started = time.perf_counter()
+    try:
+        with urllib.request.urlopen(request, timeout=300) as response:
+            response_bytes = response.read()
+    finally:
+        # 연결 오류나 타임아웃도 실제 경과 시간은 남긴다.
+        metrics["요청 소요 시간(초)"] = time.perf_counter() - started
+    body = json.loads(response_bytes.decode("utf-8"))
+    for column, key, divisor in (
+        ("모델 로딩 시간(초)", "load_duration", 1_000_000_000),
+        ("입력 토큰 수", "prompt_eval_count", 1),
+        ("출력 토큰 수", "eval_count", 1),
+        ("답변 생성 시간(초)", "eval_duration", 1_000_000_000),
+    ):
+        value = body.get(key)
+        # 누락된 측정값을 0으로 꾸미지 않는다. 실제 0은 유효한 값이다.
+        if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+            metrics[column] = value if divisor == 1 else value / divisor
     raw = body.get("response", "").strip()
     if not raw:
         raise ValueError("Qwen이 빈 답을 반환했습니다.")
@@ -172,8 +200,9 @@ def main():
         sentence, *expected_values = test
         expected = dict(zip(fields, expected_values))
         print(f"[{number}/{len(TESTS)}] 테스트 중: {sentence}")
+        metrics = dict.fromkeys(METRIC_FIELDS)
         try:
-            raw, result = ask_qwen(sentence)
+            raw, result = ask_qwen(sentence, metrics)
             actual = {field: normalize(result.get(field)) for field in fields}
             correct = sum(actual[field] == expected[field] for field in fields)
             judgment = "정답" if correct == 6 else "부분 정답" if correct else "오답"
@@ -190,6 +219,7 @@ def main():
             "Qwen location": actual["location"], "Qwen category": actual["category"],
             "Qwen content": actual["content"], "자동 판정": judgment,
             "일치 항목 수": f"{correct}/6",
+            **metrics,
         })
 
     with open(OUTPUT_FILE, "w", newline="", encoding="utf-8-sig") as file:
@@ -211,6 +241,9 @@ def main():
             normalize(row[f"Qwen {field}"]) == normalize(row[f"정답 {field}"])
             for row in rows if row["자동 판정"] != "실행 실패"
         )))
+    for column in METRIC_FIELDS:
+        values = [row[column] for row in rows if row[column] is not None]
+        summary.append((f"평균 {column}", sum(values) / len(values) if values else None))
     with open(SUMMARY_FILE, "w", newline="", encoding="utf-8-sig") as file:
         writer = csv.writer(file)
         writer.writerow(["지표", "값"])
