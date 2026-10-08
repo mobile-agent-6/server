@@ -37,6 +37,13 @@ def test_migration_upgrade_downgrade_upgrade_and_schema_contract(tmp_path: Path)
     )
     checks = inspector.get_check_constraints("schedules")
     assert [check["name"] for check in checks] == ["ck_schedules_category"]
+    check_sql = checks[0]["sqltext"]
+    assert check_sql is not None
+    for category in ("INBOUND", "INVENTORY", "OUTBOUND", "RETURN", "OTHER"):
+        assert category in check_sql
+    assert "MEETING" not in check_sql
+    assert "PERSONAL" not in check_sql
+    assert "PICKING" not in check_sql
     indexes = {index["name"]: index["column_names"] for index in inspector.get_indexes("schedules")}
     assert indexes["ix_schedules_active_time"] == [
         "deleted_at",
@@ -85,6 +92,15 @@ def test_metadata_has_same_business_tables_columns_and_indexes(database_path: Pa
         for constraint in Base.metadata.tables["schedules"].constraints
         if isinstance(constraint, sa.CheckConstraint)
     }
+    category_type = Base.metadata.tables["schedules"].c.category.type
+    assert isinstance(category_type, sa.Enum)
+    assert category_type.enums == [
+        "INBOUND",
+        "INVENTORY",
+        "OUTBOUND",
+        "RETURN",
+        "OTHER",
+    ]
 
 
 @pytest.mark.integration
@@ -141,7 +157,7 @@ def test_uuid_v4_and_utc_datetime_round_trip(database_path: Path) -> None:
                 id=identifier,
                 title="회의",
                 scheduled_at=instant,
-                category=Category.MEETING,
+                category=Category.OUTBOUND,
                 completed=False,
                 reminder_minutes_before=None,
                 created_at=instant,
@@ -170,7 +186,7 @@ def test_utc_datetime_rejects_naive_values(database_path: Path) -> None:
                 id=uuid4(),
                 title="회의",
                 scheduled_at=datetime(2026, 9, 13, 4, 45),
-                category=Category.MEETING,
+                category=Category.OUTBOUND,
                 completed=False,
                 reminder_minutes_before=None,
                 created_at=datetime.now(timezone.utc),
@@ -209,7 +225,7 @@ def test_database_constraints_and_boolean_default(database_path: Path) -> None:
             "INSERT INTO schedules "
             "(id, title, scheduled_at, category, reminder_minutes_before, created_at, updated_at) "
             "VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (identifier, "회의", instant, "MEETING", None, instant, instant),
+            (identifier, "출고", instant, "OUTBOUND", None, instant, instant),
         )
         assert connection.exec_driver_sql(
             "SELECT completed FROM schedules WHERE id = ?", (identifier,)
@@ -221,6 +237,14 @@ def test_database_constraints_and_boolean_default(database_path: Path) -> None:
                 "VALUES (?, ?, ?, ?, ?, ?)",
                 (uuid4().hex, "오류", instant, "INVALID", instant, instant),
             )
+        for removed in ("MEETING", "PERSONAL", "PICKING"):
+            with pytest.raises(sa.exc.IntegrityError):
+                connection.exec_driver_sql(
+                    "INSERT INTO schedules "
+                    "(id, title, scheduled_at, category, created_at, updated_at) "
+                    "VALUES (?, ?, ?, ?, ?, ?)",
+                    (uuid4().hex, "제거 값", instant, removed, instant, instant),
+                )
 
     with engine.begin() as connection:
         values = (

@@ -86,15 +86,22 @@ YYYY-MM-DDTHH:MM:SS[.fraction](Z|±HH:MM)
 
 ### 3.1 Category
 
-| 화면 표시 | API 값 |
-|---|---|
-| 재고 | `INVENTORY` |
-| 반품 | `RETURN` |
-| 회의 | `MEETING` |
-| 개인 | `PERSONAL` |
-| 기타 | `OTHER` |
+MVP 카테고리는 입고, 재고, 출고, 반품, 기타 5개이며 API 값은 아래 표를
+따른다(`BE-FE-AGREED`).
 
-API에는 위 대문자 enum만 전송한다.
+| 화면 표시 | API 값 | 포함할 일정의 대표 예시 |
+|---|---|---|
+| 입고 | `INBOUND` | 들어오는 상품 확인 등 입고 관련 업무 |
+| 재고 | `INVENTORY` | 재고 실사, 재확인, 부족 수량 확인, 재고 위치 확인 |
+| 출고 | `OUTBOUND` | 상품 피킹, 포장, 출고 전 검수, 송장 확인, 출고 준비 |
+| 반품 | `RETURN` | 반품 상품 확인, 검수, 분류와 처리 |
+| 기타 | `OTHER` | 교대 인수인계, 팀 회의, 안전·장비 점검 등 그 밖의 일정 |
+
+- 생성과 수정의 `category`, 목록 조회의 `category` 필터에는 위 대문자 enum만 전송한다. 응답의 `category`도 같은 5개 값을 사용한다.
+- `MEETING`, `PERSONAL`, `PICKING`, 소문자와 한글 값은 허용하지 않는다. 요청하면 `422 VALIDATION_ERROR`의 `INVALID_ENUM`으로 거절한다.
+- 대표 예시는 카테고리의 의미를 설명하며, 허용하는 일정 제목을 예시 목록으로 제한하지 않는다. 모델의 상세 업무 분류 규칙은 AI와 데이터 담당 영역에서 정리한다.
+- 표의 행 순서는 프론트의 화면 표시 순서를 강제하지 않는다.
+- MVP 이후 필요에 따라 관련 담당자와 협의해 카테고리를 추가할 수 있다. 추가가 확정되면 API 문서와 관련 구현을 함께 갱신한다.
 
 ### 3.2 Schedule 응답
 
@@ -103,7 +110,7 @@ API에는 위 대문자 enum만 전송한다.
 | `id` | UUID v4 string | 아니요 | 서버 생성 |
 | `title` | string | 아니요 | trim 후 1~100자 |
 | `scheduledAt` | datetime string | 아니요 | 일정 시각 |
-| `category` | Category | 아니요 | 다섯 enum 중 하나 |
+| `category` | Category | 아니요 | 위 5개 enum 중 하나 |
 | `completed` | boolean | 아니요 | 완료 여부 |
 | `reminderMinutesBefore` | integer | 예 | `10` 또는 `null` |
 | `reminderAt` | datetime string | 예 | 서버가 계산한 알림 시각 |
@@ -286,7 +293,7 @@ Content-Type: application/json
 | `completed` | 아니요 | boolean | 완료 여부 필터 |
 
 ```http
-GET /api/v1/schedules?from=2026-09-01T00:00:00%2B09:00&to=2026-10-01T00:00:00%2B09:00&category=MEETING&completed=false
+GET /api/v1/schedules?from=2026-09-01T00:00:00%2B09:00&to=2026-10-01T00:00:00%2B09:00&category=OUTBOUND&completed=false
 ```
 
 규칙:
@@ -429,6 +436,10 @@ X-Request-ID: {재시도 요청의 새 ID}
 - replay 본문은 최초 생성 당시의 Schedule snapshot이다.
 - 같은 key에 다른 생성 요청을 보내면 `409 IDEMPOTENCY_KEY_CONFLICT`다.
 - 성공한 `201` 기록은 24시간 유지한다.
+- 카테고리 전환 전 `MEETING`, `PERSONAL`, `PICKING` payload로 생성된 기존
+  기록의 snapshot, fingerprint와 만료 시각은 변경하지 않는다. 해당
+  이전 payload를 다시 요청하면 replay하지 않고 category 검증에서
+  `422 VALIDATION_ERROR`의 `INVALID_ENUM`으로 거절한다.
 
 ## 13. 오류 응답
 
@@ -450,7 +461,7 @@ X-Request-ID: {재시도 요청의 새 ID}
       "location": "body",
       "pointer": "/category",
       "code": "INVALID_ENUM",
-      "detail": "Allowed: INVENTORY, RETURN, MEETING, PERSONAL, OTHER"
+      "detail": "Allowed: INBOUND, INVENTORY, OUTBOUND, RETURN, OTHER"
     }
   ]
 }

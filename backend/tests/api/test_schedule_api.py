@@ -117,14 +117,14 @@ def test_list_filters_range_boundaries_and_stable_order(client: TestClient) -> N
         client,
         title="B",
         scheduledAt="2026-09-14T00:00:00Z",
-        category="MEETING",
+        category="INBOUND",
         reminderMinutesBefore=None,
     ).json()
     second = create_schedule(
         client,
         title="A",
         scheduledAt="2026-09-14T00:00:00Z",
-        category="PERSONAL",
+        category="RETURN",
         reminderMinutesBefore=None,
     ).json()
     at_to = create_schedule(
@@ -148,11 +148,54 @@ def test_list_filters_range_boundaries_and_stable_order(client: TestClient) -> N
         params={
             "from": "2026-09-14T00:00:00Z",
             "to": "2026-09-15T00:00:00Z",
-            "category": "PERSONAL",
+            "category": "RETURN",
             "completed": "false",
         },
     )
     assert [item["id"] for item in filtered.json()["items"]] == [second["id"]]
+
+
+def test_all_five_categories_create_get_patch_and_filter(client: TestClient) -> None:
+    categories = ("INBOUND", "INVENTORY", "OUTBOUND", "RETURN", "OTHER")
+    created: dict[str, dict[str, object]] = {}
+    for index, category in enumerate(categories):
+        response = create_schedule(
+            client,
+            title=f"{category} 일정",
+            scheduledAt=f"2026-09-13T0{index + 5}:00:00Z",
+            category=category,
+            reminderMinutesBefore=None,
+        )
+        assert response.status_code == 201
+        assert response.json()["category"] == category
+        created[category] = response.json()
+        fetched = client.get(f"/api/v1/schedules/{response.json()['id']}")
+        assert fetched.status_code == 200
+        assert fetched.json()["category"] == category
+
+    for category in categories:
+        listed = client.get(
+            "/api/v1/schedules",
+            params={
+                "from": "2026-09-13T04:30:00Z",
+                "to": "2026-09-14T04:30:00Z",
+                "category": category,
+            },
+        )
+        assert listed.status_code == 200
+        assert [item["id"] for item in listed.json()["items"]] == [
+            created[category]["id"]
+        ]
+
+    for current, updated_category in zip(
+        categories, categories[1:] + categories[:1], strict=True
+    ):
+        updated = client.patch(
+            f"/api/v1/schedules/{created[current]['id']}",
+            json={"category": updated_category},
+        )
+        assert updated.status_code == 200
+        assert updated.json()["category"] == updated_category
 
 
 @pytest.mark.parametrize(
@@ -268,6 +311,46 @@ def test_body_content_and_validation_contract(client: TestClient) -> None:
     wrong_reminder_type = create_schedule(client, reminderMinutesBefore="10")
     assert wrong_reminder_type.status_code == 422
     assert wrong_reminder_type.json()["errors"][0]["code"] == "INVALID_TYPE"
+
+
+@pytest.mark.parametrize(
+    "category", ["MEETING", "PERSONAL", "PICKING", "inventory", "입고"]
+)
+def test_removed_and_noncanonical_categories_are_rejected(
+    client: TestClient, category: str
+) -> None:
+    response = create_schedule(client, category=category)
+
+    assert response.status_code == 422
+    assert response.json()["code"] == "VALIDATION_ERROR"
+    assert response.json()["errors"][0]["pointer"] == "/category"
+    assert response.json()["errors"][0]["code"] == "INVALID_ENUM"
+
+
+@pytest.mark.parametrize(
+    "category", ["MEETING", "PERSONAL", "PICKING", "outbound", "출고"]
+)
+def test_patch_and_list_reject_removed_and_noncanonical_categories(
+    client: TestClient, category: str
+) -> None:
+    schedule_id = create_schedule(client).json()["id"]
+
+    updated = client.patch(
+        f"/api/v1/schedules/{schedule_id}", json={"category": category}
+    )
+    listed = client.get(
+        "/api/v1/schedules",
+        params={
+            "from": "2026-09-13T04:30:00Z",
+            "to": "2026-09-14T04:30:00Z",
+            "category": category,
+        },
+    )
+
+    for response in (updated, listed):
+        assert response.status_code == 422
+        assert response.json()["code"] == "VALIDATION_ERROR"
+        assert response.json()["errors"][0]["code"] == "INVALID_ENUM"
 
 
 def test_non_utf8_json_body_is_malformed_request(client: TestClient) -> None:

@@ -4,8 +4,8 @@ from enum import Enum
 
 
 class Category(str, Enum):
+    INBOUND = "INBOUND"
     INVENTORY = "INVENTORY"
+    OUTBOUND = "OUTBOUND"
     RETURN = "RETURN"
-    MEETING = "MEETING"
-    PERSONAL = "PERSONAL"
     OTHER = "OTHER"

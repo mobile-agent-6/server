@@ -60,11 +60,17 @@ erDiagram
 ### 제약
 
 - 기본키 `pk_schedules`: `id`
-- CHECK `ck_schedules_category`: `INVENTORY`, `RETURN`, `MEETING`, `PERSONAL`, `OTHER`
+- CHECK `ck_schedules_category`: `INBOUND`, `INVENTORY`, `OUTBOUND`, `RETURN`, `OTHER`
 - `deleted_at`, `reminder_minutes_before`만 nullable
 - 동일한 제목과 일정 시각을 가진 일정의 중복 저장 허용
 - 과거 일정 판단, 제목 검증과 reminder 값 검증은 API Schema·Service가 담당
 - Pi 시각이 뒤로 이동할 수 있으므로 `updated_at >= created_at` 같은 시각 순서 CHECK는 두지 않음
+
+기존 `20260927_0001` DB를 새 카테고리 revision으로 올릴 때는 확인된
+`MEETING` 일정 ID를 migration 입력으로 명시한 경우에만 해당 행의 `category`를
+`OTHER`로 변경한다. `PERSONAL`, `PICKING`, 확인되지 않은 `MEETING` 또는 예상하지
+못한 값이 있으면 migration은 제약 교체 전에 중단한다. 일정의 나머지 컬럼,
+인덱스와 `idempotency_records`는 변경하지 않는다.
 
 ### Soft delete
 

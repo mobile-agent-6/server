@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import sqlite3
 from datetime import timedelta
+from uuid import uuid4
 
 import pytest
 import sqlalchemy as sa
@@ -53,6 +54,56 @@ def test_replay_is_byte_exact_and_survives_patch_delete(client: TestClient) -> N
     assert after_delete.headers["Location"] == first.headers["Location"]
     assert after_delete.headers["Idempotent-Replayed"] == "true"
     assert counts(client) == (1, 1)
+
+
+def test_outbound_request_replays_without_fingerprint_version_change(
+    client: TestClient,
+) -> None:
+    key = "outbound-snapshot-key"
+    first = create_schedule(client, key=key, category="OUTBOUND", title="출고 준비")
+    replay = create_schedule(client, key=key, category="OUTBOUND", title="출고 준비")
+
+    assert first.status_code == replay.status_code == 201
+    assert replay.content == first.content
+    assert replay.headers["Idempotent-Replayed"] == "true"
+    with Session(client.app.state.engine) as session:
+        record = session.get(IdempotencyRecord, ("default", key))
+        assert record is not None
+        assert record.response_body.encode() == first.content
+
+
+@pytest.mark.parametrize("legacy_category", ["MEETING", "PERSONAL", "PICKING"])
+def test_removed_category_cannot_replay_legacy_snapshot(
+    client: TestClient, legacy_category: str
+) -> None:
+    key = f"legacy-{legacy_category.lower()}-key"
+    schedule_id = uuid4()
+    snapshot = f'{{"id":"{schedule_id}","category":"{legacy_category}"}}'
+    created_at = client.app.state.clock.now()
+    with Session(client.app.state.engine) as session:
+        session.add(
+            IdempotencyRecord(
+                scope="default",
+                idempotency_key=key,
+                fingerprint="b" * 64,
+                schedule_id=schedule_id,
+                response_body=snapshot,
+                created_at=created_at,
+                expires_at=created_at + timedelta(hours=24),
+            )
+        )
+        session.commit()
+
+    response = create_schedule(client, key=key, category=legacy_category)
+
+    assert response.status_code == 422
+    assert response.json()["errors"][0]["code"] == "INVALID_ENUM"
+    with Session(client.app.state.engine) as session:
+        record = session.get(IdempotencyRecord, ("default", key))
+        assert record is not None
+        assert record.fingerprint == "b" * 64
+        assert record.response_body == snapshot
+        assert record.expires_at == created_at + timedelta(hours=24)
 
 
 def test_replay_precedes_business_rule_but_not_body_validation(

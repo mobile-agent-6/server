@@ -20,7 +20,7 @@ def schedule(**overrides: object) -> SimpleNamespace:
         "id": uuid4(),
         "title": "회의",
         "scheduled_at": datetime(2026, 9, 13, 4, 45, tzinfo=timezone.utc),
-        "category": Category.MEETING,
+        "category": Category.OTHER,
         "completed": False,
         "reminder_minutes_before": 10,
         "created_at": NOW,
@@ -72,7 +72,7 @@ def test_create_reuses_one_clock_value_and_does_not_reread(
             {
                 "title": "회의",
                 "scheduledAt": "2026-09-13T04:45:00Z",
-                "category": "MEETING",
+                "category": "OUTBOUND",
                 "reminderMinutesBefore": None,
             }
         ),
