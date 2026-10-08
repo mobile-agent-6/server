@@ -32,6 +32,20 @@ def test_create_normalizes_title_datetime_and_category() -> None:
     assert schema.category is Category.INVENTORY
 
 
+@pytest.mark.parametrize("category", list(Category))
+def test_create_accepts_each_confirmed_category(category: Category) -> None:
+    schema = ScheduleCreate.model_validate(valid_create(category=category.value))
+
+    assert schema.category is category
+
+
+@pytest.mark.parametrize(
+    "category", ["MEETING", "PERSONAL", "PICKING", "inbound", "입고"]
+)
+def test_create_rejects_removed_and_noncanonical_categories(category: str) -> None:
+    assert error_type(valid_create(category=category)) == "enum"
+
+
 @pytest.mark.parametrize("title", ["a\n", "\t제목", "제\x00목"])
 def test_title_rejects_control_characters_before_trimming(title: str) -> None:
     assert error_type(valid_create(title=title)) == "control_character"

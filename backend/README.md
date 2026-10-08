@@ -26,6 +26,35 @@ python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 - 상태 확인: <http://127.0.0.1:8000/health>
 - Swagger UI: <http://127.0.0.1:8000/docs>
 
+## 카테고리 migration 적용
+
+`20261008_0002`는 카테고리 CHECK를 `INBOUND`, `INVENTORY`, `OUTBOUND`, `RETURN`,
+`OTHER`로 교체한다. 실제 DB에는 다음 순서로 적용한다.
+
+1. 서비스를 중지하고 대상 DB 경로와 현재 revision을 확인한다.
+2. SQLite online backup을 만들고 `integrity_check`와 revision을 검증한다.
+3. 기존 `schedules`의 카테고리와 ID를 확인한다.
+4. `PERSONAL`, `PICKING`, 확인되지 않은 `MEETING` 또는 예상하지 못한 값이 있으면
+   적용하지 않는다.
+5. 기존 `MEETING`이 없으면 `python -m alembic upgrade head`를 실행한다.
+6. 변환이 승인된 `MEETING`만 있고 그 ID가 모두 확인됐으면 쉼표로 연결한 정확한
+   ID 전체를 `CONFIRMED_MEETING_IDS`에 넣어 전달한다.
+
+```bash
+python -m alembic -x "confirmed_meeting_ids=${CONFIRMED_MEETING_IDS}" upgrade head
+```
+
+migration은 전달한 ID 집합이 DB의 기존 `MEETING` ID 집합과 정확히 같을 때만
+해당 행의 카테고리를 `OTHER`로 바꾼다. 일정의 다른 필드, soft-delete 행,
+인덱스와 멱등성 기록은 보존한다. 적용 후 `/health`, 카테고리별 CRUD와
+`alembic current`를 확인한다.
+
+`MEETING`에서 변환된 `OTHER`는 원래 값으로 자동 복원할 수 없다. `INBOUND` 또는
+`OUTBOUND` 행이 있으면 이전 revision으로 downgrade하지 않으며, migration 전
+검증 backup 복구를 기본 복구 방법으로 사용한다. 두 새 카테고리가 없어 schema
+downgrade가 가능하더라도 변환된 `OTHER`는 그대로 남는다. 구버전 코드는 새
+CHECK와 호환되지 않으므로 구버전 코드만 다시 배포하지 않는다.
+
 ## 모바일 앱 연결
 
 - iOS Simulator: 일반적으로 `http://127.0.0.1:8000`

@@ -22,7 +22,7 @@ def create_data(**overrides: object) -> ScheduleCreate:
     payload: dict[str, object] = {
         "title": "회의",
         "scheduledAt": "2026-09-13T04:45:00Z",
-        "category": "MEETING",
+        "category": "OUTBOUND",
         "reminderMinutesBefore": None,
     }
     payload.update(overrides)

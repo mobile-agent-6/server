@@ -42,10 +42,10 @@ def test_complete_openapi_contract(client: TestClient) -> None:
     assert "HTTPValidationError" not in components
     assert "ValidationError" not in components
     assert components["Category"]["enum"] == [
+        "INBOUND",
         "INVENTORY",
+        "OUTBOUND",
         "RETURN",
-        "MEETING",
-        "PERSONAL",
         "OTHER",
     ]
     assert components["ScheduleCreate"]["additionalProperties"] is False

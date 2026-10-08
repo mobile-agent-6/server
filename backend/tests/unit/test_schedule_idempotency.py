@@ -13,7 +13,7 @@ def create_data(**overrides: object) -> ScheduleCreate:
     payload: dict[str, object] = {
         "title": "회의",
         "scheduledAt": "2026-09-13T04:45:00Z",
-        "category": "MEETING",
+        "category": "OUTBOUND",
         "reminderMinutesBefore": None,
     }
     payload.update(overrides)
@@ -36,7 +36,7 @@ def test_fingerprint_includes_each_normalized_payload_field() -> None:
     variants = (
         create_data(title="다른 회의"),
         create_data(scheduledAt="2026-09-13T04:45:01Z"),
-        create_data(category="PERSONAL"),
+        create_data(category="RETURN"),
         create_data(reminderMinutesBefore=10),
     )
 
@@ -52,6 +52,7 @@ def test_fingerprint_includes_version_method_and_canonical_route() -> None:
     assert canonical_fingerprint(data, route="/api/v2/schedules") != original
     assert CREATE_METHOD == "POST"
     assert CREATE_ROUTE == "/api/v1/schedules"
+    assert FINGERPRINT_VERSION == 1
 
 
 def test_fingerprint_is_independent_of_json_layout_and_request_headers() -> None:
