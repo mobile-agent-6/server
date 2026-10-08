@@ -86,15 +86,20 @@ YYYY-MM-DDTHH:MM:SS[.fraction](Z|±HH:MM)
 
 ### 3.1 Category
 
-| 화면 표시 | API 값 |
-|---|---|
-| 재고 | `INVENTORY` |
-| 반품 | `RETURN` |
-| 회의 | `MEETING` |
-| 개인 | `PERSONAL` |
-| 기타 | `OTHER` |
+MVP 카테고리는 재고, 피킹, 반품, 기타 4개로 확정한다(`TEAM-CONFIRMED`). API 값은 아래 표를 따른다(`BE-CONFIRMED`).
 
-API에는 위 대문자 enum만 전송한다.
+| 화면 표시 | API 값 | 포함할 일정의 대표 예시 |
+|---|---|---|
+| 재고 | `INVENTORY` | 재고 실사, 재확인, 부족 수량 확인 |
+| 피킹 | `PICKING` | 주문 상품 피킹, 피킹 목록 확인 |
+| 반품 | `RETURN` | 반품 상품 확인, 검수 |
+| 기타 | `OTHER` | 재고, 피킹, 반품 분류에 해당하지 않는 일정 |
+
+- 생성과 수정의 `category`, 목록 조회의 `category` 필터에는 위 대문자 enum만 전송한다. 응답의 `category`도 같은 4개 값을 사용한다.
+- `MEETING`, `PERSONAL`, 소문자와 한글 값은 허용하지 않는다. 요청하면 `422 VALIDATION_ERROR`의 `INVALID_ENUM`으로 거절한다.
+- 대표 예시는 카테고리의 의미를 설명하며, 허용하는 일정 제목을 예시 목록으로 제한하지 않는다. 모델의 상세 업무 분류 규칙은 AI와 데이터 담당 영역에서 정리한다.
+- 표의 행 순서는 프론트의 화면 표시 순서를 강제하지 않는다.
+- MVP 이후 필요에 따라 관련 담당자와 협의해 카테고리를 추가할 수 있다. 추가가 확정되면 API 문서와 관련 구현을 함께 갱신한다.
 
 ### 3.2 Schedule 응답
 
@@ -103,7 +108,7 @@ API에는 위 대문자 enum만 전송한다.
 | `id` | UUID v4 string | 아니요 | 서버 생성 |
 | `title` | string | 아니요 | trim 후 1~100자 |
 | `scheduledAt` | datetime string | 아니요 | 일정 시각 |
-| `category` | Category | 아니요 | 다섯 enum 중 하나 |
+| `category` | Category | 아니요 | 위 4개 enum 중 하나 |
 | `completed` | boolean | 아니요 | 완료 여부 |
 | `reminderMinutesBefore` | integer | 예 | `10` 또는 `null` |
 | `reminderAt` | datetime string | 예 | 서버가 계산한 알림 시각 |
@@ -286,7 +291,7 @@ Content-Type: application/json
 | `completed` | 아니요 | boolean | 완료 여부 필터 |
 
 ```http
-GET /api/v1/schedules?from=2026-09-01T00:00:00%2B09:00&to=2026-10-01T00:00:00%2B09:00&category=MEETING&completed=false
+GET /api/v1/schedules?from=2026-09-01T00:00:00%2B09:00&to=2026-10-01T00:00:00%2B09:00&category=PICKING&completed=false
 ```
 
 규칙:
@@ -450,7 +455,7 @@ X-Request-ID: {재시도 요청의 새 ID}
       "location": "body",
       "pointer": "/category",
       "code": "INVALID_ENUM",
-      "detail": "Allowed: INVENTORY, RETURN, MEETING, PERSONAL, OTHER"
+      "detail": "Allowed: INVENTORY, PICKING, RETURN, OTHER"
     }
   ]
 }
