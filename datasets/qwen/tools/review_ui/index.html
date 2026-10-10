@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Qwen 멀티턴 시범 검토</title>
+  <style>
+    :root { font-family: system-ui, sans-serif; color: #192b39; background: #f3f6f7; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    header { background: #123648; color: white; padding: 20px 28px; }
+    header h1 { margin: 0 0 6px; font-size: 21px; }
+    header p { margin: 0; color: #d6e5ec; font-size: 13px; }
+    .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 14px 22px; background: white; border-bottom: 1px solid #dce5e8; }
+    button, .file-label { border: 1px solid #b9cbd2; background: white; border-radius: 7px; padding: 8px 11px; color: #123648; cursor: pointer; font: inherit; font-size: 13px; }
+    button:hover, .file-label:hover { background: #eef5f6; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid #65b7ca; outline-offset: 2px; }
+    button.primary { background: #087b82; border-color: #087b82; color: white; font-weight: 700; }
+    button.primary:hover { background: #07666d; }
+    input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    input[type=text], select, textarea { font: inherit; border: 1px solid #afc2cb; border-radius: 6px; padding: 8px; background: white; color: #192b39; }
+    input[type=text] { width: 145px; }
+    textarea { display: block; width: 100%; min-height: 70px; resize: vertical; }
+    .hint { color: #4a6370; font-size: 12px; }
+    .layout { display: grid; grid-template-columns: 240px minmax(340px, 1.2fr) minmax(300px, .9fr); min-height: calc(100vh - 118px); }
+    aside, main, .review-panel { padding: 20px; min-width: 0; }
+    aside { background: #eaf0f2; border-right: 1px solid #d3e0e4; }
+    main { background: #fbfcfc; }
+    .review-panel { background: white; border-left: 1px solid #dce5e8; }
+    h2 { margin: 0 0 14px; font-size: 17px; }
+    h3 { font-size: 14px; margin: 22px 0 9px; }
+    .case-list { display: grid; gap: 5px; }
+    .case-list button { text-align: left; width: 100%; overflow-wrap: anywhere; }
+    .case-list button.active { border-color: #087b82; background: #dceff0; font-weight: 700; }
+    .case-list small { display: block; color: #4a6370; margin-top: 3px; }
+    .tag { display: inline-block; border-radius: 99px; padding: 3px 9px; background: #e4edf0; font-size: 12px; margin-right: 5px; }
+    .tag.warn { background: #ffe9c4; color: #754900; }
+    .turn { background: white; border: 1px solid #dce5e8; border-radius: 9px; padding: 12px; margin: 10px 0; }
+    .turn-title { font-size: 12px; color: #4a6370; margin-bottom: 7px; }
+    .bubble { padding: 8px 10px; margin: 5px 0; border-radius: 7px; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .bubble.user { background: #eaf1f5; }
+    .bubble.assistant { background: #def2ed; }
+    .muted { color: #637986; }
+    .checks { margin-top: 8px; font-size: 12px; }
+    .checks .bad { color: #a03a22; font-weight: 700; }
+    .checks .good { color: #0e7062; }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .compare > div { background: #f0f5f6; border-radius: 8px; padding: 10px; min-width: 0; }
+    .compare strong { font-size: 12px; }
+    .schedule { font-size: 12px; margin-top: 7px; overflow-wrap: anywhere; }
+    details { margin-top: 10px; border-top: 1px solid #e4ecef; padding-top: 9px; }
+    summary { cursor: pointer; font-size: 12px; color: #315b69; }
+    pre { overflow: auto; max-height: 230px; background: #edf2f4; padding: 10px; border-radius: 6px; font-size: 11px; }
+    fieldset { border: 0; border-bottom: 1px solid #e2e9ec; margin: 0; padding: 13px 0; }
+    legend { font-size: 13px; font-weight: 700; padding: 0 0 4px; }
+    fieldset label { display: inline-flex; align-items: center; gap: 3px; margin: 5px 9px 2px 0; font-size: 13px; white-space: nowrap; }
+    .review-panel label.block { display: block; font-size: 13px; font-weight: 700; margin: 15px 0 5px; }
+    .flag { display: block; font-size: 13px; margin: 11px 0; }
+    .actions { display: flex; gap: 8px; margin-top: 16px; }
+    .message { min-height: 20px; font-size: 12px; color: #a03a22; margin-top: 9px; }
+    .empty { color: #526b77; line-height: 1.7; max-width: 550px; }
+    @media (max-width: 1000px) { .layout { grid-template-columns: 205px 1fr; } .review-panel { grid-column: 1 / -1; border-left: 0; border-top: 1px solid #dce5e8; } }
+    @media (max-width: 630px) { .layout { display: block; } aside, main, .review-panel { border: 0; border-bottom: 1px solid #dce5e8; } .case-list { grid-template-columns: repeat(2, 1fr); } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Qwen 멀티턴 시범 검토</h1>
+    <p>AI·DATA 내부 실험 · 미검수 시나리오의 일치 여부는 공식 모델 점수가 아닙니다.</p>
+  </header>
+  <div class="toolbar">
+    <label class="file-label" for="results-file">실행 결과 열기</label>
+    <input id="results-file" type="file" accept=".jsonl,.txt,application/json">
+    <label class="file-label" for="reviews-file">이전 판정 가져오기</label>
+    <input id="reviews-file" type="file" accept=".json,application/json">
+    <button id="export" type="button">판정 JSON 내보내기</button>
+    <label for="reviewer" class="hint">평가자</label>
+    <input id="reviewer" type="text" maxlength="60" placeholder="식별명 입력">
+    <span id="count" class="hint">결과 파일을 선택하세요.</span>
+  </div>
+  <div class="layout">
+    <aside>
+      <h2>사례</h2>
+      <div id="case-list" class="case-list"></div>
+    </aside>
+    <main id="case-view">
+      <p class="empty">평가기의 <code>review_cases.jsonl</code>을 열면 대화, 모의 일정 변경, 판정 근거가 여기에 표시됩니다. 파일은 브라우저 안에서만 읽습니다.</p>
+    </main>
+    <section class="review-panel" aria-label="정성 평가">
+      <h2>정성 평가</h2>
+      <p class="hint">각 항목을 판정하세요. 개선·부적절 또는 재검토 표시는 근거 한 줄이 필요합니다.</p>
+      <form id="review-form">
+        <fieldset><legend>필요한 질문</legend><div data-rating="questions"></div></fieldset>
+        <fieldset><legend>확인 문구</legend><div data-rating="confirmation"></div></fieldset>
+        <fieldset><legend>결과 안내</legend><div data-rating="outcome"></div></fieldset>
+        <label class="block" for="issue-turn">문제 턴</label>
+        <select id="issue-turn"><option value="">해당 없음</option></select>
+        <label class="block" for="rationale">판정 근거</label>
+        <textarea id="rationale" placeholder="문제가 된 표현과 이유를 한 줄로 적으세요."></textarea>
+        <label class="flag"><input id="safety" type="checkbox"> 안전 위반 의심</label>
+        <label class="flag"><input id="ambiguous" type="checkbox"> 정답·자동 채점 재검토</label>
+        <div class="actions"><button class="primary" type="submit">저장하고 다음 사례</button></div>
+        <p id="message" class="message" role="status"></p>
+      </form>
+      <p class="hint">작업 중 판정은 이 브라우저에 임시 저장됩니다. 인수인계 전 반드시 JSON으로 내보내세요.</p>
+    </section>
+  </div>
+  <script>
+    "use strict";
+    const RUBRIC_VERSION = "pilot-review-v0.1";
+    const dimensions = ["questions", "confirmation", "outcome"];
+    const ratings = ["적절", "개선 필요", "부적절", "해당 없음"];
+    const state = { cases: [], index: 0, reviews: {}, fileKey: "" };
+    const byId = id => document.getElementById(id);
+
+    function el(tag, className, content) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (content !== undefined) node.textContent = String(content);
+      return node;
+    }
+    function jsonDetails(label, value) {
+      const details = el("details");
+      details.append(el("summary", "", label), el("pre", "", JSON.stringify(value, null, 2)));
+      return details;
+    }
+    function labelSchedules(parent, items) {
+      if (!items.length) { parent.append(el("p", "schedule muted", "일정 없음")); return; }
+      for (const item of items) {
+        parent.append(el("div", "schedule", `${item.title || "제목 없음"} · ${item.scheduledAt || "시각 없음"} · ${item.id}`));
+      }
+    }
+    function draftKey() { return `qwen-pilot-review:${state.cases[0]?.run_id || state.fileKey}`; }
+    function saveDraft() {
+      try { localStorage.setItem(draftKey(), JSON.stringify(state.reviews)); } catch (_) { /* export remains available */ }
+    }
+    function loadDraft() {
+      try { state.reviews = JSON.parse(localStorage.getItem(draftKey()) || "{}"); }
+      catch (_) { state.reviews = {}; }
+    }
+    function updateCount() {
+      const done = state.cases.filter(item => state.reviews[item.case_id]).length;
+      byId("count").textContent = `${done}/${state.cases.length}건 판정 저장`;
+    }
+    function renderList() {
+      const list = byId("case-list");
+      list.replaceChildren();
+      state.cases.forEach((item, index) => {
+        const button = el("button", index === state.index ? "active" : "", `${state.reviews[item.case_id] ? "✓" : "○"} ${item.case_id}`);
+        button.type = "button";
+        button.append(el("small", "", `${item.status === "needs_review" ? "자동 확인 필요" : "잠정 일치"} · ${item.completed_turns}/${item.total_turns}턴`));
+        button.addEventListener("click", () => { state.index = index; render(); });
+        list.append(button);
+      });
+      updateCount();
+    }
+    function renderCase(item) {
+      const view = byId("case-view");
+      view.replaceChildren();
+      view.append(el("h2", "", item.case_id));
+      view.append(el("span", "tag warn", "미검수 시범 정답"));
+      view.append(el("span", "tag", item.status === "needs_review" ? "자동 확인 필요" : "잠정 일치"));
+      view.append(el("p", "hint", `기준 시각 ${item.reference_datetime} · 대화 계열 ${item.conversation_group_id}`));
+      for (const turn of item.turns) {
+        const block = el("section", "turn");
+        block.append(el("div", "turn-title", `${turn.index}턴 · 사용자 체감 ${turn.wall_time_ms}ms · 모델 호출 ${turn.model_calls.length}회`));
+        block.append(el("div", "bubble user", `사용자: ${turn.user}`));
+        block.append(el("div", "bubble assistant", `비서: ${turn.reply.message === null ? "[응답 없음]" : turn.reply.message}`));
+        const checks = el("div", "checks");
+        const misses = turn.checks.filter(check => !check.match);
+        checks.append(el("span", misses.length ? "bad" : "good", misses.length ? `잠정 기준 불일치: ${misses.map(check => check.name).join(", ")}` : "잠정 기준 일치"));
+        if (turn.crash) checks.append(el("div", "bad", turn.crash));
+        block.append(checks, jsonDetails("모델 원문 · API 호출 · 잠정 기대값", {
+          model_calls: turn.model_calls, api_calls: turn.api_calls,
+          expected: turn.expected, expected_model_outputs: turn.expected_model_outputs,
+          checks: turn.checks
+        }));
+        view.append(block);
+      }
+      if (item.completed_turns < item.total_turns) view.append(el("p", "tag warn", "대화 분기가 달라져 이후 발화를 실행하지 않았습니다."));
+      view.append(el("h3", "", "최종 일정 상태"));
+      const compare = el("div", "compare");
+      const expected = el("div"), actual = el("div");
+      expected.append(el("strong", "", "잠정 기대"));
+      actual.append(el("strong", "", "실제 모의 일정"));
+      labelSchedules(expected, item.expected_final);
+      labelSchedules(actual, item.actual_final);
+      compare.append(expected, actual);
+      view.append(compare, jsonDetails("최종 상태 상세 비교", {expected: item.expected_final, actual: item.actual_final, checks: item.final_checks}));
+    }
+    function renderForm(item) {
+      const review = state.reviews[item.case_id] || {};
+      for (const dimension of dimensions) {
+        const value = review.ratings?.[dimension] || "";
+        for (const input of document.querySelectorAll(`input[name="${dimension}"]`)) input.checked = input.value === value;
+      }
+      const select = byId("issue-turn");
+      select.replaceChildren(new Option("해당 없음", ""));
+      for (const turn of item.turns) select.add(new Option(`${turn.index}턴`, String(turn.index)));
+      select.value = review.issue_turn ? String(review.issue_turn) : "";
+      byId("rationale").value = review.rationale || "";
+      byId("safety").checked = Boolean(review.safety_concern);
+      byId("ambiguous").checked = Boolean(review.needs_recheck);
+      if (review.reviewer && !byId("reviewer").value) byId("reviewer").value = review.reviewer;
+      byId("message").textContent = "";
+    }
+    function render() {
+      if (!state.cases.length) return;
+      renderList();
+      renderCase(state.cases[state.index]);
+      renderForm(state.cases[state.index]);
+    }
+    function collectReview(item) {
+      const selected = {};
+      for (const dimension of dimensions) {
+        selected[dimension] = document.querySelector(`input[name="${dimension}"]:checked`)?.value || "";
+      }
+      const rationale = byId("rationale").value.trim();
+      const safety = byId("safety").checked;
+      const ambiguous = byId("ambiguous").checked;
+      const reviewer = byId("reviewer").value.trim();
+      if (!reviewer || Object.values(selected).some(value => !value)) return [null, "평가자와 세 항목의 판정을 모두 입력하세요."];
+      if ((Object.values(selected).some(value => value === "개선 필요" || value === "부적절") || safety || ambiguous) && !rationale)
+        return [null, "개선·부적절 또는 재검토에는 판정 근거를 입력하세요."];
+      return [{case_id: item.case_id, rubric_version: RUBRIC_VERSION, reviewer,
+               ratings: selected, issue_turn: byId("issue-turn").value || null, rationale,
+               safety_concern: safety, needs_recheck: ambiguous,
+               reviewed_at: new Date().toISOString()}, ""];
+    }
+    for (const dimension of dimensions) {
+      const group = document.querySelector(`[data-rating="${dimension}"]`);
+      for (const value of ratings) {
+        const label = el("label");
+        const input = document.createElement("input");
+        input.type = "radio"; input.name = dimension; input.value = value;
+        label.append(input, document.createTextNode(value));
+        group.append(label);
+      }
+    }
+    byId("review-form").addEventListener("submit", event => {
+      event.preventDefault();
+      if (!state.cases.length) return;
+      const item = state.cases[state.index];
+      const [review, error] = collectReview(item);
+      if (error) { byId("message").textContent = error; return; }
+      state.reviews[item.case_id] = review;
+      saveDraft();
+      if (state.index < state.cases.length - 1) state.index += 1;
+      render();
+      byId("message").textContent = "판정을 임시 저장했습니다. JSON으로 내보내세요.";
+    });
+    byId("results-file").addEventListener("change", async event => {
+      const file = event.target.files[0];
+      if (!file) return;
+      try {
+        const cases = (await file.text()).split(/\r?\n/).filter(line => line.trim()).map(line => JSON.parse(line));
+        if (!cases.length || cases.some(item => !item.case_id || !item.run_id || !Array.isArray(item.turns) || !Array.isArray(item.actual_final)))
+          throw new Error("review_cases.jsonl 형식이 아닙니다.");
+        if (new Set(cases.map(item => item.case_id)).size !== cases.length) throw new Error("중복 사례 ID가 있습니다.");
+        if (new Set(cases.map(item => item.run_id)).size !== 1) throw new Error("서로 다른 실행 결과가 섞여 있습니다.");
+        state.cases = cases; state.index = 0;
+        state.fileKey = `${file.name}:${file.size}:${file.lastModified}`;
+        loadDraft(); render();
+      } catch (error) { alert(`결과 파일을 읽지 못했습니다: ${error.message}`); }
+    });
+    byId("reviews-file").addEventListener("change", async event => {
+      const file = event.target.files[0];
+      if (!file) return;
+      try {
+        const imported = JSON.parse(await file.text());
+        if (!state.cases.length || !Array.isArray(imported.reviews) ||
+            imported.rubric_version !== RUBRIC_VERSION || imported.run_id !== state.cases[0].run_id)
+          throw new Error("평가 결과 파일의 실행 ID 또는 기준 버전이 맞지 않습니다.");
+        const ids = new Set(state.cases.map(item => item.case_id));
+        for (const item of imported.reviews) if (ids.has(item.case_id)) state.reviews[item.case_id] = item;
+        saveDraft(); render();
+      } catch (error) { alert(`판정 파일을 읽지 못했습니다: ${error.message}`); }
+    });
+    byId("export").addEventListener("click", () => {
+      if (!state.cases.length) { alert("실행 결과를 먼저 여세요."); return; }
+      const exportData = {rubric_version: RUBRIC_VERSION, run_id: state.cases[0].run_id,
+                          exported_at: new Date().toISOString(), reviews: state.cases
+                            .filter(item => state.reviews[item.case_id]).map(item => state.reviews[item.case_id])};
+      const url = URL.createObjectURL(new Blob([JSON.stringify(exportData, null, 2)], {type: "application/json"}));
+      const link = document.createElement("a");
+      link.href = url; link.download = `qwen_reviews_${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
+  </script>
+</body>
+</html>

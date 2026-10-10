@@ -103,8 +103,10 @@ class OllamaClient:
         self.model = model
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
+        self.last_metrics: dict[str, int] = {}
 
     def generate(self, messages: list[dict[str, str]]) -> str:
+        self.last_metrics = {}
         payload = json.dumps({"model": self.model, "messages": messages, "format": "json",
                               "think": False, "stream": False}, ensure_ascii=False).encode("utf-8")
         request = urllib.request.Request(self.base_url + "/api/chat", data=payload,
@@ -117,4 +119,8 @@ class OllamaClient:
         content = result.get("message", {}).get("content") if isinstance(result, dict) else None
         if not isinstance(content, str):
             raise RuntimeError("local Qwen response has no content")
+        self.last_metrics = {key: result[key] for key in (
+            "prompt_eval_count", "eval_count", "total_duration", "load_duration",
+            "prompt_eval_duration", "eval_duration")
+            if type(result.get(key)) is int}
         return content.strip()
