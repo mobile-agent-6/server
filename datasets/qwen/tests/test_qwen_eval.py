@@ -1,10 +1,9 @@
-"""Regression checks for archived results and strict output handling."""
+"""Checks for the proposed API-category evaluation tools."""
 
 from __future__ import annotations
 
 import sys
 import json
-import importlib.util
 import tempfile
 import unittest
 import urllib.error
@@ -12,28 +11,32 @@ from pathlib import Path
 from unittest.mock import patch
 
 QWEN_ROOT = Path(__file__).resolve().parents[1]
-LEGACY = QWEN_ROOT / "v0.1_initial"
+API_EXPERIMENT = QWEN_ROOT / "experiments" / "api_categories"
 sys.path.insert(0, str(QWEN_ROOT / "tools"))
 
 import qwen_eval  # noqa: E402
-import run_legacy_eval  # noqa: E402
+import run_qwen_eval  # noqa: E402
 
 
 class QwenEvaluationTests(unittest.TestCase):
-    def test_archived_results_keep_original_and_strict_counts_separate(self) -> None:
-        cases = qwen_eval.load_cases(LEGACY / "qwen_legacy_eval_100.jsonl")
-        responses = qwen_eval.load_legacy_csv(
-            LEGACY / "qwen_100_scored_results.csv", cases
+    def test_api_category_experiment_uses_all_five_enum_values(self) -> None:
+        cases = qwen_eval.load_cases(API_EXPERIMENT / "cases_100.jsonl")
+        self.assertEqual(len(cases), 100)
+        self.assertFalse(any("C구역" in case["utterance"] for case in cases))
+        self.assertFalse(any(case["expected"]["location"] == "C구역" for case in cases))
+        self.assertEqual(
+            {case["expected"]["category"] for case in cases},
+            qwen_eval.API_CATEGORIES | {None},
         )
-        report = qwen_eval.score(cases, responses)
-
-        self.assertEqual(report["total"], 100)
-        self.assertEqual(report["valid_json"], 100)
-        self.assertEqual(report["valid_format"], 64)
-        self.assertEqual(report["string_null_rows"], 35)
-        self.assertEqual(report["legacy_normalized_full"], 16)
-        self.assertEqual(report["exact_full"], 12)
-        self.assertEqual(report["speed"]["timed_count"], 0)
+        picking = [case for case in cases if "피킹" in case["utterance"]]
+        self.assertTrue(picking)
+        self.assertTrue(all(case["expected"]["category"] == "OUTBOUND" for case in picking))
+        others = [case for case in cases if case["expected"]["category"] == "OTHER"]
+        self.assertEqual({case["expected"]["intent"] for case in others},
+                         {"create", "read", "update", "delete"})
+        response = {"intent": "create", "date": None, "time": None,
+                    "location": None, "category": "피킹", "content": None}
+        self.assertIn("value:category", qwen_eval.format_issues(response))
 
     def test_missing_field_and_string_null_do_not_pass_strict_scoring(self) -> None:
         expected = {
@@ -45,7 +48,6 @@ class QwenEvaluationTests(unittest.TestCase):
         report = qwen_eval.score(cases, responses)
 
         self.assertEqual(report["exact_full"], 0)
-        self.assertEqual(report["legacy_normalized_full"], 1)
         self.assertEqual(report["valid_format"], 0)
         self.assertIn("missing:content", report["cases"][0]["issues"])
         self.assertIn("string_null:date", report["cases"][0]["issues"])
@@ -53,26 +55,23 @@ class QwenEvaluationTests(unittest.TestCase):
     def test_invalid_calendar_date_and_time_are_rejected(self) -> None:
         actual = {
             "intent": "create", "date": "2026-02-30", "time": "25:61",
-            "location": None, "category": "반품", "content": "확인",
+            "location": None, "category": "RETURN", "content": "확인",
         }
         self.assertIn("value:date", qwen_eval.format_issues(actual))
         self.assertIn("format:time", qwen_eval.format_issues(actual))
 
     def test_response_jsonl_requires_one_known_id_per_case(self) -> None:
-        cases = qwen_eval.load_cases(LEGACY / "qwen_legacy_eval_100.jsonl")
-        archived = qwen_eval.load_legacy_csv(
-            LEGACY / "qwen_100_scored_results.csv", cases
-        )
+        cases = qwen_eval.load_cases(API_EXPERIMENT / "cases_100.jsonl")[:1]
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "responses.jsonl"
             with path.open("w", encoding="utf-8") as stream:
                 for case in cases:
                     stream.write(json.dumps({
                         "id": case["id"],
-                        "raw_response": archived[case["id"]]["raw_response"],
+                        "raw_response": json.dumps(case["expected"], ensure_ascii=False),
                     }, ensure_ascii=False) + "\n")
             loaded = qwen_eval.load_responses(path, cases)
-            self.assertEqual(qwen_eval.score(cases, loaded)["exact_full"], 12)
+            self.assertEqual(qwen_eval.score(cases, loaded)["exact_full"], 1)
 
             with path.open("a", encoding="utf-8") as stream:
                 stream.write(json.dumps({
@@ -102,7 +101,7 @@ class QwenEvaluationTests(unittest.TestCase):
             self.assertIn(b'"stream": false', request.data)
             return Response()
 
-        result = run_legacy_eval.request_one(
+        result = run_qwen_eval.request_one(
             "prompt", "qwen3:4b", "http://127.0.0.1:11434", 10,
             opener=opener, clock=lambda: next(times),
         )
@@ -115,7 +114,7 @@ class QwenEvaluationTests(unittest.TestCase):
         times = iter((0, 250_000_000))
         def opener(*_args, **_kwargs):
             raise urllib.error.URLError("unavailable")
-        result = run_legacy_eval.request_one(
+        result = run_qwen_eval.request_one(
             "prompt", "qwen3:4b", "http://127.0.0.1:11434", 10,
             opener=opener, clock=lambda: next(times),
         )
@@ -158,34 +157,33 @@ class QwenEvaluationTests(unittest.TestCase):
                 qwen_eval.load_responses(path, cases)
 
     def test_run_reads_jsonl_and_writes_manifest_without_overwrite(self) -> None:
-        archived_cases = qwen_eval.load_cases(LEGACY / "qwen_legacy_eval_100.jsonl")
+        cases = qwen_eval.load_cases(API_EXPERIMENT / "cases_100.jsonl")
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             cases_path = root / "cases.jsonl"
-            cases_path.write_text(json.dumps(archived_cases[0], ensure_ascii=False) + "\n", encoding="utf-8")
+            cases_path.write_text(json.dumps(cases[0], ensure_ascii=False) + "\n", encoding="utf-8")
             output = root / "run"
             fake = {"raw_response": "{}", "wall_time_ms": 10.0,
                     "ollama_metrics": {"eval_count": 1}, "error_type": None}
-            with patch.object(run_legacy_eval, "request_one", return_value=fake) as request:
-                run_legacy_eval.run(cases_path, output, "qwen3:4b", "http://127.0.0.1:11434", 10)
-            self.assertIn(archived_cases[0]["utterance"], request.call_args.args[0])
+            with patch.object(run_qwen_eval, "request_one", return_value=fake) as request:
+                run_qwen_eval.run(cases_path, output, "qwen3:4b", "http://127.0.0.1:11434", 10)
+            self.assertIn(cases[0]["utterance"], request.call_args.args[0])
             response = qwen_eval.read_jsonl(output / "responses.jsonl")[0]
-            self.assertEqual(response["id"], archived_cases[0]["id"])
+            self.assertEqual(response["id"], cases[0]["id"])
             self.assertEqual(len(response["prompt_sha256"]), 64)
             manifest = json.loads((output / "manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["status"], "complete")
-            self.assertEqual(manifest["cases_sha256"], run_legacy_eval.sha256(cases_path))
+            self.assertEqual(manifest["cases_sha256"], run_qwen_eval.sha256(cases_path))
             with self.assertRaises(FileExistsError):
-                run_legacy_eval.run(cases_path, output, "qwen3:4b", "http://127.0.0.1:11434", 10)
+                run_qwen_eval.run(cases_path, output, "qwen3:4b", "http://127.0.0.1:11434", 10)
 
-    def test_prompt_template_matches_archived_script_exactly(self) -> None:
-        script = LEGACY / "qwen_batch_test_100_scored.py"
-        spec = importlib.util.spec_from_file_location("archived_qwen_prompt", script)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        utterance = "다음 주 입고 일정 확인"
-        self.assertEqual(run_legacy_eval.legacy_prompt(utterance, module.BASE_DATE),
-                         module.make_prompt(utterance))
+    def test_prompt_requires_api_enum_and_fills_case(self) -> None:
+        template = run_qwen_eval.PROMPT_TEMPLATE.read_text(encoding="utf-8")
+        prompt = run_qwen_eval.render_prompt(template, "내일 입고 일정 확인", "2026-09-25")
+        self.assertIn("내일 입고 일정 확인", prompt)
+        self.assertIn("2026-09-25", prompt)
+        for category in qwen_eval.API_CATEGORIES:
+            self.assertIn(category, prompt)
 
 
 if __name__ == "__main__":

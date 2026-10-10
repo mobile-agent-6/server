@@ -1,7 +1,4 @@
-"""Run the archived Qwen v0.1 prompts and record quality and timing inputs.
-
-This is a DATA-area experiment, not the shared AI runtime contract.
-"""
+"""Run the proposed API-category Qwen evaluation and record timing inputs."""
 
 from __future__ import annotations
 
@@ -16,10 +13,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from qwen_eval import DEFAULT_CASES, load_cases
+from qwen_eval import load_cases
 
-PROMPT_TEMPLATE = DEFAULT_CASES.with_name("prompt_v01.txt")
-REFERENCE_DATE = "2026-09-25"
+EXPERIMENT = Path(__file__).resolve().parents[1] / "experiments" / "api_categories"
+DEFAULT_CASES = EXPERIMENT / "cases_100.jsonl"
+PROMPT_TEMPLATE = EXPERIMENT / "prompt.txt"
 METRICS = (
     "total_duration", "load_duration", "prompt_eval_duration", "eval_duration",
     "prompt_eval_count", "prompt_eval_cached_count", "eval_count",
@@ -30,10 +28,9 @@ def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def legacy_prompt(utterance: str, reference_date: str) -> str:
-    if reference_date != REFERENCE_DATE:
-        raise ValueError(f"v0.1 prompt requires reference_date={REFERENCE_DATE}")
-    template = PROMPT_TEMPLATE.read_text(encoding="utf-8")
+def render_prompt(template: str, utterance: str, reference_date: str) -> str:
+    if "{reference_date}" not in template or "{utterance}" not in template:
+        raise ValueError("prompt template requires reference_date and utterance placeholders")
     return template.replace("{reference_date}", reference_date).replace("{utterance}", utterance)
 
 
@@ -74,10 +71,11 @@ def request_one(
 def run(
     cases_path: Path, output_dir: Path, model: str, base_url: str,
     timeout: float, model_digest: str | None = None, quantization: str | None = None,
+    prompt_template: Path = PROMPT_TEMPLATE,
 ) -> None:
     cases = load_cases(cases_path)
-    if any(case["reference_date"] != REFERENCE_DATE for case in cases):
-        raise ValueError("v0.1 runner only supports the archived reference date")
+    template = prompt_template.read_text(encoding="utf-8")
+    render_prompt(template, cases[0]["utterance"], cases[0]["reference_date"])
     if not model.strip() or timeout <= 0:
         raise ValueError("model must be nonempty and timeout must be positive")
     if not base_url.startswith(("http://127.0.0.1:", "http://localhost:")):
@@ -86,9 +84,9 @@ def run(
     manifest = {
         "status": "running",
         "started_at_utc": datetime.now(timezone.utc).isoformat(),
-        "experiment": "qwen-v0.1-legacy-provisional",
+        "experiment": "qwen-api-categories-provisional",
         "cases_sha256": sha256(cases_path),
-        "prompt_template_sha256": sha256(PROMPT_TEMPLATE),
+        "prompt_template_sha256": sha256(prompt_template),
         "model": model,
         "model_digest": model_digest,
         "quantization": quantization,
@@ -105,7 +103,7 @@ def run(
     try:
         with (output_dir / "responses.jsonl").open("w", encoding="utf-8") as stream:
             for case in cases:
-                prompt = legacy_prompt(case["utterance"], case["reference_date"])
+                prompt = render_prompt(template, case["utterance"], case["reference_date"])
                 result = request_one(prompt, model, base_url, timeout)
                 row = {"id": case["id"], "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest(), **result}
                 stream.write(json.dumps(row, ensure_ascii=False) + "\n")
@@ -122,6 +120,7 @@ def run(
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cases", type=Path, default=DEFAULT_CASES)
+    parser.add_argument("--prompt-template", type=Path, default=PROMPT_TEMPLATE)
     parser.add_argument("--output-dir", type=Path, required=True, help="new directory for run files")
     parser.add_argument("--model", required=True)
     parser.add_argument("--model-digest", help="record the exact model digest when known")
@@ -130,7 +129,7 @@ def main() -> None:
     parser.add_argument("--timeout", type=float, default=300)
     args = parser.parse_args()
     run(args.cases, args.output_dir, args.model, args.base_url, args.timeout,
-        args.model_digest, args.quantization)
+        args.model_digest, args.quantization, args.prompt_template)
 
 
 if __name__ == "__main__":

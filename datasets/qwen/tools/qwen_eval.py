@@ -1,13 +1,8 @@
-"""Offline, provisional scorer for the archived six-field Qwen experiment.
-
-This does not define the shared AI output contract. It keeps the 2026-09-25
-experiment reproducible while reporting output validity separately from values.
-"""
+"""Offline scorer for the proposed API-category six-field Qwen evaluation."""
 
 from __future__ import annotations
 
 import argparse
-import csv
 import json
 import math
 import re
@@ -19,10 +14,10 @@ from typing import Any
 
 FIELDS = ("intent", "date", "time", "location", "category", "content")
 INTENTS = {"create", "read", "update", "delete"}
-LEGACY_CATEGORIES = {"반품", "재고", "입고", "피킹", "출고"}
+API_CATEGORIES = {"INBOUND", "INVENTORY", "OUTBOUND", "RETURN", "OTHER"}
 DATE_PATTERN = re.compile(r"\d{4}-\d{2}-\d{2}\Z")
 TIME_PATTERN = re.compile(r"(?:[01]\d|2[0-3]):[0-5]\d\Z")
-DEFAULT_CASES = Path(__file__).resolve().parents[1] / "v0.1_initial" / "qwen_legacy_eval_100.jsonl"
+DEFAULT_CASES = Path(__file__).resolve().parents[1] / "experiments" / "api_categories" / "cases_100.jsonl"
 
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -61,27 +56,6 @@ def load_cases(path: Path) -> list[dict[str, Any]]:
         if any(value is not None and not isinstance(value, str) for value in expected.values()):
             raise ValueError(f"{identifier}: expected values must be strings or null")
     return cases
-
-
-def load_legacy_csv(path: Path, cases: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
-    with path.open(encoding="utf-8-sig", newline="") as stream:
-        reader = csv.DictReader(stream)
-        required = {"번호", "사용자 발화", "Qwen 결과 원문"}
-        required.update(f"정답 {field}" for field in FIELDS)
-        if not reader.fieldnames or not required.issubset(reader.fieldnames):
-            raise ValueError("legacy CSV is missing required columns")
-        rows = list(reader)
-    if len(rows) != len(cases):
-        raise ValueError("legacy CSV and case file have different row counts")
-    responses = {}
-    for index, (case, row) in enumerate(zip(cases, rows, strict=True), 1):
-        if row["번호"] != str(index) or row["사용자 발화"] != case["utterance"]:
-            raise ValueError(f"legacy CSV row {index} does not match case file")
-        for field in FIELDS:
-            if (row[f"정답 {field}"] or None) != case["expected"][field]:
-                raise ValueError(f"legacy CSV row {index} has a different {field} label")
-        responses[case["id"]] = {"raw_response": row["Qwen 결과 원문"]}
-    return responses
 
 
 def load_responses(path: Path, cases: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
@@ -163,7 +137,7 @@ def format_issues(actual: Any) -> list[str]:
             issues.append(f"string_null:{field}")
         if field == "intent" and value not in INTENTS:
             issues.append("value:intent")
-        if field == "category" and value is not None and value not in LEGACY_CATEGORIES:
+        if field == "category" and value is not None and value not in API_CATEGORIES:
             issues.append("value:category")
         if field == "date" and value is not None:
             if not DATE_PATTERN.fullmatch(value):
@@ -178,21 +152,15 @@ def format_issues(actual: Any) -> list[str]:
     return issues
 
 
-def legacy_normalize(value: Any) -> Any:
-    if isinstance(value, str):
-        stripped = value.strip()
-        if stripped.lower() in {"", "null", "none"}:
-            return None
-        return stripped
-    return value
-
-
 def score(cases: list[dict[str, Any]], responses: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    for case in cases:
+        if case["expected"]["category"] not in API_CATEGORIES | {None}:
+            raise ValueError(f"{case['id']}: category label is outside API set")
     field_stats = {field: {"exact": 0, "nonnull_exact": 0, "nonnull_total": 0} for field in FIELDS}
     intent_stats = {intent: {"total": 0, "exact": 0} for intent in sorted(INTENTS)}
     issue_counts: Counter[str] = Counter()
     results = []
-    valid_json = valid_format = exact = legacy_full = 0
+    valid_json = valid_format = exact = 0
     string_null_rows = 0
     for case in cases:
         identifier = case["id"]
@@ -211,10 +179,6 @@ def score(cases: list[dict[str, Any]], responses: dict[str, dict[str, Any]]) -> 
         valid_format += not issues
         matched = not issues and all(actual[field] == expected[field] for field in FIELDS)
         exact += matched
-        normalized = isinstance(actual, dict) and all(
-            legacy_normalize(actual.get(field)) == expected[field] for field in FIELDS
-        )
-        legacy_full += normalized
         intent_stats[expected["intent"]]["total"] += 1
         intent_stats[expected["intent"]]["exact"] += matched
         for field in FIELDS:
@@ -223,14 +187,13 @@ def score(cases: list[dict[str, Any]], responses: dict[str, dict[str, Any]]) -> 
             field_match = isinstance(actual, dict) and field in actual and actual[field] == expected[field]
             field_stats[field]["exact"] += field_match
             field_stats[field]["nonnull_exact"] += nonnull and field_match
-        results.append({"id": identifier, "issues": issues, "exact": bool(matched), "legacy_normalized_full": bool(normalized)})
+        results.append({"id": identifier, "issues": issues, "exact": bool(matched)})
     return {
-        "ruleset": "legacy-six-field-provisional",
+        "ruleset": "api-category-six-field-provisional",
         "total": len(cases),
         "valid_json": valid_json,
         "valid_format": valid_format,
         "exact_full": exact,
-        "legacy_normalized_full": legacy_full,
         "string_null_rows": string_null_rows,
         "issues": dict(sorted(issue_counts.items())),
         "fields": field_stats,
@@ -280,9 +243,7 @@ def compare_reports(before: dict[str, Any], after: dict[str, Any],
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cases", type=Path, default=DEFAULT_CASES)
-    source = parser.add_mutually_exclusive_group(required=True)
-    source.add_argument("--legacy-results", type=Path)
-    source.add_argument("--responses", type=Path)
+    parser.add_argument("--responses", type=Path, required=True)
     parser.add_argument("--compare-responses", type=Path,
                         help="second run of the same cases; requires --responses")
     parser.add_argument("--output", type=Path, help="write the JSON report to this path")
@@ -291,10 +252,7 @@ def main() -> None:
     if args.compare_responses and not args.responses:
         parser.error("--compare-responses requires --responses")
     cases = load_cases(args.cases)
-    responses = (
-        load_legacy_csv(args.legacy_results, cases)
-        if args.legacy_results else load_responses(args.responses, cases)
-    )
+    responses = load_responses(args.responses, cases)
     report = score(cases, responses)
     if args.compare_responses:
         after_responses = load_responses(args.compare_responses, cases)

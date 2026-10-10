@@ -10,6 +10,8 @@
 > 작성일: 2026-09-27 / 버전: 0.1
 > 
 > 진행 상태: 1차 평가 데이터셋 및 자동 평가 시스템 구축, 초기 성능 측정 완료
+
+> 보존 기록 안내 (2026-10-10): 이 문서는 당시 평가를 설명한다. 옛 문항·프롬프트·실행 코드는 현재 작업 트리에서 제거했고 결과 CSV만 보존한다. 현재 API 카테고리와 새 평가셋은 `docs/api.md`와 `datasets/qwen/experiments/api_categories/`를 따른다.
 > 
 
 ## 1. 목적과 평가 범위
@@ -24,7 +26,7 @@
 | --- | --- |
 | 모델 지정값 | `qwen3:4b` |
 | 모델 호출 | 로컬 Ollama의 `http://localhost:11434/api/generate` |
-| 실행 코드 | [`datasets/qwen/v0.1_initial/qwen_batch_test_100_scored.py`](../datasets/qwen/v0.1_initial/qwen_batch_test_100_scored.py) |
+| 실행 코드 | 당시 코드 기준. 현재 작업 트리에서는 제거됨 |
 | 구현 언어 | Python |
 | 상대 날짜 기준 | `2026-09-25` |
 | 출력 설정 | `format="json"`, `think=false`, `stream=false` |
@@ -153,7 +155,7 @@
 
 | 파일 | 용도 |
 | --- | --- |
-| [`qwen_batch_test_100_scored.py`](../datasets/qwen/v0.1_initial/qwen_batch_test_100_scored.py) | 100개 문항·정답, 모델 호출, 채점 및 저장 코드 |
+| 당시 평가 코드 | 현재 작업 트리에서 제거됨. 당시 문항·정답과 응답은 아래 결과 CSV에 기록 |
 | [`qwen_100_scored_results.csv`](../datasets/qwen/v0.1_initial/qwen_100_scored_results.csv) | 사용자 발화, 예상 정답, 모델 응답 원문 및 개별 판정 |
 | [`qwen_100_scored_summary.csv`](../datasets/qwen/v0.1_initial/qwen_100_scored_summary.csv) | 전체 및 필드별 집계 |
 | `api.md` 3.1절·16절 | 확정된 백엔드 카테고리와 미확정 AI 연동 사항 |
