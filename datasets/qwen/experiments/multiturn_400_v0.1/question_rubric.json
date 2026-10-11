@@ -1,0 +1,743 @@
+{
+  "in-create-past": {
+    "1": "past_time"
+  },
+  "in-create-time": {
+    "1": "time"
+  },
+  "in-list-range": {
+    "1": "date"
+  },
+  "inv-create-date": {
+    "1": "date"
+  },
+  "inv-create-reminder": {
+    "1": "time"
+  },
+  "out-create-ampm": {
+    "1": "ampm"
+  },
+  "out-create-task": {
+    "1": "task"
+  },
+  "out-delete-invalid-number": {
+    "1": "selection",
+    "2": "selection"
+  },
+  "ret-create-correct": {
+    "1": "time"
+  },
+  "ret-delete-select-approve": {
+    "1": "selection"
+  },
+  "ret-delete-select-reject": {
+    "1": "selection"
+  },
+  "other-create-clarify": {
+    "1": "category",
+    "2": "time"
+  },
+  "other-list-range": {
+    "1": "date"
+  },
+  "other-update-different-target": {
+    "1": "selection",
+    "2": "change"
+  },
+  "train-inbound-001": {
+    "1": "past_time"
+  },
+  "train-inbound-002": {
+    "1": "time"
+  },
+  "train-inbound-004": {
+    "1": "date"
+  },
+  "train-inbound-007": {
+    "1": "past_time"
+  },
+  "train-inbound-008": {
+    "1": "time"
+  },
+  "train-inbound-010": {
+    "1": "date"
+  },
+  "train-inbound-013": {
+    "1": "past_time"
+  },
+  "train-inbound-014": {
+    "1": "time"
+  },
+  "train-inbound-016": {
+    "1": "date"
+  },
+  "train-inbound-019": {
+    "1": "past_time"
+  },
+  "train-inbound-020": {
+    "1": "time"
+  },
+  "train-inbound-022": {
+    "1": "date"
+  },
+  "train-inbound-025": {
+    "1": "past_time"
+  },
+  "train-inbound-026": {
+    "1": "time"
+  },
+  "train-inbound-028": {
+    "1": "date"
+  },
+  "train-inbound-031": {
+    "1": "past_time"
+  },
+  "train-inbound-032": {
+    "1": "time"
+  },
+  "train-inbound-034": {
+    "1": "date"
+  },
+  "train-inbound-037": {
+    "1": "past_time"
+  },
+  "train-inbound-038": {
+    "1": "time"
+  },
+  "train-inbound-040": {
+    "1": "date"
+  },
+  "train-inbound-043": {
+    "1": "past_time"
+  },
+  "train-inbound-044": {
+    "1": "time"
+  },
+  "train-inbound-046": {
+    "1": "date"
+  },
+  "train-inventory-001": {
+    "1": "date"
+  },
+  "train-inventory-002": {
+    "1": "time"
+  },
+  "train-inventory-007": {
+    "1": "date"
+  },
+  "train-inventory-008": {
+    "1": "time"
+  },
+  "train-inventory-013": {
+    "1": "date"
+  },
+  "train-inventory-014": {
+    "1": "time"
+  },
+  "train-inventory-019": {
+    "1": "date"
+  },
+  "train-inventory-020": {
+    "1": "time"
+  },
+  "train-inventory-025": {
+    "1": "date"
+  },
+  "train-inventory-026": {
+    "1": "time"
+  },
+  "train-inventory-031": {
+    "1": "date"
+  },
+  "train-inventory-032": {
+    "1": "time"
+  },
+  "train-inventory-037": {
+    "1": "date"
+  },
+  "train-inventory-038": {
+    "1": "time"
+  },
+  "train-inventory-043": {
+    "1": "date"
+  },
+  "train-inventory-044": {
+    "1": "time"
+  },
+  "train-outbound-001": {
+    "1": "ampm"
+  },
+  "train-outbound-002": {
+    "1": "task"
+  },
+  "train-outbound-003": {
+    "1": "selection",
+    "2": "selection"
+  },
+  "train-outbound-007": {
+    "1": "ampm"
+  },
+  "train-outbound-008": {
+    "1": "task"
+  },
+  "train-outbound-009": {
+    "1": "selection",
+    "2": "selection"
+  },
+  "train-outbound-013": {
+    "1": "ampm"
+  },
+  "train-outbound-014": {
+    "1": "task"
+  },
+  "train-outbound-015": {
+    "1": "selection",
+    "2": "selection"
+  },
+  "train-outbound-019": {
+    "1": "ampm"
+  },
+  "train-outbound-020": {
+    "1": "task"
+  },
+  "train-outbound-021": {
+    "1": "selection",
+    "2": "selection"
+  },
+  "train-outbound-025": {
+    "1": "ampm"
+  },
+  "train-outbound-026": {
+    "1": "task"
+  },
+  "train-outbound-027": {
+    "1": "selection",
+    "2": "selection"
+  },
+  "train-outbound-031": {
+    "1": "ampm"
+  },
+  "train-outbound-032": {
+    "1": "task"
+  },
+  "train-outbound-033": {
+    "1": "selection",
+    "2": "selection"
+  },
+  "train-outbound-037": {
+    "1": "ampm"
+  },
+  "train-outbound-038": {
+    "1": "task"
+  },
+  "train-outbound-039": {
+    "1": "selection",
+    "2": "selection"
+  },
+  "train-outbound-043": {
+    "1": "ampm"
+  },
+  "train-outbound-044": {
+    "1": "task"
+  },
+  "train-outbound-045": {
+    "1": "selection",
+    "2": "selection"
+  },
+  "train-return-001": {
+    "1": "time"
+  },
+  "train-return-002": {
+    "1": "selection"
+  },
+  "train-return-003": {
+    "1": "selection"
+  },
+  "train-return-007": {
+    "1": "time"
+  },
+  "train-return-008": {
+    "1": "selection"
+  },
+  "train-return-009": {
+    "1": "selection"
+  },
+  "train-return-013": {
+    "1": "time"
+  },
+  "train-return-014": {
+    "1": "selection"
+  },
+  "train-return-015": {
+    "1": "selection"
+  },
+  "train-return-019": {
+    "1": "time"
+  },
+  "train-return-020": {
+    "1": "selection"
+  },
+  "train-return-021": {
+    "1": "selection"
+  },
+  "train-return-025": {
+    "1": "time"
+  },
+  "train-return-026": {
+    "1": "selection"
+  },
+  "train-return-027": {
+    "1": "selection"
+  },
+  "train-return-031": {
+    "1": "time"
+  },
+  "train-return-032": {
+    "1": "selection"
+  },
+  "train-return-033": {
+    "1": "selection"
+  },
+  "train-return-037": {
+    "1": "time"
+  },
+  "train-return-038": {
+    "1": "selection"
+  },
+  "train-return-039": {
+    "1": "selection"
+  },
+  "train-return-043": {
+    "1": "time"
+  },
+  "train-return-044": {
+    "1": "selection"
+  },
+  "train-return-045": {
+    "1": "selection"
+  },
+  "train-other-001": {
+    "1": "category",
+    "2": "time"
+  },
+  "train-other-004": {
+    "1": "date"
+  },
+  "train-other-005": {
+    "1": "selection",
+    "2": "change"
+  },
+  "train-other-007": {
+    "1": "category",
+    "2": "time"
+  },
+  "train-other-010": {
+    "1": "date"
+  },
+  "train-other-011": {
+    "1": "selection",
+    "2": "change"
+  },
+  "train-other-013": {
+    "1": "category",
+    "2": "time"
+  },
+  "train-other-016": {
+    "1": "date"
+  },
+  "train-other-017": {
+    "1": "selection",
+    "2": "change"
+  },
+  "train-other-019": {
+    "1": "category",
+    "2": "time"
+  },
+  "train-other-022": {
+    "1": "date"
+  },
+  "train-other-023": {
+    "1": "selection",
+    "2": "change"
+  },
+  "train-other-025": {
+    "1": "category",
+    "2": "time"
+  },
+  "train-other-028": {
+    "1": "date"
+  },
+  "train-other-029": {
+    "1": "selection",
+    "2": "change"
+  },
+  "train-other-031": {
+    "1": "category",
+    "2": "time"
+  },
+  "train-other-034": {
+    "1": "date"
+  },
+  "train-other-035": {
+    "1": "selection",
+    "2": "change"
+  },
+  "train-other-037": {
+    "1": "category",
+    "2": "time"
+  },
+  "train-other-040": {
+    "1": "date"
+  },
+  "train-other-041": {
+    "1": "selection",
+    "2": "change"
+  },
+  "train-other-043": {
+    "1": "category",
+    "2": "time"
+  },
+  "train-other-046": {
+    "1": "date"
+  },
+  "validation-inbound-create-task_date-01": {
+    "1": "task",
+    "2": "date"
+  },
+  "validation-inbound-create-date_time-01": {
+    "1": "date",
+    "2": "time"
+  },
+  "validation-inbound-query-missing_then_incomplete-01": {
+    "1": "date"
+  },
+  "validation-inbound-query-missing_then_complete-01": {
+    "1": "date"
+  },
+  "validation-inbound-delete-missing_date_single-01": {
+    "1": "date"
+  },
+  "validation-inventory-create-task_date-02": {
+    "1": "task",
+    "2": "date"
+  },
+  "validation-inventory-create-date_time-02": {
+    "1": "date",
+    "2": "time"
+  },
+  "validation-inventory-query-missing_then_incomplete-02": {
+    "1": "date"
+  },
+  "validation-inventory-query-missing_then_complete-02": {
+    "1": "date"
+  },
+  "validation-inventory-delete-missing_date_single-02": {
+    "1": "date"
+  },
+  "validation-outbound-create-task_date-03": {
+    "1": "task",
+    "2": "date"
+  },
+  "validation-outbound-create-date_time-03": {
+    "1": "date",
+    "2": "time"
+  },
+  "validation-outbound-query-missing_then_incomplete-03": {
+    "1": "date"
+  },
+  "validation-outbound-query-missing_then_complete-03": {
+    "1": "date"
+  },
+  "validation-outbound-delete-missing_date_single-03": {
+    "1": "date"
+  },
+  "validation-return-create-task_date-04": {
+    "1": "task",
+    "2": "date"
+  },
+  "validation-return-create-date_time-04": {
+    "1": "date",
+    "2": "time"
+  },
+  "validation-return-query-missing_then_incomplete-04": {
+    "1": "date"
+  },
+  "validation-return-query-missing_then_complete-04": {
+    "1": "date"
+  },
+  "validation-return-delete-missing_date_single-04": {
+    "1": "date"
+  },
+  "validation-other-create-task_date-05": {
+    "1": "task",
+    "2": "date"
+  },
+  "validation-other-create-date_time-05": {
+    "1": "date",
+    "2": "time"
+  },
+  "validation-other-query-missing_then_incomplete-05": {
+    "1": "date"
+  },
+  "validation-other-query-missing_then_complete-05": {
+    "1": "date"
+  },
+  "validation-other-delete-missing_date_single-05": {
+    "1": "date"
+  },
+  "test-inbound-create-task_date_time-01": {
+    "1": "task",
+    "2": "date",
+    "3": "time"
+  },
+  "test-inbound-create-task_date_time-02": {
+    "1": "task",
+    "2": "date",
+    "3": "time"
+  },
+  "test-inbound-create-date_ampm-01": {
+    "1": "date",
+    "2": "ampm"
+  },
+  "test-inbound-create-date_ampm-02": {
+    "1": "date",
+    "2": "ampm"
+  },
+  "test-inbound-create-past_then_ambiguous-01": {
+    "1": "past_time",
+    "2": "ampm"
+  },
+  "test-inbound-query-unsupported_then_toggle-01": {
+    "1": "date"
+  },
+  "test-inbound-query-unsupported_then_toggle-02": {
+    "1": "date"
+  },
+  "test-inbound-update-missing_date_title-01": {
+    "1": "date"
+  },
+  "test-inbound-delete-unsupported_select-01": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-inbound-delete-unsupported_select-02": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-inbound-delete-unsupported_select-03": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-inbound-delete-unsupported_select-04": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-inbound-delete-unsupported_select-05": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-inventory-create-task_date_time-02": {
+    "1": "task",
+    "2": "date",
+    "3": "time"
+  },
+  "test-inventory-create-task_date_time-03": {
+    "1": "task",
+    "2": "date",
+    "3": "time"
+  },
+  "test-inventory-create-date_ampm-02": {
+    "1": "date",
+    "2": "ampm"
+  },
+  "test-inventory-create-date_ampm-03": {
+    "1": "date",
+    "2": "ampm"
+  },
+  "test-inventory-create-past_then_ambiguous-02": {
+    "1": "past_time",
+    "2": "ampm"
+  },
+  "test-inventory-query-unsupported_then_toggle-02": {
+    "1": "date"
+  },
+  "test-inventory-query-unsupported_then_toggle-03": {
+    "1": "date"
+  },
+  "test-inventory-update-missing_date_title-02": {
+    "1": "date"
+  },
+  "test-inventory-delete-unsupported_select-02": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-inventory-delete-unsupported_select-03": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-inventory-delete-unsupported_select-04": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-inventory-delete-unsupported_select-05": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-inventory-delete-unsupported_select-06": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-outbound-create-task_date_time-03": {
+    "1": "task",
+    "2": "date",
+    "3": "time"
+  },
+  "test-outbound-create-task_date_time-04": {
+    "1": "task",
+    "2": "date",
+    "3": "time"
+  },
+  "test-outbound-create-date_ampm-03": {
+    "1": "date",
+    "2": "ampm"
+  },
+  "test-outbound-create-date_ampm-04": {
+    "1": "date",
+    "2": "ampm"
+  },
+  "test-outbound-create-past_then_ambiguous-03": {
+    "1": "past_time",
+    "2": "ampm"
+  },
+  "test-outbound-query-unsupported_then_toggle-03": {
+    "1": "date"
+  },
+  "test-outbound-query-unsupported_then_toggle-04": {
+    "1": "date"
+  },
+  "test-outbound-update-missing_date_title-03": {
+    "1": "date"
+  },
+  "test-outbound-delete-unsupported_select-03": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-outbound-delete-unsupported_select-04": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-outbound-delete-unsupported_select-05": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-outbound-delete-unsupported_select-06": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-outbound-delete-unsupported_select-07": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-return-create-task_date_time-04": {
+    "1": "task",
+    "2": "date",
+    "3": "time"
+  },
+  "test-return-create-task_date_time-05": {
+    "1": "task",
+    "2": "date",
+    "3": "time"
+  },
+  "test-return-create-date_ampm-04": {
+    "1": "date",
+    "2": "ampm"
+  },
+  "test-return-create-date_ampm-05": {
+    "1": "date",
+    "2": "ampm"
+  },
+  "test-return-create-past_then_ambiguous-04": {
+    "1": "past_time",
+    "2": "ampm"
+  },
+  "test-return-query-unsupported_then_toggle-04": {
+    "1": "date"
+  },
+  "test-return-query-unsupported_then_toggle-05": {
+    "1": "date"
+  },
+  "test-return-update-missing_date_title-04": {
+    "1": "date"
+  },
+  "test-return-delete-unsupported_select-04": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-return-delete-unsupported_select-05": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-return-delete-unsupported_select-06": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-return-delete-unsupported_select-07": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-return-delete-unsupported_select-08": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-other-create-task_date_time-05": {
+    "1": "task",
+    "2": "date",
+    "3": "time"
+  },
+  "test-other-create-task_date_time-06": {
+    "1": "task",
+    "2": "date",
+    "3": "time"
+  },
+  "test-other-create-date_ampm-05": {
+    "1": "date",
+    "2": "ampm"
+  },
+  "test-other-create-date_ampm-06": {
+    "1": "date",
+    "2": "ampm"
+  },
+  "test-other-create-past_then_ambiguous-05": {
+    "1": "past_time",
+    "2": "ampm"
+  },
+  "test-other-query-unsupported_then_toggle-05": {
+    "1": "date"
+  },
+  "test-other-query-unsupported_then_toggle-06": {
+    "1": "date"
+  },
+  "test-other-update-missing_date_title-05": {
+    "1": "date"
+  },
+  "test-other-delete-unsupported_select-05": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-other-delete-unsupported_select-06": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-other-delete-unsupported_select-07": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-other-delete-unsupported_select-08": {
+    "1": "date",
+    "2": "selection"
+  },
+  "test-other-delete-unsupported_select-09": {
+    "1": "date",
+    "2": "selection"
+  }
+}

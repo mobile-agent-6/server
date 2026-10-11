@@ -21,3 +21,7 @@ python datasets/qwen/tools/qwen_eval.py --responses datasets/qwen/runs/api-categ
 실행기는 로컬 Ollama의 `/api/generate`를 호출하고 응답·요청 시간·Ollama 지표를 기록한다. `manifest.json`에는 문항과 프롬프트 해시, 모델 이름, 실행 환경과 옵션이 들어간다. 채점기는 JSON 형식, 6개 필드의 엄격한 일치, 카테고리 enum 준수, 응답 시간과 토큰 속도를 구분해 보고한다. 필요하면 `--compare-responses`로 동일 문항의 두 실행 결과를 비교할 수 있다.
 
 이 평가는 텍스트를 6개 필드로 구조화하는 실험이며 실제 Schedule API 호출 성공 여부를 측정하지 않는다. 원본 음성·실제 사용자 자료·모델 체크포인트·비밀값은 Git에 추가하지 않는다.
+
+## 멀티턴 400개 초안
+
+[멀티턴 400개 실험](qwen/experiments/multiturn_400_v0.1/README.md)에 학습 260개·검증 40개·테스트 예약 100개 대화와 고정 평가 실행기를 추가했다. 모두 `proposed_unreviewed`이며 파인튜닝은 아직 실행하지 않았다. 제안 정답의 오프라인 재생은 400건 통과했고, 실제 Qwen 검증 40건은 31건 잠정 일치했다. 실행 방법·정답 검수·분할 한계와 결과 해석은 해당 README를 따른다. 실제 모델 원문과 개별 검수 기록은 Git에 포함하지 않는다.
