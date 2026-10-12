@@ -11,11 +11,11 @@ from pathlib import Path
 from typing import Any
 from uuid import UUID
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from schedule_assistant.actions import ActionError, parse_action  # noqa: E402
-from schedule_assistant.clients import ScheduleError  # noqa: E402
-from schedule_assistant.service import ConversationService  # noqa: E402
+from runtime.schedule_assistant.actions import ActionError, parse_action  # noqa: E402
+from runtime.schedule_assistant.clients import ScheduleError  # noqa: E402
+from runtime.schedule_assistant.service import ConversationService  # noqa: E402
 
 SCHEMA_VERSION = "pilot-v0.1"
 STATUSES = {"proposed_unreviewed", "reviewed", "rejected"}

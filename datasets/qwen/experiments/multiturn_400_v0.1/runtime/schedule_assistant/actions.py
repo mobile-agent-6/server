@@ -11,7 +11,7 @@ from typing import Any
 from uuid import UUID
 
 CATEGORIES = {"INBOUND", "INVENTORY", "OUTBOUND", "RETURN", "OTHER"}
-ACTIONS = {"ASK", "LIST", "CREATE", "CONFIRM_UPDATE", "CONFIRM_DELETE", "ANSWER"}
+ACTIONS = {"ASK", "LIST", "CREATE", "SELECT_TARGET", "CONFIRM_UPDATE", "CONFIRM_DELETE", "ANSWER"}
 DATETIME = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-]\d{2}:\d{2})\Z")
 
 
@@ -98,7 +98,7 @@ def parse_action(raw: str) -> Action:
     if not isinstance(name, str) or name not in ACTIONS:
         raise ActionError("invalid action")
     message = _message(data["message"], name == "ASK")
-    if name == "ANSWER" and message is not None:
+    if name in {"ANSWER", "SELECT_TARGET"} and message is not None:
         raise ActionError("unexpected message")
     request = data["request"]
     if name in {"ASK", "ANSWER"}:
@@ -120,8 +120,10 @@ def parse_action(raw: str) -> Action:
         request = _fields(request, {"title", "scheduledAt", "category", "reminderMinutesBefore"})
         request = {"title": _title(request["title"]), "scheduledAt": _datetime(request["scheduledAt"]),
                    "category": _category(request["category"]), "reminderMinutesBefore": _reminder(request["reminderMinutesBefore"])}
-    elif name == "CONFIRM_UPDATE":
-        request = _fields(request, {"targetId", "changes"})
+    elif name == "CONFIRM_UPDATE" or (name == "SELECT_TARGET" and isinstance(request, dict)
+                                      and request.get("operation") == "update"):
+        request = _fields(request, {"targetId", "changes"} if name == "CONFIRM_UPDATE"
+                          else {"operation", "changes"})
         changes = _fields(request["changes"], set(), {"title", "scheduledAt", "category", "completed", "reminderMinutesBefore"})
         if not changes:
             raise ActionError("empty update")
@@ -139,7 +141,12 @@ def parse_action(raw: str) -> Action:
                 checked[key] = item
             else:
                 checked[key] = _reminder(item)
-        request = {"targetId": _uuid(request["targetId"]), "changes": checked}
+        request = ({"targetId": _uuid(request["targetId"]), "changes": checked}
+                   if name == "CONFIRM_UPDATE" else {"operation": "update", "changes": checked})
+    elif name == "SELECT_TARGET":
+        request = _fields(request, {"operation"})
+        if request["operation"] != "delete":
+            raise ActionError("invalid selection operation")
     else:
         request = _fields(request, {"targetId"})
         request = {"targetId": _uuid(request["targetId"])}

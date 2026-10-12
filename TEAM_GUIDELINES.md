@@ -61,7 +61,7 @@ Git은 빈 디렉터리를 추적하지 않으므로 각 디렉터리는 실제 
 | `backend/` | 백엔드 담당 | FastAPI, Schedule API, 데이터베이스와 백엔드 관련 작업 |
 | `ai/` | AI 담당 | Qwen, STT·TTS와 AI 관련 작업 |
 | `datasets/` | 데이터·테스트 담당 중심의 공용 영역 | 학습·검증·평가 데이터와 평가 결과 |
-| `docs/` | 관련 담당자 공동 | Git에서 공유하기로 정한 기술 문서 |
+| `docs/` | 관련 담당자 공동 | Git에서 공유하기로 정한 기술 문서와 팀 작성 제출용 문서. Markdown·HTML·PDF 관리 규칙은 `AGENTS.md` §5를 따른다. |
 | 저장소 루트 | 관련 담당자 공동 | 저장소 전체에 영향을 주는 설정과 협업 지침 |
 
 `BE-PROPOSED` 작은 텍스트 평가 데이터를 `datasets/`에서 버전 관리하는 방안을 제안한다. 구체적인 데이터 구성과 관리 방식은 `TBD-DATA`, 최종 데이터 위치와 저장소 구성은 `TBD-TEAM`이다.
@@ -114,12 +114,14 @@ API, AI 구조화 출력, 데이터 schema처럼 둘 이상의 영역이 사용�
 
 필요한 예시 값과 템플릿은 비밀값과 개인정보를 제거한 뒤 별도 파일로 작성한다.
 
+팀이 직접 작성한 설계안·평가 결과·문제점 분석 보고서의 HTML·PDF는 `AGENTS.md` §5에 따라 `docs/`에서 관리할 수 있다. 문서 형식 허용은 위 금지 자료의 포함이나 제안·TBD 계약의 확정을 허용한다는 뜻이 아니다.
+
 ## 8. 운영 제안과 현재 저장소 설정
 
 - `TBD-AI` AI 실행 구조, endpoint·port·protocol과 Schedule API 호출 방식
 - `TBD-DATA` 평가 데이터의 세부 schema, 검수·평가 방식과 관리 책임
 - `TBD-TEAM` 데이터의 최종 위치와 저장소 구성
-- `TBD-TEAM` Git에서 공유할 기술 문서의 최종 범위
+- `TBD-TEAM` Git에서 공유할 기술 문서의 최종 범위. `AGENTS.md` §5에서 허용한 팀 작성 제출용 Markdown·HTML·PDF는 관리할 수 있으며, 그 밖의 공유 범위는 별도 확인한다.
 - `BE-PROPOSED` GitHub Issue 사용 여부와 생성·관리 방식은 각 담당 영역에서 결정한다. Issue 생성이나 배정은 작업 진행의 필수 조건이 아니다.
 - `BE-PROPOSED` 작업 branch는 `develop`에서 분기하고 작업 완료 후 `develop` 대상 PR로 반영한다. `main`은 안정·배포 기준으로 유지한다.
 - `BE-PROPOSED` 작업 branch 접두어로 `feature/`, `fix/`, `docs/`, `test/`, `chore/`, `hotfix/`를 사용할 수 있다. 각 담당 영역은 작업 성격에 맞는 접두어를 선택한다.

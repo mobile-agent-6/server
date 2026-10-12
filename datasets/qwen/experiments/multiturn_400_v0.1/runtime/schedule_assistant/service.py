@@ -54,7 +54,6 @@ class Selection:
     operation: str
     changes: dict[str, Any] | None
     candidate_ids: list[str]
-    proposed_target_id: str
 
 
 @dataclass
@@ -164,12 +163,6 @@ class ConversationService:
             return Reply("ask", f"1번부터 {len(selection.candidate_ids)}번 중 대상 번호를 말씀해 주세요. 취소할 수도 있어요.")
         self.state.selection = None
         target_id = selection.candidate_ids[number - 1]
-        if selection.operation == "update" and target_id != selection.proposed_target_id:
-            self.state.candidates = {target_id: self.state.candidates[target_id]}
-            message = "선택한 일정에 적용할 변경 내용을 다시 말씀해 주세요."
-            self.state.history.append({"role": "user", "content": utterance.strip()})
-            self.state.history.append({"role": "assistant", "content": message})
-            return Reply("ask", message)
         reply = self._begin_confirmation(target_id, selection.operation, selection.changes)
         self.state.history.append({"role": "user", "content": utterance.strip()})
         self.state.history.append({"role": "assistant", "content": reply.message})
@@ -205,7 +198,12 @@ class ConversationService:
             return Reply("cancelled", "취소했어요. 일정은 변경하지 않았어요.")
         if answer not in YES:
             self.state.pending = None
-            self.state.candidates = {}
+            # A correction that names the confirmed schedule may reuse only that
+            # candidate. Every other request must look up its target again.
+            selected = self.state.candidates.get(pending.schedule_id)
+            title = selected.get("title") if selected else None
+            self.state.candidates = ({pending.schedule_id: selected}
+                                     if isinstance(title, str) and title in utterance else {})
             self.state.history.append({"role": "assistant", "content": "이전 변경 확인은 취소했어요."})
             return None
         self.state.pending = None
@@ -323,19 +321,24 @@ class ConversationService:
                 self.state.last_result = result
                 self.state.candidates = {}
                 return Reply("created", "일정을 등록했어요.", result)
+            if action.name == "SELECT_TARGET":
+                if len(self.state.candidates) > 10:
+                    return Reply("ask", "대상 일정이 많아요. 날짜와 제목을 더 좁혀 말씀해 주세요.")
+                if len(self.state.candidates) < 2:
+                    return Reply("error", "대상 일정을 다시 조회해 주세요.")
+                operation = request["operation"]
+                changes = request.get("changes")
+                self.state.selection = Selection(operation, changes, list(self.state.candidates))
+                options = ", ".join(f"{index}번 {item.get('title', '제목 없음')} ({item.get('scheduledAt', '시각 없음')})"
+                                    for index, item in enumerate(self.state.candidates.values(), 1))
+                return Reply("ask", f"어느 일정을 뜻하나요? {options}. 번호를 말씀해 주세요.")
             if action.name in {"CONFIRM_UPDATE", "CONFIRM_DELETE"}:
                 target_id = request["targetId"] if request else ""
                 if target_id not in self.state.candidates:
                     return Reply("error", "대상 일정을 먼저 조회해 주세요.")
+                if len(self.state.candidates) != 1:
+                    return Reply("error", "여러 일정이 조회됐어요. 번호로 대상을 선택해 주세요.")
                 operation = "update" if action.name == "CONFIRM_UPDATE" else "delete"
                 changes = request.get("changes") if request else None
-                if len(self.state.candidates) > 1:
-                    if len(self.state.candidates) > 10:
-                        return Reply("ask", "대상 일정이 많아요. 날짜와 제목을 더 좁혀 말씀해 주세요.")
-                    ids = list(self.state.candidates)
-                    self.state.selection = Selection(operation, changes, ids, target_id)
-                    options = ", ".join(f"{index}번 {item.get('title', '제목 없음')} ({item.get('scheduledAt', '시각 없음')})"
-                                        for index, item in enumerate(self.state.candidates.values(), 1))
-                    return Reply("ask", f"어느 일정을 뜻하나요? {options}. 번호를 말씀해 주세요.")
                 return self._begin_confirmation(target_id, operation, changes)
         return Reply("error", "요청을 처리하지 못했어요. 다시 말씀해 주세요.")

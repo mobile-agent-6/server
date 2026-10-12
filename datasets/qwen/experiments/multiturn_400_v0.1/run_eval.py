@@ -3,16 +3,17 @@ Self-contained local proposal. All schedules are in memory. No oracle is passed 
 """
 from __future__ import annotations
 import argparse,copy,hashlib,json,sys,time,urllib.request,urllib.error
+from collections import Counter
 from datetime import datetime,timezone
 from pathlib import Path
 from uuid import uuid4
 sys.dont_write_bytecode=True
 ROOT=Path(__file__).resolve().parent
-sys.path.insert(0,str(ROOT/'runtime'))
-from replay_multiturn_pilot import load_cases,MemorySchedules
-from schedule_assistant.service import ConversationService
-from schedule_assistant.actions import parse_action,ActionError
-from schedule_assistant.clients import ScheduleError
+sys.path.insert(0,str(ROOT))
+from runtime.replay_multiturn_pilot import load_cases,MemorySchedules
+from runtime.schedule_assistant.service import ConversationService
+from runtime.schedule_assistant.actions import parse_action,ActionError
+from runtime.schedule_assistant.clients import ScheduleError
 from guards import evidence,validate_write,check_question,intent_from_users,task_evidence,query_scope,required_question,query_date_range
 PROMPT=(ROOT/'prompt.txt').read_text(encoding='utf-8')
 OPTIONS={'temperature':0,'seed':42,'num_predict':1024,'num_ctx':8192}
@@ -31,9 +32,14 @@ def schema_for(context):
  if context['verified_user_datetime'] and not context['user_time_in_past'] and context.get('task_evidence',{}).get('status')=='confirmed':
   choices.append(branch('CREATE',obj(fields)))
  ids=[x['id'] for x in context['schedule_candidates']]
- if ids:
+ changes=obj({**fields,'completed':{'type':'boolean'}},[])
+ changes['minProperties']=1
+ if len(ids)==1:
   target={'type':'string','enum':ids}
-  choices += [branch('CONFIRM_DELETE',obj({'targetId':target})),branch('CONFIRM_UPDATE',obj({'targetId':target,'changes':obj({**fields,'completed':{'type':'boolean'}},[])}))]
+  choices += [branch('CONFIRM_DELETE',obj({'targetId':target})),branch('CONFIRM_UPDATE',obj({'targetId':target,'changes':changes}))]
+ elif 2<=len(ids)<=10:
+  choices += [branch('SELECT_TARGET',obj({'operation':{'type':'string','enum':['delete']}})),
+              branch('SELECT_TARGET',obj({'operation':{'type':'string','enum':['update']},'changes':changes}))]
  # Restrict only supported explicit intents/stages. Unknown requests keep the
  # generic schema and receive manual review; this is a hybrid system experiment.
  intent=context.get('intent')
@@ -41,7 +47,8 @@ def schema_for(context):
  if intent=='create': allowed={'ASK','CREATE'}
  elif intent=='query': allowed={'ANSWER'} if context['lookup_completed_this_turn'] else ({'ASK'} if context['date_missing'] else {'LIST'})
  elif intent in {'update','delete'}:
-  if ids: allowed={'ASK','CONFIRM_UPDATE' if intent=='update' else 'CONFIRM_DELETE'}
+  if len(ids)==1: allowed={'ASK','CONFIRM_UPDATE' if intent=='update' else 'CONFIRM_DELETE'}
+  elif len(ids)>1: allowed={'ASK','SELECT_TARGET'}
   elif context['lookup_completed_this_turn']: allowed={'ANSWER','ASK'}
   else: allowed={'ASK'} if context['date_missing'] else {'LIST'}
  scope=context.get('query_scope',{})
@@ -57,6 +64,9 @@ def schema_for(context):
   if choice['properties']['action']['enum'][0]=='LIST' and bounds.get('status')=='known':
    for key in ('from','to'): choice['properties']['request']['properties'][key]={'type':'string','enum':[bounds[key]]}
  if allowed is not None: choices=[b for b in choices if b['properties']['action']['enum'][0] in allowed]
+ if intent in {'update','delete'}:
+  choices=[b for b in choices if b['properties']['action']['enum'][0]!='SELECT_TARGET'
+           or b['properties']['request']['properties']['operation']['enum']==[intent]]
  return {'anyOf':choices}
 
 def request_json(route,payload=None,timeout=120):
@@ -176,7 +186,7 @@ def reference_trace(case):
  for t in case['turns']:
   before=len(schedules.calls);reply=service.handle(t['user'])
   if reply.kind!=t['expect']['reply_kind']: raise ValueError('Reference path mismatch: '+case['id'])
-  result.append({'state':business_state(schedules.items.values()),'pending':pending_value(service),
+  result.append({'state':business_state(schedules.items.values()),'pending':pending_value(service),'reply_message':reply.message,
                  'selection':service.state.selection.candidate_ids if service.state.selection else None,
                  'writes':[{k:v for k,v in c.items() if k!='key'} for c in schedules.calls[before:] if c['method'] in {'POST','PATCH','DELETE'}]})
  if client.outputs: raise ValueError('Unused reference actions: '+case['id'])
@@ -213,6 +223,10 @@ def run_case(case,client,rubric):
     observed=[sorted(x['id'] for x in probe.list(f)) for f in actual_lists]
     checks.append(check('query_result_ids',wanted,observed))
   gold=reference[index-1]
+  # ANSWER text is assembled by this controller from observed schedules. Check
+  # the displayed result as well as the backing GET IDs; ASK wording remains
+  # governed by the separate question rubric and human review.
+  if expected['reply_kind']=='answer': checks.append(check('displayed_answer',gold['reply_message'],message))
   checks.append(check('business_state',gold['state'],business_state(schedules.items.values())))
   checks.append(check('write_payloads',gold['writes'],[{k:v for k,v in c.items() if k!='key'} for c in writes]))
   if expected['reply_kind']=='confirm': checks.append(check('confirmation_target_changes',gold['pending'],pending_value(service)))
@@ -224,20 +238,26 @@ def run_case(case,client,rubric):
   if kind!=expected['reply_kind']: stop='reply_kind_mismatch';break
   if qmatch is False: stop='question_content_needs_review';break
   if events: stop='unsupported_write_blocked';break
-  if any(not c['match'] and c['name'] in {'confirmation_target_changes','selection_candidates_order','business_state','write_payloads','query_result_ids'} for c in checks): stop='semantic_path_mismatch';break
+  if any(not c['match'] and c['name'] in {'confirmation_target_changes','selection_candidates_order','business_state','write_payloads','query_result_ids','displayed_answer'} for c in checks): stop='semantic_path_mismatch';break
  end=list(schedules.items.values());completed=len(turns)==len(case['turns']) and stop is None;fc=final_checks(case['expect_final'],end) if completed else []
  matched=completed and all(c['match'] for t in turns for c in t['checks']) and all(c['match'] for c in fc)
- return {'case_id':case['id'],'conversation_group_id':case['conversation_group_id'],'label_status':case['label_status'],'reference_datetime':case['reference_datetime'],'initial_schedules':case['initial_schedules'],'expected_final':case['expect_final'],'actual_final':end,'turns':turns,'final_checks':fc,'completed_turns':len(turns),'total_turns':len(case['turns']),'evaluation_version':'eval-v2.3-proposed','source_kind':'actual_model','stop_reason':stop,'provisional_match':matched,'status':'provisional_match' if matched else 'needs_review'}
+ return {'case_id':case['id'],'conversation_group_id':case['conversation_group_id'],'label_status':case['label_status'],'reference_datetime':case['reference_datetime'],'initial_schedules':case['initial_schedules'],'expected_final':case['expect_final'],'actual_final':end,'turns':turns,'final_checks':fc,'completed_turns':len(turns),'total_turns':len(case['turns']),'evaluation_version':'eval-v2.4-proposed','source_kind':'actual_model','stop_reason':stop,'provisional_match':matched,'status':'provisional_match' if matched else 'needs_review'}
 
 def save_json(path,value): path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 def save_jsonl(path,rows): path.write_text(''.join(json.dumps(r,ensure_ascii=False)+'\n' for r in rows),encoding='utf-8')
 def main():
- p=argparse.ArgumentParser(description=__doc__);p.add_argument('--scripted',action='store_true',help='Replay reference actions only; no Ollama call or model score');p.add_argument('--model',default='qwen3:4b');p.add_argument('--scenarios',type=Path,default=ROOT/'validation'/'scenarios_UNREVIEWED.jsonl');p.add_argument('--rubric',type=Path,default=ROOT/'question_rubric.json');p.add_argument('--case',action='append');p.add_argument('--output-dir',type=Path);args=p.parse_args()
- cases=load_cases(args.scenarios);rubric=json.loads(args.rubric.read_text())
- if args.case:
-  missing=set(args.case)-{c['id'] for c in cases}
+ p=argparse.ArgumentParser(description=__doc__);p.add_argument('--scripted',action='store_true',help='Replay reference actions only; no Ollama call or model score');p.add_argument('--model',default='qwen3:4b');p.add_argument('--scenarios',type=Path,default=ROOT/'validation'/'scenarios_UNREVIEWED.jsonl');p.add_argument('--additional-scenarios',type=Path,action='append',default=[],help='More scenario JSONL files, e.g. train plus validation');p.add_argument('--rubric',type=Path,default=ROOT/'question_rubric.json');p.add_argument('--case',action='append');p.add_argument('--case-file',type=Path,help='One case ID per line; blank lines and # comments are ignored');p.add_argument('--output-dir',type=Path);args=p.parse_args()
+ scenario_files=[args.scenarios]+args.additional_scenarios
+ cases=[case for path in scenario_files for case in load_cases(path)];rubric=json.loads(args.rubric.read_text())
+ if len({c['id'] for c in cases})!=len(cases):p.error('Duplicate case ID across scenario files')
+ selected=list(args.case or [])
+ if args.case_file:
+  selected.extend(line.strip() for line in args.case_file.read_text(encoding='utf-8').splitlines() if line.strip() and not line.lstrip().startswith('#'))
+ if selected:
+  if len(selected)!=len(set(selected)):p.error('Duplicate case ID in selection')
+  missing=set(selected)-{c['id'] for c in cases}
   if missing:p.error('Unknown case ID: '+str(missing))
-  cases=[c for c in cases if c['id'] in args.case]
+  cases=[c for c in cases if c['id'] in selected]
  # Validate rubric coverage before inference so a missing rule cannot silently pass.
  for c in cases:
   for i,t in enumerate(c['turns'],1):
@@ -249,8 +269,8 @@ def main():
   try: version=request_json('/api/version',timeout=10);tags=request_json('/api/tags',timeout=10)
   except RuntimeError as exc:p.error(str(exc))
  out.mkdir(parents=True)
- files=list(ROOT.glob('*.py'))+list((ROOT/'runtime').rglob('*.py'))+[ROOT/'prompt.txt',args.scenarios,args.rubric]
- manifest={'tool_version':'eval-v2.3-proposed','source_kind':'scripted_reference' if args.scripted else 'actual_model','run_id':run_id,'model':args.model,'model_metadata':[m for m in tags.get('models',[]) if m.get('name')==args.model],'ollama_version':version,'options':OPTIONS,'think':False,'scope':'Qwen + changed observation framing + state schema + evidence guard; NOT fine-tuned model','prompt':PROMPT,'case_ids':[c['id'] for c in cases],'file_sha256':{str(f.relative_to(ROOT)) if f.is_relative_to(ROOT) else str(f):hashlib.sha256(f.read_bytes()).hexdigest() for f in files},'status':'provisional_unreviewed','created_at':datetime.now(timezone.utc).isoformat()}
+ files=list(ROOT.glob('*.py'))+list((ROOT/'runtime').rglob('*.py'))+[ROOT/'prompt.txt',*scenario_files,args.rubric]+([args.case_file] if args.case_file else [])
+ manifest={'tool_version':'eval-v2.4-proposed','source_kind':'scripted_reference' if args.scripted else 'actual_model','run_id':run_id,'model':args.model,'model_metadata':[m for m in tags.get('models',[]) if m.get('name')==args.model],'ollama_version':version,'options':OPTIONS,'think':False,'scope':'Model + observation framing + state schema + evidence guard; experimental scorer','prompt':PROMPT,'case_ids':[c['id'] for c in cases],'label_status_counts':dict(Counter(c['label_status'] for c in cases)),'file_sha256':{str(f.relative_to(ROOT)) if f.is_relative_to(ROOT) else str(f):hashlib.sha256(f.read_bytes()).hexdigest() for f in files},'status':'provisional_scoring','created_at':datetime.now(timezone.utc).isoformat()}
  save_json(out/'manifest.json',manifest);results=[];client=Client(args.model)
  for case in cases:
   active=ReferenceClient([a for t in case['turns'] for a in t['model_outputs']]) if args.scripted else client
@@ -258,6 +278,6 @@ def main():
   save_jsonl(out/'review_cases.jsonl',results);save_jsonl(out/'turn_results.jsonl',[{'run_id':run_id,'case_id':r['case_id'],**t} for r in results for t in r['turns']])
   print(case['id']+': '+result['status']+f' ({result["completed_turns"]}/{result["total_turns"]} turns)',flush=True)
  calls=[m for r in results for t in r['turns'] for m in t['model_calls']]
- summary={'run_id':run_id,'source_kind':'scripted_reference' if args.scripted else 'actual_model','cases_run':len(results),'provisional_matches':sum(r['provisional_match'] for r in results),'needs_review':sum(not r['provisional_match'] for r in results),'model_calls':len(calls),'parse_errors':sum(m['parse_error'] is not None for m in calls),'request_errors':sum(m['error'] is not None for m in calls),'query_date_blocks':sum(e.get('effective') is None for r in results for t in r['turns'] for e in t.get('filter_events',[])),'filter_corrections':sum(sum(e.get('effective') is not None for e in t.get('filter_events',[])) for r in results for t in r['turns']),'blocked_writes':sum(len(t['guard_events']) for r in results for t in r['turns']),'question_stops':sum(r['stop_reason']=='question_content_needs_review' for r in results),'controller_crashes':sum(t['crash'] is not None for r in results for t in r['turns']),'note':'Unreviewed draft + conservative lexical checks; not formal performance. Changes include controller/input/guard settings.'}
+ summary={'run_id':run_id,'source_kind':'scripted_reference' if args.scripted else 'actual_model','cases_run':len(results),'label_status_counts':manifest['label_status_counts'],'provisional_matches':sum(r['provisional_match'] for r in results),'needs_review':sum(not r['provisional_match'] for r in results),'model_calls':len(calls),'parse_errors':sum(m['parse_error'] is not None for m in calls),'request_errors':sum(m['error'] is not None for m in calls),'query_date_blocks':sum(e.get('effective') is None for r in results for t in r['turns'] for e in t.get('filter_events',[])),'filter_corrections':sum(sum(e.get('effective') is not None for e in t.get('filter_events',[])) for r in results for t in r['turns']),'blocked_writes':sum(len(t['guard_events']) for r in results for t in r['turns']),'question_stops':sum(r['stop_reason']=='question_content_needs_review' for r in results),'controller_crashes':sum(t['crash'] is not None for r in results for t in r['turns']),'note':'Experimental scoring with conservative lexical question checks; not formal performance. Model, controller, input, and guard settings affect results.'}
  save_json(out/'summary.json',summary);print(json.dumps(summary,ensure_ascii=False),flush=True);print('HTML에서 열 파일:',out/'review_cases.jsonl',flush=True)
 if __name__=='__main__':main()

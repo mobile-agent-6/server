@@ -85,6 +85,8 @@ wandb/
 
 # Course, vendor, office, and submission documents
 *.pdf
+# Team-authored PDF documents in docs/ (AGENTS.md section 5)
+!/docs/**/*.pdf
 *.ppt
 *.pptx
 *.doc
