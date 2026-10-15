@@ -11,6 +11,7 @@
 | `review_sources.py` | 사례별 검수 원본 생성·검증 및 승인 사례만 별도 출력 |
 | `pilot_review_cases_v0.1.txt` | train 25건·validation 5건의 재현 가능한 시범 검수 표본. test는 포함하지 않음 |
 | `scenarios_all_400_UNREVIEWED.jsonl` | 전체 400개 대화 |
+| `scenarios_all_400_UNREVIEWED_turns.csv` | 전체 400개 대화의 1,004개 사용자 턴을 한 행씩 펼친 검토용 CSV |
 | `train/scenarios_UNREVIEWED.jsonl` | 학습 후보 260개 |
 | `validation/scenarios_UNREVIEWED.jsonl` | 검증 후보 40개 |
 | `test/scenarios_UNREVIEWED.jsonl` | 테스트 예약 후보 100개 |
@@ -21,6 +22,8 @@
 | `runtime/` | 평가기가 사용하는 action 검증·대화 제어부·메모리 일정 저장소 등 실행 의존 파일 |
 
 `runtime/schedule_assistant/prompt.txt`는 내부 기반 클래스가 읽는 기본 프롬프트다. 실제 Qwen 평가에는 최상위 `prompt.txt`를 사용한다. 실행 의존 파일을 제외하면 import 또는 실행이 실패한다. 이 폴더는 DATA 내부 재현 실험이며 저장소의 `ai/`·`backend/` 구현을 변경하지 않는다.
+
+CSV는 JSONL 원본을 수정하지 않고 만든 검토용 사본이다. `scenario_id`와 `turn_number`로 원래 대화 순서를 확인할 수 있다. `model_outputs_json`, `expect_json`, 초기·최종 일정 열은 중첩 구조를 JSON 문자열로 보존한다. 학습·평가 입력과 검수 상태의 기준은 계속 JSONL 원본이다.
 
 ### 다중 후보 대상 선택 규칙 — DATA 내부 제안
 
