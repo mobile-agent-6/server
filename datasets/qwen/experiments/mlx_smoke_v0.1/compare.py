@@ -4,6 +4,7 @@ import collections
 import gc
 import hashlib
 import json
+import shlex
 import sys
 import time
 from datetime import datetime
@@ -54,6 +55,27 @@ def select_rows(rows, limit):
     return selected
 
 
+def resume_command(root, runtime, out):
+    return shlex.join([sys.executable, str(Path(__file__).resolve()),
+                       '--run-dir', str(root), '--runtime', str(runtime),
+                       '--resume', str(out), '--stage', 'both'])
+
+
+def save_records(path, records):
+    # Commit a complete snapshot; interruption cannot leave a partial JSONL row
+    # in the saved results. An unfinished temporary file is ignored on resume.
+    temporary = path.with_suffix('.jsonl.tmp')
+    temporary.write_text(''.join(json.dumps(r, ensure_ascii=False) + '\n' for r in records), encoding='utf-8')
+    temporary.replace(path)
+
+
+def diagnostic_scope(root):
+    inspection = root / 'inspection.json'
+    status = json.loads(inspection.read_text()).get('status') if inspection.exists() else None
+    label = {'REVIEWED_SMOKE_ONLY': 'REVIEWED', 'UNREVIEWED_SMOKE_ONLY': 'UNREVIEWED'}.get(status, 'UNSPECIFIED')
+    return f'{label} fixed-reference-context diagnostic; no API calls or JSON constraints'
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--run-dir', type=Path, required=True, help='Prepared dataset/model/adapter directory')
@@ -66,22 +88,17 @@ def main():
         parser.error('--stage after requires --resume')
     if args.limit < 1:
         parser.error('--limit must be positive')
-    import mlx.core as mx
-    from mlx_lm import load, generate
-    from mlx_lm.sample_utils import make_sampler
-
     root = args.run_dir.expanduser().resolve()
     runtime = args.runtime.expanduser().resolve()
     sys.path.insert(0, str(runtime))
-    from schedule_assistant.actions import parse_action
 
     data = (root / 'valid.jsonl').read_bytes()
     rows = [json.loads(line) for line in data.decode().splitlines() if line.strip()]
     selected = select_rows(rows, args.limit)
-    out = args.resume.expanduser() if args.resume else root / ('comparison-' + datetime.now().strftime('%Y%m%d-%H%M%S-%f'))
+    out = args.resume.expanduser().resolve() if args.resume else root / ('comparison-' + datetime.now().strftime('%Y%m%d-%H%M%S-%f'))
     if not args.resume:
         out.mkdir()
-    meta = {'scope': 'UNREVIEWED fixed-reference-context diagnostic; no API calls or JSON constraints',
+    meta = {'scope': diagnostic_scope(root),
             'rows_1_based': [i + 1 for i in selected], 'data_sha256': hashlib.sha256(data).hexdigest(),
             'temperature': 0, 'max_tokens': 512,
             'adapter_sha256': file_hash(root / 'adapters/adapters.safetensors'),
@@ -94,6 +111,20 @@ def main():
     else:
         (out / 'manifest.json').write_text(json.dumps(meta, indent=2))
     print(f'Comparison directory: {out}', flush=True)
+    command = resume_command(root, runtime, out)
+    print(f'Resume command (skips saved rows):\n{command}', flush=True)
+    try:
+        compare_stages(args, root, out, rows, selected, meta)
+    except KeyboardInterrupt:
+        print(f'\nStopped. Saved rows are preserved; the unfinished row will be retried.\nResume:\n{command}', flush=True)
+
+
+def compare_stages(args, root, out, rows, selected, meta):
+    import mlx.core as mx
+    from mlx_lm import load, generate
+    from mlx_lm.sample_utils import make_sampler
+    from schedule_assistant.actions import parse_action
+
     results = {}
     prompts = {}
     for label, adapter in [('before', None), ('after', str(root / 'adapters'))]:
@@ -109,38 +140,36 @@ def main():
         print(f'Loading {label}...', flush=True)
         model, tokenizer = load(str(root / 'model'), adapter_path=adapter)
         completed = len(existing)
-        with path.open('a') as log:
-            for position, index in enumerate(selected, 1):
-                if position <= completed:
-                    continue
-                messages = rows[index]['messages']
-                assert messages[-1]['role'] == 'assistant'
-                expected = json.loads(messages[-1]['content'])
-                prompt = tokenizer.apply_chat_template(messages[:-1], add_generation_prompt=True, tokenize=True, return_dict=False)
-                if label == 'before':
-                    prompts[index] = prompt
-                elif index in prompts:
-                    assert prompts[index] == prompt, 'Before/after input mismatch'
-                mx.random.seed(42)
-                start = time.perf_counter()
-                raw = generate(model, tokenizer, prompt=prompt, max_tokens=512,
-                               sampler=make_sampler(temp=0), verbose=False)
-                seconds = time.perf_counter() - start
-                error = None
-                try:
-                    parsed = json.loads(raw)
-                    parse_action(raw)
-                    valid = True
-                except (ValueError, TypeError, KeyError) as exc:
-                    parsed, valid, error = None, False, str(exc)
-                record = {'row': index + 1, 'expected': expected, 'output': raw,
-                          'schema_valid': valid, 'action_match': valid and parsed.get('action') == expected['action'],
-                          'exact_json_match': valid and parsed == expected,
-                          'seconds': round(seconds, 2), 'error': error}
-                results[label].append(record)
-                log.write(json.dumps(record, ensure_ascii=False) + '\n')
-                log.flush()
-                print(f"{label} {position}/{len(selected)} row={index+1} expected={expected['action']} valid={valid} exact={record['exact_json_match']} {seconds:.1f}s", flush=True)
+        for position, index in enumerate(selected, 1):
+            if position <= completed:
+                continue
+            messages = rows[index]['messages']
+            assert messages[-1]['role'] == 'assistant'
+            expected = json.loads(messages[-1]['content'])
+            prompt = tokenizer.apply_chat_template(messages[:-1], add_generation_prompt=True, tokenize=True, return_dict=False)
+            if label == 'before':
+                prompts[index] = prompt
+            elif index in prompts:
+                assert prompts[index] == prompt, 'Before/after input mismatch'
+            mx.random.seed(42)
+            start = time.perf_counter()
+            raw = generate(model, tokenizer, prompt=prompt, max_tokens=512,
+                           sampler=make_sampler(temp=0), verbose=False)
+            seconds = time.perf_counter() - start
+            error = None
+            try:
+                parsed = json.loads(raw)
+                parse_action(raw)
+                valid = True
+            except (ValueError, TypeError, KeyError) as exc:
+                parsed, valid, error = None, False, str(exc)
+            record = {'row': index + 1, 'expected': expected, 'output': raw,
+                      'schema_valid': valid, 'action_match': valid and parsed.get('action') == expected['action'],
+                      'exact_json_match': valid and parsed == expected,
+                      'seconds': round(seconds, 2), 'error': error}
+            results[label].append(record)
+            save_records(path, results[label])
+            print(f"{label} {position}/{len(selected)} row={index+1} expected={expected['action']} valid={valid} exact={record['exact_json_match']} {seconds:.1f}s", flush=True)
         del model, tokenizer
         gc.collect()
         mx.clear_cache()
@@ -162,4 +191,4 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
-        print('Stopped. Completed rows are saved; resume with the same comparison directory.')
+        print('Stopped during setup. If a comparison directory with manifest.json exists, use it with --resume; otherwise restart the command.')

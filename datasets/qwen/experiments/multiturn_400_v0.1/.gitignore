@@ -1,4 +1,5 @@
 /runs/
+/reviewed/
 /manifest.json
 /verification_failures.json
 /verification_summary.json

@@ -1,7 +1,11 @@
 """CPU-only checks for sample coverage and safe comparison resumption."""
 import importlib.util
+import json
+import shlex
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location('smoke_compare', Path(__file__).with_name('compare.py'))
 compare = importlib.util.module_from_spec(spec)
@@ -37,6 +41,35 @@ class CompareTests(unittest.TestCase):
     def test_invalid_sample_limit(self):
         with self.assertRaises(ValueError):
             compare.select_rows([], 0)
+
+    def test_interrupted_save_preserves_last_complete_rows(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'before.jsonl'
+            first = [{'row': 3, 'output': '질문'}]
+            compare.save_records(path, first)
+            more = first + [{'row': 1, 'output': '정답'}]
+            with patch.object(Path, 'replace', side_effect=KeyboardInterrupt):
+                with self.assertRaises(KeyboardInterrupt):
+                    compare.save_records(path, more)
+            saved = [json.loads(line) for line in path.read_text().splitlines()]
+            self.assertEqual(saved, first)
+            compare.validate_saved_rows(saved, [2, 0])
+            compare.save_records(path, more)
+            self.assertEqual([json.loads(line) for line in path.read_text().splitlines()], more)
+
+    def test_resume_command_quotes_paths_and_finishes_both_stages(self):
+        args = shlex.split(compare.resume_command(Path('/run with spaces'), Path('/runtime'), Path('/compare dir')))
+        self.assertEqual(args[args.index('--run-dir') + 1], '/run with spaces')
+        self.assertEqual(args[args.index('--resume') + 1], '/compare dir')
+        self.assertEqual(args[args.index('--stage') + 1], 'both')
+
+    def test_scope_uses_prepared_data_status(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.assertTrue(compare.diagnostic_scope(root).startswith('UNSPECIFIED '))
+            for status, label in [('REVIEWED_SMOKE_ONLY', 'REVIEWED'), ('UNREVIEWED_SMOKE_ONLY', 'UNREVIEWED')]:
+                (root / 'inspection.json').write_text(json.dumps({'status': status}))
+                self.assertTrue(compare.diagnostic_scope(root).startswith(label + ' '))
 
 
 if __name__ == '__main__':
