@@ -1,0 +1,6 @@
+# Versions observed in the macOS arm64 smoke experiment; not a full lockfile.
+mlx==0.32.4
+mlx-metal==0.32.4
+mlx-lm[train]==0.32.0
+transformers==5.19.0
+huggingface-hub==2.2.0
