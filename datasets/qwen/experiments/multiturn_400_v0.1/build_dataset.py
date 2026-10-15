@@ -165,7 +165,7 @@ def create(b,mode):
  elif mode=='date_ampm':
   b.ask(f'{b.hour-12}시에 {b.title} 등록해줘.'+tail,'date');b.ask(d+'이야.','ampm');last=tm+'야.'
  elif mode=='past_then_ambiguous':
-  b.ask(f'오늘 오전 8시에 {b.title} 등록해줘.'+tail,'past_time');b.ask(f'{d} {b.hour-12}시로 할게.','ampm');last=tm+'야.'
+  b.ask(f'오늘 아침 8시에 {b.title} 등록해줘.'+tail,'past_time');b.ask(f'{d} {b.hour-12}시로 할게.','ampm');last=tm+'야.'
  body={'title':b.title,'scheduledAt':b.dt(b.day,b.hour,b.minute),'category':b.cat,'reminderMinutesBefore':alarm}
  b.c['created_id']=uid(b.id+':created');b.emit(last,[act('CREATE',body)],'created',['POST'],1,post_body=body)
  b.finish([{'id':b.c['created_id'],**body,'completed':False}])

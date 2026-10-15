@@ -1,0 +1,46 @@
+{
+  "count": 114,
+  "scope": "UNREVIEWED fixed-reference-context diagnostic; no API calls or JSON constraints",
+  "before": {
+    "schema_valid": 62,
+    "action_match": 35,
+    "exact_json_match": 23
+  },
+  "after": {
+    "schema_valid": 76,
+    "action_match": 55,
+    "exact_json_match": 43
+  },
+  "improved_exact": 20,
+  "regressed_exact": 0,
+  "dataset_commit": "39c2d3c518844f09e31545ea1df00a37c2489421",
+  "experiment_date": "2026-10-15/2026-10-16 Asia/Seoul",
+  "training_steps": 20,
+  "inspection": {
+    "status": "UNREVIEWED_SMOKE_ONLY",
+    "mask_check": "PASS",
+    "max_seq_length": 3328,
+    "splits": {
+      "train": {
+        "rows": 651,
+        "min_tokens": 2428,
+        "max_tokens": 3244,
+        "mean_tokens": 2699,
+        "source_sha256": "486ecf81c87cdac32377b38d1cf8ea381c33814d852417ec9b05b15735f92221"
+      },
+      "valid": {
+        "rows": 114,
+        "min_tokens": 2419,
+        "max_tokens": 2915,
+        "mean_tokens": 2625,
+        "source_sha256": "8a3e29252715530966742fcda769b1805d28129aeb4d265fca8489b85b6e74d4"
+      }
+    }
+  },
+  "comparison": {
+    "temperature": 0,
+    "max_tokens": 512,
+    "data_sha256": "8a3e29252715530966742fcda769b1805d28129aeb4d265fca8489b85b6e74d4",
+    "adapter_sha256": "c46024ade0f1abc5b4ee760f12e88e902205e45ef960c3a252e184cdcce20148"
+  }
+}

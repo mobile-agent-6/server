@@ -1,0 +1,107 @@
+{
+  "count": 13,
+  "scope": "REVIEWED fixed-reference-context diagnostic; no API calls or JSON constraints",
+  "before": {
+    "schema_valid": 13,
+    "action_match": 7,
+    "exact_json_match": 5
+  },
+  "after": {
+    "schema_valid": 13,
+    "action_match": 7,
+    "exact_json_match": 5
+  },
+  "improved_exact": 0,
+  "regressed_exact": 0,
+  "original_scope": "UNREVIEWED fixed-reference-context diagnostic; no API calls or JSON constraints",
+  "scope_correction": "The original tool used a fixed UNREVIEWED label. Dataset hashes match the reviewed export and REVIEWED_SMOKE_ONLY inspection; original local logs preserved.",
+  "experiment_date": "2026-10-16 Asia/Seoul",
+  "prompt_version": "v2.5",
+  "training_steps": 20,
+  "review": {
+    "scenario_counts": {
+      "train": 25,
+      "validation": 5
+    },
+    "method": "User reported overall acceptance and delegated review recording; Codex inspected and recorded 30 cases. Not an independent multi-human review.",
+    "functional_successes": 30,
+    "controller_wording_improvement_cases": 4,
+    "target_json_edits": 0
+  },
+  "dataset": {
+    "format": "reviewed-chat-v1",
+    "prompt_sha256": "8702bc69aa1bb66b25bdd9142c66371b4c1844f9b14799581be6aa2971c50af8",
+    "files": {
+      "train.jsonl": {
+        "rows": 63,
+        "sha256": "913ed7e38a549a6c07081e889e1913b578e87a12282e650c97b5548cb20e1ade"
+      },
+      "train_row_map.jsonl": {
+        "rows": 65,
+        "sha256": "a4b59810bed946b9e365470f43f4feb7a466ab576ff3076b05adc2a7a23d9a79"
+      },
+      "valid.jsonl": {
+        "rows": 13,
+        "sha256": "398188d7c703fb05a97198f8ff7c402e8098ff2d2fb1e0ce8cc50d7cc1f687d0"
+      },
+      "valid_row_map.jsonl": {
+        "rows": 14,
+        "sha256": "02cd8495132feca5001fc511b3befd2fc531e214b66647ec1e9f7290013bc329"
+      }
+    }
+  },
+  "inspection": {
+    "status": "REVIEWED_SMOKE_ONLY",
+    "mask_check": "PASS",
+    "max_seq_length": 4352,
+    "splits": {
+      "train": {
+        "rows": 63,
+        "min_tokens": 3367,
+        "max_tokens": 4169,
+        "mean_tokens": 3648,
+        "source_sha256": "913ed7e38a549a6c07081e889e1913b578e87a12282e650c97b5548cb20e1ade"
+      },
+      "valid": {
+        "rows": 13,
+        "min_tokens": 3358,
+        "max_tokens": 3839,
+        "mean_tokens": 3539,
+        "source_sha256": "398188d7c703fb05a97198f8ff7c402e8098ff2d2fb1e0ce8cc50d7cc1f687d0"
+      }
+    }
+  },
+  "comparison": {
+    "temperature": 0,
+    "max_tokens": 512,
+    "data_sha256": "398188d7c703fb05a97198f8ff7c402e8098ff2d2fb1e0ce8cc50d7cc1f687d0",
+    "adapter_sha256": "36020678065db32f2c6e66ff8e7622d89b94f1793ae997e98591306fc2ef250f"
+  },
+  "validation_loss_console": [
+    {
+      "iteration": 1,
+      "loss": 0.466
+    },
+    {
+      "iteration": 10,
+      "loss": 0.035
+    },
+    {
+      "iteration": 20,
+      "loss": 0.036
+    }
+  ],
+  "validation_batches": 2,
+  "after_mismatch_review": {
+    "equivalent_date_question_wording": 2,
+    "create_without_confirmed_date": 2,
+    "list_instead_of_create": 2,
+    "select_before_lookup": 2
+  },
+  "limitations": [
+    "13 fixed-context validation rows from 5 dialogues; not end-to-end accuracy.",
+    "Initial unreviewed and later reviewed runs use different prompts and data; scores are not directly comparable.",
+    "20 iterations do not cover a full pass of 63 training rows.",
+    "Test data was not used for training or comparison."
+  ]
+}

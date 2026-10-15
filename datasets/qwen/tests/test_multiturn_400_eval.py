@@ -22,6 +22,17 @@ class Multiturn400EvalTests(unittest.TestCase):
             EXPERIMENT / "train" / "scenarios_UNREVIEWED.jsonl")}
         cls.rubric = json.loads((EXPERIMENT / "question_rubric.json").read_text(encoding="utf-8"))
 
+    def test_first_utterances_do_not_overlap_across_splits(self) -> None:
+        first_utterances = {
+            split: {case["turns"][0]["user"] for case in evaluator.load_cases(
+                EXPERIMENT / split / "scenarios_UNREVIEWED.jsonl")}
+            for split in ("train", "validation", "test")
+        }
+        for left, right in (("train", "validation"), ("train", "test"),
+                            ("validation", "test")):
+            self.assertFalse(first_utterances[left] & first_utterances[right],
+                             f"identical first utterances in {left} and {right}")
+
     def test_wrong_displayed_query_result_fails_even_when_get_and_state_match(self) -> None:
         case = self.cases["in-list-range"]
         original_service = evaluator.Service
