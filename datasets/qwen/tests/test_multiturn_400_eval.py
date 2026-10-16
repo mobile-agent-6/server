@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import csv
 import json
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -33,6 +35,67 @@ class Multiturn400EvalTests(unittest.TestCase):
                             ("validation", "test")):
             self.assertFalse(first_utterances[left] & first_utterances[right],
                              f"identical first utterances in {left} and {right}")
+
+    def test_generated_wording_and_review_csv_match(self) -> None:
+        cases = evaluator.load_cases(EXPERIMENT / "scenarios_all_400_UNREVIEWED.jsonl")
+        turns_by_id = {}
+        cases_by_id = {case["id"]: case for case in cases}
+        splits_by_id = {case["id"]: split for split in ("train", "validation", "test")
+                        for case in evaluator.load_cases(
+                            EXPERIMENT / split / "scenarios_UNREVIEWED.jsonl")}
+        self.assertEqual(set(cases_by_id), set(splits_by_id))
+        for case in cases:
+            titles = {item["title"] for item in case["initial_schedules"] + case["expect_final"]}
+            titles.update(output["request"]["changes"]["title"]
+                          for turn in case["turns"] for output in turn["model_outputs"]
+                          if output.get("request") and output["request"].get("changes")
+                          and "title" in output["request"]["changes"])
+            for number, turn in enumerate(case["turns"], 1):
+                turns_by_id[(case["id"], str(number))] = turn
+                messages = [turn["user"]] + [output["message"] for output in turn["model_outputs"]
+                                                    if output["action"] == "ASK" and output["message"]]
+                for message in messages:
+                    self.assertNotRegex(message, r"모레이야|\d+분야|\d+분로|\d+시으로", case["id"])
+                    for title in titles:
+                        pattern = re.escape(title) + r"[\"”]?(으로|로|을|를|이야|야|이|가|은|는|과|와)(?=$|[\s.,!?\"“”‘’])"
+                        for match in re.finditer(pattern, message):
+                            jong = (ord(title[-1]) - 0xAC00) % 28
+                            particle = match.group(1)
+                            expected = ("로" if jong in (0, 8) else "으로") if particle in ("으로", "로") else {
+                                "을": ("을", "를"), "를": ("을", "를"),
+                                "이": ("이", "가"), "가": ("이", "가"),
+                                "은": ("은", "는"), "는": ("은", "는"),
+                                "과": ("과", "와"), "와": ("과", "와"),
+                                "이야": ("이야", "야"), "야": ("이야", "야"),
+                            }[particle][0 if jong else 1]
+                            self.assertEqual(particle, expected, f"{case['id']}: {message}")
+        with (EXPERIMENT / "scenarios_all_400_UNREVIEWED_turns.csv").open(
+                encoding="utf-8-sig", newline="") as source:
+            csv_rows = list(csv.DictReader(source))
+        self.assertEqual(len(csv_rows), len(turns_by_id))
+        self.assertEqual({(row["scenario_id"], row["turn_number"]) for row in csv_rows},
+                         set(turns_by_id))
+        for row in csv_rows:
+            turn = turns_by_id[(row["scenario_id"], row["turn_number"])]
+            case = cases_by_id[row["scenario_id"]]
+            self.assertEqual(row["user"], turn["user"])
+            self.assertEqual(json.loads(row["model_outputs_json"]), turn["model_outputs"])
+            self.assertEqual(json.loads(row["expect_json"]), turn["expect"])
+            self.assertEqual(json.loads(row["initial_schedules_json"]), case["initial_schedules"])
+            self.assertEqual(json.loads(row["expect_final_json"]), case["expect_final"])
+            self.assertEqual(row["split"], splits_by_id[case["id"]])
+            self.assertEqual(row["total_turns"], str(len(case["turns"])))
+            self.assertEqual(row["model_actions"], " | ".join(
+                output["action"] for output in turn["model_outputs"]))
+            self.assertEqual(row["expected_reply_kind"], turn["expect"]["reply_kind"])
+            self.assertEqual(row["expected_writes"], str(turn["expect"]["writes"]))
+            self.assertEqual(row["expected_api_methods"], " | ".join(turn["expect"]["api_methods"]))
+            for column, key in (("schema_version", "schema_version"),
+                                ("conversation_group_id", "conversation_group_id"),
+                                ("reference_datetime", "reference_datetime"),
+                                ("label_status", "label_status")):
+                self.assertEqual(row[column], case[key])
+            self.assertEqual(row["created_id"], case.get("created_id", ""))
 
     def test_wrong_displayed_query_result_fails_even_when_get_and_state_match(self) -> None:
         case = self.cases["in-list-range"]

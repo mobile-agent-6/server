@@ -1,5 +1,5 @@
 """Deterministic, unreviewed dialogue drafts. Never consumes live model answers."""
-import copy, hashlib, json, sys, shutil
+import copy, csv, hashlib, json, sys, shutil, re
 from pathlib import Path
 from datetime import datetime, timedelta
 from uuid import uuid5, NAMESPACE_URL
@@ -27,6 +27,15 @@ DAYS={0:'오늘',1:'내일',2:'모레'}
 Q={'task':'어떤 업무를 등록할까요?','date':'어느 날짜의 일정인가요?','time':'어떤 시각에 등록할까요?','ampm':'오전인가요, 오후인가요?','past_time':'말씀하신 시각은 이미 지났어요. 몇 시로 등록할까요?'}
 ALL=[];META=[];RUBRIC={}
 def uid(s):return str(uuid5(NAMESPACE_URL,'qwen400:v1:'+s))
+def particle_for(text,original):
+ """Match a Korean particle to the final syllable after title substitution."""
+ code=ord(text[-1]);jong=(code-0xAC00)%28 if 0xAC00<=code<=0xD7A3 else None
+ if jong is None:return original
+ if original in ('으로','로'):return '로' if jong in (0,8) else '으로'
+ choices={'을':('을','를'),'를':('을','를'),'이':('이','가'),'가':('이','가'),
+          '은':('은','는'),'는':('은','는'),'과':('과','와'),'와':('과','와'),
+          '이야':('이야','야'),'야':('이야','야')}
+ return choices[original][0 if jong else 1] if original in choices else original
 def act(name,request=None,message=None):return {'action':name,'message':message,'request':request}
 def turn(user,outputs,kind,methods=(),writes=0,**extra):return {'user':user,'model_outputs':outputs,'expect':{'reply_kind':kind,'writes':writes,'api_methods':list(methods),**extra}}
 def clean(items):return [{k:v for k,v in x.items() if k not in ('createdAt','updatedAt','reminderAt')} for x in items]
@@ -95,9 +104,14 @@ for ci,cat in enumerate(CATS):
    if len(obj)>=25 and obj[:4].isdigit() and 'T' in obj:
     try:return (datetime.fromisoformat(obj)+delta).isoformat(timespec='seconds')
     except ValueError:pass
-   # One-pass placeholders prevent cascading replacements.
-   for i,t in enumerate(sorted(replacements,key=len,reverse=True)):obj=obj.replace(t,f'@@TASK{i}@@')
-   for i,t in enumerate(sorted(replacements,key=len,reverse=True)):obj=obj.replace(f'@@TASK{i}@@',replacements[t])
+   # One-pass placeholders prevent cascading replacements. Re-select an attached
+   # particle because the replacement title may end in a different consonant.
+   titles=sorted(replacements,key=len,reverse=True)
+   for i,t in enumerate(titles):obj=obj.replace(t,f'@@TASK{i}@@')
+   def restore(match):
+    title=replacements[titles[int(match.group(1))]];particle=match.group(2)
+    return title+(particle_for(title,particle) if particle else '')
+   obj=re.sub(r'@@TASK(\d+)@@(?:(으로|로|을|를|이야|야|이|가|은|는|과|와)(?=$|[\s.,!?"“”‘’]))?',restore,obj)
    return obj
   x=transform(x);x['id']=new_id;x['conversation_group_id']=base['conversation_group_id']
   # Follow-up yes/no turns are controller turns; no manufactured model answer.
@@ -159,13 +173,13 @@ def create(b,mode):
  if mode=='task_date':
   b.ask(f'{tm}에 일정 등록해줘.'+tail,'task');b.ask(b.title,'date');last=f'{d}로 해줘.'
  elif mode=='date_time':
-  b.ask(f'{b.title} 등록해줘.'+tail,'date');b.ask(f'{d}.','time');last=tm+'야.'
+  b.ask(f'{b.title} 등록해줘.'+tail,'date');b.ask(f'{d}.','time');last=tm+particle_for(tm,'야')+'.'
  elif mode=='task_date_time':
-  b.ask('일정 등록해줘.'+tail,'task');b.ask(b.title,'date');b.ask(d+'이야.','time');last=tm+'로 해줘.'
+  b.ask('일정 등록해줘.'+tail,'task');b.ask(b.title,'date');b.ask(d+particle_for(d,'야')+'.','time');last=tm+particle_for(tm,'로')+' 해줘.'
  elif mode=='date_ampm':
-  b.ask(f'{b.hour-12}시에 {b.title} 등록해줘.'+tail,'date');b.ask(d+'이야.','ampm');last=tm+'야.'
+  b.ask(f'{b.hour-12}시에 {b.title} 등록해줘.'+tail,'date');b.ask(d+particle_for(d,'야')+'.','ampm');last=tm+particle_for(tm,'야')+'.'
  elif mode=='past_then_ambiguous':
-  b.ask(f'오늘 아침 8시에 {b.title} 등록해줘.'+tail,'past_time');b.ask(f'{d} {b.hour-12}시로 할게.','ampm');last=tm+'야.'
+  b.ask(f'오늘 아침 8시에 {b.title} 등록해줘.'+tail,'past_time');b.ask(f'{d} {b.hour-12}시로 할게.','ampm');last=tm+particle_for(tm,'야')+'.'
  body={'title':b.title,'scheduledAt':b.dt(b.day,b.hour,b.minute),'category':b.cat,'reminderMinutesBefore':alarm}
  b.c['created_id']=uid(b.id+':created');b.emit(last,[act('CREATE',body)],'created',['POST'],1,post_body=body)
  b.finish([{'id':b.c['created_id'],**body,'completed':False}])
@@ -188,13 +202,13 @@ def query(b,mode):
  b.finish()
 
 def update(b,mode):
- d=DAYS[b.day];target=b.fixture(alarm=None);b.fixture(cat=CATS[(CATS.index(b.cat)+1)%5]);title=target['title'];newtitle=title+' 재확인'
- if mode=='title_alarm':changes={'title':newtitle,'reminderMinutesBefore':10};text=f'{d} {title} 제목을 "{newtitle}"로 바꿔줘. 10분 전 알림도 켜줘.'
+ d=DAYS[b.day];target=b.fixture(alarm=None);b.fixture(cat=CATS[(CATS.index(b.cat)+1)%5]);title=target['title'];newtitle=title+' 재확인';quoted=f'"{newtitle}"{particle_for(newtitle,"로")}'
+ if mode=='title_alarm':changes={'title':newtitle,'reminderMinutesBefore':10};text=f'{d} {title} 제목을 {quoted} 바꿔줘. 10분 전 알림도 켜줘.'
  elif mode=='completed_alarm':changes={'completed':True,'reminderMinutesBefore':10};text=f'{d} {title} 일정을 완료로 바꿔줘. 10분 전 알림도 켜줘.'
- elif mode=='time_alarm':changes={'scheduledAt':b.dt(b.day,b.hour,b.minute),'reminderMinutesBefore':10};text=f'{d} {title} 시간을 {b.clock()}로 바꿔줘. 10분 전 알림도 켜줘.'
- elif mode=='title_time':changes={'title':newtitle,'scheduledAt':b.dt(b.day,b.hour,b.minute)};text=f'{d} {title} 제목을 "{newtitle}"로 바꿔줘. 시간은 {b.clock()}로 변경해줘.'
+ elif mode=='time_alarm':changes={'scheduledAt':b.dt(b.day,b.hour,b.minute),'reminderMinutesBefore':10};text=f'{d} {title} 시간을 {b.clock()}{particle_for(b.clock(),"로")} 바꿔줘. 10분 전 알림도 켜줘.'
+ elif mode=='title_time':changes={'title':newtitle,'scheduledAt':b.dt(b.day,b.hour,b.minute)};text=f'{d} {title} 제목을 {quoted} 바꿔줘. 시간은 {b.clock()}{particle_for(b.clock(),"로")} 변경해줘.'
  elif mode=='missing_date_title':
-  changes={'title':newtitle};b.ask(f'{title} 일정 제목을 "{newtitle}"로 바꿔줘.','date');text=f'{d} 일정이야.'
+  changes={'title':newtitle};b.ask(f'{title} 일정 제목을 {quoted} 바꿔줘.','date');text=f'{d} 일정이야.'
  b.confirm(text,target,changes);b.decision(target,changes)
 
 def delete(b,mode):
@@ -266,7 +280,6 @@ for r in results:
    if not schema_matches(json.loads(m['raw']),m['schema']):schema_errors.append((r['case_id'],t['index'],m['raw']))
 assert not schema_errors,schema_errors[:10]
 # Exact whole-conversation duplicates, ignoring generated UUIDs, are forbidden.
-import re
 fingerprints=set()
 for c in ALL:
  canonical=json.dumps({k:v for k,v in c.items() if k not in ('id','conversation_group_id','created_id')},sort_keys=True,ensure_ascii=False)
@@ -305,7 +318,19 @@ for split in ['train','validation','test']:
  rowhashes[split]=set(seen)
  stats[split]={'dialogues':len(cases),'conversation_groups':len({c['conversation_group_id'] for c in cases}),'user_turns':sum(len(c['turns']) for c in cases),'model_calls':len(maps),'unique_supervised_rows':len(rows),'categories':dict(Counter(meta[c['id']]['category'] for c in cases))}
 for a,b in [('train','validation'),('train','test'),('validation','test')]:assert not rowhashes[a]&rowhashes[b],(a,b,'identical row leakage')
+csv_path=ROOT/'scenarios_all_400_UNREVIEWED_turns.csv'
+with csv_path.open(encoding='utf-8-sig',newline='') as source:
+ reader=csv.DictReader(source);fieldnames=reader.fieldnames;csv_rows=list(reader)
+turn_by_id={(case['id'],str(index)):turn for case in ALL for index,turn in enumerate(case['turns'],1)}
+assert len(csv_rows)==len(turn_by_id) and {(row['scenario_id'],row['turn_number']) for row in csv_rows}==set(turn_by_id),'review CSV is out of sync with scenario IDs/turns'
+for row in csv_rows:
+ turn=turn_by_id[(row['scenario_id'],row['turn_number'])]
+ row['user']=turn['user']
+ row['model_outputs_json']=json.dumps(turn['model_outputs'],ensure_ascii=False,separators=(',',':'))
+with csv_path.open('w',encoding='utf-8-sig',newline='') as target:
+ writer=csv.DictWriter(target,fieldnames=fieldnames,lineterminator='\r\n')
+ writer.writeheader();writer.writerows(csv_rows)
 app.save_json(ROOT/'verification_summary.json',{'status':'scripted_reference_passed_NOT_MODEL_ACCURACY','cases':len(results),'matches':len(results),'filter_corrections':0,'blocked_writes':0,'group_overlap':0,'exact_row_overlap':0,'human_reviewed':0,'dynamic_action_schema_errors':0,'exact_dialogue_duplicates_ignoring_uuid':0,'splits':stats})
 files=[p for p in ROOT.rglob('*') if p.is_file() and p.name!='manifest.json' and '__pycache__' not in str(p)]
-app.save_json(ROOT/'manifest.json',{'dataset_version':'qwen-dataset-400-v0.1','label_status':'proposed_unreviewed','source_run_for_context_only':'eval_20261011_230323_c4efb5','source_run_answers_used':False,'split_unit':'conversation_group_id','test_status':'reserved_draft_not_human_reviewed_not_final_locked_benchmark','supervision':'only final assistant action per row; prior assistant messages are context','splits':stats,'sha256':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(files)}})
+app.save_json(ROOT/'manifest.json',{'dataset_version':'qwen-dataset-400-v0.1.1-proposed','label_status':'proposed_unreviewed','source_run_for_context_only':'eval_20261011_230323_c4efb5','source_run_answers_used':False,'split_unit':'conversation_group_id','test_status':'reserved_draft_not_human_reviewed_not_final_locked_benchmark','supervision':'only final assistant action per row; prior assistant messages are context','splits':stats,'sha256':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(files)}})
 print(json.dumps(stats,ensure_ascii=False,indent=2));print('400 scripted reference dialogues passed; human reviewed: 0')

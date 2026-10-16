@@ -19,6 +19,16 @@ import run_qwen_eval  # noqa: E402
 
 
 class QwenEvaluationTests(unittest.TestCase):
+    def test_read_content_names_an_explicit_task_or_is_null(self) -> None:
+        cases = qwen_eval.load_cases(API_EXPERIMENT / "cases_100.jsonl")
+        for case in cases:
+            if case["expected"]["intent"] != "read":
+                continue
+            content = case["expected"]["content"]
+            self.assertNotEqual(content, "일정 조회", case["id"])
+            if content is not None:
+                self.assertIn(content, case["utterance"], case["id"])
+
     def test_api_category_experiment_uses_all_five_enum_values(self) -> None:
         cases = qwen_eval.load_cases(API_EXPERIMENT / "cases_100.jsonl")
         self.assertEqual(len(cases), 100)

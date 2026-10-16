@@ -39,6 +39,12 @@ v2.5 JSON 예시 8개는 기존 action 검증기와 해당 상황의 동적 sche
 
 CSV는 JSONL 원본을 수정하지 않고 만든 검토용 사본이다. `scenario_id`와 `turn_number`로 원래 대화 순서를 확인할 수 있다. `model_outputs_json`, `expect_json`, 초기·최종 일정 열은 중첩 구조를 JSON 문자열로 보존한다. 학습·평가 입력과 검수 상태의 기준은 계속 JSONL 원본이다.
 
+### 데이터 문구 개정 — 2026-10-16
+
+현재 생성본은 `qwen-dataset-400-v0.1.1-proposed`다. 제목 치환 후 잘못 붙은 조사(train 27건), `분야` 시각 표현(validation 3건·test 10건), `모레이야` 날짜 표현(test 10건), 제목 변경 문장의 인용부호 뒤 조사(validation 5건·test 15건), `분로` 시각 표현(test 21건)을 고쳤다. 일부 test 사례에서 수정이 겹치므로 변경된 대화는 train 27건·validation 8건·test 39건, 총 74건이다. `build_dataset.py` 실행 시 검토용 CSV의 사용자 발화·모델 질문도 JSONL에 맞춰 갱신한다. 분할·그룹·action·API 요청·정답 상태는 그대로이며, 모든 사례는 여전히 미검수 제안이다.
+
+문구가 달라져 JSONL·CSV의 해시가 바뀌었다. 아래의 과거 실제 모델 평가와 20-step 시험 학습 수치는 개정 전 입력의 기록이다. 개정본의 전후 비교에는 두 모델을 같은 새 입력으로 다시 평가해야 한다. 고정 시범 표본 30건 중 `validation-outbound-update-title_alarm-03`의 문구가 바뀌었다. 이미 만든 `reviewed/` 검수 원본은 새 초안과 해시가 다를 수 있으므로 자동 승인하거나 덮어쓰지 말고 해당 사례를 대조한다.
+
 ### 다중 후보 대상 선택 규칙 — AI·DATA 로컬 시범
 
 수정·삭제 조회 결과가 1건이면 기존 `CONFIRM_UPDATE`/`CONFIRM_DELETE`에 조회된 ID를 넣는다. 2~10건이면 `SELECT_TARGET`을 출력한다. 삭제 형식은 `{"action":"SELECT_TARGET","message":null,"request":{"operation":"delete"}}`, 수정 형식은 `request={"operation":"update","changes":{...}}`다. `SELECT_TARGET`에는 `targetId`가 없다. 제어부가 번호를 보여주고 사용자의 선택을 실제 ID로 바꿔 대상·변경값을 확인한 뒤 승인 시에만 쓴다. 잘못된 번호는 다시 묻고, 취소하면 쓰지 않는다. 10건 초과는 날짜·제목으로 범위를 좁혀 다시 조회하도록 묻는다.
@@ -59,7 +65,9 @@ CSV는 JSONL 원본을 수정하지 않고 만든 검토용 사본이다. `scena
 
 원본 30개와 추가 train 230개는 같은 상황의 어휘·날짜·승인 표현 변형을 포함한다. validation/test는 새 대화 조합으로 작성했다. 같은 원본/조합의 변형은 같은 그룹과 분할에 배치했다. 그룹 ID와 동일 입력·정답 행의 분할 간 중복은 없으나 의미상 유사성과 실제 현장 대표성은 사람 검수가 필요하다. test는 검수 전 예약 초안이며 아직 잠근 독립 시험본이 아니다.
 
-기존 400건의 기대 응답 종류를 점검하면 `error`·`stale`은 0건이고 validation 40건에는 `SELECT_TARGET`이 없다. 기존 분할과 과거 실행의 비교 기준을 유지하기 위해 이 파일들을 변경하지 않았다. 대신 `diagnostic/`에 대상 선택 2건, 오류 6턴·stale 1턴, GET/POST/PATCH/DELETE 장애 주입 7건을 별도로 추가했다. 등록 응답 유실 후 같은 멱등키 재시도, 등록 거부 후 새 요청, 수정·삭제의 커밋 전 거부와 커밋 후 응답 유실, 확인 전 외부 변경을 포함한다. 10건 모두 **미검수 DATA 진단용**이며 기존 validation/test 점수에 합치지 않는다. 다음 데이터 버전의 분할·누출 점검과 사람 검수 후 평가 범위를 결정한다.
+기존 400건의 기대 응답 종류를 점검하면 `error`·`stale`은 0건이고 validation 40건에는 `SELECT_TARGET`이 없다. 진단 범위를 별도로 확인하기 위해 `diagnostic/`에 대상 선택 2건, 오류 6턴·stale 1턴, GET/POST/PATCH/DELETE 장애 주입 7건을 추가했다. 등록 응답 유실 후 같은 멱등키 재시도, 등록 거부 후 새 요청, 수정·삭제의 커밋 전 거부와 커밋 후 응답 유실, 확인 전 외부 변경을 포함한다. 10건 모두 **미검수 DATA 진단용**이며 기존 validation/test 점수에 합치지 않는다. 다음 데이터 버전의 분할·누출 점검과 사람 검수 후 평가 범위를 결정한다.
+
+진단 10건 중 9건의 첫 사용자 발화가 train과 같다. 기존 train 사례에서 복사한 장애 진단을 validation으로 옮기면 독립 분할로 볼 수 없다. 대상 선택·장애 경로를 공식 validation에 포함하려면 train과 겹치지 않는 새 대화 가족을 별도 데이터 버전으로 작성하고 정답·채점 경로를 검수해야 한다. 기존 40건의 과거 실행 점수와 새 버전 점수는 구분한다.
 
 ```bash
 python3 build_fault_probes.py
