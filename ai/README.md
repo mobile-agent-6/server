@@ -13,11 +13,12 @@ Ollama와 백엔드가 먼저 실행돼 있어야 한다. 위 명령은 지정�
 | `ASK`            | 짧은 추가 질문만 표시                                                                   |
 | `LIST`           | `GET /api/v1/schedules` 후 결과를 문맥으로 넣고 모델을 다시 호출                      |
 | `CREATE`         | 유효한 필수값에 대해 `Idempotency-Key`를 붙여 `POST /api/v1/schedules`              |
-| `CONFIRM_UPDATE` | 후보가 여럿이면 사용자에게 번호 선택을 받고, 실제 대상·변경값을 확인; 승인 시 재조회 후 `PATCH` |
-| `CONFIRM_DELETE` | 같은 선택·확인 절차 후 승인 시 `DELETE`                                               |
+| `SELECT_TARGET`  | 조회 후보가 2~10건이면 ID 없이 번호 선택을 요청; 선택한 대상·변경값을 확인하기 전에는 쓰지 않음 |
+| `CONFIRM_UPDATE` | 조회 후보가 1건이면 해당 ID·변경값을 확인; 승인 시 재조회 후 `PATCH`                 |
+| `CONFIRM_DELETE` | 조회 후보가 1건이면 해당 ID를 확인; 승인 시 재조회 후 `DELETE`                       |
 | `ANSWER`         | `message=null`. 조회 결과가 있으면 API 응답에서 안내를 만들고, 그 외에는 고정 안내 표시 |
 
-모델 출력은 `{"action":"...","message":null,"request":...}`의 세 키만 허용한다. 상세 필드와 다섯 category는 [검증 코드](schedule_assistant/actions.py), 지시문은 [프롬프트](schedule_assistant/prompt.txt)에 있다. 위치 필드는 없다. 수정·삭제는 목록에서 얻은 UUID만 대상으로 삼고, 여러 후보 중에서는 사용자 번호 선택을 요구한다. 확인 전이나 거절 뒤에는 쓰지 않는다. 확인 문구에 모델의 `message`를 사용하지 않는다. 등록과 수정·삭제 성공 문구는 API 성공 뒤에만 표시한다. 확인 중 승인·거절 외 새 발화는 기존 확인을 취소하고 새 요청으로 처리한다.
+모델 출력은 `action`, `message`, `request`의 세 키만 허용한다. `ASK.message`에는 질문을 넣고 `SELECT_TARGET.message`와 `ANSWER.message`는 `null`이다. 상세 필드와 다섯 category는 [검증 코드](schedule_assistant/actions.py), 지시문은 [프롬프트](schedule_assistant/prompt.txt)에 있다. 위치 필드는 없다. 수정·삭제 조회 결과가 0건이면 없음을 안내하고, 1건이면 해당 UUID로 확인을 시작한다. 2~10건이면 `SELECT_TARGET`에 `targetId` 없이 번호 선택을 요구하며, 10건 초과면 날짜·제목으로 범위를 좁히도록 묻는다. 선택한 대상·변경값을 사용자에게 확인받기 전이나 거절 뒤에는 쓰지 않는다. 확인 문구에 모델의 `message`를 사용하지 않는다. 등록과 수정·삭제 성공 문구는 API 성공 뒤에만 표시한다. 확인 중 승인·거절 외 새 발화는 기존 확인을 취소하고 새 요청으로 처리한다.
 
 등록 결과가 불확실하면 새 생성 요청을 막고, 사용자가 `재시도`라고 입력했을 때 같은 본문·키로만 다시 요청한다. 24시간이 지났으면 자동 재시도를 막고 서버 확인을 안내한다. 이 보관은 프로세스 메모리에서만 유효하므로 재시작 뒤 중복 등록 위험은 남는다.
 

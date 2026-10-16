@@ -4,7 +4,7 @@
 
 이 자료는 실제 녹음 대신 인식이 끝난 텍스트 대화를 입력으로 사용한다. 짧은 음성식 발화와 인식 오류 정정은 시범 사례를 늘릴 때 텍스트로 표현한다. 실제 STT·TTS 성능은 별도로 평가한다.
 
-시나리오 JSONL은 한 줄에 대화 한 건을 둔다. `schema_version`, `id`, `conversation_group_id`, `reference_datetime`, `initial_schedules`, `turns`, `label_status`, `expect_final`을 필수로 한다. 각 턴에는 사용자 발화, 시범 검수용 `model_outputs`, 기대 답변 종류·쓰기 시도 수를 둔다. `model_outputs`는 실제 모델 평가 결과가 아니라 제어부 동작을 재생하기 위한 **미검수 action 제안**이다. 승인·거절·번호 선택처럼 모델을 호출하지 않는 턴에는 빈 배열을 둔다. 등록 사례는 결정적인 결과 비교를 위해 `created_id`를 지정할 수 있다.
+시나리오 JSONL은 한 줄에 대화 한 건을 둔다. `schema_version`, `id`, `conversation_group_id`, `reference_datetime`, `initial_schedules`, `turns`, `label_status`, `expect_final`을 필수로 한다. 각 턴에는 사용자 발화, 시범 검수용 `model_outputs`, 기대 답변 종류·쓰기 시도 수를 둔다. `model_outputs`는 실제 모델 평가 결과가 아니라 제어부 동작을 재생하기 위한 **미검수 action 제안**이다. 승인·거절·번호 선택처럼 모델을 호출하지 않는 턴에는 빈 배열을 둔다. 등록 사례는 결정적인 결과 비교를 위해 `created_id`를 지정할 수 있다. 다중 후보 삭제 사례 `delete-select-001`은 현재 AI 시범 제어부에 맞춰 ID 없는 `SELECT_TARGET`을 사용한다. 이전 ID 선제 지정 형식으로 얻은 결과가 있다면 같은 입력 버전의 평가로 합산하지 않는다.
 
 저장소 루트에서 표준 라이브러리만으로 검증·재생할 수 있다.
 

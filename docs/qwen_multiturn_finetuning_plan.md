@@ -30,7 +30,7 @@
 - 이 100문항을 새 멀티턴 LoRA에 **6필드 출력 그대로 넣지 않는다**. 재사용할 사례는 새 action 출력으로 다시 정답을 만들고 검수·분리한다. 멀티턴 test와 겹치는 발화·시나리오는 학습에 넣지 않는다.
 - 단일 발화 데이터에는 `location`이 있으나 Schedule API에는 독립 위치 필드가 없다. 새 멀티턴 출력·평가에서는 별도 위치 데이터를 만들지 않는다. “B구역 재고 확인”처럼 **대화에서 구역을 언급하는 것은 허용**한다. 구역명을 일정 제목에 자동 삽입하는 규칙도 두지 않는다.
 - [Schedule API](api.md)는 조회·생성·수정·삭제와 `INBOUND`, `INVENTORY`, `OUTBOUND`, `RETURN`, `OTHER`를 정의한다. 생성 요청에는 `title`, `scheduledAt`, `category`, `reminderMinutesBefore`가 필요하고, `10`은 10분 전 알림이다. POST에는 `Idempotency-Key`가 필요하다.
-- [AI 영역 로컬 시범 구현](../ai/README.md)에 action 검증, 한 세션의 대화 상태, Ollama `/api/chat`와 기존 Schedule HTTP API 연결이 있다. [초기 멀티턴 시범 자료](../datasets/qwen/experiments/multiturn_pilot/README.md)의 미검수 예시 5건에 이어, [멀티턴 400건 초안](../datasets/qwen/experiments/multiturn_400_v0.1/README.md)이 train 260·validation 40·test 예약 100건으로 만들어졌다. DATA 내부 초안의 다중 후보 60건은 ID 없는 `SELECT_TARGET` 제안으로 고쳤고 정답 재생은 400/400건 통과했다. 이전 규칙에서 실제 Qwen은 미검수 validation 40건 중 31건 잠정 일치했으며, 이는 새 규칙의 측정값이 아니다. 30건 시범 표본(train 25·validation 5)은 사용자 위임에 따른 Codex 검토·판정 기록 후 로컬 승인본으로 반영했다. 이는 독립적인 복수 사람 검수와 구분한다. 승인본 63/13행의 후속 20-step 시험은 JSON 전체 일치 5/13→5/13으로 개선이 확인되지 않았다. 검수 원본 보존 도구·잠정 평가기·로컬 HTML 검토 화면이 있으며, 독립 검수·고정된 평가셋과 확정 채점 기준·합의된 출력 계약은 아직 없다. 맥북에서의 MLX 20-step 시험 학습과 고정 문맥 응답 비교는 [2026-10-16 결과 보고서](qwen_smoke_training_results_20261016.md)에 기록했다. 본 계획의 검수·전체 학습·시스템 전후 평가를 완료한 것은 아니며, Orange Pi 성능도 아직 측정하지 않았다.
+- [AI 영역 로컬 시범 구현](../ai/README.md)에 action 검증, 한 세션의 대화 상태, Ollama `/api/chat`와 기존 Schedule HTTP API 연결이 있다. [초기 멀티턴 시범 자료](../datasets/qwen/experiments/multiturn_pilot/README.md)의 미검수 예시 5건에 이어, [멀티턴 400건 초안](../datasets/qwen/experiments/multiturn_400_v0.1/README.md)이 train 260·validation 40·test 예약 100건으로 만들어졌다. DATA 내부 초안의 다중 후보 60건은 ID 없는 `SELECT_TARGET` 제안으로 고쳤고 AI 로컬 시범도 같은 action 흐름을 처리한다. 제안 정답 재생은 400/400건 통과했다. 이전 규칙에서 실제 Qwen은 미검수 validation 40건 중 31건 잠정 일치했으며, 이는 새 규칙의 측정값이 아니다. 30건 시범 표본(train 25·validation 5)은 사용자 위임에 따른 Codex 검토·판정 기록 후 로컬 승인본으로 반영했다. 이는 독립적인 복수 사람 검수와 구분한다. 승인본 63/13행의 후속 20-step 시험은 JSON 전체 일치 5/13→5/13으로 개선이 확인되지 않았다. 검수 원본 보존 도구·잠정 평가기·로컬 HTML 검토 화면이 있으며, 독립 검수·고정된 평가셋과 확정 채점 기준·합의된 출력 계약은 아직 없다. 맥북에서의 MLX 20-step 시험 학습과 고정 문맥 응답 비교는 [2026-10-16 결과 보고서](qwen_smoke_training_results_20261016.md)에 기록했다. 본 계획의 검수·전체 학습·시스템 전후 평가를 완료한 것은 아니며, Orange Pi 성능도 아직 측정하지 않았다.
 
 ## 3. 단계와 산출물
 
@@ -73,7 +73,7 @@ UTF-8 `.jsonl`을 사용한다. JSON 객체 하나가 파일 한 줄이다. 예�
 | test 예약 초안 |           100 |                각 25건 | 검수·기준 고정 뒤 잠근 BEFORE/AFTER 시험으로 전환  |
 | **합계** | **400** |     **각 100건** | 서로 다른 대화 시나리오 기준                       |
 
-현재 초안의 train 등록·조회·수정·삭제는 각각 72·61·64·63건으로 원래 목표인 각 65건과 다르다. validation은 각 10건, test 예약 초안은 각 25건이다. 30건 시범 표본은 train 25건·validation 5건에서 골랐으며 전체 400건에 추가되는 수량이 아니다. 사람 승인 사례는 0건이다. train 시나리오 한 건에서 assistant 학습 행이 여러 개 나오므로 학습 행 수는 대화 260건보다 많고, 실제 대화 길이에 따라 정해진다. test 100건은 실패·재시도 사례와 의미상 유사성까지 검수한 뒤 BEFORE 실행 전에 잠근다. 전체 비율과 함께 `성공 건수/시험 건수`, 유형별 분모를 보고한다. 자료 작성 여건에 따라 목표 수를 조정한다면 test를 열어 보기 **전에** 계획 버전을 수정한다.
+현재 초안의 train 등록·조회·수정·삭제는 각각 72·61·64·63건으로 원래 목표인 각 65건과 다르다. validation은 각 10건, test 예약 초안은 각 25건이다. 30건 시범 표본은 train 25건·validation 5건에서 골랐으며 전체 400건에 추가되는 수량이 아니다. 이 30건은 사용자 위임에 따른 Codex 검토·판정 기록 후 로컬 승인본으로 구성했으며 독립적인 복수 사람 검수는 아니다. train 시나리오 한 건에서 assistant 학습 행이 여러 개 나오므로 학습 행 수는 대화 260건보다 많고, 실제 대화 길이에 따라 정해진다. test 100건은 실패·재시도 사례와 의미상 유사성까지 검수한 뒤 BEFORE 실행 전에 잠근다. 전체 비율과 함께 `성공 건수/시험 건수`, 유형별 분모를 보고한다. 자료 작성 여건에 따라 목표 수를 조정한다면 test를 열어 보기 **전에** 계획 버전을 수정한다.
 
 ### 4.2 포함할 장면
 
@@ -110,7 +110,7 @@ UTF-8 `.jsonl`을 사용한다. JSON 객체 하나가 파일 한 줄이다. 예�
 {"action":"ANSWER","message":null,"request":null}
 ```
 
-`train.jsonl`·`valid.jsonl`의 실제 `messages`는 DATA [실험 실행기](../datasets/qwen/experiments/multiturn_400_v0.1/run_eval.py)의 입력 구성대로 고정 프롬프트 `P` 전체, `reference_datetime`·조회 후보·마지막 처리 결과의 동적 문맥, 제한된 이전 이력과 현재 사용자 발화를 같은 순서로 넣어 생성한다. 같은 사용자 턴의 `LIST` 이후 두 번째 모델 호출도 조회 결과가 들어간 별도 학습 행이다. 변환된 행은 실험 [프롬프트](../datasets/qwen/experiments/multiturn_400_v0.1/prompt.txt)·[action 검증기](../datasets/qwen/experiments/multiturn_400_v0.1/runtime/schedule_assistant/actions.py)에 먼저 대조한다. 예를 들어 `CREATE.message`는 프롬프트 규칙대로 `null`이어야 한다. 정식 [AI 프롬프트](../ai/schedule_assistant/prompt.txt)·[검증기](../ai/schedule_assistant/actions.py)와는 `SELECT_TARGET` 계약 합의 후 정렬해야 한다. 제어부가 API 결과로 만드는 확인·성공·`ANSWER` 표시 문구를 모델 정답으로 학습시키지 않는다. MLX LM의 chat `messages` 변환과 `--mask-prompt` 학습 방식은 선택한 Qwen 체크포인트·MLX LM 버전의 작은 샘플에서 확인한다. [MLX LM 공식 문서](https://github.com/ml-explore/mlx-lm/blob/main/mlx_lm/LORA.md)
+`train.jsonl`·`valid.jsonl`의 실제 `messages`는 DATA [실험 실행기](../datasets/qwen/experiments/multiturn_400_v0.1/run_eval.py)의 입력 구성대로 고정 프롬프트 `P` 전체, `reference_datetime`·조회 후보·마지막 처리 결과의 동적 문맥, 제한된 이전 이력과 현재 사용자 발화를 같은 순서로 넣어 생성한다. 같은 사용자 턴의 `LIST` 이후 두 번째 모델 호출도 조회 결과가 들어간 별도 학습 행이다. 변환된 행은 실험 [프롬프트](../datasets/qwen/experiments/multiturn_400_v0.1/prompt.txt)·[action 검증기](../datasets/qwen/experiments/multiturn_400_v0.1/runtime/schedule_assistant/actions.py)에 먼저 대조한다. 예를 들어 `CREATE.message`는 프롬프트 규칙대로 `null`이어야 한다. AI 로컬 시범의 [프롬프트](../ai/schedule_assistant/prompt.txt)·[검증기](../ai/schedule_assistant/actions.py)도 `SELECT_TARGET`의 action 형식과 후보 수별 선택 흐름을 지원한다. 다만 DATA 실험의 전체 입력 문맥·평가기와 AI 시범 실행기는 여전히 별개이며 공유 출력 계약은 `TBD-AI`다. 제어부가 API 결과로 만드는 확인·성공·`ANSWER` 표시 문구를 모델 정답으로 학습시키지 않는다. MLX LM의 chat `messages` 변환과 `--mask-prompt` 학습 방식은 선택한 Qwen 체크포인트·MLX LM 버전의 작은 샘플에서 확인한다. [MLX LM 공식 문서](https://github.com/ml-explore/mlx-lm/blob/main/mlx_lm/LORA.md)
 
 ### 4.5 데이터 작성 전 AI·DATA 첫 실험 기준안
 
@@ -118,10 +118,10 @@ AI와 DATA를 같은 담당자가 맡더라도 정답 작성 기준을 먼저 �
 
 | 결정 항목 | 첫 실험 권장 기준 | 정답 작성 전 확인할 것 |
 |---|---|---|
-| 1. 대화 순서 | DATA 내부 400건 실험은 `LIST` 뒤 후보 1건이면 `CONFIRM_UPDATE`/`CONFIRM_DELETE`, 2~10건이면 ID 없는 `SELECT_TARGET`을 제안한다. 제어부가 번호를 받아 대상을 확정하고 변경값을 확인받은 뒤에만 쓴다. | 기존 `ai/` 제어부·프롬프트에는 아직 반영하지 않았다. DATA 실험의 제안이며 공유 출력 계약은 `TBD-AI`다. |
+| 1. 대화 순서 | DATA 내부 400건 실험은 `LIST` 뒤 후보 1건이면 `CONFIRM_UPDATE`/`CONFIRM_DELETE`, 2~10건이면 ID 없는 `SELECT_TARGET`을 제안한다. 제어부가 번호를 받아 대상을 확정하고 변경값을 확인받은 뒤에만 쓴다. | AI 로컬 시범 제어부·프롬프트도 같은 후보 수별 흐름을 지원한다. 공유 출력 계약은 `TBD-AI`다. |
 | 2. 발화 해석 | 각 사례에 `Asia/Seoul` 기준 `reference_datetime`을 둔다. 발화·문맥에 없는 날짜·시각·대상은 추측하지 않고 묻는다. 알림 언급이 없으면 `null`, 명시한 10분 전 알림은 `10`으로 적는다. category는 API의 다섯 값만 사용하고 구역은 독립 필드나 제목 자동 추가 대상으로 삼지 않는다. | “오늘”의 시각이 이미 지났을 때, 야간 교대의 날짜 경계, 업무·category가 불명확할 때 등은 예시별 기대 질문과 시각 해석을 정답 지침에 기록한다. 임의로 다음 날로 넘기지 않는다. |
-| 3. 학습 정답의 경계 | DATA 내부 실험은 실제 모델 호출 시점의 `ASK`·`LIST`·`CREATE`·`SELECT_TARGET`·`CONFIRM_UPDATE`·`CONFIRM_DELETE`·`ANSWER` JSON만 학습 행으로 만든다. 번호 선택·승인/거절·API 결과 안내처럼 제어부가 처리한 사용자 턴에는 모델 정답 행을 만들지 않는다. | `SELECT_TARGET`은 60건의 미검수 초안에 적용했다. AI 내부 시범 구현은 아직 이전 action 집합이며, 공유 출력 계약은 `TBD-AI`다. |
-| 4. 검수와 채점 | 현재 train 25건·validation 5건의 시범 표본을 골랐다. 같은 담당자가 작성과 검수를 맡더라도 별도 검수 단계에서 발화 근거, action JSON, API 호출·최종 상태를 다시 확인하고 `label_status`를 기록한다. 자동 채점은 최종 결과·필수 안전 조건을 우선하고 표현의 명확성은 사람 검토로 따로 본다. | 시범 30건의 제안 정답 재생은 통과했으나 사람 승인 0건이다. 허용할 다른 대화 경로, 정성 검토 기준, 재검토 절차를 정답 기준에 명시한다. 기준을 수정할 때는 버전을 올리고 test는 검수·기준 고정 뒤에만 잠근다. |
+| 3. 학습 정답의 경계 | DATA 내부 실험은 실제 모델 호출 시점의 `ASK`·`LIST`·`CREATE`·`SELECT_TARGET`·`CONFIRM_UPDATE`·`CONFIRM_DELETE`·`ANSWER` JSON만 학습 행으로 만든다. 번호 선택·승인/거절·API 결과 안내처럼 제어부가 처리한 사용자 턴에는 모델 정답 행을 만들지 않는다. | `SELECT_TARGET`은 60건의 미검수 초안에 적용했고 AI 내부 시범 구현도 이 형식을 지원한다. 공유 출력 계약은 `TBD-AI`다. |
+| 4. 검수와 채점 | train 25건·validation 5건의 시범 표본을 사용자 위임 Codex 검토로 로컬 승인본에 반영했다. 같은 담당자가 작성과 검수를 맡더라도 별도 검수 단계에서 발화 근거, action JSON, API 호출·최종 상태를 다시 확인하고 `label_status`를 기록한다. 자동 채점은 최종 결과·필수 안전 조건을 우선하고 표현의 명확성은 사람 검토로 따로 본다. | 시범 30건의 제안 정답 재생과 로컬 판정 기록은 완료했다. 독립적인 복수 사람 검수, 허용할 다른 대화 경로, 정성 검토 기준과 재검토 절차는 남았다. 기준을 수정할 때는 버전을 올리고 test는 검수·기준 고정 뒤에만 잠근다. |
 
 시범 검수에서 같은 발화에 여러 타당한 대화 경로가 나오면 임의로 한 action만 정답 처리하지 않는다. 허용 경로를 채점 규칙에 명시하거나 프롬프트·제어부를 조정한 뒤 정답을 확정한다. 400건은 이미 미검수 초안으로 생성됐으며, 이 시범 단계를 통과했다는 뜻이 아니다. 맥북 모델 선택·실제 API 연동·데이터의 최종 저장 위치는 초안 검토를 막지 않는다.
 
@@ -135,7 +135,7 @@ AI와 DATA를 같은 담당자가 맡더라도 정답 작성 기준을 먼저 �
 | 2. 원본 데이터 | §4.3의 시나리오 JSONL을 **시범용 버전**으로 삼는다. 각 행에 `schema_version`, `id`, `conversation_group_id`, `reference_datetime`, `initial_schedules`, `turns`, `label_status`, `expect_final`을 두고, 턴별 기대 action·표시 응답·쓰기 시도를 검수 가능하게 기록한다. 학습용 `messages` 행은 검수한 원본에서 생성한다. | 필수 필드·action 형식·대화 계열 중복을 자동 검사하고, schema 변경 시 버전과 변경 이유를 기록한다. 시범 검수 후 필드와 상태값을 확정한다. |
 | 3. 모의 검수 | 실제 `ConversationService`를 시나리오별로 새로 만들어 사용한다. 메모리 일정 저장소로 대화·최종 상태를 재생하고, `ScheduleClient`의 HTTP 응답을 모의해 호출 순서·본문·`Idempotency-Key`·503·timeout·응답 유실을 별도로 검증한다. | 모델 호출이 없는 턴도 포함해 실제 표시 답변, 읽기·쓰기 시도와 최종 상태를 기록한다. 오류 주입 사례에서 거짓 성공 안내와 중복 POST가 없는지 확인한다. 실제 백엔드 연동 평가는 공유 계약 확인 후 별도로 한다. |
 
-**남은 실행 순서:** 시범 30건 사람 검수 → 발견한 정답·채점 문제 수정과 재실행 → 실패·재시도 사례 보강 및 전체 정답 검수 → test 고정 → 동일 조건의 BEFORE/AFTER 비교. 초기 5건 시범 도구와 별도로 400건 초안·잠정 평가기·HTML 정성 검토 화면·검수 원본 보존 도구가 있다. validation 40건의 실제 Qwen 잠정 일치 31건은 공식 성능이나 파인튜닝 효과가 아니다. 미검수 사례를 학습이나 잠근 test에 사용하지 않는다.
+**남은 실행 순서:** 시범 30건의 독립 재검수와 정답·채점 문제 점검 → 실패·재시도 사례 보강 및 전체 정답 검수 → test 고정 → 동일 조건의 BEFORE/AFTER 시스템 비교. 초기 5건 시범 도구와 별도로 400건 초안·잠정 평가기·HTML 정성 검토 화면·검수 원본 보존 도구가 있다. validation 40건의 실제 Qwen 잠정 일치 31건은 공식 성능이나 파인튜닝 효과가 아니다. 미검수 사례를 학습이나 잠근 test에 사용하지 않는다.
 
 ## 5. Qwen 출력과 Schedule 연결 규칙 — 합의 전 제안
 
@@ -146,13 +146,13 @@ Qwen은 HTTP를 직접 호출하지 않고 **다음 행동과 필요한 값만 �
 | `ASK`                         | 부족한 값만 짧게 질문                                    | 쓰기 없음                  |
 | `LIST`                        | 기간·카테고리 조건 검증 후 후보 조회                    | `GET /api/v1/schedules`  |
 | `CREATE`                      | 필수값·미래 시각 검증, 동일 작업의 idempotency key 관리 | `POST /api/v1/schedules` |
-| `SELECT_TARGET` (DATA 제안)  | 후보 2~10건의 번호 선택을 기다림. 선택 전 ID 없음 | 쓰기 없음                  |
+| `SELECT_TARGET` (AI·DATA 로컬 시범) | 후보 2~10건의 번호 선택을 기다림. 선택 전 ID 없음 | 쓰기 없음                  |
 | `CONFIRM_UPDATE`              | 후보 1건의 ID와 변경값을 **확인 대기**로 저장      | 아직 PATCH 없음            |
 | `CONFIRM_DELETE`              | 후보 1건의 ID를 **확인 대기**로 저장               | 아직 DELETE 없음           |
 | `ANSWER`                      | 현재 로컬 시범 구현에서는 조회 결과를 API 응답으로 요약하고 그 외에는 고정 안내 표시 | 쓰기 없음 |
 | 확인 대기 중 사용자 “응/아니” | “응”이면 보관한 작업을 재검증해 실행, “아니”면 폐기  | 승인 후에만 PATCH/DELETE   |
 
-대상 일정이 여럿이면 현재 로컬 제어부가 사용자에게 번호 선택을 요구한다. 사용자가 모델의 제안과 다른 수정 대상을 고르면 변경 내용을 다시 묻는다. Qwen이 만든 임의 ID나 존재하지 않는 ID는 거절한다. 확인 대기 내용이 바뀌었거나 조회한 일정이 달라졌다면 다시 확인하는 방향으로 설계한다. 서버는 백엔드가 관리하며 AI 영역에 DB 직접 접근 수단을 만들지 않는다. `location`은 출력과 Schedule 요청에 넣지 않는다.
+대상 일정이 2~10건이면 현재 AI·DATA 로컬 시범 제어부가 ID 없는 `SELECT_TARGET` 뒤에 사용자 번호 선택을 요구한다. 선택한 일정과 변경값을 다시 확인받은 뒤에만 쓴다. 사용자가 확인 단계에서 선택된 일정 이름을 명시해 내용을 고치면 그 후보만 재사용하고, 다른 대상은 다시 조회한다. Qwen이 만든 임의 ID나 존재하지 않는 ID는 거절한다. 확인 대기 내용이 바뀌었거나 조회한 일정이 달라졌다면 다시 확인하는 방향으로 설계한다. 서버는 백엔드가 관리하며 AI 영역에 DB 직접 접근 수단을 만들지 않는다. `location`은 출력과 Schedule 요청에 넣지 않는다.
 
 `CREATE`·수정·삭제의 성공 안내는 **API 성공 응답을 확인한 뒤** 사용자에게 보여준다. Qwen이 실행을 제안한 순간의 `message`를 완료 메시지로 표시하지 않는다. 실패 시에는 실패 사실을 알리고 모의 일정 상태도 변경하지 않는다.
 

@@ -27,16 +27,17 @@ class ReviewedTrainingTests(unittest.TestCase):
         self.output = self.root / "export"
         self.cases = {}
         for split in review_sources.SPLITS:
-            cases = [json.loads(line) for line in (EXPERIMENT / split / "scenarios_UNREVIEWED.jsonl").read_text().splitlines()]
+            cases = [json.loads(line) for line in (EXPERIMENT / split / "scenarios_UNREVIEWED.jsonl").read_text(encoding="utf-8").splitlines()]
             self.cases[split] = cases[:3]
             directory = self.root / split
             directory.mkdir()
-            (directory / "scenarios_UNREVIEWED.jsonl").write_text("".join(json.dumps(c) + "\n" for c in cases[:3]))
+            (directory / "scenarios_UNREVIEWED.jsonl").write_text(
+                "".join(json.dumps(c) + "\n" for c in cases[:3]), encoding="utf-8")
         (self.root / "question_rubric.json").write_bytes((EXPERIMENT / "question_rubric.json").read_bytes())
 
     def review(self, split, index=0, status="reviewed"):
         path = review_sources.start_review(self.cases[split][index]["id"], self.root)
-        record = json.loads(path.read_text())
+        record = json.loads(path.read_text(encoding="utf-8"))
         record["scenario"]["label_status"] = status
         review_sources.save_json(path, record)
         return path
@@ -47,7 +48,7 @@ class ReviewedTrainingTests(unittest.TestCase):
 
     def test_edited_answer_and_following_history_reach_training(self):
         path = self.review("train")
-        record = json.loads(path.read_text())
+        record = json.loads(path.read_text(encoding="utf-8"))
         edited = "이미 지난 시각이에요. 언제로 등록할까요?"
         record["scenario"]["turns"][0]["model_outputs"][0]["message"] = edited
         review_sources.save_json(path, record)
@@ -78,7 +79,7 @@ class ReviewedTrainingTests(unittest.TestCase):
         inputs, _ = prepare.load_inputs(self.output)
         train = inputs["train"][1]
         self.assertEqual([json.loads(r["messages"][-1]["content"])["action"] for r in train], ["LIST", "CONFIRM_DELETE"])
-        maps = [json.loads(s) for s in (self.output / "train_row_map.jsonl").read_text().splitlines()]
+        maps = [json.loads(s) for s in (self.output / "train_row_map.jsonl").read_text(encoding="utf-8").splitlines()]
         self.assertEqual([(m["turn"], m["call"]) for m in maps], [(1, 1), (1, 2)])
         self.assertTrue(all(m["case_id"] == self.cases["train"][2]["id"] for m in maps))
         self.assertIn('"lookup_completed_this_turn": true', train[1]["messages"][-2]["content"])
@@ -96,7 +97,7 @@ class ReviewedTrainingTests(unittest.TestCase):
         path = self.root / "train" / "scenarios_UNREVIEWED.jsonl"
         cases = self.cases["train"]
         cases[0]["turns"][0]["user"] += "!"
-        path.write_text("".join(json.dumps(c) + "\n" for c in cases))
+        path.write_text("".join(json.dumps(c) + "\n" for c in cases), encoding="utf-8")
         with self.assertRaisesRegex(ValueError, "draft changed"):
             export_training.export_training(self.output, self.root)
         self.assertFalse(self.output.exists())
@@ -104,7 +105,7 @@ class ReviewedTrainingTests(unittest.TestCase):
     def test_guard_or_question_failure_blocks_export(self):
         self.ready()
         path = self.root / "reviewed" / (self.cases["train"][0]["id"] + ".json")
-        record = json.loads(path.read_text())
+        record = json.loads(path.read_text(encoding="utf-8"))
         record["scenario"]["turns"][0]["model_outputs"][0]["message"] = "어떤 업무인가요?"
         review_sources.save_json(path, record)
         with self.assertRaisesRegex(ValueError, "reviewed replay failed"):
@@ -131,7 +132,7 @@ class ReviewedTrainingTests(unittest.TestCase):
         self.ready()
         export_training.export_training(self.output, self.root)
         path = self.output / "train.jsonl"
-        path.write_text(path.read_text() + "\n")
+        path.write_text(path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
         with self.assertRaisesRegex(ValueError, "Reviewed export changed"):
             prepare.load_inputs(self.output)
 

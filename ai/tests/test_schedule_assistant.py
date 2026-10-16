@@ -19,6 +19,7 @@ from schedule_assistant.service import ConversationService
 
 
 ID = "11111111-1111-4111-8111-111111111111"
+NOW = datetime.fromisoformat("2026-10-10T09:00:00+09:00")
 WHEN = "2026-10-11T10:00:00+09:00"
 LATER = "2026-10-11T15:00:00+09:00"
 ITEM = {"id": ID, "title": "재고 실사", "scheduledAt": WHEN,
@@ -74,6 +75,21 @@ class ActionTests(unittest.TestCase):
             with self.subTest(raw=raw), self.assertRaises(ActionError):
                 parse_action(raw)
 
+    def test_select_target_requires_id_free_request_and_valid_changes(self):
+        request = {"operation": "update", "changes": {"scheduledAt": LATER}}
+        self.assertEqual(parse_action(action("SELECT_TARGET", request)).request, request)
+        self.assertEqual(parse_action(action("SELECT_TARGET", {"operation": "delete"})).request,
+                         {"operation": "delete"})
+        for raw in (
+            action("SELECT_TARGET", request, "1번인가요?"),
+            action("SELECT_TARGET", {"operation": "delete", "targetId": ID}),
+            action("SELECT_TARGET", {"operation": "update", "changes": {}}),
+            action("SELECT_TARGET", {"operation": "update", "changes": {"completed": "yes"}}),
+            action("SELECT_TARGET", {"operation": "other"}),
+        ):
+            with self.subTest(raw=raw), self.assertRaises(ActionError):
+                parse_action(raw)
+
     def test_create_after_valid_action_only(self):
         body = {"title": "재고 실사", "scheduledAt": WHEN, "category": "INVENTORY", "reminderMinutesBefore": 10}
         schedules = FakeSchedules()
@@ -114,7 +130,7 @@ class ActionTests(unittest.TestCase):
             action("LIST", {"from": WHEN, "to": LATER}),
             action("CONFIRM_UPDATE", {"targetId": ID, "changes": {"scheduledAt": LATER}}, "이미 변경했어요"),
         )
-        service = ConversationService(model, schedules)
+        service = ConversationService(model, schedules, lambda: NOW)
         reply = service.handle("재고 실사 3시로 바꿔줘")
         self.assertEqual(reply.kind, "confirm")
         self.assertIn(LATER, reply.message)
@@ -158,7 +174,7 @@ class ActionTests(unittest.TestCase):
         schedules = TwoSchedules()
         service = ConversationService(FakeModel(
             action("LIST", {"from": WHEN, "to": LATER}),
-            action("CONFIRM_DELETE", {"targetId": ID})), schedules)
+            action("SELECT_TARGET", {"operation": "delete"})), schedules)
         self.assertEqual(service.handle("일정 삭제해").kind, "ask")
         self.assertEqual(schedules.writes, [])
         self.assertEqual(service.handle("3번").kind, "ask")
@@ -170,7 +186,40 @@ class ActionTests(unittest.TestCase):
         self.assertEqual(service.handle("응").kind, "deleted")
         self.assertEqual(schedules.writes, [("DELETE", second_id)])
 
-    def test_update_to_another_candidate_requires_new_changes(self):
+    def test_multiple_candidates_reject_model_target_id(self):
+        second_id = "22222222-2222-4222-8222-222222222222"
+
+        class TwoSchedules(FakeSchedules):
+            def list(self, filters):
+                return [dict(self.item), {**self.item, "id": second_id}]
+
+        schedules = TwoSchedules()
+        service = ConversationService(FakeModel(
+            action("LIST", {"from": WHEN, "to": LATER}),
+            action("CONFIRM_DELETE", {"targetId": ID})), schedules)
+        self.assertEqual(service.handle("일정 삭제해").kind, "error")
+        self.assertIsNone(service.state.selection)
+        self.assertEqual(schedules.writes, [])
+
+    def test_select_target_without_lookup_and_cancel_never_write(self):
+        schedules = FakeSchedules()
+        service = ConversationService(FakeModel(action("SELECT_TARGET", {"operation": "delete"})), schedules)
+        self.assertEqual(service.handle("삭제해").kind, "error")
+        self.assertEqual(schedules.writes, [])
+
+        class TwoSchedules(FakeSchedules):
+            def list(self, filters):
+                return [dict(self.item), {**self.item, "id": "22222222-2222-4222-8222-222222222222"}]
+
+        schedules = TwoSchedules()
+        service = ConversationService(FakeModel(
+            action("LIST", {"from": WHEN, "to": LATER}),
+            action("SELECT_TARGET", {"operation": "delete"})), schedules)
+        self.assertEqual(service.handle("일정 삭제해").kind, "ask")
+        self.assertEqual(service.handle("취소").kind, "cancelled")
+        self.assertEqual(schedules.writes, [])
+
+    def test_update_selection_confirms_selected_target_and_changes(self):
         second_id = "22222222-2222-4222-8222-222222222222"
 
         class TwoSchedules(FakeSchedules):
@@ -178,7 +227,8 @@ class ActionTests(unittest.TestCase):
                 return [dict(self.item), {**self.item, "id": second_id, "title": "반품 확인"}]
 
             def get(self, schedule_id):
-                return {**self.item, "id": schedule_id}
+                return {**self.item, "id": schedule_id,
+                        "title": "반품 확인" if schedule_id == second_id else self.item["title"]}
 
             def update(self, schedule_id, changes):
                 self.writes.append(("PATCH", schedule_id, changes))
@@ -187,18 +237,60 @@ class ActionTests(unittest.TestCase):
         schedules = TwoSchedules()
         service = ConversationService(FakeModel(
             action("LIST", {"from": WHEN, "to": LATER}),
-            action("CONFIRM_UPDATE", {"targetId": ID, "changes": {"scheduledAt": LATER}}),
-            action("CONFIRM_UPDATE", {"targetId": second_id,
-                                      "changes": {"scheduledAt": "2026-10-11T16:00:00+09:00"}})), schedules)
+            action("SELECT_TARGET", {"operation": "update", "changes": {"scheduledAt": LATER}})),
+            schedules, lambda: NOW)
         self.assertEqual(service.handle("일정 한 시간 늦춰줘").kind, "ask")
-        self.assertEqual(service.handle("2번").kind, "ask")
-        self.assertEqual(schedules.writes, [])
-        confirmation = service.handle("반품 확인을 4시로 바꿔줘")
+        confirmation = service.handle("2번")
         self.assertEqual(confirmation.kind, "confirm")
-        self.assertIn("16:00", confirmation.message)
+        self.assertIn("반품 확인", confirmation.message)
+        self.assertIn(LATER, confirmation.message)
+        self.assertEqual(schedules.writes, [])
         self.assertEqual(service.handle("응").kind, "updated")
         self.assertEqual(schedules.writes[0][1], second_id)
-        self.assertEqual(schedules.writes[0][2]["scheduledAt"], "2026-10-11T16:00:00+09:00")
+        self.assertEqual(schedules.writes[0][2]["scheduledAt"], LATER)
+
+    def test_selected_update_correction_requires_new_confirmation(self):
+        second_id = "22222222-2222-4222-8222-222222222222"
+        corrected_time = "2026-10-11T16:00:00+09:00"
+
+        class TwoSchedules(FakeSchedules):
+            def list(self, filters):
+                return [dict(self.item), {**self.item, "id": second_id, "title": "반품 확인"}]
+
+            def get(self, schedule_id):
+                return {**self.item, "id": schedule_id,
+                        "title": "반품 확인" if schedule_id == second_id else self.item["title"]}
+
+        schedules = TwoSchedules()
+        service = ConversationService(FakeModel(
+            action("LIST", {"from": WHEN, "to": LATER}),
+            action("SELECT_TARGET", {"operation": "update", "changes": {"scheduledAt": LATER}}),
+            action("CONFIRM_UPDATE", {"targetId": second_id, "changes": {"scheduledAt": corrected_time}})),
+            schedules, lambda: NOW)
+        self.assertEqual(service.handle("일정 시간을 바꿔줘").kind, "ask")
+        self.assertEqual(service.handle("2번").kind, "confirm")
+        corrected = service.handle("아니, 반품 확인을 4시로 바꿔줘")
+        self.assertEqual(corrected.kind, "confirm")
+        self.assertIn(corrected_time, corrected.message)
+        self.assertEqual(schedules.writes, [])
+        self.assertEqual(service.handle("응").kind, "updated")
+        self.assertEqual(schedules.writes, [("PATCH", second_id, {"scheduledAt": corrected_time})])
+
+    def test_more_than_ten_candidates_require_narrower_lookup(self):
+        class ManySchedules(FakeSchedules):
+            def list(self, filters):
+                return [{**self.item, "id": f"00000000-0000-4000-8000-{index:012d}"}
+                        for index in range(11)]
+
+        schedules = ManySchedules()
+        service = ConversationService(FakeModel(
+            action("LIST", {"from": WHEN, "to": LATER}),
+            action("SELECT_TARGET", {"operation": "delete"})), schedules)
+        reply = service.handle("일정 삭제해")
+        self.assertEqual(reply.kind, "ask")
+        self.assertIn("좁혀", reply.message)
+        self.assertIsNone(service.state.selection)
+        self.assertEqual(schedules.writes, [])
 
     def test_correction_cancels_pending_write_and_processes_new_request(self):
         schedules = FakeSchedules()
@@ -290,7 +382,8 @@ class ActionTests(unittest.TestCase):
         schedules = FailingSchedules()
         service = ConversationService(FakeModel(
             action("LIST", {"from": WHEN, "to": LATER}),
-            action("CONFIRM_UPDATE", {"targetId": ID, "changes": {"scheduledAt": LATER}})), schedules)
+            action("CONFIRM_UPDATE", {"targetId": ID, "changes": {"scheduledAt": LATER}})),
+            schedules, lambda: NOW)
         self.assertEqual(service.handle("3시로 바꿔줘").kind, "confirm")
         reply = service.handle("응")
         self.assertEqual(reply.kind, "error")
