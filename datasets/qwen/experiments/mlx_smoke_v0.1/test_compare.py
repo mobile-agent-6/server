@@ -4,7 +4,7 @@ import json
 import shlex
 import tempfile
 import unittest
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location('smoke_compare', Path(__file__).with_name('compare.py'))
@@ -51,14 +51,16 @@ class CompareTests(unittest.TestCase):
             with patch.object(Path, 'replace', side_effect=KeyboardInterrupt):
                 with self.assertRaises(KeyboardInterrupt):
                     compare.save_records(path, more)
-            saved = [json.loads(line) for line in path.read_text().splitlines()]
+            saved = [json.loads(line) for line in path.read_text(encoding='utf-8').splitlines()]
             self.assertEqual(saved, first)
             compare.validate_saved_rows(saved, [2, 0])
             compare.save_records(path, more)
-            self.assertEqual([json.loads(line) for line in path.read_text().splitlines()], more)
+            self.assertEqual([json.loads(line) for line in path.read_text(encoding='utf-8').splitlines()], more)
 
     def test_resume_command_quotes_paths_and_finishes_both_stages(self):
-        args = shlex.split(compare.resume_command(Path('/run with spaces'), Path('/runtime'), Path('/compare dir')))
+        args = shlex.split(compare.resume_command(PurePosixPath('/run with spaces'),
+                                                  PurePosixPath('/runtime'),
+                                                  PurePosixPath('/compare dir')))
         self.assertEqual(args[args.index('--run-dir') + 1], '/run with spaces')
         self.assertEqual(args[args.index('--resume') + 1], '/compare dir')
         self.assertEqual(args[args.index('--stage') + 1], 'both')
@@ -68,7 +70,7 @@ class CompareTests(unittest.TestCase):
             root = Path(directory)
             self.assertTrue(compare.diagnostic_scope(root).startswith('UNSPECIFIED '))
             for status, label in [('REVIEWED_SMOKE_ONLY', 'REVIEWED'), ('UNREVIEWED_SMOKE_ONLY', 'UNREVIEWED')]:
-                (root / 'inspection.json').write_text(json.dumps({'status': status}))
+                (root / 'inspection.json').write_text(json.dumps({'status': status}), encoding='utf-8')
                 self.assertTrue(compare.diagnostic_scope(root).startswith(label + ' '))
 
 

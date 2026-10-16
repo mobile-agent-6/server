@@ -71,7 +71,7 @@ def save_records(path, records):
 
 def diagnostic_scope(root):
     inspection = root / 'inspection.json'
-    status = json.loads(inspection.read_text()).get('status') if inspection.exists() else None
+    status = json.loads(inspection.read_text(encoding='utf-8')).get('status') if inspection.exists() else None
     label = {'REVIEWED_SMOKE_ONLY': 'REVIEWED', 'UNREVIEWED_SMOKE_ONLY': 'UNREVIEWED'}.get(status, 'UNSPECIFIED')
     return f'{label} fixed-reference-context diagnostic; no API calls or JSON constraints'
 
@@ -104,12 +104,12 @@ def main():
             'adapter_sha256': file_hash(root / 'adapters/adapters.safetensors'),
             'input_identity': input_identity(root, runtime)}
     if args.resume:
-        previous = json.loads((out / 'manifest.json').read_text())
+        previous = json.loads((out / 'manifest.json').read_text(encoding='utf-8'))
         validate_resume(previous, meta)
         meta = previous
         selected = [i - 1 for i in meta['rows_1_based']]
     else:
-        (out / 'manifest.json').write_text(json.dumps(meta, indent=2))
+        (out / 'manifest.json').write_text(json.dumps(meta, indent=2), encoding='utf-8')
     print(f'Comparison directory: {out}', flush=True)
     command = resume_command(root, runtime, out)
     print(f'Resume command (skips saved rows):\n{command}', flush=True)
@@ -129,7 +129,7 @@ def compare_stages(args, root, out, rows, selected, meta):
     prompts = {}
     for label, adapter in [('before', None), ('after', str(root / 'adapters'))]:
         path = out / (label + '.jsonl')
-        results[label] = [json.loads(line) for line in path.read_text().splitlines() if line.strip()] if path.exists() else []
+        results[label] = [json.loads(line) for line in path.read_text(encoding='utf-8').splitlines() if line.strip()] if path.exists() else []
         existing = results[label]
         validate_saved_rows(existing, selected)
         if args.stage not in ['both', label] or len(existing) == len(selected):
@@ -182,7 +182,7 @@ def compare_stages(args, root, out, rows, selected, meta):
                           for key in ['schema_valid', 'action_match', 'exact_json_match']}
     summary['improved_exact'] = sum(not a['exact_json_match'] and b['exact_json_match'] for a, b in zip(results['before'], results['after']))
     summary['regressed_exact'] = sum(a['exact_json_match'] and not b['exact_json_match'] for a, b in zip(results['before'], results['after']))
-    (out / 'summary.json').write_text(json.dumps(summary, indent=2))
+    (out / 'summary.json').write_text(json.dumps(summary, indent=2), encoding='utf-8')
     print(json.dumps(summary, indent=2))
     print(f'Results: {out}', flush=True)
 

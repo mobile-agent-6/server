@@ -10,7 +10,7 @@ from uuid import uuid4
 sys.dont_write_bytecode=True
 ROOT=Path(__file__).resolve().parent
 sys.path.insert(0,str(ROOT))
-from runtime.replay_multiturn_pilot import load_cases,MemorySchedules
+from runtime.replay_multiturn_pilot import load_cases,MemorySchedules,FaultingMemorySchedules
 from runtime.schedule_assistant.service import ConversationService
 from runtime.schedule_assistant.actions import parse_action,ActionError
 from runtime.schedule_assistant.clients import ScheduleError
@@ -102,8 +102,8 @@ class RecordingModel:
   finally:
    call['schema']=copy.deepcopy(getattr(self.client,'last_schema',None));call['wall_time_ms']=round((time.perf_counter()-started)*1000,1);self.calls.append(call)
 
-class GuardedSchedules(MemorySchedules):
- def __init__(self,initial,created_id,now): super().__init__(initial,created_id);self.users=[];self.now=now;self.guard_events=[];self.filter_events=[]
+class GuardedSchedules(FaultingMemorySchedules):
+ def __init__(self,initial,created_id,now,faults=None): super().__init__(initial,created_id,faults);self.users=[];self.now=now;self.guard_events=[];self.filter_events=[]
  def guard(self,body,operation,current=None):
   error=validate_write(body,self.users,self.now,operation,current)
   if error:
@@ -155,6 +155,34 @@ class Service(ConversationService):
   return [{'role':'system','content':PROMPT}]+history
 
 def check(name,expected,actual): return {'name':name,'expected':expected,'actual':actual,'match':expected==actual}
+def raw_model_checks(expected_outputs, model_calls):
+ """Compare uncorrected model JSON to reference actions by call position."""
+ checks=[]
+ for position in range(max(len(expected_outputs),len(model_calls))):
+  wanted=expected_outputs[position] if position<len(expected_outputs) else None
+  call=model_calls[position] if position<len(model_calls) else None
+  actual=None
+  if call and call.get('raw') is not None:
+   try: actual=json.loads(call['raw'])
+   except (TypeError,ValueError): pass
+  valid=bool(call and call.get('action') is not None and call.get('parse_error') is None and call.get('error') is None)
+  checks.append({'position':position+1,'expected_action':wanted['action'] if wanted else None,
+                 'actual_action':call.get('action') if call else None,
+                 'parse_valid':valid,
+                 'action_exact':bool(wanted and valid and call['action']==wanted['action']),
+                 'json_exact':bool(wanted and valid and actual==wanted)})
+ return checks
+def answer_content_checks(message,candidates):
+ """Check displayed facts against observed schedules, independently of reference text."""
+ if not candidates:
+  return [check('answer_empty_result',True,isinstance(message,str) and '없' in message)]
+ checks=[]
+ for item in candidates[:10]:
+  checks.append(check('answer_title:'+item['id'],True,
+                      isinstance(message,str) and item['title'] in message))
+  checks.append(check('answer_time:'+item['id'],True,
+                      isinstance(message,str) and item['scheduledAt'] in message))
+ return checks
 def final_checks(expected,actual):
  checks=[check('final_ids',sorted(x['id'] for x in expected),sorted(x['id'] for x in actual))];byid={x['id']:x for x in actual}
  for e in expected:
@@ -180,7 +208,7 @@ def pending_value(service):
 def reference_trace(case):
  """Independent scorer-only trace. Never provided to the live model/client."""
  client=ReferenceClient([a for t in case['turns'] for a in t['model_outputs']])
- schedules=MemorySchedules(case['initial_schedules'],case.get('created_id'))
+ schedules=FaultingMemorySchedules(case['initial_schedules'],case.get('created_id'),case.get('faults'))
  service=ConversationService(client,schedules,lambda:datetime.fromisoformat(case['reference_datetime']))
  result=[]
  for t in case['turns']:
@@ -194,7 +222,7 @@ def reference_trace(case):
 
 
 def run_case(case,client,rubric):
- now=datetime.fromisoformat(case['reference_datetime']);schedules=GuardedSchedules(case['initial_schedules'],case.get('created_id'),now);model=RecordingModel(client);service=Service(model,schedules,lambda:now);turns=[];stop=None;reference=reference_trace(case)
+ now=datetime.fromisoformat(case['reference_datetime']);schedules=GuardedSchedules(case['initial_schedules'],case.get('created_id'),now,case.get('faults'));model=RecordingModel(client);service=Service(model,schedules,lambda:now);turns=[];stop=None;reference=reference_trace(case)
  for index,turn in enumerate(case['turns'],1):
   a,b,g=len(schedules.calls),len(model.calls),len(schedules.guard_events);f=len(schedules.filter_events);started=time.perf_counter();crash=None
   try: reply=service.handle(turn['user'])
@@ -226,7 +254,9 @@ def run_case(case,client,rubric):
   # ANSWER text is assembled by this controller from observed schedules. Check
   # the displayed result as well as the backing GET IDs; ASK wording remains
   # governed by the separate question rubric and human review.
-  if expected['reply_kind']=='answer': checks.append(check('displayed_answer',gold['reply_message'],message))
+  if expected['reply_kind']=='answer':
+   checks.append(check('displayed_answer',gold['reply_message'],message))
+   if expected_lists: checks.extend(answer_content_checks(message,list(service.state.candidates.values())))
   checks.append(check('business_state',gold['state'],business_state(schedules.items.values())))
   checks.append(check('write_payloads',gold['writes'],[{k:v for k,v in c.items() if k!='key'} for c in writes]))
   if expected['reply_kind']=='confirm': checks.append(check('confirmation_target_changes',gold['pending'],pending_value(service)))
@@ -234,14 +264,21 @@ def run_case(case,client,rubric):
    checks.append(check('selection_candidates_order',gold['selection'],service.state.selection.candidate_ids if service.state.selection else None))
   events=schedules.guard_events[g:]
   if events: checks.append(check('unsupported_write_blocked',False,True))
-  turns.append({'index':index,'user':turn['user'],'expected':expected,'expected_model_outputs':turn['model_outputs'],'reply':{'kind':kind,'message':message},'model_calls':model.calls[b:],'api_calls':calls,'guard_events':events,'filter_events':schedules.filter_events[f:],'wall_time_ms':round((time.perf_counter()-started)*1000,1),'checks':checks,'query_filter_diagnostic':{'expected':expected_lists,'actual':actual_lists},'crash':crash})
+  observed_calls=model.calls[b:]
+  turns.append({'index':index,'user':turn['user'],'expected':expected,'expected_model_outputs':turn['model_outputs'],'reply':{'kind':kind,'message':message},'model_calls':observed_calls,'raw_model_checks':raw_model_checks(turn['model_outputs'],observed_calls),'api_calls':calls,'guard_events':events,'filter_events':schedules.filter_events[f:],'wall_time_ms':round((time.perf_counter()-started)*1000,1),'checks':checks,'query_filter_diagnostic':{'expected':expected_lists,'actual':actual_lists},'crash':crash})
   if kind!=expected['reply_kind']: stop='reply_kind_mismatch';break
   if qmatch is False: stop='question_content_needs_review';break
   if events: stop='unsupported_write_blocked';break
-  if any(not c['match'] and c['name'] in {'confirmation_target_changes','selection_candidates_order','business_state','write_payloads','query_result_ids','displayed_answer'} for c in checks): stop='semantic_path_mismatch';break
+  if any(not c['match'] and (c['name'] in {'confirmation_target_changes','selection_candidates_order','business_state','write_payloads','query_result_ids','displayed_answer'} or c['name'].startswith('answer_')) for c in checks): stop='semantic_path_mismatch';break
  end=list(schedules.items.values());completed=len(turns)==len(case['turns']) and stop is None;fc=final_checks(case['expect_final'],end) if completed else []
+ if completed and case.get('faults'):
+  by_key=lambda fault:(fault['method'],fault['occurrence'])
+  fc.append(check('injected_faults_triggered',sorted(case['faults'],key=by_key),sorted(schedules.fault_events,key=by_key)))
  matched=completed and all(c['match'] for t in turns for c in t['checks']) and all(c['match'] for c in fc)
- return {'case_id':case['id'],'conversation_group_id':case['conversation_group_id'],'label_status':case['label_status'],'reference_datetime':case['reference_datetime'],'initial_schedules':case['initial_schedules'],'expected_final':case['expect_final'],'actual_final':end,'turns':turns,'final_checks':fc,'completed_turns':len(turns),'total_turns':len(case['turns']),'evaluation_version':'eval-v2.4-proposed','source_kind':'actual_model','stop_reason':stop,'provisional_match':matched,'status':'provisional_match' if matched else 'needs_review'}
+ raw_path=completed and all(len(t['model_calls'])==len(t['expected_model_outputs']) for t in turns)
+ raw_action_path=raw_path and all(c['action_exact'] for t in turns for c in t['raw_model_checks'])
+ raw_json_path=raw_path and all(c['json_exact'] for t in turns for c in t['raw_model_checks'])
+ return {'case_id':case['id'],'conversation_group_id':case['conversation_group_id'],'label_status':case['label_status'],'reference_datetime':case['reference_datetime'],'initial_schedules':case['initial_schedules'],'faults':case.get('faults',[]),'fault_events':schedules.fault_events,'expected_final':case['expect_final'],'actual_final':end,'turns':turns,'final_checks':fc,'completed_turns':len(turns),'total_turns':len(case['turns']),'evaluation_version':'eval-v2.7-proposed','source_kind':'actual_model','stop_reason':stop,'provisional_match':matched,'raw_action_path_exact':raw_action_path,'raw_json_path_exact':raw_json_path,'status':'provisional_match' if matched else 'needs_review'}
 
 def save_json(path,value): path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 def save_jsonl(path,rows): path.write_text(''.join(json.dumps(r,ensure_ascii=False)+'\n' for r in rows),encoding='utf-8')
@@ -270,7 +307,7 @@ def main():
   except RuntimeError as exc:p.error(str(exc))
  out.mkdir(parents=True)
  files=list(ROOT.glob('*.py'))+list((ROOT/'runtime').rglob('*.py'))+[ROOT/'prompt.txt',*scenario_files,args.rubric]+([args.case_file] if args.case_file else [])
- manifest={'tool_version':'eval-v2.4-proposed','source_kind':'scripted_reference' if args.scripted else 'actual_model','run_id':run_id,'model':args.model,'model_metadata':[m for m in tags.get('models',[]) if m.get('name')==args.model],'ollama_version':version,'options':OPTIONS,'think':False,'scope':'Model + observation framing + state schema + evidence guard; experimental scorer','prompt':PROMPT,'case_ids':[c['id'] for c in cases],'label_status_counts':dict(Counter(c['label_status'] for c in cases)),'file_sha256':{str(f.relative_to(ROOT)) if f.is_relative_to(ROOT) else str(f):hashlib.sha256(f.read_bytes()).hexdigest() for f in files},'status':'provisional_scoring','created_at':datetime.now(timezone.utc).isoformat()}
+ manifest={'tool_version':'eval-v2.7-proposed','source_kind':'scripted_reference' if args.scripted else 'actual_model','run_id':run_id,'model':args.model,'model_metadata':[m for m in tags.get('models',[]) if m.get('name')==args.model],'ollama_version':version,'options':OPTIONS,'think':False,'scope':'Model + observation framing + state schema + evidence guard; experimental scorer','prompt':PROMPT,'case_ids':[c['id'] for c in cases],'label_status_counts':dict(Counter(c['label_status'] for c in cases)),'file_sha256':{str(f.relative_to(ROOT)) if f.is_relative_to(ROOT) else str(f):hashlib.sha256(f.read_bytes()).hexdigest() for f in files},'status':'provisional_scoring','created_at':datetime.now(timezone.utc).isoformat()}
  save_json(out/'manifest.json',manifest);results=[];client=Client(args.model)
  for case in cases:
   active=ReferenceClient([a for t in case['turns'] for a in t['model_outputs']]) if args.scripted else client
@@ -279,5 +316,17 @@ def main():
   print(case['id']+': '+result['status']+f' ({result["completed_turns"]}/{result["total_turns"]} turns)',flush=True)
  calls=[m for r in results for t in r['turns'] for m in t['model_calls']]
  summary={'run_id':run_id,'source_kind':'scripted_reference' if args.scripted else 'actual_model','cases_run':len(results),'label_status_counts':manifest['label_status_counts'],'provisional_matches':sum(r['provisional_match'] for r in results),'needs_review':sum(not r['provisional_match'] for r in results),'model_calls':len(calls),'parse_errors':sum(m['parse_error'] is not None for m in calls),'request_errors':sum(m['error'] is not None for m in calls),'query_date_blocks':sum(e.get('effective') is None for r in results for t in r['turns'] for e in t.get('filter_events',[])),'filter_corrections':sum(sum(e.get('effective') is not None for e in t.get('filter_events',[])) for r in results for t in r['turns']),'blocked_writes':sum(len(t['guard_events']) for r in results for t in r['turns']),'question_stops':sum(r['stop_reason']=='question_content_needs_review' for r in results),'controller_crashes':sum(t['crash'] is not None for r in results for t in r['turns']),'note':'Experimental scoring with conservative lexical question checks; not formal performance. Model, controller, input, and guard settings affect results.'}
+ raw_checks=[c for r in results for t in r['turns'] for c in t['raw_model_checks']]
+ summary.update({'injected_fault_events':sum(len(r['fault_events']) for r in results)})
+ summary.update({
+  'raw_reference_calls_total':sum(len(t['model_outputs']) for case in cases for t in case['turns']),
+  'raw_reference_calls_reached':sum(len(t['expected_model_outputs']) for r in results for t in r['turns']),
+  'raw_observed_calls':len(calls),
+  'raw_parse_valid_calls':sum(c['parse_valid'] for c in raw_checks),
+  'raw_action_exact_calls':sum(c['action_exact'] for c in raw_checks),
+  'raw_json_exact_calls':sum(c['json_exact'] for c in raw_checks),
+  'raw_action_exact_dialogues':sum(r['raw_action_path_exact'] for r in results),
+  'raw_json_exact_dialogues':sum(r['raw_json_path_exact'] for r in results),
+  'scoring_note':'Raw fields compare constrained model output before guard correction; provisional_matches measures the guarded DATA prototype. Scripted-reference runs are not model scores.'})
  save_json(out/'summary.json',summary);print(json.dumps(summary,ensure_ascii=False),flush=True);print('HTML에서 열 파일:',out/'review_cases.jsonl',flush=True)
 if __name__=='__main__':main()

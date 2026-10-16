@@ -31,7 +31,7 @@ def _fields(value: Any, required: set[str], optional: set[str] = frozenset()) ->
 
 def validate_scenario(value: Any) -> dict[str, Any]:
     case = _fields(value, {"schema_version", "id", "conversation_group_id", "reference_datetime",
-                           "initial_schedules", "turns", "label_status", "expect_final"}, {"created_id"})
+                           "initial_schedules", "turns", "label_status", "expect_final"}, {"created_id", "faults"})
     if case["schema_version"] != SCHEMA_VERSION:
         raise ValueError("unsupported schema version")
     for key in ("id", "conversation_group_id"):
@@ -58,6 +58,19 @@ def validate_scenario(value: Any) -> dict[str, Any]:
         raise ValueError("duplicate final schedule ID")
     if not isinstance(case["turns"], list) or not case["turns"]:
         raise ValueError("turns must be a nonempty list")
+    faults = case.get("faults", [])
+    if not isinstance(faults, list):
+        raise ValueError("faults must be a list")
+    for fault in faults:
+        _fields(fault, {"method", "occurrence", "effect"})
+        supported = {(method, effect) for method in ("POST", "PATCH", "DELETE")
+                     for effect in ("commit_then_timeout", "reject_before_commit")}
+        supported.add(("GET", "stale_before_read"))
+        if (type(fault["occurrence"]) is not int or fault["occurrence"] < 1
+                or (fault["method"], fault["effect"]) not in supported):
+            raise ValueError("unsupported fault injection")
+    if len({(fault["method"], fault["occurrence"]) for fault in faults}) != len(faults):
+        raise ValueError("duplicate fault occurrence")
     for turn in case["turns"]:
         _fields(turn, {"user", "model_outputs", "expect"})
         if not isinstance(turn["user"], str) or not turn["user"].strip():
@@ -145,10 +158,77 @@ class MemorySchedules:
         del self.items[schedule_id]
 
 
+class FaultingMemorySchedules(MemorySchedules):
+    """DATA-only deterministic write failures and pre-read stale state."""
+
+    def __init__(self, initial: list[dict[str, Any]], created_id: str | None = None,
+                 faults: list[dict[str, Any]] | None = None) -> None:
+        super().__init__(initial, created_id)
+        self.faults = faults or []
+        self.post_count = 0
+        self.patch_count = 0
+        self.delete_count = 0
+        self.get_count = 0
+        self.fault_events: list[dict[str, Any]] = []
+
+    def get(self, schedule_id: str) -> dict[str, Any]:
+        self.get_count += 1
+        if any(fault == {"method": "GET", "occurrence": self.get_count,
+                         "effect": "stale_before_read"} for fault in self.faults):
+            if schedule_id in self.items:
+                self.items[schedule_id]["updatedAt"] = "pilot-external-change"
+            self.fault_events.append({"method": "GET", "occurrence": self.get_count,
+                                      "effect": "stale_before_read"})
+        return super().get(schedule_id)
+
+    def create(self, body: dict[str, Any], key: str) -> dict[str, Any]:
+        self.post_count += 1
+        if any(fault == {"method": "POST", "occurrence": self.post_count,
+                         "effect": "reject_before_commit"} for fault in self.faults):
+            self.calls.append({"method": "POST", "body": copy.deepcopy(body), "key": key})
+            self.fault_events.append({"method": "POST", "occurrence": self.post_count,
+                                      "effect": "reject_before_commit"})
+            raise ScheduleError("SERVICE_UNAVAILABLE")
+        result = super().create(body, key)
+        if any(fault == {"method": "POST", "occurrence": self.post_count,
+                         "effect": "commit_then_timeout"} for fault in self.faults):
+            self.fault_events.append({"method": "POST", "occurrence": self.post_count,
+                                      "effect": "commit_then_timeout"})
+            raise ScheduleError("CONNECTION_UNCERTAIN", uncertain=True)
+        return result
+
+    def _write_fault(self, method: str, occurrence: int, effect: str) -> bool:
+        if any(fault == {"method": method, "occurrence": occurrence,
+                         "effect": effect} for fault in self.faults):
+            self.fault_events.append({"method": method, "occurrence": occurrence,
+                                      "effect": effect})
+            return True
+        return False
+
+    def update(self, schedule_id: str, changes: dict[str, Any]) -> dict[str, Any]:
+        self.patch_count += 1
+        if self._write_fault("PATCH", self.patch_count, "reject_before_commit"):
+            self.calls.append({"method": "PATCH", "id": schedule_id, "body": copy.deepcopy(changes)})
+            raise ScheduleError("SERVICE_UNAVAILABLE")
+        result = super().update(schedule_id, changes)
+        if self._write_fault("PATCH", self.patch_count, "commit_then_timeout"):
+            raise ScheduleError("CONNECTION_UNCERTAIN", uncertain=True)
+        return result
+
+    def delete(self, schedule_id: str) -> None:
+        self.delete_count += 1
+        if self._write_fault("DELETE", self.delete_count, "reject_before_commit"):
+            self.calls.append({"method": "DELETE", "id": schedule_id})
+            raise ScheduleError("SERVICE_UNAVAILABLE")
+        super().delete(schedule_id)
+        if self._write_fault("DELETE", self.delete_count, "commit_then_timeout"):
+            raise ScheduleError("CONNECTION_UNCERTAIN", uncertain=True)
+
+
 def replay(case: dict[str, Any]) -> None:
     validate_scenario(case)
     model = ScriptedModel()
-    schedules = MemorySchedules(case["initial_schedules"], case.get("created_id"))
+    schedules = FaultingMemorySchedules(case["initial_schedules"], case.get("created_id"), case.get("faults"))
     now = datetime.fromisoformat(case["reference_datetime"])
     service = ConversationService(model, schedules, lambda: now)
     for index, turn in enumerate(case["turns"], 1):
@@ -183,6 +263,9 @@ def replay(case: dict[str, Any]) -> None:
         for key, value in expected.items():
             if current.get(key) != value:
                 raise AssertionError(f"{case['id']}: final {expected['id']} {key} differs")
+    if sorted(schedules.fault_events, key=lambda event: (event["method"], event["occurrence"])) != sorted(
+            case.get("faults", []), key=lambda event: (event["method"], event["occurrence"])):
+        raise AssertionError(f"{case['id']}: declared faults were not triggered")
 
 
 def load_cases(path: Path) -> list[dict[str, Any]]:

@@ -17,6 +17,9 @@
 | `validation/scenarios_UNREVIEWED.jsonl` | 검증 후보 40개 |
 | `test/scenarios_UNREVIEWED.jsonl` | 테스트 예약 후보 100개 |
 | `run_eval.py` | 지정한 시나리오를 읽어 실제 Qwen 평가 |
+| `compare_runs.py` | 동일한 입력·코드·설정으로 실행한 모델 두 개의 전체 대화 결과를 사례별로 비교 |
+| `build_fault_probes.py`, `diagnostic/` | 기존 400건과 분리한 미검수 대상 선택·API 장애 진단 사례 10건 |
+| `audit_coverage.py` | 분할별 대상 선택·오류·장애 사례와 검수 원본 현황 보고 |
 | `review.html` | 실행 결과 JSONL을 첨부해 대화·모델 원문·판정 확인 |
 | `guards.py` | 발화 근거·날짜·질문·쓰기 검사 |
 | `question_rubric.json` | 대화별 기대 질문 종류 |
@@ -28,7 +31,7 @@
 
 등록의 `required_question=null` 조건을 `intent=create`와 확인된 업무·시각 조건으로 한정했다. 조회 범위 규칙도 조회·수정·삭제의 조회 전 단계에 한정했다. 후보가 1건일 때의 `CONFIRM_UPDATE`/`CONFIRM_DELETE`와 다중 후보의 `SELECT_TARGET`을 완전한 JSON 예시로 구분한다. action·필드 계약과 제어부는 변경하지 않았다.
 
-기존 20-step 시험 및 23/114 → 43/114 비교는 **v2.4 프롬프트** 결과다. v2.5 개선 효과는 아직 측정하지 않았으며 기존 결과를 새 버전의 성능으로 표시하지 않는다. `run_eval.py`의 `eval-v2.4-proposed`는 기존 평가기 버전이며 프롬프트 버전과 별개다.
+기존 20-step 시험 및 23/114 → 43/114 비교는 **v2.4 프롬프트** 결과다. v2.5 개선 효과는 아직 측정하지 않았으며 기존 결과를 새 버전의 성능으로 표시하지 않는다. 평가기 버전 `eval-v2.7-proposed`는 프롬프트 버전과 별개이며 원출력 action·JSON 일치를 가드 보정 후 시스템 결과와 분리하고 주입된 장애 사건을 기록한다.
 
 학습 JSONL에는 생성 당시 시스템 프롬프트가 포함된다. 미검수 재현 시험은 `build_dataset.py`, 승인본은 아래 `export_training.py`로 새 입력을 생성하고 별도 출력 폴더에서 토큰 길이·마스크를 다시 검사한다. 과거 학습 폴더·어댑터·결과는 보존한다. 학습 전후 비교는 동일한 v2.5 프롬프트를 사용해야 한다. 프롬프트 정리와 승인본 변환 도구 구현은 검수 승인·본 학습·평가기 개선의 완료를 뜻하지 않는다.
 
@@ -56,7 +59,15 @@ CSV는 JSONL 원본을 수정하지 않고 만든 검토용 사본이다. `scena
 
 원본 30개와 추가 train 230개는 같은 상황의 어휘·날짜·승인 표현 변형을 포함한다. validation/test는 새 대화 조합으로 작성했다. 같은 원본/조합의 변형은 같은 그룹과 분할에 배치했다. 그룹 ID와 동일 입력·정답 행의 분할 간 중복은 없으나 의미상 유사성과 실제 현장 대표성은 사람 검수가 필요하다. test는 검수 전 예약 초안이며 아직 잠근 독립 시험본이 아니다.
 
-400건의 기대 응답 종류를 점검하면 `error`·`stale`은 0건이다. 현재 시나리오에는 API 실패·응답 유실·재시도 주입도 없다. 따라서 이 초안만으로는 실패 후 복구와 중복 쓰기 방지를 평가할 수 없다. 해당 사례를 별도로 설계·검수하고 split 누출을 점검한 뒤 test 고정 여부를 결정해야 한다.
+기존 400건의 기대 응답 종류를 점검하면 `error`·`stale`은 0건이고 validation 40건에는 `SELECT_TARGET`이 없다. 기존 분할과 과거 실행의 비교 기준을 유지하기 위해 이 파일들을 변경하지 않았다. 대신 `diagnostic/`에 대상 선택 2건, 오류 6턴·stale 1턴, GET/POST/PATCH/DELETE 장애 주입 7건을 별도로 추가했다. 등록 응답 유실 후 같은 멱등키 재시도, 등록 거부 후 새 요청, 수정·삭제의 커밋 전 거부와 커밋 후 응답 유실, 확인 전 외부 변경을 포함한다. 10건 모두 **미검수 DATA 진단용**이며 기존 validation/test 점수에 합치지 않는다. 다음 데이터 버전의 분할·누출 점검과 사람 검수 후 평가 범위를 결정한다.
+
+```bash
+python3 build_fault_probes.py
+python3 audit_coverage.py
+python3 run_eval.py --scripted --scenarios diagnostic/scenarios_UNREVIEWED.jsonl --rubric diagnostic/question_rubric.json --output-dir runs/diagnostic_scripted_001
+```
+
+첫 명령은 진단 초안을 다시 만들고 정답 재생까지 확인한다. 두 번째 명령의 `gaps`는 공식 validation과 test에 남은 공백을 표시한다. `--require-complete`는 공백이 남으면 실패한다. 마지막 명령은 모델 없이 평가기의 장애 경로·원출력 지표를 확인한다. 실제 모델로 진단할 때는 `--scripted`를 빼고 별도 출력 폴더를 사용한다. 이 결과도 검수 전 탐색 결과다.
 
 ## 실행
 
@@ -130,7 +141,7 @@ python3 run_eval.py --scripted --scenarios train/scenarios_UNREVIEWED.jsonl --ad
 
 `review.html`에서 `runs/pilot_review_001/review_cases.jsonl`을 열어 사용자 발화, 실제 표시 답변, action, API 호출, 최종 상태를 확인한다. 브라우저에서 내보낸 판정 JSON은 개인 검수 기록으로 로컬에 보관한다. 정답 수정·승인 사례는 `review_sources.py start --case 사례ID`로 만든 해당 원본 JSON에 반영하고 `check`를 실행한다. 자동 재생의 `provisional_match`는 검수 승인이나 Qwen 정확도를 뜻하지 않는다.
 
-시범 검수에서 채점 오판·허용 경로 차이를 기록하고 기준을 고친 뒤 같은 사례를 재실행한다. 현재 평가기는 제어부가 구성하는 `ANSWER` 조회 문장을 정답 재생의 표시 문장과 대조한다. 자유로운 `ASK` 표현은 제한된 단어 검사와 사람 판정을 함께 사용한다. 시범 검수와 기준 고정이 끝나기 전에는 test를 독립 시험본으로 잠그지 않는다.
+시범 검수에서 채점 오판·허용 경로 차이를 기록하고 기준을 고친 뒤 같은 사례를 재실행한다. 현재 평가기는 `ANSWER` 조회 문장을 정답 재생의 표시 문장과 대조하고, 실제 조회 일정의 제목·시각이 사용자에게 표시됐는지도 별도로 확인한다. 자유로운 `ASK` 표현은 관련 단어와 질문·요청 형태를 함께 검사하지만 한국어 의미 판정은 아니므로 사람 판정을 병행한다. 시범 검수와 기준 고정이 끝나기 전에는 test를 독립 시험본으로 잠그지 않는다.
 
 ### 실제 Qwen 평가
 
@@ -149,6 +160,21 @@ python3 run_eval.py --model qwen3:4b --scenarios scenarios_all_400_UNREVIEWED.js
 ```
 
 단, 독립 테스트를 남겨두려면 개발 중에는 validation만 사용한다. test 결과를 보고 모델·프롬프트를 조정하면 새로운 독립 시험본이 필요하다.
+
+### 동일 조건의 전체 대화 전후 비교
+
+로컬 `reviewed/` 원본에서 승인된 validation을 내보낸 뒤, 같은 시나리오·rubric·코드로 기본 모델과 어댑터 모델을 각각 실행한다. 두 모델은 Ollama에 별도 이름으로 설치되어야 한다. 전달받은 PEFT 파일을 `run_eval.py`가 직접 로드하지는 않는다. 아래 명령은 **이 README 폴더**에서 실행하며 실행 사이에 코드·입력·프롬프트·옵션을 변경하지 않는다.
+
+```bash
+python3 review_sources.py export --output-dir runs/reviewed_eval_001
+python3 run_eval.py --model BASE_MODEL --scenarios runs/reviewed_eval_001/validation/scenarios_REVIEWED.jsonl --rubric runs/reviewed_eval_001/question_rubric_REVIEWED.json --output-dir runs/base_001
+python3 run_eval.py --model ADAPTER_MODEL --scenarios runs/reviewed_eval_001/validation/scenarios_REVIEWED.jsonl --rubric runs/reviewed_eval_001/question_rubric_REVIEWED.json --output-dir runs/adapter_001
+python3 compare_runs.py --before runs/base_001 --after runs/adapter_001 --output runs/paired_001.json
+```
+
+비교기는 두 실행이 실제 모델 응답인지, 사례 순서·상태와 입력 파일·프롬프트·코드 해시·생성 설정이 같은지, Ollama 모델 digest가 서로 다른지 검사한다. `provisional_match`는 가드가 적용된 DATA 시범 시스템의 대화 성공이다. `raw_action_path_exact`와 `raw_json_path_exact`는 가드 보정 전 모델 응답을 각 호출의 제안 정답과 순서대로 비교하며, 중간 실패로 호출하지 못한 정답도 대화 전체 불일치로 센다. `summary.json`의 원출력 호출 수·일치 수는 도달한 턴과 전체 기대 호출 수를 따로 기록한다. `--scripted` 결과는 비교 대상이 아니다.
+
+미검수 자료로 탐색할 때만 `compare_runs.py --allow-unreviewed`를 사용한다. 승인본 비교도 사람의 정답 검수 범위에 한정한 잠정 결과다. test 100건은 의미상 중복·실패 사례·채점 기준을 별도로 검수하고 고정하기 전까지 최종 점수에 쓰지 않는다. 실제 백엔드, STT·TTS, Orange Pi 성능은 이 메모리 기반 평가 범위 밖이다.
 
 ## 확인된 결과
 

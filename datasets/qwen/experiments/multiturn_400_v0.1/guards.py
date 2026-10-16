@@ -96,6 +96,21 @@ def validate_write(body,users,now,operation='create',current=None):
         title_task=task_evidence([body.get('title','')])
         if not title or title not in re.sub(r'\s+','',task['source']) or title_task['status']!='confirmed' or title_task['category']!=task['category']:
             return '제목이 확인된 업무 발화에 없습니다. 별도 검수가 필요합니다.'
+    if operation=='update':
+        if 'title' in body and (not isinstance(body['title'],str) or not any(
+                '제목' in u and re.sub(r'\s+','',body['title']) in re.sub(r'\s+','',u)
+                for u in users)):
+            return '변경할 제목의 발화 근거가 없습니다.'
+        if 'completed' in body:
+            requested=(r'완료(?:로|\s*처리|\s*표시)' if body['completed']
+                       else r'미완료(?:로|\s*처리|\s*표시)|완료.*(?:취소|해제)')
+            if type(body['completed']) is not bool or not any(re.search(requested,u) for u in users):
+                return '완료 상태 변경의 발화 근거가 없습니다.'
+        if 'category' in body:
+            word=CATEGORY_WORDS.get(body['category'])
+            if not word or not any(re.search(r'(?:분류|카테고리)(?:를|을)?[^.?!]*?(?:'+word+r')\s*(?:로|으로)',u)
+                                   and re.search(r'바꿔|변경|수정',u) for u in users):
+                return '카테고리 변경의 발화 근거가 없습니다.'
     if 'scheduledAt' in body:
         expected=facts['datetime']
         if operation=='update' and expected is None and facts['clock'] and current:
@@ -115,19 +130,22 @@ def validate_write(body,users,now,operation='create',current=None):
 # Unknown wording must be reviewed, never silently treated as a successful ASK.
 def check_question(kind,text,selection_active=False):
     if not isinstance(text,str): return False
-    if kind=='selection': return selection_active and ('번호' in text or ('1번' in text and '2번' in text))
-    if kind=='change': return bool(re.search(r'변경.*(?:내용|말씀|알려)',text))
-    if kind=='ampm': return '오전' in text and '오후' in text and bool(re.search(r'인가|어느|몇|오전.*오후.*[?？]',text))
-    if kind=='date': return bool(re.search(r'(?:어느|어떤|무슨)\s*(?:날짜|날)|날짜.*(?:알려|말씀|언제)|며칠',text))
-    if kind=='task': return bool(re.search(r'(어떤|무슨).*?(업무|일정|일)|업무.*(알려|말씀)|제목.*(알려|말씀|정해)',text))
-    if kind=='category': return bool(re.search(r'(어떤|무슨).*?(업무|종류)|입고.*반품|업무.*(알려|말씀)',text))
+    # A keyword in a statement is not a question to the user.
+    asks=bool(re.search(r'[?？]|(?:까요|나요|세요|주세요|줘요|줘)\s*[.!?]?(?:\s|$)',text))
+    if kind=='selection': return asks and selection_active and ('번호' in text or ('1번' in text and '2번' in text))
+    if kind=='scope': return asks and bool(re.search(r'(?:범위|날짜|제목).*(?:좁혀|구체적으로|다시)',text))
+    if kind=='change': return asks and bool(re.search(r'변경.*(?:내용|말씀|알려)',text))
+    if kind=='ampm': return asks and '오전' in text and '오후' in text and bool(re.search(r'인가|어느|몇|오전.*오후.*[?？]',text))
+    if kind=='date': return asks and bool(re.search(r'(?:어느|어떤|무슨)\s*(?:날짜|날)|날짜.*(?:알려|말씀|언제)|며칠|언제.*(?:일정|등록|진행|잡)',text))
+    if kind=='task': return asks and bool(re.search(r'(어떤|무슨).*?(업무|일정|일)|업무.*(알려|말씀)|제목.*(알려|말씀|정해)',text))
+    if kind=='category': return asks and bool(re.search(r'(어떤|무슨).*?(업무|종류)|입고.*반품|업무.*(알려|말씀)',text))
     if kind in {'time','past_time'}:
         positive=bool(re.search(r'몇\s*시|(?:어떤|어느|무슨)\s*(?:시간|시각)(?:에|으로|을|이)|시각.*(?:알려|말씀)|시간.*(?:알려|말씀)|언제로|언제.*(?:등록|변경|진행)',text))
         bad=bool(re.search(r'언제까지|얼마나|몇\s*시간|소요|걸리|동안|제목.*(?:정해|알려)|어떤.*업무',text))
         # A yes/no proposal or an invented concrete time is not a request for the missing time.
         bad=bad or bool(re.search(r'\d{1,2}\s*시|\d{1,2}:\d{2}',text))
         if kind=='past_time': positive=positive and bool(re.search(r'지났|지난|과거',text))
-        return positive and not bad
+        return asks and positive and not bad
     raise ValueError('Unknown question rubric: '+kind)
 
 def intent_from_users(users):
