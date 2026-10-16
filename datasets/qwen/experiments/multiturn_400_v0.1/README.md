@@ -12,9 +12,9 @@
 | `export_training.py` | 승인된 train/validation을 재생해 현재 프롬프트의 학습 JSONL과 원본 추적표 생성 |
 | `pilot_review_cases_v0.1.txt` | train 25건·validation 5건의 재현 가능한 시범 검수 표본. test는 포함하지 않음 |
 | `scenarios_all_400_UNREVIEWED.jsonl` | 전체 400개 대화 |
-| `scenarios_all_400_UNREVIEWED_turns.csv` | 전체 400개 대화의 1,004개 사용자 턴을 한 행씩 펼친 검토용 CSV |
-| `train/scenarios_UNREVIEWED.jsonl` | 학습 후보 260개 |
-| `validation/scenarios_UNREVIEWED.jsonl` | 검증 후보 40개 |
+| `scenarios_all_400_UNREVIEWED_turns.csv` | 전체 400개 대화의 979개 사용자 턴을 한 행씩 펼친 검토용 CSV |
+| `train/scenarios_UNREVIEWED.jsonl` | 학습 후보 250개 |
+| `validation/scenarios_UNREVIEWED.jsonl` | 검증 후보 50개 |
 | `test/scenarios_UNREVIEWED.jsonl` | 테스트 예약 후보 100개 |
 | `run_eval.py` | 지정한 시나리오를 읽어 실제 Qwen 평가 |
 | `compare_runs.py` | 동일한 입력·코드·설정으로 실행한 모델 두 개의 전체 대화 결과를 사례별로 비교 |
@@ -41,15 +41,21 @@ CSV는 JSONL 원본을 수정하지 않고 만든 검토용 사본이다. `scena
 
 ### 데이터 문구 개정 — 2026-10-16
 
-현재 생성본은 `qwen-dataset-400-v0.1.1-proposed`다. 제목 치환 후 잘못 붙은 조사(train 27건), `분야` 시각 표현(validation 3건·test 10건), `모레이야` 날짜 표현(test 10건), 제목 변경 문장의 인용부호 뒤 조사(validation 5건·test 15건), `분로` 시각 표현(test 21건)을 고쳤다. 일부 test 사례에서 수정이 겹치므로 변경된 대화는 train 27건·validation 8건·test 39건, 총 74건이다. `build_dataset.py` 실행 시 검토용 CSV의 사용자 발화·모델 질문도 JSONL에 맞춰 갱신한다. 분할·그룹·action·API 요청·정답 상태는 그대로이며, 모든 사례는 여전히 미검수 제안이다.
+이전 `qwen-dataset-400-v0.1.1-proposed`에서 제목 치환 후 잘못 붙은 조사(train 27건), `분야` 시각 표현(validation 3건·test 10건), `모레이야` 날짜 표현(test 10건), 제목 변경 문장의 인용부호 뒤 조사(validation 5건·test 15건), `분로` 시각 표현(test 21건)을 고쳤다. 일부 test 사례에서 수정이 겹치므로 당시 변경된 대화는 train 27건·validation 8건·test 39건, 총 74건이었다. 이 문구 교정은 현재 생성본에도 유지된다.
 
 문구가 달라져 JSONL·CSV의 해시가 바뀌었다. 아래의 과거 실제 모델 평가와 20-step 시험 학습 수치는 개정 전 입력의 기록이다. 개정본의 전후 비교에는 두 모델을 같은 새 입력으로 다시 평가해야 한다. 고정 시범 표본 30건 중 `validation-outbound-update-title_alarm-03`의 문구가 바뀌었다. 이미 만든 `reviewed/` 검수 원본은 새 초안과 해시가 다를 수 있으므로 자동 승인하거나 덮어쓰지 말고 해당 사례를 대조한다.
+
+### 기본 발화·검증 범위 개정 — 2026-10-16
+
+현재 생성본은 `qwen-dataset-400-v0.1.2-proposed`다. 전체 400건은 유지하고 반복 train 변형 20건을 줄여 train 250·validation 50·test 예약 100건으로 재분할했다. 날짜·시각·업무가 모두 있는 직접 등록을 train 10·validation 5·test 5건 넣고, validation에는 별도 대화 가족의 다중 후보 삭제 선택 5건을 넣었다. train 변형의 첫 요청 동사를 일부 바꾸고 기준 시각 밤 9시 사례를 train 60·validation 20·test 47건 포함했다. train의 고유 첫 발화는 이전 88/260에서 109/250으로 늘었지만 실제 음성 표현의 대표성을 입증하지 않는다. 검토용 CSV는 400건 JSONL에서 매번 다시 만들며 학습·평가 기준은 계속 JSONL이다.
+
+과거 validation 40건의 실제 Qwen 점수와 기존 651/114행의 tokenizer 검사는 수정된 validation 50건·학습 행 612/129건의 결과가 아니다. 시범 승인본도 새 초안과 해시·분할을 대조하기 전까지 자동 승계하지 않는다. 새 정답은 모두 `proposed_unreviewed`이며 실제 Qwen 기준선과 tokenizer 길이·마스크 검사는 재실행해야 한다.
 
 ### 다중 후보 대상 선택 규칙 — AI·DATA 로컬 시범
 
 수정·삭제 조회 결과가 1건이면 기존 `CONFIRM_UPDATE`/`CONFIRM_DELETE`에 조회된 ID를 넣는다. 2~10건이면 `SELECT_TARGET`을 출력한다. 삭제 형식은 `{"action":"SELECT_TARGET","message":null,"request":{"operation":"delete"}}`, 수정 형식은 `request={"operation":"update","changes":{...}}`다. `SELECT_TARGET`에는 `targetId`가 없다. 제어부가 번호를 보여주고 사용자의 선택을 실제 ID로 바꿔 대상·변경값을 확인한 뒤 승인 시에만 쓴다. 잘못된 번호는 다시 묻고, 취소하면 쓰지 않는다. 10건 초과는 날짜·제목으로 범위를 좁혀 다시 조회하도록 묻는다.
 
-이번 초안의 `SELECT_TARGET`은 60건(train 35·test 예약 25)에 있다. `other-update-different-target`처럼 2번을 선택한 뒤 변경 시각을 다시 말하면 선택된 일정의 이름이 명시된 경우에만 그 후보를 재사용하고 변경값을 다시 확인한다. 400건 초안은 재생 통과했다. 이 중 시범 30건은 사용자 위임 Codex 검토로 별도의 로컬 승인본을 구성했으며 독립 검수와 구분한다. AI 영역의 로컬 시범 제어부·검증기·프롬프트도 같은 다중 후보 action 형식을 지원한다. 공유 출력 계약은 여전히 `TBD-AI`이며, 학습 어댑터의 AI 실행기 연결이나 실제 모델 평가가 완료된 것은 아니다. 기존 단일 후보 흐름과 5건 구형 시범 데이터는 별개로 유지한다.
+이번 초안의 `SELECT_TARGET`은 62건(train 32·validation 5·test 예약 25)에 있다. `other-update-different-target`처럼 2번을 선택한 뒤 변경 시각을 다시 말하면 선택된 일정의 이름이 명시된 경우에만 그 후보를 재사용하고 변경값을 다시 확인한다. 400건 초안은 재생 통과했다. 이전 시범 30건은 사용자 위임 Codex 검토로 별도의 로컬 승인본을 구성했으며 독립 검수와 구분한다. AI 영역의 로컬 시범 제어부·검증기·프롬프트도 같은 다중 후보 action 형식을 지원한다. 공유 출력 계약은 여전히 `TBD-AI`이며, 학습 어댑터의 AI 실행기 연결이나 실제 모델 평가가 완료된 것은 아니다. 기존 단일 후보 흐름과 5건 구형 시범 데이터는 별개로 유지한다.
 
 학습 행·검수표·정답 재생 미리보기·실행 로그는 Git에 올리지 않고 필요할 때 생성한다. 기존 시범 파일은 별도로 복사하지 않는다. 실행 로그와 개인 검수 기록은 공유 대상에서 제외한다.
 
@@ -57,17 +63,17 @@ CSV는 JSONL 원본을 수정하지 않고 만든 검토용 사본이다. `scena
 
 | 분할 | 대화 | 그룹 | 생성되는 학습/참조 행 |
 |---|---:|---:|---:|
-| train | 260 | 27 | 651 |
-| validation | 40 | 8 | 114 |
-| test | 100 | 10 | 352 |
+| train | 250 | 28 | 612 |
+| validation | 50 | 10 | 129 |
+| test | 100 | 11 | 327 |
 
-각 업무 카테고리(INBOUND·INVENTORY·OUTBOUND·RETURN·OTHER)는 train 52개·validation 8개·test 20개다. train의 등록/조회/수정/삭제는 72/61/64/63개로, 기존 계획의 각 65개와는 다르다. validation은 각 10개, test는 각 25개다.
+각 업무 카테고리(INBOUND·INVENTORY·OUTBOUND·RETURN·OTHER)는 train 50개·validation 10개·test 20개다. train의 등록/조회/수정/삭제는 74/56/64/56개, validation은 15/10/10/15개, test는 30/20/25/25개다.
 
-원본 30개와 추가 train 230개는 같은 상황의 어휘·날짜·승인 표현 변형을 포함한다. validation/test는 새 대화 조합으로 작성했다. 같은 원본/조합의 변형은 같은 그룹과 분할에 배치했다. 그룹 ID와 동일 입력·정답 행의 분할 간 중복은 없으나 의미상 유사성과 실제 현장 대표성은 사람 검수가 필요하다. test는 검수 전 예약 초안이며 아직 잠근 독립 시험본이 아니다.
+원본 30개와 추가 train 변형 210개는 같은 상황의 어휘·날짜·승인 표현 변형을 포함한다. validation/test는 새 대화 조합으로 작성했다. 같은 원본/조합의 변형은 같은 그룹과 분할에 배치했다. 그룹 ID와 동일 입력·정답 행의 분할 간 중복은 없으나 의미상 유사성과 실제 현장 대표성은 사람 검수가 필요하다. test는 검수 전 예약 초안이며 아직 잠근 독립 시험본이 아니다.
 
-기존 400건의 기대 응답 종류를 점검하면 `error`·`stale`은 0건이고 validation 40건에는 `SELECT_TARGET`이 없다. 진단 범위를 별도로 확인하기 위해 `diagnostic/`에 대상 선택 2건, 오류 6턴·stale 1턴, GET/POST/PATCH/DELETE 장애 주입 7건을 추가했다. 등록 응답 유실 후 같은 멱등키 재시도, 등록 거부 후 새 요청, 수정·삭제의 커밋 전 거부와 커밋 후 응답 유실, 확인 전 외부 변경을 포함한다. 10건 모두 **미검수 DATA 진단용**이며 기존 validation/test 점수에 합치지 않는다. 다음 데이터 버전의 분할·누출 점검과 사람 검수 후 평가 범위를 결정한다.
+400건의 기대 응답 종류를 점검하면 `error`·`stale`은 0건이다. validation 50건에는 `SELECT_TARGET` 5건이 있다. 별도 `diagnostic/`에는 대상 선택 2건, 오류 6턴·stale 1턴, GET/POST/PATCH/DELETE 장애 주입 7건이 있다. 등록 응답 유실 후 같은 멱등키 재시도, 등록 거부 후 새 요청, 수정·삭제의 커밋 전 거부와 커밋 후 응답 유실, 확인 전 외부 변경을 포함한다. 10건 모두 **미검수 DATA 진단용**이며 validation/test 점수에 합치지 않는다. 장애 경로의 독립 평가 채택은 분할·누출 점검과 사람 검수 후 결정한다.
 
-진단 10건 중 9건의 첫 사용자 발화가 train과 같다. 기존 train 사례에서 복사한 장애 진단을 validation으로 옮기면 독립 분할로 볼 수 없다. 대상 선택·장애 경로를 공식 validation에 포함하려면 train과 겹치지 않는 새 대화 가족을 별도 데이터 버전으로 작성하고 정답·채점 경로를 검수해야 한다. 기존 40건의 과거 실행 점수와 새 버전 점수는 구분한다.
+진단 10건 중 9건의 첫 사용자 발화가 train과 같다. 기존 train 사례에서 복사한 장애 진단을 validation으로 옮기면 독립 분할로 볼 수 없다. 공식 validation의 대상 선택 5건은 새 발화 가족으로 작성했으며, 장애 경로를 포함하려면 train과 겹치지 않는 새 가족을 별도로 작성하고 정답·채점 경로를 검수해야 한다. 기존 40건의 과거 실행 점수와 새 50건의 점수는 구분한다.
 
 ```bash
 python3 build_fault_probes.py
@@ -87,7 +93,7 @@ Python 3.10 이상을 사용한다. 아래 명령은 **이 README가 있는 폴�
 python3 run_eval.py --scripted --output-dir runs/smoke_001
 ```
 
-`review.html`을 브라우저로 열고 `runs/smoke_001/review_cases.jsonl`을 선택한다. 기본 validation 40개의 **제안 정답 재생 미리보기**이며 실제 Qwen 응답이 아니다. Python 표준 라이브러리만 사용하며 별도 pip 설치는 필요 없다.
+`review.html`을 브라우저로 열고 `runs/smoke_001/review_cases.jsonl`을 선택한다. 기본 validation 50개의 **제안 정답 재생 미리보기**이며 실제 Qwen 응답이 아니다. Python 표준 라이브러리만 사용하며 별도 pip 설치는 필요 없다.
 
 ### 제안 정답 재생 및 산출물 생성
 
@@ -153,7 +159,7 @@ python3 run_eval.py --scripted --scenarios train/scenarios_UNREVIEWED.jsonl --ad
 
 ### 실제 Qwen 평가
 
-Ollama가 실행 중이고 로컬에 `qwen3:4b`가 있어야 한다. 기본 입력은 validation 40개다.
+Ollama가 실행 중이고 로컬에 `qwen3:4b`가 있어야 한다. 기본 입력은 수정된 validation 50개다.
 
 ```bash
 python3 run_eval.py --model qwen3:4b --scenarios validation/scenarios_UNREVIEWED.jsonl --rubric question_rubric.json --output-dir runs/validation_001

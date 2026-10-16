@@ -106,15 +106,6 @@
   "train-inbound-040": {
     "1": "date"
   },
-  "train-inbound-043": {
-    "1": "past_time"
-  },
-  "train-inbound-044": {
-    "1": "time"
-  },
-  "train-inbound-046": {
-    "1": "date"
-  },
   "train-inventory-001": {
     "1": "date"
   },
@@ -155,12 +146,6 @@
     "1": "date"
   },
   "train-inventory-038": {
-    "1": "time"
-  },
-  "train-inventory-043": {
-    "1": "date"
-  },
-  "train-inventory-044": {
     "1": "time"
   },
   "train-outbound-001": {
@@ -233,16 +218,6 @@
     "1": "selection",
     "2": "selection"
   },
-  "train-outbound-043": {
-    "1": "ampm"
-  },
-  "train-outbound-044": {
-    "1": "task"
-  },
-  "train-outbound-045": {
-    "1": "selection",
-    "2": "selection"
-  },
   "train-return-001": {
     "1": "time"
   },
@@ -304,15 +279,6 @@
     "1": "selection"
   },
   "train-return-039": {
-    "1": "selection"
-  },
-  "train-return-043": {
-    "1": "time"
-  },
-  "train-return-044": {
-    "1": "selection"
-  },
-  "train-return-045": {
     "1": "selection"
   },
   "train-other-001": {
@@ -385,13 +351,6 @@
   "train-other-041": {
     "1": "selection"
   },
-  "train-other-043": {
-    "1": "category",
-    "2": "time"
-  },
-  "train-other-046": {
-    "1": "date"
-  },
   "validation-inbound-create-task_date-01": {
     "1": "task",
     "2": "date"
@@ -408,6 +367,9 @@
   },
   "validation-inbound-delete-missing_date_single-01": {
     "1": "date"
+  },
+  "validation-inbound-delete-select_validation-01": {
+    "1": "selection"
   },
   "validation-inventory-create-task_date-02": {
     "1": "task",
@@ -426,6 +388,9 @@
   "validation-inventory-delete-missing_date_single-02": {
     "1": "date"
   },
+  "validation-inventory-delete-select_validation-02": {
+    "1": "selection"
+  },
   "validation-outbound-create-task_date-03": {
     "1": "task",
     "2": "date"
@@ -442,6 +407,9 @@
   },
   "validation-outbound-delete-missing_date_single-03": {
     "1": "date"
+  },
+  "validation-outbound-delete-select_validation-03": {
+    "1": "selection"
   },
   "validation-return-create-task_date-04": {
     "1": "task",
@@ -460,6 +428,9 @@
   "validation-return-delete-missing_date_single-04": {
     "1": "date"
   },
+  "validation-return-delete-select_validation-04": {
+    "1": "selection"
+  },
   "validation-other-create-task_date-05": {
     "1": "task",
     "2": "date"
@@ -476,6 +447,9 @@
   },
   "validation-other-delete-missing_date_single-05": {
     "1": "date"
+  },
+  "validation-other-delete-select_validation-05": {
+    "1": "selection"
   },
   "test-inbound-create-task_date_time-01": {
     "1": "task",

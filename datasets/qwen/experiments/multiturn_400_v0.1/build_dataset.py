@@ -77,13 +77,16 @@ for c in original:
  bycat[cat].append(c)
  x=copy.deepcopy(c);register(x,'train',cat,'legacy:'+c['conversation_group_id'],'original_30',c['id'])
  if c['id'] in oldrub:RUBRIC[c['id']]=copy.deepcopy(oldrub[c['id']])
-# 230 additional train dialogues. Preserve causal path, vary task vocabulary,
+# 210 additional train dialogues. Preserve causal path, vary task vocabulary,
 # reference calendar, fixture identifiers, and follow-up phrasing. IDs retain lineage.
 for ci,cat in enumerate(CATS):
- for v in range(46):
+ for v in range(42):
   base=bycat[cat][v%len(bycat[cat])];x=copy.deepcopy(base)
-  new_id=f'train-{cat.lower()}-{v+1:03d}';ref=datetime.fromisoformat(DATES[(v+ci)%len(DATES)]+'T09:00:00+09:00')+timedelta(days=3*(1+v//8))
-  delta=ref-datetime.fromisoformat(base['reference_datetime'])
+  new_id=f'train-{cat.lower()}-{v+1:03d}';hour='21:00:00' if v%4==1 and base['id']!='in-create-past' else '09:00:00'
+  ref=datetime.fromisoformat(DATES[(v+ci)%len(DATES)]+'T'+hour+'+09:00')+timedelta(days=3*(1+v//8))
+  # Move fixture dates without shifting spoken clock times when the reference
+  # changes from morning to evening.
+  delta=timedelta(days=(ref.date()-datetime.fromisoformat(base['reference_datetime']).date()).days)
   fixture_ids={item['id'] for item in base['initial_schedules']}|({base['created_id']} if 'created_id' in base else set())
   idmap={i:uid(new_id+':'+i) for i in fixture_ids}
   # Replace complete literal task titles, longest first. Distinct titles stay distinct.
@@ -113,7 +116,17 @@ for ci,cat in enumerate(CATS):
     return title+(particle_for(title,particle) if particle else '')
    obj=re.sub(r'@@TASK(\d+)@@(?:(으로|로|을|를|이야|야|이|가|은|는|과|와)(?=$|[\s.,!?"“”‘’]))?',restore,obj)
    return obj
-  x=transform(x);x['id']=new_id;x['conversation_group_id']=base['conversation_group_id']
+  x=transform(x);x['id']=new_id;x['conversation_group_id']=base['conversation_group_id'];x['reference_datetime']=ref.isoformat()
+  if (v//len(bycat[cat]))%2:
+   # Change one intent phrase, not task/date evidence or the dialogue path.
+   alternatives=(('삭제하고 싶어','지우고 싶어'),('삭제해줘','지워줘'),
+                 ('등록해줘','넣어줘'),('잡아줘','등록해줘'),
+                 ('보여줘','조회해줘'),('알려줘','보여줘'),
+                 ('바꿔줘','변경해줘'),('알림을 꺼줘','알림을 해제해줘'))
+   for old,new in alternatives:
+    if old in x['turns'][0]['user']:
+     x['turns'][0]['user']=x['turns'][0]['user'].replace(old,new,1)
+     break
   # Follow-up yes/no turns are controller turns; no manufactured model answer.
   for t in x['turns']:
    if not t['model_outputs'] and t['expect']['reply_kind'] in ('updated','deleted'):t['user']=['네','응','진행해','확인'][v%4]
@@ -125,7 +138,8 @@ class Builder:
  def __init__(self,split,cat,family,v):
   self.cat=cat;self.family=family;self.v=v;self.split=split
   self.id=f'{split}-{cat.lower()}-{family.replace(":","-")}-{v+1:02d}'
-  self.now=datetime.fromisoformat(DATES[(v+CATS.index(cat))%len(DATES)]+'T09:00:00+09:00')
+  hour='21:00:00' if v%2 else '09:00:00'
+  self.now=datetime.fromisoformat(DATES[(v+CATS.index(cat))%len(DATES)]+'T'+hour+'+09:00')
   self.title=TITLES[cat][(v+CATS.index(cat))%8];self.day=1+v%2;self.hour=14+v%4;self.minute=[0,15,30,45][v%4]
   self.c={'schema_version':'pilot-v0.1','id':self.id,'conversation_group_id':'family:'+family,'reference_datetime':self.now.isoformat(),'initial_schedules':[],'turns':[],'label_status':'proposed_unreviewed','expect_final':[]}
   self.questions={}
@@ -170,6 +184,14 @@ class Builder:
 
 def create(b,mode):
  d=DAYS[b.day];tm=b.clock();alarm=10 if b.v%2 else None;tail=' 10분 전 알림도 부탁해.' if alarm==10 else ''
+ if mode.startswith('direct_'):
+  verb={'direct_train':'등록해줘','direct_validation':'넣어줘','direct_test':'잡아줘'}[mode]
+  text=f'{d} {tm}에 {b.title} 일정 {verb}.'+tail
+  body={'title':b.title,'scheduledAt':b.dt(b.day,b.hour,b.minute),'category':b.cat,'reminderMinutesBefore':alarm}
+  b.c['created_id']=uid(b.id+':created')
+  b.emit(text,[act('CREATE',body)],'created',['POST'],1,post_body=body)
+  b.finish([{'id':b.c['created_id'],**body,'completed':False}])
+  return
  if mode=='task_date':
   b.ask(f'{tm}에 일정 등록해줘.'+tail,'task');b.ask(b.title,'date');last=f'{d}로 해줘.'
  elif mode=='date_time':
@@ -213,6 +235,16 @@ def update(b,mode):
 
 def delete(b,mode):
  d=DAYS[b.day];k=KO[b.cat]
+ if mode=='select_validation':
+  b.fixture(hour=10);target=b.fixture(hour=14)
+  b.fixture(cat=CATS[(CATS.index(b.cat)+1)%5])
+  b.emit(f'{d} {k} 일정 중 하나 지우고 싶어.',
+         [b.listing(),act('SELECT_TARGET',{'operation':'delete'})],
+         'ask',['GET'])
+  b.questions[str(len(b.c['turns']))]='selection'
+  b.emit('2번',[],'confirm',['GET'])
+  b.decision(target)
+  return
  if mode in ('missing_date_single','empty_then_single'):
   target=b.fixture();b.fixture(cat=CATS[(CATS.index(b.cat)+1)%5])
   if mode=='missing_date_single':b.ask(f'{k} 일정 삭제해줘.','date')
@@ -228,8 +260,10 @@ def delete(b,mode):
 # Held-out compositions, assigned BEFORE lexical/calendar variants are authored.
 # Approval/rejection and all five business categories of a family remain together.
 FAMILIES={
-'validation': [('create:task_date',create,1),('create:date_time',create,1),('query:missing_then_incomplete',query,1),('query:missing_then_complete',query,1),('update:title_alarm',update,1),('update:completed_alarm',update,1),('delete:missing_date_single',delete,1),('delete:empty_then_single',delete,1)],
- 'test': [('create:task_date_time',create,2),('create:date_ampm',create,2),('create:past_then_ambiguous',create,1),('query:unsupported_then_toggle',query,2),('query:filter_then_day',query,2),('query:scope_then_filter',query,1),('update:time_alarm',update,2),('update:title_time',update,2),('update:missing_date_title',update,1),('delete:unsupported_select',delete,5)]}
+'validation': [('create:task_date',create,1),('create:date_time',create,1),('create:direct_validation',create,1),('query:missing_then_incomplete',query,1),('query:missing_then_complete',query,1),('update:title_alarm',update,1),('update:completed_alarm',update,1),('delete:missing_date_single',delete,1),('delete:empty_then_single',delete,1),('delete:select_validation',delete,1)],
+ 'test': [('create:task_date_time',create,2),('create:date_ampm',create,2),('create:past_then_ambiguous',create,1),('create:direct_test',create,1),('query:unsupported_then_toggle',query,2),('query:filter_then_day',query,1),('query:scope_then_filter',query,1),('update:time_alarm',update,2),('update:title_time',update,2),('update:missing_date_title',update,1),('delete:unsupported_select',delete,5)]}
+for ci,cat in enumerate(CATS):
+ for v in range(2):create(Builder('train',cat,'create:direct_train',v+ci*2),'direct_train')
 for split,families in FAMILIES.items():
  for ci,cat in enumerate(CATS):
   for family,build,n in families:
@@ -240,7 +274,7 @@ app.save_jsonl(ROOT/'scenarios_all_400_UNREVIEWED.jsonl',ALL)
 app.save_json(ROOT/'question_rubric.json',RUBRIC)
 app.save_jsonl(ROOT/'case_manifest.jsonl',META)
 assert len(ALL)==400 and len({c['id'] for c in ALL})==400
-assert Counter(m['split'] for m in META)=={'train':260,'validation':40,'test':100}
+assert Counter(m['split'] for m in META)=={'train':250,'validation':50,'test':100}
 meta={m['case_id']:m for m in META};groups=defaultdict(set)
 for m in META:groups[m['conversation_group_id']].add(m['split'])
 assert all(len(s)==1 for s in groups.values())
@@ -319,18 +353,35 @@ for split in ['train','validation','test']:
  stats[split]={'dialogues':len(cases),'conversation_groups':len({c['conversation_group_id'] for c in cases}),'user_turns':sum(len(c['turns']) for c in cases),'model_calls':len(maps),'unique_supervised_rows':len(rows),'categories':dict(Counter(meta[c['id']]['category'] for c in cases))}
 for a,b in [('train','validation'),('train','test'),('validation','test')]:assert not rowhashes[a]&rowhashes[b],(a,b,'identical row leakage')
 csv_path=ROOT/'scenarios_all_400_UNREVIEWED_turns.csv'
-with csv_path.open(encoding='utf-8-sig',newline='') as source:
- reader=csv.DictReader(source);fieldnames=reader.fieldnames;csv_rows=list(reader)
-turn_by_id={(case['id'],str(index)):turn for case in ALL for index,turn in enumerate(case['turns'],1)}
-assert len(csv_rows)==len(turn_by_id) and {(row['scenario_id'],row['turn_number']) for row in csv_rows}==set(turn_by_id),'review CSV is out of sync with scenario IDs/turns'
-for row in csv_rows:
- turn=turn_by_id[(row['scenario_id'],row['turn_number'])]
- row['user']=turn['user']
- row['model_outputs_json']=json.dumps(turn['model_outputs'],ensure_ascii=False,separators=(',',':'))
+fieldnames=['split','scenario_id','turn_number','total_turns','user','model_actions',
+            'expected_reply_kind','expected_writes','expected_api_methods',
+            'model_outputs_json','expect_json','schema_version','conversation_group_id',
+            'reference_datetime','initial_schedules_json','expect_final_json',
+            'created_id','label_status']
+compact=lambda value:json.dumps(value,ensure_ascii=False,separators=(',',':'))
+csv_rows=[]
+for case in ALL:
+ for index,turn in enumerate(case['turns'],1):
+  csv_rows.append({'split':meta[case['id']]['split'],'scenario_id':case['id'],
+                   'turn_number':index,'total_turns':len(case['turns']),
+                   'user':turn['user'],
+                   'model_actions':' | '.join(action['action'] for action in turn['model_outputs']),
+                   'expected_reply_kind':turn['expect']['reply_kind'],
+                   'expected_writes':turn['expect']['writes'],
+                   'expected_api_methods':' | '.join(turn['expect']['api_methods']),
+                   'model_outputs_json':compact(turn['model_outputs']),
+                   'expect_json':compact(turn['expect']),
+                   'schema_version':case['schema_version'],
+                   'conversation_group_id':case['conversation_group_id'],
+                   'reference_datetime':case['reference_datetime'],
+                   'initial_schedules_json':compact(case['initial_schedules']),
+                   'expect_final_json':compact(case['expect_final']),
+                   'created_id':case.get('created_id',''),
+                   'label_status':case['label_status']})
 with csv_path.open('w',encoding='utf-8-sig',newline='') as target:
  writer=csv.DictWriter(target,fieldnames=fieldnames,lineterminator='\r\n')
  writer.writeheader();writer.writerows(csv_rows)
 app.save_json(ROOT/'verification_summary.json',{'status':'scripted_reference_passed_NOT_MODEL_ACCURACY','cases':len(results),'matches':len(results),'filter_corrections':0,'blocked_writes':0,'group_overlap':0,'exact_row_overlap':0,'human_reviewed':0,'dynamic_action_schema_errors':0,'exact_dialogue_duplicates_ignoring_uuid':0,'splits':stats})
 files=[p for p in ROOT.rglob('*') if p.is_file() and p.name!='manifest.json' and '__pycache__' not in str(p)]
-app.save_json(ROOT/'manifest.json',{'dataset_version':'qwen-dataset-400-v0.1.1-proposed','label_status':'proposed_unreviewed','source_run_for_context_only':'eval_20261011_230323_c4efb5','source_run_answers_used':False,'split_unit':'conversation_group_id','test_status':'reserved_draft_not_human_reviewed_not_final_locked_benchmark','supervision':'only final assistant action per row; prior assistant messages are context','splits':stats,'sha256':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(files)}})
+app.save_json(ROOT/'manifest.json',{'dataset_version':'qwen-dataset-400-v0.1.2-proposed','label_status':'proposed_unreviewed','source_run_for_context_only':'eval_20261011_230323_c4efb5','source_run_answers_used':False,'split_unit':'conversation_group_id','test_status':'reserved_draft_not_human_reviewed_not_final_locked_benchmark','supervision':'only final assistant action per row; prior assistant messages are context','splits':stats,'sha256':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(files)}})
 print(json.dumps(stats,ensure_ascii=False,indent=2));print('400 scripted reference dialogues passed; human reviewed: 0')

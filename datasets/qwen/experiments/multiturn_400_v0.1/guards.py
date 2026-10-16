@@ -152,8 +152,8 @@ def intent_from_users(users):
     """Bounded lexical routing from real utterances, never gold actions/case IDs."""
     intent=None
     for text in users:
-        if re.search(r'삭제|지워|지울',text): intent='delete'
-        elif re.search(r'바꿔|변경|수정|완료로|알림.*(?:켜|꺼|해제)',text): intent='update'
+        if re.search(r'삭제|지우|지워|지울',text): intent='delete'
+        elif re.search(r'바꾸|바꿔|변경|수정|완료로|알림.*(?:켜|꺼|해제)',text): intent='update'
         elif re.search(r'등록|잡아|잡고|넣',text): intent='create'
         elif re.search(r'보여|알려|일정.*있어|조회',text): intent='query'
     return intent

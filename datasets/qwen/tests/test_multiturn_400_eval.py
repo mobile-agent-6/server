@@ -14,7 +14,7 @@ EXPERIMENT = Path(__file__).resolve().parents[1] / "experiments" / "multiturn_40
 sys.path.insert(0, str(EXPERIMENT))
 
 import run_eval as evaluator  # noqa: E402
-from guards import check_question, validate_write  # noqa: E402
+from guards import check_question, intent_from_users, validate_write  # noqa: E402
 from runtime.schedule_assistant.service import ConversationService, Reply  # noqa: E402
 
 
@@ -35,6 +35,25 @@ class Multiturn400EvalTests(unittest.TestCase):
                             ("validation", "test")):
             self.assertFalse(first_utterances[left] & first_utterances[right],
                              f"identical first utterances in {left} and {right}")
+
+    def test_revised_split_covers_direct_create_selection_and_evening(self) -> None:
+        splits = {name: evaluator.load_cases(EXPERIMENT / name / "scenarios_UNREVIEWED.jsonl")
+                  for name in ("train", "validation", "test")}
+        self.assertEqual({name: len(cases) for name, cases in splits.items()},
+                         {"train": 250, "validation": 50, "test": 100})
+        for name, cases in splits.items():
+            with self.subTest(split=name):
+                self.assertTrue(any(case["turns"][0]["model_outputs"][0]["action"] == "CREATE"
+                                    for case in cases))
+        self.assertTrue(any(action["action"] == "SELECT_TARGET"
+                            for case in splits["validation"] for turn in case["turns"]
+                            for action in turn["model_outputs"]))
+        self.assertTrue(any("T21:00:00" in case["reference_datetime"]
+                            for case in splits["train"]))
+
+    def test_natural_delete_and_update_phrases_keep_their_intent(self) -> None:
+        self.assertEqual(intent_from_users(["내일 반품 일정 하나 지우고 싶어."]), "delete")
+        self.assertEqual(intent_from_users(["내일 팀 회의 시간을 바꾸고 싶어."]), "update")
 
     def test_generated_wording_and_review_csv_match(self) -> None:
         cases = evaluator.load_cases(EXPERIMENT / "scenarios_all_400_UNREVIEWED.jsonl")
