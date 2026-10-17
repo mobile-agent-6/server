@@ -14,8 +14,9 @@ from app.core.clock import SystemClock, SystemMonotonicClock
 from app.core.config import Settings, get_settings
 from app.core.database import create_api_engine, create_session_factory
 from app.core.logging import configure_logging
-from app.core.middleware import RequestIdMiddleware
+from app.core.middleware import AssistantRequestBodyMiddleware, RequestIdMiddleware
 from app.core.problem_details import ProblemBoundaryMiddleware, register_exception_handlers
+from app.modules.assistant.router import router as assistant_router
 from app.modules.schedules.router import router as schedules_router
 from app.modules.system.router import router as system_router
 from app.modules.system.service import resolve_expected_head
@@ -81,6 +82,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
 
     application.add_middleware(ProblemBoundaryMiddleware)
+    application.add_middleware(AssistantRequestBodyMiddleware)
     application.add_middleware(RequestIdMiddleware)
     if resolved.cors_origins:
         application.add_middleware(
@@ -93,6 +95,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         )
 
     register_exception_handlers(application)
+    application.include_router(assistant_router)
     application.include_router(schedules_router)
     application.include_router(system_router)
     _install_openapi_contract(application)
