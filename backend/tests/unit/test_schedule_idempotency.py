@@ -14,7 +14,6 @@ def create_data(**overrides: object) -> ScheduleCreate:
         "title": "회의",
         "scheduledAt": "2026-09-13T04:45:00Z",
         "category": "OUTBOUND",
-        "reminderMinutesBefore": None,
     }
     payload.update(overrides)
     return ScheduleCreate.model_validate(payload)
@@ -37,7 +36,6 @@ def test_fingerprint_includes_each_normalized_payload_field() -> None:
         create_data(title="다른 회의"),
         create_data(scheduledAt="2026-09-13T04:45:01Z"),
         create_data(category="RETURN"),
-        create_data(reminderMinutesBefore=10),
     )
 
     assert all(canonical_fingerprint(variant) != original for variant in variants)
@@ -52,7 +50,7 @@ def test_fingerprint_includes_version_method_and_canonical_route() -> None:
     assert canonical_fingerprint(data, route="/api/v2/schedules") != original
     assert CREATE_METHOD == "POST"
     assert CREATE_ROUTE == "/api/v1/schedules"
-    assert FINGERPRINT_VERSION == 1
+    assert FINGERPRINT_VERSION == 2
 
 
 def test_fingerprint_is_independent_of_json_layout_and_request_headers() -> None:
@@ -61,12 +59,11 @@ def test_fingerprint_is_independent_of_json_layout_and_request_headers() -> None
             "title": "한글 일정",
             "scheduledAt": "2026-09-13T04:45:00.100000Z",
             "category": "OTHER",
-            "reminderMinutesBefore": None,
         }
     )
     reordered = ScheduleCreate.model_validate_json(
-        '{ "reminderMinutesBefore": null, "category": "OTHER", '
-        '"scheduledAt": "2026-09-13T04:45:00.1Z", "title": "한글 일정" }'
+        '{ "category": "OTHER", "scheduledAt": "2026-09-13T04:45:00.1Z", '
+        '"title": "한글 일정" }'
     )
 
     assert canonical_fingerprint(first) == canonical_fingerprint(reordered)

@@ -1,6 +1,8 @@
 # Schedule API 설계
 
-> 계약 상태: `BE-CONFIRMED`, 프론트 연동 항목은 `BE-FE-AGREED`
+> 계약 상태: 기존 Schedule 백엔드 계약은 `BE-CONFIRMED`, 기존 프론트 연동 항목은 `BE-FE-AGREED`
+>
+> 알림 제거 전환 상태: 알림 제외는 `TEAM-CONFIRMED`, 필드 제거·구형 요청 `422`·유효한 version 1 key의 새 요청 `409`는 `BE-CONFIRMED`. FE·AI 적용 확인과 실제 적용 버전·시점은 각각 `TBD-FE`, `TBD-AI`다.
 >
 > 범위: MVP Schedule CRUD, 상태 확인, Orange Pi 시각 동기화
 
@@ -9,6 +11,7 @@
 이 문서는 모바일 앱이 Orange Pi의 Schedule 서버와 연동할 때 사용하는 HTTP API를 정의한다. FastAPI 구현과 자동 생성되는 `/openapi.json`은 이 계약을 따라야 한다.
 
 - 일반 일정 화면은 이 문서의 Schedule REST API를 직접 호출한다.
+- 알림 기능은 제품 범위에서 제외했으며 Schedule 요청·응답에 알림 필드를 제공하지 않는다.
 - 일정 비서 화면이 호출할 AI 서비스의 endpoint와 요청·응답 형식은 아직 확정하지 않았다.
 - AI 서비스 계약을 추측해 Schedule API에 필드나 endpoint를 추가하지 않는다.
 - MVP에는 계정, 사용자별 일정 소유권과 API 인증을 포함하지 않는다.
@@ -112,8 +115,6 @@ MVP 카테고리는 입고, 재고, 출고, 반품, 기타 5개이며 API 값은
 | `scheduledAt` | datetime string | 아니요 | 일정 시각 |
 | `category` | Category | 아니요 | 위 5개 enum 중 하나 |
 | `completed` | boolean | 아니요 | 완료 여부 |
-| `reminderMinutesBefore` | integer | 예 | `10` 또는 `null` |
-| `reminderAt` | datetime string | 예 | 서버가 계산한 알림 시각 |
 | `createdAt` | datetime string | 아니요 | 서버 생성 시각 |
 | `updatedAt` | datetime string | 아니요 | 마지막 실제 변경 시각 |
 
@@ -124,23 +125,13 @@ MVP 카테고리는 입고, 재고, 출고, 반품, 기타 5개이며 API 값은
   "scheduledAt": "2026-09-14T06:00:00Z",
   "category": "INVENTORY",
   "completed": false,
-  "reminderMinutesBefore": 10,
-  "reminderAt": "2026-09-14T05:50:00Z",
   "createdAt": "2026-09-13T02:10:00Z",
   "updatedAt": "2026-09-13T02:10:00Z"
 }
 ```
 
-`reminderAt` 계산:
-
-```text
-reminderMinutesBefore == 10   → scheduledAt - 10분
-reminderMinutesBefore == null → null
-```
-
 - `title`에는 일반 Unicode 텍스트를 허용한다.
 - NUL, 줄바꿈, 탭 등 제어문자는 `INVALID_VALUE`로 거부한다.
-- `reminderAt`은 읽기 전용이며 현재 시각이나 완료 여부와 무관하게 계산한다.
 - soft delete용 `deletedAt`은 API에 노출하지 않는다.
 
 ### 3.3 일정 생성 요청
@@ -150,7 +141,6 @@ reminderMinutesBefore == null → null
 | `title` | 예 | trim 후 1~100자 |
 | `scheduledAt` | 예 | 공통 datetime 문법 |
 | `category` | 예 | Category enum |
-| `reminderMinutesBefore` | 예 | `10` 또는 `null` |
 
 - 생성 요청에 `completed`를 보내지 않는다.
 - 서버가 새 일정을 항상 `completed: false`로 생성한다.
@@ -164,11 +154,9 @@ reminderMinutesBefore == null → null
 | `scheduledAt` | 아니요 | 금지 |
 | `category` | 아니요 | 금지 |
 | `completed` | 아니요 | 금지 |
-| `reminderMinutesBefore` | 아니요 | 허용 |
 
 - 전송된 필드만 수정한다.
 - 한 개 이상의 수정 필드가 있어야 한다.
-- `reminderMinutesBefore: null`은 알림 해제를 뜻한다.
 - 이 API는 RFC 7396이 아닌 프로젝트 자체 부분 수정 규칙이다.
 
 ## 4. Endpoint 요약
@@ -327,18 +315,15 @@ Idempotency-Key: 7031e930-5089-45ff-a54d-4b7ab77917c5
 {
   "title": "3분기 재고 실사",
   "scheduledAt": "2026-09-14T15:00:00+09:00",
-  "category": "INVENTORY",
-  "reminderMinutesBefore": 10
+  "category": "INVENTORY"
 }
 ```
 
 규칙:
 
-- `Idempotency-Key`와 네 body 필드는 모두 필수다.
+- `Idempotency-Key`와 세 body 필드는 모두 필수다.
 - `scheduledAt`이 요청 처리 시점의 Pi 시각보다 과거이면 `422 SCHEDULE_IN_THE_PAST`다.
-- 일정은 미래지만 `reminderAt`만 이미 지났다면 일정 생성은 허용한다.
 - 같은 제목과 같은 시각의 일정도 별개의 일정으로 생성할 수 있다.
-- 알림 없음은 `reminderMinutesBefore: null`로 명시한다.
 
 성공:
 
@@ -380,13 +365,12 @@ Content-Type: application/json
 
 - 프론트는 사용자가 실제로 변경한 필드만 전송한다.
 - `{}`는 `422 EMPTY_UPDATE`다.
-- `reminderMinutesBefore: null`은 알림 해제다.
 - `title`, `scheduledAt`, `category`, `completed`의 명시적 null은 `NULL_NOT_ALLOWED`다.
 - 읽기 전용 필드, snake_case와 알 수 없는 필드는 `UNKNOWN_FIELD`다.
 - `scheduledAt`이 실제로 변경됐을 때만 과거 여부를 검사한다.
 - 같은 instant를 다른 offset으로 표현한 값은 시각 변경이 아니다.
 - 새 `scheduledAt`이 Pi 현재 시각보다 과거이면 `422 SCHEDULE_IN_THE_PAST`다.
-- 일정 시각을 변경하지 않는 제목·카테고리·완료·알림 수정은 기존 일정이 과거여도 허용한다.
+- 일정 시각을 변경하지 않는 제목·카테고리·완료 수정은 기존 일정이 과거여도 허용한다.
 - 실제 변경이 없으면 현재 Schedule을 `200`으로 반환하고 `updatedAt`은 바꾸지 않는다.
 - 일정이 없거나 삭제됐으면 `404 SCHEDULE_NOT_FOUND`다.
 
@@ -436,6 +420,16 @@ X-Request-ID: {재시도 요청의 새 ID}
 - replay 본문은 최초 생성 당시의 Schedule snapshot이다.
 - 같은 key에 다른 생성 요청을 보내면 `409 IDEMPOTENCY_KEY_CONFLICT`다.
 - 성공한 `201` 기록은 24시간 유지한다.
+- 현재 생성 fingerprint는 version `2`와 HTTP method, canonical route 및 정규화한
+  `title`, UTC `scheduledAt`, `category`를 포함한다.
+- version `1`은 알림 필드를 포함하던 이전 규격이다. 아직 유효한 version `1` key를
+  새 규격 요청에 사용하면 구형 응답을 replay하거나 새 일정을 만들지 않고
+  `409 IDEMPOTENCY_KEY_CONFLICT`로 거절한다. 저장된 구형 fingerprint, 응답 snapshot과
+  만료 시각은 변경하지 않는다.
+- `reminderMinutesBefore`, `reminderAt`을 포함한 구형 요청은 멱등성 조회 전에
+  `422 VALIDATION_ERROR`의 `UNKNOWN_FIELD`로 거절한다.
+- 위 409 또는 422 뒤 새 key로 자동 재등록하지 않는다. 기존 일정이 생성됐을 수 있으므로
+  먼저 목록 또는 단건 조회로 결과를 확인한다.
 - 카테고리 전환 전 `MEETING`, `PERSONAL`, `PICKING` payload로 생성된 기존
   기록의 snapshot, fingerprint와 만료 시각은 변경하지 않는다. 해당
   이전 payload를 다시 요청하면 replay하지 않고 category 검증에서
@@ -536,32 +530,18 @@ X-Request-ID: {재시도 요청의 새 ID}
 - 자동 재시도를 반복하지 않는다.
 - 최종 timeout 값과 재시도 세부 조정은 Orange Pi 응답 시간 실측 후 확정한다(`TBD-TEAM`).
 
-## 14. 로컬 알림 연동
+## 14. 알림 제거와 구형 클라이언트 호환성
 
-백엔드는 `reminderAt`만 계산하며 실제 알림은 모바일 앱이 관리한다.
-
-다음 조건을 모두 만족할 때 로컬 알림 등록 대상이다.
-
-```text
-completed == false
-reminderAt != null
-reminderAt > 기기 현재 시각
-```
-
-| 일정 변경 | 프론트 처리 |
-|---|---|
-| 완료 처리 | 기존 알림 취소 |
-| 삭제 | 기존 알림 취소 |
-| `reminderMinutesBefore: null` | 기존 알림 취소 |
-| `scheduledAt` 변경 | 기존 알림 취소 후 재등록 판단 |
-| `title` 변경 | 기존 알림 취소 후 최신 Schedule 제목으로 재등록 판단 |
-| 미완료로 변경 | `reminderAt`이 미래면 등록 |
-
-- 로컬 알림의 제목은 `일정 알림`, 본문은 Schedule의 `title`을 사용한다.
-- `title` 변경이 성공하면 기존 알림을 취소하고, 변경 후 Schedule이 알림 등록 조건을 만족할 때만 새 제목으로 재예약한다.
-- 백엔드는 Expo `notificationIdentifier`를 저장하지 않는다.
-- 프론트는 `scheduleId ↔ notificationIdentifier`를 앱 재실행 후에도 유지되는 로컬 저장소에 보관하며 재예약 후 새 identifier로 갱신한다.
-- 알림 권한이 거부돼도 일정 저장 자체는 성공시키고 로컬 알림만 생략한다.
+- 상태를 구분한다. 알림 제외 자체는 팀 결정이고, 아래 필드 제거·구형 요청 `422`·
+  유효한 version 1 key의 새 요청 `409`는 백엔드가 채택·구현한 전환 규칙이다.
+  FE·AI가 이 전환 규칙을 적용했는지와 실제 적용 버전·시점은 아직 확인 대기다.
+- 제품 범위에서 알림을 제외했으며 백엔드는 알림 설정을 저장·계산·응답하지 않는다.
+- 생성·수정 요청의 `reminderMinutesBefore`와 읽기 전용 `reminderAt`은 알 수 없는
+  필드로 처리한다.
+- 새 API 응답에는 두 필드가 없으므로 구형 클라이언트·AI 제어부·평가 도구는 새
+  서버 버전에 맞게 조정한 뒤 연동한다.
+- 과거 migration과 기존 멱등성 응답 snapshot에는 재현·보존 목적으로 알림 필드가
+  남을 수 있다. 이를 현재 API가 알림을 지원한다는 뜻으로 해석하지 않는다.
 
 ## 15. OpenAPI 공개 계약
 
@@ -595,7 +575,7 @@ ValidationErrorItem
 - AI와 백엔드의 프로세스 분리 방식
 - AI가 Schedule API를 호출하는 방식
 - AI의 `Idempotency-Key` 생성·재사용 규칙
-- `affectedSchedules` schema와 알림 동기화 계약
+- `affectedSchedules` schema와 목록 갱신 계약
 - 재질문, 상대 날짜 해석과 AI가 생성하는 `scheduledAt` 규칙
 - STT 결과와 후속 대화 protocol
 - AI timeout과 retry
@@ -603,7 +583,7 @@ ValidationErrorItem
 ### `POST-MVP`
 
 - 반복 일정, 종일 일정과 종료 시각
-- 정시·30분 전·복수 알림
+- 알림 기능 재도입과 구체적인 알림 시점
 - 휴지통과 복원
 - 다중 사용자, 인증과 사용자별 일정 소유권
 - 제목 검색, 정렬 parameter와 pagination

@@ -59,7 +59,6 @@ def _from_model(model: Schedule, **overrides: object) -> ScheduleResponse:
         "scheduled_at": model.scheduled_at,
         "category": model.category,
         "completed": model.completed,
-        "reminder_minutes_before": model.reminder_minutes_before,
         "created_at": model.created_at,
         "updated_at": model.updated_at,
     }
@@ -152,7 +151,6 @@ def create_schedule(
         scheduled_at=data.scheduled_at,
         category=data.category,
         completed=False,
-        reminder_minutes_before=data.reminder_minutes_before,
         created_at=now,
         updated_at=now,
         deleted_at=None,

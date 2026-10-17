@@ -23,7 +23,6 @@ def create_data(**overrides: object) -> ScheduleCreate:
         "title": "회의",
         "scheduledAt": "2026-09-13T04:45:00Z",
         "category": "OUTBOUND",
-        "reminderMinutesBefore": None,
     }
     payload.update(overrides)
     return ScheduleCreate.model_validate(payload)

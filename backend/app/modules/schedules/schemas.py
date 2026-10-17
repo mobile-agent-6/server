@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import re
 import unicodedata
-from datetime import datetime, timedelta, timezone
-from typing import Annotated, Literal
+from datetime import datetime, timezone
+from typing import Annotated
 from uuid import UUID
 
 from pydantic import (
@@ -76,19 +76,6 @@ def parse_category(value: object) -> object:
 CategoryValue = Annotated[Category, BeforeValidator(parse_category)]
 
 
-def parse_reminder(value: object) -> object:
-    if value is None:
-        return None
-    if type(value) is not int:
-        raise PydanticCustomError("invalid_type", "reminder must be an integer or null")
-    if value != 10:
-        raise PydanticCustomError("invalid_value", "reminder must be 10 or null")
-    return value
-
-
-ReminderValue = Annotated[Literal[10] | None, BeforeValidator(parse_reminder)]
-
-
 class RequestModel(BaseModel):
     model_config = ConfigDict(
         alias_generator=AliasGenerator(
@@ -116,7 +103,6 @@ class ScheduleCreate(RequestModel):
     title: Title
     scheduled_at: ApiDateTime
     category: CategoryValue
-    reminder_minutes_before: ReminderValue
 
 
 class ScheduleUpdate(RequestModel):
@@ -124,7 +110,6 @@ class ScheduleUpdate(RequestModel):
     scheduled_at: ApiDateTime = None  # type: ignore[assignment]
     category: CategoryValue = None  # type: ignore[assignment]
     completed: bool = None  # type: ignore[assignment]
-    reminder_minutes_before: ReminderValue = None
 
 
 class ScheduleResponse(ResponseModel):
@@ -133,8 +118,6 @@ class ScheduleResponse(ResponseModel):
     scheduled_at: datetime = Field(json_schema_extra={"format": "date-time"})
     category: Category
     completed: bool
-    reminder_minutes_before: int | None
-    reminder_at: datetime | None = Field(json_schema_extra={"format": "date-time"})
     created_at: datetime = Field(json_schema_extra={"format": "date-time"})
     updated_at: datetime = Field(json_schema_extra={"format": "date-time"})
 
@@ -143,22 +126,9 @@ class ScheduleResponse(ResponseModel):
         utc_value = value.astimezone(timezone.utc)
         return utc_value.isoformat().replace("+00:00", "Z")
 
-    @field_serializer("reminder_at")
-    def serialize_optional_datetime(self, value: datetime | None) -> str | None:
-        if value is None:
-            return None
-        utc_value = value.astimezone(timezone.utc)
-        return utc_value.isoformat().replace("+00:00", "Z")
-
 
 class ScheduleListResponse(ResponseModel):
     items: list[ScheduleResponse]
-
-
-def reminder_at(scheduled_at: datetime, minutes: int | None) -> datetime | None:
-    if minutes is None:
-        return None
-    return scheduled_at - timedelta(minutes=minutes)
 
 
 def schedule_response(
@@ -168,7 +138,6 @@ def schedule_response(
     scheduled_at: datetime,
     category: Category,
     completed: bool,
-    reminder_minutes_before: int | None,
     created_at: datetime,
     updated_at: datetime,
 ) -> ScheduleResponse:
@@ -178,8 +147,6 @@ def schedule_response(
         scheduled_at=scheduled_at,
         category=category,
         completed=completed,
-        reminder_minutes_before=reminder_minutes_before,
-        reminder_at=reminder_at(scheduled_at, reminder_minutes_before),
         created_at=created_at,
         updated_at=updated_at,
     )

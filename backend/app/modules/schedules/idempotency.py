@@ -8,7 +8,7 @@ from datetime import timezone
 
 from app.modules.schedules.schemas import ScheduleCreate
 
-FINGERPRINT_VERSION = 1
+FINGERPRINT_VERSION = 2
 CREATE_METHOD = "POST"
 CREATE_ROUTE = "/api/v1/schedules"
 
@@ -25,7 +25,6 @@ def canonical_fingerprint(
     canonical = {
         "body": {
             "category": data.category.value,
-            "reminderMinutesBefore": data.reminder_minutes_before,
             "scheduledAt": data.scheduled_at.astimezone(timezone.utc)
             .isoformat(timespec="microseconds")
             .replace("+00:00", "Z"),

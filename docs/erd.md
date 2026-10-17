@@ -22,7 +22,6 @@ erDiagram
         datetime scheduled_at
         varchar_32 category
         boolean completed
-        integer reminder_minutes_before
         datetime created_at
         datetime updated_at
         datetime deleted_at
@@ -52,7 +51,6 @@ erDiagram
 | `scheduled_at` | DATETIME | 불가 | 없음 | UTC로 정규화한 일정 시각 |
 | `category` | VARCHAR(32) | 불가 | 없음 | 5개 카테고리 중 하나 |
 | `completed` | BOOLEAN | 불가 | `false` | 생성 시 미완료 |
-| `reminder_minutes_before` | INTEGER | 가능 | 없음 | MVP 입력은 `10` 또는 `null` |
 | `created_at` | DATETIME | 불가 | 애플리케이션 Clock | 생성 시각, UTC |
 | `updated_at` | DATETIME | 불가 | 애플리케이션 Clock | 마지막 실제 변경 시각, UTC |
 | `deleted_at` | DATETIME | 가능 | 없음 | 최초 soft delete 시각, UTC |
@@ -61,9 +59,9 @@ erDiagram
 
 - 기본키 `pk_schedules`: `id`
 - CHECK `ck_schedules_category`: `INBOUND`, `INVENTORY`, `OUTBOUND`, `RETURN`, `OTHER`
-- `deleted_at`, `reminder_minutes_before`만 nullable
+- `deleted_at`만 nullable
 - 동일한 제목과 일정 시각을 가진 일정의 중복 저장 허용
-- 과거 일정 판단, 제목 검증과 reminder 값 검증은 API Schema·Service가 담당
+- 과거 일정 판단과 제목 검증은 API Schema·Service가 담당
 - Pi 시각이 뒤로 이동할 수 있으므로 `updated_at >= created_at` 같은 시각 순서 CHECK는 두지 않음
 
 기존 `20260927_0001` DB를 새 카테고리 revision으로 올릴 때는 확인된
@@ -71,6 +69,12 @@ erDiagram
 `OTHER`로 변경한다. `PERSONAL`, `PICKING`, 확인되지 않은 `MEETING` 또는 예상하지
 못한 값이 있으면 migration은 제약 교체 전에 중단한다. 일정의 나머지 컬럼,
 인덱스와 `idempotency_records`는 변경하지 않는다.
+
+`20261017_0003`은 알림 기능 제거에 따라 `schedules.reminder_minutes_before`만
+삭제한다. 나머지 일정 데이터, soft-delete 행, 인덱스와 `idempotency_records`는
+변경하지 않는다. downgrade는 해당 컬럼을 nullable로 다시 만들지만 제거 전 값을
+복원하지 않으며 모든 행의 값은 `null`이다. 제거 전 알림 값까지 복구해야 한다면
+migration 전 검증 backup을 사용한다.
 
 ### Soft delete
 
@@ -112,15 +116,14 @@ MVP 예상 데이터량과 최대 92일의 조회 범위를 기준으로 `catego
 
 ## 6. 저장하지 않는 값
 
-- `reminderAt`: `scheduled_at - reminder_minutes_before`로 응답 생성 시 계산
-- 모바일 로컬 알림의 `notificationIdentifier`
+- 알림 시점, 알림 간격과 모바일 로컬 알림의 `notificationIdentifier`
 - Assistant 대화와 conversation context
 - STT 음성, LLM prompt·응답, TTS binary
 - 사용자와 소유권 정보: MVP는 단일 사용자이며 다중 사용자·인증은 `POST-MVP`
 
 ## 7. 확장 원칙
 
-- 반복 일정, 종료 시각, 종일 일정과 복수 알림은 현재 테이블에 미리 nullable 컬럼으로 넣지 않는다.
+- 반복 일정, 종료 시각, 종일 일정과 알림은 현재 테이블에 미리 nullable 컬럼으로 넣지 않는다.
 - 새 기능이 확정되면 Alembic migration과 호환 가능한 API 추가로 확장한다.
 - 다중 사용자 도입 시 소유권 컬럼의 nullable 추가, backfill, NOT NULL·인덱스 적용 순서로 확장한다.
 - 재고·폐기·작업 기록은 Schedule과 다른 도메인이므로 기능이 채택되면 별도 테이블·Service·API로 추가한다.
