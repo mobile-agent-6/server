@@ -851,7 +851,7 @@ Assistant의 접수 전 거절·GET·취소 오류도 13장의 Problem Details�
 
 ### 16.9 앱 재실행과 로컬 복구 정보 정리
 
-앱은 POST 전에 `requestId`·서버 식별값·`firstPostAttemptAt`·`lastPostAttemptAt`·`acceptConfirmed`를 로컬에 저장한다. `202`·동일 요청 `200` 또는 GET `200`을 받으면 `acceptConfirmed: true`로 갱신하고, 확인한 `conversationId`와 마지막 상태·결과 종류도 저장한다. 저장 실패 시 POST를 보내지 않는다. 원래 body의 영구 저장은 요구하지 않으며 앱 재실행 후에는 원래 requestId로 GET만 수행한다. 복구 항목이 없을 때만 새 대화를 시작한다.
+앱은 POST 전에 `requestId`·서버 식별값·`firstPostAttemptAt`·`lastPostAttemptAt`·`acceptConfirmed`를 로컬에 저장한다. `202`·동일 요청 `200` 또는 GET `200`을 받으면 `acceptConfirmed: true`로 갱신하고, 확인한 `conversationId`와 마지막 상태·결과 종류도 저장한다. 저장 실패 시 POST를 보내지 않는다. 원래 body의 영구 저장은 요구하지 않으며 앱 재실행 후에는 원래 requestId로 GET만 수행한다. 복구 항목이 있으면 새 입력 전에 먼저 원래 requestId를 GET한다. 확인 뒤에도 항목이 남아 있다는 이유만으로 새 대화를 막지 않으며, 새 작업 허용 여부는 서버의 `CONVERSATION_BUSY`·`UNRESOLVED_UNCERTAIN` 판정을 따른다.
 
 로컬의 자동 복구 목록 정리 기준:
 
