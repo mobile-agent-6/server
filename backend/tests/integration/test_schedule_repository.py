@@ -29,7 +29,6 @@ def test_list_query_plan_uses_active_time_index(database_path: Path) -> None:
                     scheduled_at=scheduled,
                     category=Category.OTHER,
                     completed=False,
-                    reminder_minutes_before=None,
                     created_at=now + timedelta(microseconds=offset),
                     updated_at=now,
                     deleted_at=None,

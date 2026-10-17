@@ -19,7 +19,6 @@ def create_payload(**overrides: object) -> dict[str, object]:
         "title": "재고 확인",
         "scheduledAt": "2026-09-13T04:45:00Z",
         "category": "INVENTORY",
-        "reminderMinutesBefore": 10,
     }
     payload.update(overrides)
     return payload
@@ -53,13 +52,10 @@ def test_create_get_list_patch_delete_vertical_flow(client: TestClient) -> None:
         "scheduledAt",
         "category",
         "completed",
-        "reminderMinutesBefore",
-        "reminderAt",
         "createdAt",
         "updatedAt",
     }
     assert created.json()["scheduledAt"] == "2026-09-13T04:45:00Z"
-    assert created.json()["reminderAt"] == "2026-09-13T04:35:00Z"
     assert created.json()["completed"] is False
     assert UUID(created.json()["id"]).version == 4
     assert_request_id(created)
@@ -91,12 +87,10 @@ def test_create_get_list_patch_delete_vertical_flow(client: TestClient) -> None:
     client.app.state.clock.advance(timedelta(seconds=5))
     changed = client.patch(
         f"/api/v1/schedules/{schedule_id}",
-        json={"title": " 변경됨 ", "reminderMinutesBefore": None},
+        json={"title": " 변경됨 "},
     )
     assert changed.status_code == 200
     assert changed.json()["title"] == "변경됨"
-    assert changed.json()["reminderMinutesBefore"] is None
-    assert changed.json()["reminderAt"] is None
     assert changed.json()["updatedAt"] != created.json()["updatedAt"]
 
     deleted = client.delete(f"/api/v1/schedules/{schedule_id}")
@@ -118,20 +112,17 @@ def test_list_filters_range_boundaries_and_stable_order(client: TestClient) -> N
         title="B",
         scheduledAt="2026-09-14T00:00:00Z",
         category="INBOUND",
-        reminderMinutesBefore=None,
     ).json()
     second = create_schedule(
         client,
         title="A",
         scheduledAt="2026-09-14T00:00:00Z",
         category="RETURN",
-        reminderMinutesBefore=None,
     ).json()
     at_to = create_schedule(
         client,
         title="Excluded",
         scheduledAt="2026-09-15T00:00:00Z",
-        reminderMinutesBefore=None,
     ).json()
     response = client.get(
         "/api/v1/schedules",
@@ -164,7 +155,6 @@ def test_all_five_categories_create_get_patch_and_filter(client: TestClient) -> 
             title=f"{category} 일정",
             scheduledAt=f"2026-09-13T0{index + 5}:00:00Z",
             category=category,
-            reminderMinutesBefore=None,
         )
         assert response.status_code == 201
         assert response.json()["category"] == category
@@ -308,9 +298,35 @@ def test_body_content_and_validation_contract(client: TestClient) -> None:
     assert wrong_category.status_code == 422
     assert wrong_category.json()["errors"][0]["code"] == "INVALID_ENUM"
 
-    wrong_reminder_type = create_schedule(client, reminderMinutesBefore="10")
-    assert wrong_reminder_type.status_code == 422
-    assert wrong_reminder_type.json()["errors"][0]["code"] == "INVALID_TYPE"
+    removed_reminder = create_schedule(client, reminderMinutesBefore=None)
+    assert removed_reminder.status_code == 422
+    assert removed_reminder.json()["errors"][0]["pointer"] == "/reminderMinutesBefore"
+    assert removed_reminder.json()["errors"][0]["code"] == "UNKNOWN_FIELD"
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("reminderMinutesBefore", None),
+        ("reminderAt", "2026-09-13T04:35:00Z"),
+    ],
+)
+def test_create_and_patch_reject_removed_reminder_fields(
+    client: TestClient, field: str, value: object
+) -> None:
+    created = create_schedule(client)
+    assert created.status_code == 201
+
+    create_rejected = create_schedule(client, **{field: value})
+    patch_rejected = client.patch(
+        f"/api/v1/schedules/{created.json()['id']}", json={field: value}
+    )
+
+    for response in (create_rejected, patch_rejected):
+        assert response.status_code == 422
+        assert response.json()["code"] == "VALIDATION_ERROR"
+        assert response.json()["errors"][0]["pointer"] == f"/{field}"
+        assert response.json()["errors"][0]["code"] == "UNKNOWN_FIELD"
 
 
 @pytest.mark.parametrize(
@@ -397,14 +413,13 @@ def test_patch_empty_null_past_and_not_found_rules(client: TestClient) -> None:
     assert client.delete(f"/api/v1/schedules/{missing}").status_code == 404
 
 
-def test_create_past_rejected_but_past_reminder_allowed(client: TestClient) -> None:
+def test_create_past_rejected_but_near_future_allowed(client: TestClient) -> None:
     past = create_schedule(client, scheduledAt="2026-09-13T04:29:59Z")
     assert past.status_code == 422
     assert past.json()["code"] == "SCHEDULE_IN_THE_PAST"
 
-    reminder_past = create_schedule(client, scheduledAt="2026-09-13T04:35:00Z")
-    assert reminder_past.status_code == 201
-    assert reminder_past.json()["reminderAt"] == "2026-09-13T04:25:00Z"
+    near_future = create_schedule(client, scheduledAt="2026-09-13T04:35:00Z")
+    assert near_future.status_code == 201
 
 
 def test_past_schedule_allows_non_time_patch(client: TestClient) -> None:

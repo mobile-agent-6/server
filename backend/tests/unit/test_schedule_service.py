@@ -22,7 +22,6 @@ def schedule(**overrides: object) -> SimpleNamespace:
         "scheduled_at": datetime(2026, 9, 13, 4, 45, tzinfo=timezone.utc),
         "category": Category.OTHER,
         "completed": False,
-        "reminder_minutes_before": 10,
         "created_at": NOW,
         "updated_at": NOW,
         "deleted_at": None,
@@ -73,7 +72,6 @@ def test_create_reuses_one_clock_value_and_does_not_reread(
                 "title": "회의",
                 "scheduledAt": "2026-09-13T04:45:00Z",
                 "category": "OUTBOUND",
-                "reminderMinutesBefore": None,
             }
         ),
         idempotency_key="create-key",

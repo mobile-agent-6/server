@@ -55,7 +55,6 @@ def test_migration_upgrade_downgrade_upgrade_and_schema_contract(tmp_path: Path)
     columns = {column["name"]: column for column in inspector.get_columns("schedules")}
     assert columns["completed"]["default"] in {"0", "false", "(0)"}
     assert {name for name, column in columns.items() if column["nullable"]} == {
-        "reminder_minutes_before",
         "deleted_at",
     }
 
@@ -159,7 +158,6 @@ def test_uuid_v4_and_utc_datetime_round_trip(database_path: Path) -> None:
                 scheduled_at=instant,
                 category=Category.OUTBOUND,
                 completed=False,
-                reminder_minutes_before=None,
                 created_at=instant,
                 updated_at=instant,
                 deleted_at=None,
@@ -188,7 +186,6 @@ def test_utc_datetime_rejects_naive_values(database_path: Path) -> None:
                 scheduled_at=datetime(2026, 9, 13, 4, 45),
                 category=Category.OUTBOUND,
                 completed=False,
-                reminder_minutes_before=None,
                 created_at=datetime.now(timezone.utc),
                 updated_at=datetime.now(timezone.utc),
                 deleted_at=None,
@@ -223,9 +220,9 @@ def test_database_constraints_and_boolean_default(database_path: Path) -> None:
     with engine.begin() as connection:
         connection.exec_driver_sql(
             "INSERT INTO schedules "
-            "(id, title, scheduled_at, category, reminder_minutes_before, created_at, updated_at) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (identifier, "출고", instant, "OUTBOUND", None, instant, instant),
+            "(id, title, scheduled_at, category, created_at, updated_at) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            (identifier, "출고", instant, "OUTBOUND", instant, instant),
         )
         assert connection.exec_driver_sql(
             "SELECT completed FROM schedules WHERE id = ?", (identifier,)

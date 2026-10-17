@@ -12,7 +12,6 @@ def valid_create(**overrides: object) -> dict[str, object]:
         "title": "재고 확인",
         "scheduledAt": "2026-09-13T13:45:00+09:00",
         "category": "INVENTORY",
-        "reminderMinutesBefore": 10,
     }
     values.update(overrides)
     return values
@@ -80,15 +79,23 @@ def test_create_rejects_unknown_snake_case_and_read_only_fields() -> None:
 
 def test_update_distinguishes_omitted_null_and_empty() -> None:
     empty = ScheduleUpdate.model_validate({})
-    cleared = ScheduleUpdate.model_validate({"reminderMinutesBefore": None})
+    changed = ScheduleUpdate.model_validate({"completed": True})
 
     assert empty.model_fields_set == set()
-    assert cleared.model_fields_set == {"reminder_minutes_before"}
+    assert changed.model_fields_set == {"completed"}
     with pytest.raises(ValidationError):
         ScheduleUpdate.model_validate({"title": None})
 
 
-@pytest.mark.parametrize("value", [0, 30, "10", True])
-def test_reminder_accepts_only_integer_ten_or_null(value: object) -> None:
+@pytest.mark.parametrize(
+    ("schema", "values"),
+    [
+        (ScheduleCreate, valid_create(reminderMinutesBefore=None)),
+        (ScheduleCreate, valid_create(reminderAt="2026-09-13T04:35:00Z")),
+        (ScheduleUpdate, {"reminderMinutesBefore": None}),
+        (ScheduleUpdate, {"reminderAt": "2026-09-13T04:35:00Z"}),
+    ],
+)
+def test_removed_reminder_fields_are_unknown(schema, values: dict[str, object]) -> None:
     with pytest.raises(ValidationError):
-        ScheduleCreate.model_validate(valid_create(reminderMinutesBefore=value))
+        schema.model_validate(values)

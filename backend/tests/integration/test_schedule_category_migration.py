@@ -139,7 +139,7 @@ def test_category_upgrade_preserves_rows_indexes_and_idempotency_records(
         )
 
     _configure_confirmed_meetings(config, meeting_id, deleted_meeting_id)
-    command.upgrade(config, "head")
+    command.upgrade(config, CURRENT_REVISION)
 
     with engine.begin() as connection:
         after_schedules = _schedule_rows(connection)
@@ -222,7 +222,7 @@ def test_category_upgrade_refuses_unapproved_legacy_rows_before_writing(
         )
 
     with pytest.raises(RuntimeError, match=category):
-        command.upgrade(config, "head")
+        command.upgrade(config, CURRENT_REVISION)
 
     with engine.connect() as connection:
         assert _revision(connection) == LEGACY_REVISION
@@ -251,7 +251,7 @@ def test_category_upgrade_requires_exact_meeting_confirmation_set(
 
     _configure_confirmed_meetings(config, uuid4())
     with pytest.raises(RuntimeError, match="exact existing MEETING IDs"):
-        command.upgrade(config, "head")
+        command.upgrade(config, CURRENT_REVISION)
 
     with engine.connect() as connection:
         assert _revision(connection) == LEGACY_REVISION
@@ -283,7 +283,7 @@ def test_category_upgrade_refuses_unsupported_stored_value_before_writing(
         connection.exec_driver_sql("PRAGMA ignore_check_constraints=OFF")
 
     with pytest.raises(RuntimeError, match=message):
-        command.upgrade(config, "head")
+        command.upgrade(config, CURRENT_REVISION)
 
     with engine.connect() as connection:
         assert _revision(connection) == LEGACY_REVISION
@@ -300,7 +300,7 @@ def test_category_downgrade_refuses_new_categories_without_changing_data(
 ) -> None:
     database = tmp_path / f"downgrade-{category.lower()}.db"
     config = alembic_config(database)
-    command.upgrade(config, "head")
+    command.upgrade(config, CURRENT_REVISION)
     identifier = uuid4()
     engine = sa.create_engine(f"sqlite:///{database}")
     with engine.begin() as connection:
@@ -338,14 +338,14 @@ def test_category_downgrade_keeps_converted_other_and_can_upgrade_again(
         )
 
     _configure_confirmed_meetings(config, meeting_id)
-    command.upgrade(config, "head")
+    command.upgrade(config, CURRENT_REVISION)
     command.downgrade(config, LEGACY_REVISION)
     with engine.connect() as connection:
         assert _revision(connection) == LEGACY_REVISION
         assert _schedule_rows(connection)[0]["category"] == "OTHER"
 
     _configure_confirmed_meetings(config)
-    command.upgrade(config, "head")
+    command.upgrade(config, CURRENT_REVISION)
     with engine.connect() as connection:
         assert _revision(connection) == CURRENT_REVISION
         assert _schedule_rows(connection)[0]["category"] == "OTHER"

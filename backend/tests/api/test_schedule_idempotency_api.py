@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import sqlite3
 from datetime import timedelta
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 import sqlalchemy as sa
@@ -10,6 +12,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 from app.modules.schedules import repository
+from app.modules.schedules.category import Category
 from app.modules.schedules.model import IdempotencyRecord, Schedule
 from tests.api.test_schedule_api import create_payload, create_schedule
 
@@ -21,6 +24,27 @@ def counts(client: TestClient) -> tuple[int, int]:
             sa.select(sa.func.count()).select_from(IdempotencyRecord)
         )
     return int(schedules or 0), int(records or 0)
+
+
+def legacy_v1_fingerprint() -> str:
+    canonical = {
+        "body": {
+            "category": "INVENTORY",
+            "reminderMinutesBefore": None,
+            "scheduledAt": "2026-09-13T04:45:00.000000Z",
+            "title": "재고 확인",
+        },
+        "method": "POST",
+        "route": "/api/v1/schedules",
+        "version": 1,
+    }
+    encoded = json.dumps(
+        canonical,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
 def test_replay_is_byte_exact_and_survives_patch_delete(client: TestClient) -> None:
@@ -70,6 +94,142 @@ def test_outbound_request_replays_without_fingerprint_version_change(
         record = session.get(IdempotencyRecord, ("default", key))
         assert record is not None
         assert record.response_body.encode() == first.content
+
+
+def test_active_v1_key_conflicts_with_v2_request_and_old_payload_is_invalid(
+    client: TestClient,
+) -> None:
+    key = "legacy-reminder-key"
+    schedule_id = uuid4()
+    snapshot = (
+        f'{{"id":"{schedule_id}","title":"재고 확인",'
+        '"reminderMinutesBefore":null,"reminderAt":null}'
+    )
+    created_at = client.app.state.clock.now()
+    expires_at = created_at + timedelta(hours=24)
+    with Session(client.app.state.engine) as session:
+        session.add(
+            IdempotencyRecord(
+                scope="default",
+                idempotency_key=key,
+                fingerprint=legacy_v1_fingerprint(),
+                schedule_id=schedule_id,
+                response_body=snapshot,
+                created_at=created_at,
+                expires_at=expires_at,
+            )
+        )
+        session.commit()
+
+    new_request = create_schedule(client, key=key)
+    old_request = client.post(
+        "/api/v1/schedules",
+        json={**create_payload(), "reminderMinutesBefore": None},
+        headers={"Idempotency-Key": key},
+    )
+
+    assert new_request.status_code == 409
+    assert new_request.json()["code"] == "IDEMPOTENCY_KEY_CONFLICT"
+    assert old_request.status_code == 422
+    assert old_request.json()["errors"][0]["pointer"] == "/reminderMinutesBefore"
+    assert old_request.json()["errors"][0]["code"] == "UNKNOWN_FIELD"
+    assert counts(client) == (0, 1)
+    with Session(client.app.state.engine) as session:
+        record = session.get(IdempotencyRecord, ("default", key))
+        assert record is not None
+        assert record.fingerprint == legacy_v1_fingerprint()
+        assert record.schedule_id == schedule_id
+        assert record.response_body == snapshot
+        assert record.created_at == created_at
+        assert record.expires_at == expires_at
+
+
+def test_expired_v1_key_is_reused_by_v2_at_exact_ttl_boundary(
+    client: TestClient,
+) -> None:
+    key = "expired-legacy-reminder-key"
+    legacy_schedule_id = uuid4()
+    legacy_snapshot = (
+        f'{{"id":"{legacy_schedule_id}","title":"기존 재고 확인",'
+        '"reminderMinutesBefore":null,"reminderAt":null}'
+    )
+    created_at = client.app.state.clock.now()
+    expires_at = created_at + timedelta(hours=24)
+    legacy_fingerprint = legacy_v1_fingerprint()
+    with Session(client.app.state.engine) as session:
+        session.add(
+            Schedule(
+                id=legacy_schedule_id,
+                title="기존 재고 확인",
+                scheduled_at=created_at + timedelta(minutes=15),
+                category=Category.INVENTORY,
+                completed=False,
+                created_at=created_at,
+                updated_at=created_at,
+                deleted_at=None,
+            )
+        )
+        session.add(
+            IdempotencyRecord(
+                scope="default",
+                idempotency_key=key,
+                fingerprint=legacy_fingerprint,
+                schedule_id=legacy_schedule_id,
+                response_body=legacy_snapshot,
+                created_at=created_at,
+                expires_at=expires_at,
+            )
+        )
+        session.commit()
+
+    new_payload = {
+        "title": "새 규격 출고 일정",
+        "scheduledAt": "2026-09-14T04:45:00Z",
+        "category": "OUTBOUND",
+    }
+    client.app.state.clock.advance(timedelta(hours=24) - timedelta(microseconds=1))
+    before_boundary = create_schedule(client, key=key, **new_payload)
+
+    assert before_boundary.status_code == 409
+    assert before_boundary.json()["code"] == "IDEMPOTENCY_KEY_CONFLICT"
+    assert counts(client) == (1, 1)
+    with Session(client.app.state.engine) as session:
+        legacy_schedule = session.get(Schedule, legacy_schedule_id)
+        record = session.get(IdempotencyRecord, ("default", key))
+        assert legacy_schedule is not None
+        assert legacy_schedule.title == "기존 재고 확인"
+        assert record is not None
+        assert record.fingerprint == legacy_fingerprint
+        assert record.schedule_id == legacy_schedule_id
+        assert record.response_body == legacy_snapshot
+        assert record.created_at == created_at
+        assert record.expires_at == expires_at
+
+    client.app.state.clock.advance(timedelta(microseconds=1))
+    at_boundary = create_schedule(client, key=key, **new_payload)
+
+    assert at_boundary.status_code == 201
+    assert UUID(at_boundary.json()["id"]) != legacy_schedule_id
+    assert {"reminderMinutesBefore", "reminderAt"}.isdisjoint(at_boundary.json())
+    assert "Idempotent-Replayed" not in at_boundary.headers
+    assert counts(client) == (2, 1)
+    with Session(client.app.state.engine) as session:
+        assert session.get(Schedule, legacy_schedule_id) is not None
+        record = session.get(IdempotencyRecord, ("default", key))
+        assert record is not None
+        assert record.fingerprint != legacy_fingerprint
+        assert record.schedule_id == UUID(at_boundary.json()["id"])
+        assert record.response_body.encode() == at_boundary.content
+        assert record.created_at == expires_at
+        assert record.expires_at == expires_at + timedelta(hours=24)
+
+    replay = create_schedule(client, key=key, **new_payload)
+    assert replay.status_code == 201
+    assert replay.content == at_boundary.content
+    assert replay.headers["Location"] == at_boundary.headers["Location"]
+    assert replay.headers["Idempotent-Replayed"] == "true"
+    assert {"reminderMinutesBefore", "reminderAt"}.isdisjoint(replay.json())
+    assert counts(client) == (2, 1)
 
 
 @pytest.mark.parametrize("legacy_category", ["MEETING", "PERSONAL", "PICKING"])

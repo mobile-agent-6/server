@@ -53,7 +53,6 @@ def test_complete_openapi_contract(client: TestClient) -> None:
         "title",
         "scheduledAt",
         "category",
-        "reminderMinutesBefore",
     }
     assert "completed" not in components["ScheduleCreate"]["properties"]
     assert "required" not in components["ScheduleUpdate"]
@@ -63,18 +62,16 @@ def test_complete_openapi_contract(client: TestClient) -> None:
             branch.get("type") == "null"
             for branch in components["ScheduleUpdate"]["properties"][field].get("anyOf", [])
         )
-    assert any(
-        branch.get("type") == "null"
-        for branch in components["ScheduleUpdate"]["properties"]["reminderMinutesBefore"]["anyOf"]
-    )
+    assert "reminderMinutesBefore" not in components["ScheduleCreate"]["properties"]
+    assert "reminderMinutesBefore" not in components["ScheduleUpdate"]["properties"]
+    assert "reminderMinutesBefore" not in components["ScheduleResponse"]["properties"]
+    assert "reminderAt" not in components["ScheduleResponse"]["properties"]
     assert set(components["ScheduleResponse"]["required"]) == {
         "id",
         "title",
         "scheduledAt",
         "category",
         "completed",
-        "reminderMinutesBefore",
-        "reminderAt",
         "createdAt",
         "updatedAt",
     }
