@@ -1,10 +1,12 @@
-# Schedule API 설계
+# Schedule 및 Assistant API 설계
 
 > 계약 상태: 기존 Schedule 백엔드 계약은 `BE-CONFIRMED`, 기존 프론트 연동 항목은 `BE-FE-AGREED`
 >
 > 알림 제거 전환 상태: 알림 제외는 `TEAM-CONFIRMED`, 필드 제거·구형 요청 `422`·유효한 version 1 key의 새 요청 `409`는 `BE-CONFIRMED`. FE·AI 적용 확인과 실제 적용 버전·시점은 각각 `TBD-FE`, `TBD-AI`다.
 >
-> 범위: MVP Schedule CRUD, 상태 확인, Orange Pi 시각 동기화
+> Assistant 계약 상태: 텍스트 Assistant의 앱 공개 계약은 `BE-FE-AGREED`, 서버·앱 구현과 통합 시험은 아직 완료되지 않았다.
+>
+> 범위: MVP Schedule CRUD, 상태 확인, Orange Pi 시각 동기화, 텍스트 Assistant 공개 계약
 
 ## 1. 문서 목적과 범위
 
@@ -12,8 +14,9 @@
 
 - 일반 일정 화면은 이 문서의 Schedule REST API를 직접 호출한다.
 - 알림 기능은 제품 범위에서 제외했으며 Schedule 요청·응답에 알림 필드를 제공하지 않는다.
-- 일정 비서 화면이 호출할 AI 서비스의 endpoint와 요청·응답 형식은 아직 확정하지 않았다.
-- AI 서비스 계약을 추측해 Schedule API에 필드나 endpoint를 추가하지 않는다.
+- 일정 비서 화면은 이 문서의 Assistant API를 호출하고, 서버가 모델 해석·검증 뒤 Schedule API를 실행한다. 앱은 Assistant 결과를 근거로 같은 CRUD를 다시 실행하지 않는다.
+- Assistant 공개 계약은 확정됐지만 endpoint·저장소·제어부 연결은 아직 미구현이다. 구현 전 서버에서는 Assistant 경로가 `404 ROUTE_NOT_FOUND`일 수 있다.
+- 이번 Assistant 범위는 텍스트 입력이다. STT/TTS 전송 형식과 서버 내부 모델 연결 protocol은 아직 포함하지 않는다.
 - MVP에는 계정, 사용자별 일정 소유권과 API 인증을 포함하지 않는다.
 - 데이터베이스 구조는 [`erd.md`](erd.md)를 참고한다.
 
@@ -49,6 +52,7 @@ API Base: http://{PI_IP}:8000/api/v1
 - 모든 응답에 `X-Request-ID` 헤더를 포함한다.
 - 오류 본문의 `requestId`와 `X-Request-ID` 헤더는 같다.
 - 클라이언트가 보낸 `X-Request-ID`는 MVP에서 사용하지 않는다.
+- Assistant 정상 body의 `requestId`는 앱이 입력마다 생성하는 논리 요청 ID다. HTTP 추적 ID와 다른 값이며, Assistant 오류에서 논리 ID를 연결할 수 있으면 `assistantRequestId`로 별도 제공한다.
 
 ### 2.4 경로
 
@@ -56,6 +60,7 @@ API Base: http://{PI_IP}:8000/api/v1
 - 마지막 `/`만 추가된 요청은 `307 Temporary Redirect`가 될 수 있으므로 클라이언트는 canonical path를 호출한다.
 - 정의되지 않은 경로는 `404 ROUTE_NOT_FOUND`다.
 - UUID 형식이 아닌 `{scheduleId}`는 `422 VALIDATION_ERROR`의 path 오류다.
+- UUID 형식이 아닌 Assistant `{requestId}`·`{conversationId}`도 `422 VALIDATION_ERROR`의 path 오류다.
 
 ### 2.5 날짜와 시간
 
@@ -161,15 +166,18 @@ MVP 카테고리는 입고, 재고, 출고, 반품, 기타 5개이며 API 값은
 
 ## 4. Endpoint 요약
 
-| operationId | Method | Path | 성공 | 용도 |
-|---|---|---|---:|---|
-| `healthCheck` | GET | `/health` | 200 | 서버·DB·schema와 Pi 시각 확인 |
-| `syncSystemTime` | POST | `/api/v1/system/time-sync` | 200 | Pi 시스템 시각 동기화 |
-| `listSchedules` | GET | `/api/v1/schedules` | 200 | 일정 목록 조회 |
-| `createSchedule` | POST | `/api/v1/schedules` | 201 | 일정 생성 |
-| `getSchedule` | GET | `/api/v1/schedules/{scheduleId}` | 200 | 일정 단건 조회 |
-| `updateSchedule` | PATCH | `/api/v1/schedules/{scheduleId}` | 200 | 일정 부분 수정 |
-| `deleteSchedule` | DELETE | `/api/v1/schedules/{scheduleId}` | 204 | 일정 soft delete |
+| operationId | Method | Path | 성공 | 용도 | 구현 상태 |
+|---|---|---|---:|---|---|
+| `healthCheck` | GET | `/health` | 200 | 서버·DB·schema와 Pi 시각 확인 | 구현됨 |
+| `syncSystemTime` | POST | `/api/v1/system/time-sync` | 200 | Pi 시스템 시각 동기화 | 구현됨 |
+| `listSchedules` | GET | `/api/v1/schedules` | 200 | 일정 목록 조회 | 구현됨 |
+| `createSchedule` | POST | `/api/v1/schedules` | 201 | 일정 생성 | 구현됨 |
+| `getSchedule` | GET | `/api/v1/schedules/{scheduleId}` | 200 | 일정 단건 조회 | 구현됨 |
+| `updateSchedule` | PATCH | `/api/v1/schedules/{scheduleId}` | 200 | 일정 부분 수정 | 구현됨 |
+| `deleteSchedule` | DELETE | `/api/v1/schedules/{scheduleId}` | 204 | 일정 soft delete | 구현됨 |
+| `createAssistantRequest` | POST | `/api/v1/assistant/requests` | 202/200 | 새 입력 접수·동일 요청 복구 | 계약 확정·미구현 |
+| `getAssistantRequest` | GET | `/api/v1/assistant/requests/{requestId}` | 200 | 입력 상태·결과 조회 | 계약 확정·미구현 |
+| `cancelAssistantTarget` | POST | `/api/v1/assistant/conversations/{conversationId}/cancel` | 200 | 요청 또는 질문 취소 판정 | 계약 확정·미구현 |
 
 ## 5. 상태 확인
 
@@ -492,10 +500,23 @@ X-Request-ID: {재시도 요청의 새 ID}
 |---:|---|---|
 | 400 | `MALFORMED_REQUEST` | JSON 문법 오류 |
 | 404 | `SCHEDULE_NOT_FOUND` | 유효한 UUID지만 대상 일정 없음 |
+| 404 | `ASSISTANT_REQUEST_NOT_FOUND` | Assistant 요청 기록 없음. 원래 쓰기 미실행의 증거가 아님 |
+| 404 | `ASSISTANT_CONVERSATION_NOT_FOUND` | Assistant 대화 기록 없음 |
+| 404 | `ASSISTANT_TARGET_NOT_FOUND` | 취소 대상 없음 또는 다른 대화 소속 |
 | 404 | `ROUTE_NOT_FOUND` | 정의되지 않은 경로 |
 | 405 | `METHOD_NOT_ALLOWED` | 허용되지 않은 method |
 | 409 | `IDEMPOTENCY_KEY_CONFLICT` | 같은 key에 다른 생성 요청 |
 | 409 | `CLOCK_AUTO_SYNC_ACTIVE` | NTP 활성으로 시각 변경 불가 |
+| 409 | `REQUEST_ID_CONFLICT` | 같은 Assistant 요청 ID에 다른 body |
+| 409 | `CONVERSATION_BUSY` | 기존 Assistant 요청 처리 중 |
+| 409 | `UNRESOLVED_UNCERTAIN` | 미인지 Assistant 불확실 결과가 남음 |
+| 409 | `STALE_QUESTION` | 현재 활성 질문과 맞지 않는 후속 입력 |
+| 409 | `QUESTION_EXPIRED` | 후보 선택·승인 질문 만료 |
+| 409 | `ACKNOWLEDGEMENT_NOT_APPLICABLE` | 지정 ID를 uncertain 인지 대상으로 사용할 수 없음 |
+| 409 | `REQUEST_EXPIRED` | 상세가 정리된 Assistant ID의 POST 재접수 거절 |
+| 409 | `CONVERSATION_EXPIRED` | 만료된 Assistant 대화에 새 입력 |
+| 410 | `REQUEST_EXPIRED` | Assistant 요청의 상세 결과가 정리됨 |
+| 413 | `REQUEST_BODY_TOO_LARGE` | Assistant JSON body가 UTF-8 16 KiB 초과 |
 | 422 | `VALIDATION_ERROR` | body/query/header/path 검증 실패 |
 | 422 | `EMPTY_UPDATE` | PATCH body가 빈 객체 |
 | 422 | `SCHEDULE_IN_THE_PAST` | 과거 일정 생성 또는 과거 시각으로 변경 |
@@ -505,6 +526,7 @@ X-Request-ID: {재시도 요청의 새 ID}
 | 500 | `INTERNAL_ERROR` | 예상하지 못한 서버 오류 |
 | 503 | `DATABASE_UNAVAILABLE` | DB 일시 장애 또는 `/health`의 DB·schema 준비 실패 |
 | 503 | `TIME_SYNC_UNAVAILABLE` | 시각 동기화 lock·권한·명령 실패 |
+| 503 | `ASSISTANT_UNAVAILABLE` | Assistant 서비스 사용 불가 |
 
 ### 13.4 필수 응답 헤더
 
@@ -523,11 +545,14 @@ X-Request-ID: {재시도 요청의 새 ID}
 | `GET /health` | 5초 | 1초 후 최대 1회 |
 | Schedule 목록·CRUD | 10초 | timeout·네트워크 오류·503일 때 최대 1회 |
 | `POST /api/v1/system/time-sync` | 15초 | 같은 요청을 즉시 재시도하지 않고 `/health`로 적용 여부 확인 |
+| Assistant POST·GET | 각 5초 | POST 응답이 없으면 먼저 원래 ID로 GET. GET 실패만 다시 조회 |
 
 - Schedule POST 재시도에는 같은 payload와 `Idempotency-Key`를 사용한다.
 - PATCH는 같은 body, DELETE는 같은 `scheduleId`로만 재시도한다.
-- 4xx, 409와 500 응답은 자동 재시도하지 않는다.
+- Schedule·time-sync의 4xx, 409와 500 응답은 자동 재시도하지 않는다.
+- Assistant 오류의 재조회·재전송은 16.9절을 따른다. 같은 앱 실행·120초 안의 `404 ASSISTANT_REQUEST_NOT_FOUND`에 같은 ID·같은 body를 보내는 경우만 제한된 예외다.
 - 자동 재시도를 반복하지 않는다.
+- Assistant 정상 polling은 직전 GET 응답 뒤 2초를 기다리며 요청을 겹치지 않는다. 최초 POST 시도부터 120초가 지나면 자동 조회와 재전송을 중단하되 로컬 복구 정보를 자동 삭제하지 않는다.
 - 최종 timeout 값과 재시도 세부 조정은 Orange Pi 응답 시간 실측 후 확정한다(`TBD-TEAM`).
 
 ## 14. 알림 제거와 구형 클라이언트 호환성
@@ -546,7 +571,7 @@ X-Request-ID: {재시도 요청의 새 ID}
 ## 15. OpenAPI 공개 계약
 
 - `/openapi.json`은 OpenAPI `3.1.0`으로 제공한다.
-- 4장의 `operationId`를 고정한다.
+- 4장의 구현된 endpoint `operationId`를 고정한다. Assistant 구현이 병합되면 같은 표의 Assistant `operationId`도 공개 schema에 추가한다.
 - 요청 객체는 알 수 없는 필드를 허용하지 않는다.
 - 성공 JSON은 `application/json`, 오류는 `application/problem+json`으로 선언한다.
 - FastAPI 기본 `HTTPValidationError`를 공개 오류 schema로 사용하지 않는다.
@@ -561,24 +586,336 @@ ScheduleListResponse
 HealthResponse
 TimeSyncRequest
 TimeSyncResponse
+AssistantRequestCreate
+AssistantRequestAcceptedResponse
+AssistantRequestStatusResponse
+AssistantCancelRequest
+AssistantCancelResponse
+AssistantResultNeedMoreInfo
+AssistantResultCandidateSelection
+AssistantResultConfirmation
+AssistantResultOutcome
+AssistantResultFailure
+AssistantResultUncertain
+AssistantCandidate
+AssistantScheduleSummary
 Problem
 ValidationErrorItem
 ```
 
-## 16. 현재 포함하지 않는 계약
+현재 `/openapi.json`에 Assistant component·path가 없다는 사실은 계약 취소가 아니라 구현 전 상태를 뜻한다. Assistant 구현과 계약 시험이 병합된 버전에서 위 path·component를 함께 공개한다.
 
-다음 항목은 Schedule API 구현을 막지 않으며, 관련 담당자 확인 전 임의로 추가하지 않는다.
+## 16. 텍스트 Assistant API 공개 계약
+
+> 상태: `BE-FE-AGREED`
+>
+> 구현: 미구현. 이 절은 구현 목표 계약이며 현재 서버 동작을 나타내지 않는다.
+
+### 16.1 역할과 기본 흐름
+
+- 수동 일정 조작은 앱이 기존 Schedule API를 직접 호출한다.
+- 일정 비서는 앱이 Assistant API를 호출하고, 서버가 모델 해석·검증 뒤 Schedule API를 실행한다.
+- 앱은 Assistant의 성공 결과를 근거로 같은 Schedule write를 다시 실행하지 않는다.
+- 지원 작업은 등록·조회·수정·삭제·완료 상태 변경이다.
+- 정보가 충분한 등록은 추가 승인 없이 실행한다. 수정·삭제·AI를 통한 완료 상태 변경은 대상과 변경 내용을 확인한 뒤 실행한다.
+- 한 Assistant write 성공은 일정 하나만 변경한다. MVP에서 여러 일정을 한 입력으로 일괄 변경하지 않는다.
+- 알림은 제외하며 `reminderMinutesBefore`·`reminderAt`을 만들거나 전달하지 않는다.
+
+처리 상태는 다음 단방향 흐름을 기본으로 한다.
+
+```text
+accepted → processing → completed
+```
+
+`completed`는 입력 하나의 처리가 종결됐다는 뜻이다. 결과가 추가 질문·후보 선택·승인 요청·불확실일 수 있으므로 대화 종료나 일정 변경 성공과 같지 않다.
+
+### 16.2 요청 body와 식별 정보
+
+`POST /api/v1/assistant/requests`는 첫 입력·후속 답변·후보 선택·승인 또는 거절을 접수한다.
+
+| 필드 | 타입·주체 | 필수·용도 |
+|---|---|---|
+| `requestId` | 앱 생성 UUID v4 string | 입력마다 필수. 대화 ID나 HTTP 추적 ID가 아님 |
+| `conversationId` | 서버 발급 UUID v4 string | 첫 입력은 생략, 같은 대화의 후속 입력에는 필수 |
+| `input` | object | 아래 3종 중 하나 |
+| `acknowledgedUncertainRequestId` | UUID v4 string | 불확실을 인지하고 새 text 작업을 시작할 때만 사용 |
+
+| `input.type` | `input` 필드 | 조건 |
+|---|---|---|
+| `text` | `text`, 선택적으로 `questionId` | 첫 입력은 text만. 활성 질문에 답하는 자유 텍스트에는 현재 questionId 필수 |
+| `selection` | `questionId`, `candidateId` | 서버가 현재 질문에 제공한 값을 그대로 전송 |
+| `confirmation` | `questionId`, `approved` | `approved`는 boolean. false는 해당 변경안 거절이며 대화 전체 삭제가 아님 |
+
+- `conversationId`와 `questionId`는 서버가 발급한다.
+- `candidateId`는 불투명 문자열이며 앱이 생성하거나 순번·Schedule ID로 바꾸지 않는다.
+- `text`는 Unicode 코드 포인트 기준 1~500자다. 공백만 있는 입력은 `422 VALIDATION_ERROR`다.
+- 전체 JSON 요청 body는 UTF-8 기준 16 KiB 이하다. 초과하면 `413 REQUEST_BODY_TOO_LARGE`다.
+- 잘못된 타입·enum·null·알 수 없는 필드는 거절한다.
+- 앱은 전체 채팅 이력·모델 출력·Schedule 변경 payload를 보내지 않는다.
+
+첫 입력 예시:
+
+```json
+{
+  "requestId": "11111111-1111-4111-8111-111111111111",
+  "input": {
+    "type": "text",
+    "text": "내일 반품 검수 등록해줘"
+  }
+}
+```
+
+후속 입력 예시:
+
+```json
+{
+  "requestId": "33333333-3333-4333-8333-333333333333",
+  "conversationId": "22222222-2222-4222-8222-222222222222",
+  "input": {
+    "type": "text",
+    "questionId": "44444444-4444-4444-8444-444444444444",
+    "text": "오후 3시"
+  }
+}
+```
+
+### 16.3 접수·조회와 중복 요청
+
+신규 요청을 영속적으로 접수하면 `202 Accepted`를 반환한다.
+
+```json
+{
+  "requestId": "11111111-1111-4111-8111-111111111111",
+  "conversationId": "22222222-2222-4222-8222-222222222222",
+  "status": "accepted"
+}
+```
+
+앱은 `GET /api/v1/assistant/requests/{requestId}`로 원래 입력의 상태와 결과를 조회한다. 정상 GET과 동일 요청 재수신의 `200`은 `requestId`·`conversationId`·`status`를 반환한다. `accepted`·`processing`에서는 `result`를 생략하고 `completed`에서만 포함한다.
+
+```json
+{
+  "requestId": "11111111-1111-4111-8111-111111111111",
+  "conversationId": "22222222-2222-4222-8222-222222222222",
+  "status": "completed",
+  "result": {
+    "kind": "need_more_info",
+    "text": "몇 시로 등록할까요?",
+    "questionId": "44444444-4444-4444-8444-444444444444"
+  }
+}
+```
+
+- 같은 `requestId`와 동일한 정규화 body를 다시 받으면 기존 상태·결과를 `200`으로 반환하고 모델이나 Schedule write를 재실행하지 않는다.
+- 이 기존 요청 판정은 `CONVERSATION_BUSY`·질문 유효성·대화 만료 검사보다 먼저 한다.
+- 같은 ID에 다른 body가 오면 `409 REQUEST_ID_CONFLICT`다.
+- 상세가 최소 기록으로 정리된 ID는 body 동일 여부와 관계없이 `409 REQUEST_EXPIRED`다.
+- POST 판정 순서는 body 크기 `413` → JSON 형식 `400` → schema `422` → requestId의 기존 상세·충돌·최소 기록 → 대화·질문·불확실 보류다.
+- GET이나 서버 재시작을 이유로 모델 처리·Schedule write를 다시 실행하지 않는다.
+- 서버 재시작 전에 실행되지 않은 질문 대기는 자동으로 활성 재개하지 않는다. 과거 질문 결과가 GET에 남아 있어도 후속 입력은 현재 유효성 검사를 통과해야 한다.
+
+### 16.4 결과 6종
+
+모든 `result`에는 `kind`와 `text: string`이 필수다.
+
+| `result.kind` | 추가 필드 | 앱 처리 |
+|---|---|---|
+| `need_more_info` | `questionId` | 질문 표시 후 답변 |
+| `candidate_selection` | `questionId`, `expiresAt`, `candidates` | 실제 후보 표시·선택 |
+| `confirmation` | `questionId`, `expiresAt`, `operation`, `target`, 수정이면 `changes` | 대상·변경 내용 확인 후 승인·거절 |
+| `outcome` | `outcome`, `schedulesChanged`, 상황별 `operation`·결과 데이터 | 성공·취소·대상 없음 구분 |
+| `failure` | `code`, `nextAction` | 오류 code에 맞게 안내 |
+| `uncertain` | `code`, `nextAction` | 결과 미확인 표시·원래 ID 조회·명시적 보류 해제 |
+
+공통 규칙:
+
+- `expiresAt`은 UTC `Z` datetime string이다. 후보·승인에는 필수이며 기한 없는 정보 보완에서는 생략한다.
+- `candidates`는 2~10개다. 각 항목은 `candidateId`·`title`·`scheduledAt`·`category`를 항상 제공한다.
+- candidate의 `category`는 `INBOUND / INVENTORY / OUTBOUND / RETURN / OTHER` 중 하나다.
+- `target`과 조회 `items`의 일정 요약은 `id`·`title`·`scheduledAt`·`category`·`completed`·`updatedAt`이다.
+- `confirmation.operation`은 `update / delete`다. 완료 상태 변경은 `update`와 `changes.completed`를 사용한다. delete에서는 `changes`를 생략한다.
+- `outcome.outcome`은 `success / cancelled / no_match`다.
+- `outcome.operation`은 `create / list / update / delete`이며 작업 특정 전 취소에서는 생략할 수 있다.
+- 성공한 create/update/delete에는 `schedulesChanged: true`와 실제 Schedule ID 하나를 담은 `affectedScheduleIds`가 필수다.
+- 조회 성공은 `operation: list`, `schedulesChanged: false`, `items`를 반환한다. 0건은 `items: []`다.
+- 취소·거절·대상 없음은 `schedulesChanged: false`이며 관련 없는 `items`와 변경 ID를 생략한다.
+- `uncertain`에는 `schedulesChanged: false`를 넣지 않는다. 미변경이 확정됐다는 뜻으로 해석하면 안 된다.
+
+후보의 `title + scheduledAt + category`가 모두 같아 앱에서 구별할 수 없으면 `candidate_selection`을 반환하지 않는다. 실제 조회 결과에 사용자가 설명할 수 있는 구분 조건이 있으면 `need_more_info`로 먼저 질문한다. 끝내 하나로 확정할 수 없으면 `failure / TARGET_AMBIGUOUS / revise_input`으로 종결하고 쓰기를 실행하지 않는다.
+
+confirmation 예시:
+
+```json
+{
+  "kind": "confirmation",
+  "text": "반품 검수를 오후 4시로 변경할까요?",
+  "questionId": "44444444-4444-4444-8444-444444444444",
+  "expiresAt": "2026-10-18T05:10:00Z",
+  "operation": "update",
+  "target": {
+    "id": "77777777-7777-4777-8777-777777777777",
+    "title": "반품 검수",
+    "scheduledAt": "2026-10-18T06:00:00Z",
+    "category": "RETURN",
+    "completed": false,
+    "updatedAt": "2026-10-17T03:00:00Z"
+  },
+  "changes": {
+    "scheduledAt": "2026-10-18T07:00:00Z"
+  }
+}
+```
+
+### 16.5 취소
+
+`POST /api/v1/assistant/conversations/{conversationId}/cancel`은 지정한 요청 또는 질문의 취소 가능 상태를 즉시 `200`으로 반환한다. 취소에는 새 requestId·`202`·추가 polling을 사용하지 않는다. 별도 취소 버튼은 MVP 필수가 아니며, confirmation의 `approved: false`는 변경안 거절이다. 앱 종료·화면 이탈·통신 종료는 서버 취소가 아니다.
+
+```json
+{
+  "target": {
+    "type": "request",
+    "id": "11111111-1111-4111-8111-111111111111"
+  }
+}
+```
+
+`target.type`은 `request / question`이다. 대상은 경로의 `conversationId`에 속해야 한다.
+
+정상 응답은 요청의 `target`, 아래 `targetState`, 사용자 안내용 `text`를 반환한다.
+
+| `targetState` | 의미·후속 처리 |
+|---|---|
+| `cancelled` | 실행 전 취소 확정 |
+| `not_guaranteed` | write 전송이 시작돼 중단 보장 불가. 원래 요청 GET |
+| `already_completed` | 입력 처리가 이미 끝남. 남은 활성 질문은 questionId로 별도 취소 |
+| `uncertain` | 원래 결과 미확인 유지 |
+| `not_active` | 질문이 이미 답변·만료·무효 상태 |
+
+request 취소가 `cancelled`로 확정된 경우에만 원래 GET을 `completed + outcome/cancelled + schedulesChanged: false`로 바꾼다. `not_guaranteed`·`uncertain`은 원래 결과를 취소 성공으로 덮어쓰지 않는다. question 취소는 질문만 무효화하며 질문을 반환한 과거 요청 결과는 유지한다.
+
+### 16.6 접수 전 오류와 복구 필드
+
+Assistant의 접수 전 거절·GET·취소 오류도 13장의 Problem Details를 사용한다. HTTP별 추적 ID는 `requestId`, 앱의 논리 요청 ID는 연결할 수 있을 때 `assistantRequestId`로 제공한다.
+
+추가 복구 필드:
+
+- `409 CONVERSATION_BUSY`: 처리 중인 `blockingRequestId`
+- `409 UNRESOLVED_UNCERTAIN`: 가장 오래된 미인지 불확실의 `blockingRequestId`
+- `409 STALE_QUESTION`: 활성 질문이 있으면 `activeQuestionId`와 그 질문 결과를 반환한 `activeQuestionRequestId`
+
+앱은 `activeQuestionRequestId`를 GET해 질문 내용을 복구하되 과거 승인·선택을 자동 전송하지 않는다. `404`는 status만 보지 않고 Problem Details의 `code`로 `ASSISTANT_REQUEST_NOT_FOUND`와 `ROUTE_NOT_FOUND` 등을 구별한다.
+
+### 16.7 접수 후 실패·불확실
+
+접수 뒤 오류는 GET의 `completed` 결과로 전달한다.
+
+| kind·code | `nextAction` | 의미 |
+|---|---|---|
+| `failure · MODEL_OUTPUT_INVALID` | `revise_input` | 모델 출력 검증 실패, write 미실행 |
+| `failure · SCHEDULE_REJECTED` | `revise_input` | Schedule API가 요청을 확정 거절 |
+| `failure · TARGET_AMBIGUOUS` | `revise_input` | 대상을 하나로 확정할 수 없어 write 미실행 |
+| `failure · MODEL_TIMEOUT / SCHEDULE_UNAVAILABLE / PROCESSING_INTERRUPTED` | `retry_later` | 확인된 실패. 자동 재실행 지시가 아님 |
+| `failure · PROCESSING_TIMEOUT` | `retry_later` | 300초 상한 도달, write 미실행이 확실함 |
+| `failure · INTERNAL_ERROR` | `none` | 내부 오류 |
+| `uncertain · EXECUTION_RESULT_UNKNOWN` | `check_status` | write 전송 또는 반영 가능성이 남아 있음 |
+
+`nextAction`은 앱이 write를 자동 실행하라는 명령이 아니다. `completed` 결과는 원칙적으로 바뀌지 않으며, 실제 근거를 확보한 `uncertain → outcome/failure`만 예외로 허용한다. 반대 방향 전환은 없다. 앱은 `uncertain`을 사용자가 다시 확인할 때와 앱 재실행 때 원래 requestId로 다시 GET한다.
+
+### 16.8 시간·대화·결과 보관
+
+| 항목 | 값 | 규칙 |
+|---|---:|---|
+| POST 접수 응답 대기 | 5초 | 앱 timeout과 서버 취소는 별개 |
+| GET 1회 응답 대기 | 5초 | 실패한 GET만 재조회하며 write를 반복하지 않음 |
+| 정상 polling 간격 | 2초 | 직전 GET 응답 뒤 대기, 요청을 겹치지 않음 |
+| 앱 자동 조회 한도 | 최초 POST 시도부터 120초 | 동일 요청 재전송으로 초기화하지 않음 |
+| 후보·승인 질문 만료 | 발급부터 10분 | 조회·재전송으로 연장하지 않음. `expiresAt` 우선 |
+| 정보 보완 질문 | 일률 10분 미적용 | 오래돼 문맥이 애매하면 필요한 정보·날짜 재확인 |
+| 확정된 상세 결과 | 아래 기산점부터 최소 24시간 | 기간 안에 원래 requestId로 조회 가능 |
+| 대화 전체 수명 | 마지막 유효 입력부터 24시간 무활동 | GET·동일 요청 재전송·거절된 입력으로 연장하지 않음 |
+| 서버 요청 처리 상한 | 영속 접수부터 300초 | 앱 자동 조회 120초와 별개인 초기 운영값 |
+
+300초에 도달하면 요청은 `completed`로 종결한다. write 미실행이 확실하면 `failure / PROCESSING_TIMEOUT`, write가 전송됐거나 실행 여부를 확정할 수 없으면 `uncertain / EXECUTION_RESULT_UNKNOWN`이다. 이미 전송된 write의 늦은 반영 가능성을 실패로 단정하지 않는다.
+
+`accepted`·`processing` 또는 미해소 `uncertain`이 연결된 대화는 시간만으로 만료하지 않는다. 만료된 `conversationId`의 새 입력은 `409 CONVERSATION_EXPIRED`이며 과거 문맥을 자동 복원하거나 새 실행을 시작하지 않는다. 기존 requestId의 GET 가능 기간은 개별 요청 보관 규칙을 따른다.
+
+상세 결과를 최소 기록으로 줄일 수 있는 시점:
+
+- `outcome`·`failure`: 결과 확정부터 최소 24시간 뒤
+- 질문 3종: 질문이 답변·취소·만료·무효로 비활성이 된 때부터 최소 24시간 뒤
+- 나중에 확정된 `uncertain`: `outcome`·`failure` 확정 전환부터 최소 24시간 뒤
+
+`accepted`·`processing`, 활성 질문, 아직 확정되지 않은 `uncertain`은 사용자가 인지했더라도 최소 기록으로 줄이지 않는다. 상세를 정리한 뒤에는 requestId의 최소 기록을 MVP 기간 동안 자동 삭제하지 않는다. DB 초기화 같은 운영 작업은 예외로 기록한다.
+
+최소 기록 상태에서 GET은 `410 REQUEST_EXPIRED`, 같은 ID의 POST는 `409 REQUEST_EXPIRED`다. 해당 ID에 진행 중 처리·활성 질문·미해소 불확실이 없고 새 실행도 없다는 뜻이지만 과거 성공·실패는 알려주지 않는다. 최소 기록에서 상세 결과 상태로 되돌아가지 않는다.
+
+### 16.9 앱 재실행과 로컬 복구 정보 정리
+
+앱은 POST 전에 `requestId`·서버 식별값·`firstPostAttemptAt`·`lastPostAttemptAt`·`acceptConfirmed`를 로컬에 저장한다. `202`·동일 요청 `200` 또는 GET `200`을 받으면 `acceptConfirmed: true`로 갱신하고, 확인한 `conversationId`와 마지막 상태·결과 종류도 저장한다. 저장 실패 시 POST를 보내지 않는다. 원래 body의 영구 저장은 요구하지 않으며 앱 재실행 후에는 원래 requestId로 GET만 수행한다. 복구 항목이 없을 때만 새 대화를 시작한다.
+
+로컬의 자동 복구 목록 정리 기준:
+
+| 확인 결과·상황 | 앱 처리 | 자동 정리 |
+|---|---|---|
+| GET `200 completed` + `outcome/failure` | 결과 표시 | 표시 뒤 가능 |
+| GET `200 completed` + 질문 3종 | 질문 복구 유지 | 다음 입력 `2xx` 접수로 교체되거나 답변·취소·만료·`not_active`가 확인되면 가능 |
+| GET `200 completed` + `uncertain` | 결과 미확인 표시·사용자 확인과 앱 재실행 때 재조회 | 확정 결과로 바뀌거나 해당 ID를 인지한 새 text 요청이 `2xx`로 접수될 때만 자동 복구 목록에서 제외 가능 |
+| GET `200 accepted/processing` | 유지. 120초 뒤 자동 조회만 중단 | 금지 |
+| GET `410` 또는 POST `409 REQUEST_EXPIRED` | 상세 결과 보관 기간 경과 안내·Schedule 목록 GET 권장 | 즉시 가능 |
+| `404 ASSISTANT_REQUEST_NOT_FOUND` | 미실행으로 해석하지 않음. 늦은 POST·기록 유실·DB 초기화·다른 서버 가능성 안내 | 금지. 사용자 확인 뒤 수동 정리만 허용 |
+| 네트워크·timeout·`5xx`·`503`·`ROUTE_NOT_FOUND`·비표준 오류 body | 다음 기회에 원래 ID GET | 금지 |
+| 저장 서버와 현재 서버가 다름 | 다른 서버에 GET하지 않고 설정 확인 | 금지. 수동 정리만 허용 |
+| 120초 자동 조회 종료 또는 단순 시간 경과 | 결과 확인 필요 상태 유지 | 금지 |
+
+같은 앱 실행 중 POST 응답을 확인하지 못하면 먼저 GET한다. 최초 POST 시도부터 120초 안에 `404 ASSISTANT_REQUEST_NOT_FOUND`를 확인하고 원래 body를 메모리에 그대로 보유한 경우에만 같은 ID·같은 body의 제한된 재전송을 허용한다. 120초 뒤에는 자동 조회와 재전송을 중단하지만 로컬 항목을 자동 삭제하지 않는다.
+
+사용자는 모든 상태에서 한 번의 명시적 확인 뒤 로컬 복구 정보만 수동 정리할 수 있다. 이 정리는 서버 취소·불확실 해소·원래 write 미실행·동일 작업의 안전한 재실행을 뜻하지 않는다.
+
+### 16.10 불확실 보류 해제
+
+단일 사용자·단일 단말 MVP에서는 미인지 `uncertain`이 있으면 새 `conversationId`를 만들어도 같은 서버의 새 Assistant 작업 전체를 보류한다. GET·질문 복구·불확실 고지·명시적 보류 해제는 허용하며 수동 Schedule API는 차단하지 않는다.
+
+여러 미인지 불확실이 있으면 `blockingRequestId`는 가장 오래된 한 건을 가리킨다. 사용자가 위험을 인지하고 새 text 작업을 명시적으로 시작할 때만 `acknowledgedUncertainRequestId`를 보낼 수 있다.
+
+- 현재 미인지 uncertain이면 인지 처리와 새 요청 접수를 원자적으로 적용한다.
+- 해당 ID가 이미 인지됐거나 뒤에 `outcome`·`failure`로 확정됐으면 인지 조건을 충족한 것으로 보고 새 요청 검사를 계속한다.
+- 존재하지 않거나 uncertain 이력이 아닌 ID는 `409 ACKNOWLEDGEMENT_NOT_APPLICABLE`이다.
+- 새 요청이 다른 검증·대화 상태·동시성 사유로 거절되면 인지 처리도 적용하지 않는다.
+- 보류 해제는 원래 요청을 성공·실패·취소로 바꾸거나 재실행하지 않는다.
+
+### 16.11 상대 날짜·시간대
+
+- 상대 날짜는 `Asia/Seoul`과 작업을 시작한 첫 유효 입력의 서버 접수 시각을 기준으로 해석한다.
+- 같은 작업의 후속 답변·재전송·복구에서는 기준 시각과 이미 해석한 날짜를 유지한다.
+- 사용자가 날짜를 명시적으로 고치거나 새 작업을 시작하면 새 기준을 적용한다.
+- 서버 시각을 신뢰할 수 없거나 오래 지나 의미가 애매하면 추측해 write를 실행하지 않고 절대 날짜·시각을 다시 확인한다.
+- Schedule API에는 2.5절의 시간대 포함 datetime을 보내며 UTC 정규화·과거 시각 검증을 그대로 적용한다.
+
+### 16.12 Schedule 목록 동기화
+
+- Assistant create/update/delete 성공 뒤 앱은 현재 화면에 필요한 Schedule 목록을 기존 Schedule GET으로 다시 조회한다.
+- 목록 조회만 실패하면 GET만 재시도하고 완료된 Assistant write를 다시 실행하지 않는다.
+- candidate snapshot이나 모델 응답으로 Schedule 목록을 임의 재구성하지 않는다.
+
+## 17. 현재 포함하지 않는 계약
+
+다음 항목은 현재 Schedule API와 위 Assistant 공개 계약의 문서 확정을 막지 않으며, 관련 담당자 확인 전 구현 계약으로 임의 추가하지 않는다.
 
 ### `TBD-AI`
 
-- AI 서비스 endpoint, port와 protocol
-- AI와 백엔드의 프로세스 분리 방식
-- AI가 Schedule API를 호출하는 방식
-- AI의 `Idempotency-Key` 생성·재사용 규칙
-- `affectedSchedules` schema와 목록 갱신 계약
-- 재질문, 상대 날짜 해석과 AI가 생성하는 `scheduledAt` 규칙
-- STT 결과와 후속 대화 protocol
-- AI timeout과 retry
+- Assistant 제어부·모델의 내부 프로세스 분리 방식과 내부 endpoint·port·protocol
+- 모델 구조화 출력 schema와 제어부 검증 경계
+- 제어부가 Schedule 생성에 사용하는 내부 `Idempotency-Key` 생성·재사용 방식
+- STT/TTS 전송 형식과 음성 후속 대화 protocol
+- 서버 처리 상한 안의 모델 호출 timeout·내부 retry 세부값
+- Assistant 구현 담당과 제어부·모델 연결 작업 분담
+
+### `TBD-TEAM`
+
+- 각자 집에서 수행할 원격 시험 경로·접근 제한·암호화 방식
+- Pi·실제 모델·단말 측정 뒤 Assistant 5초·2초·120초·300초 값의 조정 여부
+- 다중 단말 시험 시 `UNRESOLVED_UNCERTAIN` 보류 범위
+- MVP 이후 최소 ID 기록과 미해소 uncertain의 장기 폐기 정책
 
 ### `POST-MVP`
 
