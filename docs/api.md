@@ -571,7 +571,7 @@ X-Request-ID: {재시도 요청의 새 ID}
 ## 15. OpenAPI 공개 계약
 
 - `/openapi.json`은 OpenAPI `3.1.0`으로 제공한다.
-- 4장의 구현된 endpoint `operationId`를 고정한다. Assistant 구현이 병합되면 같은 표의 Assistant `operationId`도 공개 schema에 추가한다.
+- 4장의 구현된 endpoint `operationId`를 고정한다. Assistant의 `createAssistantRequest`·`getAssistantRequest`·`cancelAssistantTarget`도 공개 schema에 포함된다.
 - 요청 객체는 알 수 없는 필드를 허용하지 않는다.
 - 성공 JSON은 `application/json`, 오류는 `application/problem+json`으로 선언한다.
 - FastAPI 기본 `HTTPValidationError`를 공개 오류 schema로 사용하지 않는다.
@@ -603,7 +603,15 @@ Problem
 ValidationErrorItem
 ```
 
-현재 `/openapi.json`에 Assistant component·path가 없다는 사실은 계약 취소가 아니라 구현 전 상태를 뜻한다. Assistant 구현과 계약 시험이 병합된 버전에서 위 path·component를 함께 공개한다.
+현재 `/openapi.json`은 다음 Assistant path 3개를 공개한다.
+
+```text
+/api/v1/assistant/requests
+/api/v1/assistant/requests/{requestId}
+/api/v1/assistant/conversations/{conversationId}/cancel
+```
+
+위 component 목록은 앱·연동 계약에서 직접 참조하는 주요 schema이며 `components.schemas`의 전체 집합은 아니다. 중첩 객체·enum·union을 표현하는 `AssistantCancelTarget`, `AssistantCancelTargetState`, `AssistantCancelTargetType`, `AssistantConfirmationChanges`, `AssistantConfirmationOperation`, `AssistantFailureCode`, `AssistantFailureNextAction`, `AssistantInputConfirmation`, `AssistantInputSelection`, `AssistantInputText`, `AssistantOutcome`, `AssistantOutcomeOperation`, `AssistantRequestStatus` 보조 component도 OpenAPI에 노출된다.
 
 ## 16. 텍스트 Assistant API 공개 계약
 
@@ -710,7 +718,7 @@ accepted → processing → completed
 - 이 기존 요청 판정은 `CONVERSATION_BUSY`·질문 유효성·대화 만료 검사보다 먼저 한다.
 - 같은 ID에 다른 body가 오면 `409 REQUEST_ID_CONFLICT`다.
 - 상세가 최소 기록으로 정리된 ID는 body 동일 여부와 관계없이 `409 REQUEST_EXPIRED`다.
-- POST 판정 순서는 body 크기 `413` → JSON 형식 `400` → schema `422` → requestId의 기존 상세·충돌·최소 기록 → 대화·질문·불확실 보류다.
+- POST 판정 순서는 body 크기 `413` → Content-Type `422` → JSON 형식 `400` → schema `422` → requestId의 기존 상세·충돌·최소 기록 → 대화·질문·불확실 보류다.
 - GET이나 서버 재시작을 이유로 모델 처리·Schedule write를 다시 실행하지 않는다.
 - 서버 재시작 전에 실행되지 않은 질문 대기는 자동으로 활성 재개하지 않는다. 과거 질문 결과가 GET에 남아 있어도 후속 입력은 현재 유효성 검사를 통과해야 한다.
 
