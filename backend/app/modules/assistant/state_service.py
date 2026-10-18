@@ -267,7 +267,7 @@ def get_assistant_request(
 
 
 def _request_cancel_state(
-    request: AssistantRequest, *, now: datetime
+    session: Session, request: AssistantRequest, *, now: datetime
 ) -> AssistantCancelTargetState:
     if request.tombstone:
         return AssistantCancelTargetState.ALREADY_COMPLETED
@@ -289,13 +289,16 @@ def _request_cancel_state(
         outcome=AssistantOutcome.CANCELLED,
         schedules_changed=False,
     )
-    repository.complete_request_as_cancelled(
-        request,
+    cancelled = repository.complete_request_as_cancelled(
+        session,
+        request_id=request.id,
         result_json=result.model_dump(
             mode="json", by_alias=True, exclude_none=True
         ),
         at=now,
     )
+    if not cancelled:
+        raise AssistantStateCorrupted("Assistant cancellation CAS lost.")
     return AssistantCancelTargetState.CANCELLED
 
 
@@ -324,7 +327,7 @@ def cancel_assistant_target(
                         or stored_request.conversation_id != conversation_id
                     ):
                         raise AssistantTargetNotFound()
-                    state = _request_cancel_state(stored_request, now=now)
+                    state = _request_cancel_state(session, stored_request, now=now)
                 else:
                     question = repository.get_question(session, target.id)
                     if (
@@ -335,9 +338,15 @@ def cancel_assistant_target(
                     if question.status == AssistantQuestionStatus.ACTIVE.value:
                         if question.expires_at is not None and question.expires_at <= now:
                             repository.expire_question(question, at=now)
+                            repository.start_question_source_retention(
+                                session, question, at=now
+                            )
                             state = AssistantCancelTargetState.NOT_ACTIVE
                         else:
                             repository.cancel_question(question, at=now)
+                            repository.start_question_source_retention(
+                                session, question, at=now
+                            )
                             state = AssistantCancelTargetState.CANCELLED
                     elif question.status in {
                         AssistantQuestionStatus.ANSWERED.value,

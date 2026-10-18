@@ -4,11 +4,10 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from threading import Event
-from uuid import UUID, uuid4
+from uuid import UUID
 
 import pytest
 import sqlalchemy as sa
-from sqlalchemy.orm import Session
 
 from app.core.clock import FixedClock, FixedMonotonicClock
 from app.core.config import Settings
@@ -20,7 +19,6 @@ from app.modules.assistant.decisions import (
     DecisionEnvelope,
     DecisionProviderTimeout,
 )
-from app.modules.assistant.enums import AssistantResultKind
 from app.modules.assistant.model import (
     AssistantConversation,
     AssistantQuestion,
@@ -134,6 +132,12 @@ class BlockingScheduleReader(MemoryScheduleReader):
         return super().get(schedule_id)
 
 
+class PendingSafeWriter:
+    def execute(self, *, request_id, runtime_guard):
+        del request_id, runtime_guard
+        return ProcessOneResult.PENDING_WRITE
+
+
 @pytest.fixture
 def processor_store(database_path: Path):
     settings = Settings(_env_file=None, database_url=f"sqlite:///{database_path}")
@@ -234,6 +238,7 @@ def run(
         time_trust_source=TrustSource(trusted),
         uuid_factory=uuid_factory or UuidSequence(),
         runtime_guard=runtime_guard,
+        safe_writer=PendingSafeWriter(),
     )
 
 

@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from app.core.database import is_database_unavailable
 from app.modules.assistant import repository
 from app.modules.assistant.processor import ProcessOneResult
+from app.modules.assistant.recovery import recover_startup_requests as recover_requests
 from app.modules.assistant.runtime_failures import (
     interrupted_snapshot,
     timeout_snapshot,
@@ -26,6 +27,7 @@ from app.modules.assistant.runtime_guard import (
     MonotonicClock,
     ProcessDeadlineGuard,
 )
+from app.modules.assistant.safe_write import timeout_request
 
 PROCESSING_LIMIT_SECONDS = 300.0
 DEFAULT_SHUTDOWN_GRACE_SECONDS = 5.0
@@ -91,17 +93,8 @@ def recover_startup_requests(
 ) -> int:
     """Atomically stop every pre-write request left by an earlier process."""
 
-    result = interrupted_snapshot()
     recovered_at = _aware_utc(wall_clock.now())
-    with session_factory() as session:
-        with session.begin():
-            if repository.has_active_write_marker(session):
-                raise UnsafeActiveWriteMarker(
-                    "active Assistant write marker requires phase 6 recovery"
-                )
-            return repository.recover_prewrite_requests(
-                session, result_json=result, at=recovered_at
-            )
+    return recover_requests(session_factory, recovered_at=recovered_at)
 
 
 def compensate_registration_failure(
@@ -139,9 +132,13 @@ class AssistantRuntimeController:
             [threading.Condition, float | None], None
         ] | None = None,
         on_unhealthy: Callable[[], None] | None = None,
+        cleanup_once: Callable[[], None] | None = None,
+        cleanup_interval_seconds: float = 3600.0,
     ) -> None:
         if shutdown_grace_seconds < 0:
             raise ValueError("shutdown grace cannot be negative")
+        if cleanup_interval_seconds <= 0:
+            raise ValueError("cleanup interval must be positive")
         self._ownership_lock = ownership_lock
         self._timeout_session_factory = timeout_session_factory
         self._process_request = process_request
@@ -151,6 +148,8 @@ class AssistantRuntimeController:
         self._shutdown_grace_seconds = shutdown_grace_seconds
         self._condition_waiter = condition_waiter or self._default_waiter
         self._on_unhealthy = on_unhealthy
+        self._periodic_cleanup = cleanup_once
+        self._cleanup_interval_seconds = cleanup_interval_seconds
 
         self._condition = threading.Condition()
         self._shutdown_event = threading.Event()
@@ -165,6 +164,9 @@ class AssistantRuntimeController:
         self._sweeper_thread: threading.Thread | None = None
         self._cleanup_thread: threading.Thread | None = None
         self._cleanup_done = False
+        self._next_cleanup_deadline = (
+            self._monotonic_clock.now() + cleanup_interval_seconds
+        )
 
     @staticmethod
     def _default_waiter(
@@ -281,6 +283,7 @@ class AssistantRuntimeController:
                     type(exc).__name__,
                     extra={"event": "assistant.lazy_timeout_failed"},
                 )
+                self.mark_unhealthy()
                 continue
             self._apply_timeout_outcome(entry, outcome)
 
@@ -367,10 +370,10 @@ class AssistantRuntimeController:
         while not self._shutdown_event.is_set():
             with self._condition:
                 nearest = self._nearest_deadline()
-                if nearest is None:
-                    self._condition_waiter(self._condition, None)
-                    continue
-                remaining = nearest - self._monotonic_clock.now()
+                wake_at = self._next_cleanup_deadline
+                if nearest is not None:
+                    wake_at = min(wake_at, nearest)
+                remaining = wake_at - self._monotonic_clock.now()
                 if remaining > 0:
                     self._condition_waiter(self._condition, remaining)
                     continue
@@ -395,6 +398,19 @@ class AssistantRuntimeController:
                 retry_index = 0
             if unhealthy_after_due:
                 self.mark_unhealthy()
+            if self._monotonic_clock.now() >= self._next_cleanup_deadline:
+                if self._periodic_cleanup is not None:
+                    try:
+                        self._periodic_cleanup()
+                    except Exception as exc:
+                        logger.warning(
+                            "Assistant cleanup deferred: %s",
+                            type(exc).__name__,
+                            extra={"event": "assistant.cleanup_deferred"},
+                        )
+                self._next_cleanup_deadline = (
+                    self._monotonic_clock.now() + self._cleanup_interval_seconds
+                )
 
     def _due_entries(
         self, *, request_id: UUID | None, limit: int | None
@@ -424,10 +440,10 @@ class AssistantRuntimeController:
                         return repository.PrewriteCompletionResult.NOOP
                     if self._monotonic_clock.now() < entry.deadline:
                         return repository.PrewriteCompletionResult.NOOP
-                    return repository.complete_prewrite_request(
+                    return timeout_request(
                         session,
                         request_id=entry.request_id,
-                        result_json=timeout_snapshot(),
+                        prewrite_result_json=timeout_snapshot(),
                         at=_aware_utc(self._wall_clock.now()),
                     )
         except Exception as exc:

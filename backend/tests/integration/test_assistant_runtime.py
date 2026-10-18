@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 from pathlib import Path
 from threading import Event, current_thread, enumerate as enumerate_threads
 from uuid import UUID
@@ -24,17 +24,19 @@ from app.modules.assistant.model import (
     AssistantConversation,
     AssistantQuestion,
     AssistantRequest,
+    AssistantWriteGate,
 )
 from app.modules.assistant.processor import ProcessOneResult
+from app.modules.assistant import recovery as assistant_recovery
 from app.modules.assistant.readiness import probe_assistant_schema
 from app.modules.assistant.runtime import RegistrationOutcome
-from app.modules.assistant import repository as assistant_repository
 from app.modules.assistant.runtime_lock import (
     AssistantRuntimeFileLock,
     AssistantRuntimeLockContended,
     AssistantRuntimeLockUnavailable,
 )
-from app.modules.schedules.model import Schedule
+from app.modules.schedules.category import Category
+from app.modules.schedules.model import IdempotencyRecord, Schedule
 from app.modules.system.service import resolve_expected_head
 from tests.conftest import FIXED_NOW
 from tests.fakes.assistant import ScriptedDecisionProvider
@@ -326,7 +328,7 @@ def test_startup_recovery_atomically_interrupts_only_prewrite_requests(
     application.state.engine.dispose()
 
 
-def test_active_write_marker_blocks_all_recovery_and_background_start(
+def test_atomic_write_marker_is_recovered_without_schedule_reexecution(
     database_path: Path,
 ) -> None:
     engine, factory = standalone_factory(database_path)
@@ -348,22 +350,24 @@ def test_active_write_marker_blocks_all_recovery_and_background_start(
     application = create_app(settings_for(database_path))
     with TestClient(application, raise_server_exceptions=False) as client:
         assert application.state.assistant_schema_ready is True
-        assert application.state.assistant_runtime_owner is False
-        assert application.state.assistant_runtime is None
+        assert application.state.assistant_runtime_owner is True
+        assert application.state.assistant_runtime is not None
         assert client.get("/health").status_code == 200
-        assert client.get(
-            f"/api/v1/assistant/requests/{REQUEST_ID}"
-        ).json()["status"] == "accepted"
+        first = client.get(f"/api/v1/assistant/requests/{REQUEST_ID}").json()
+        assert first["status"] == "completed"
+        assert first["result"]["code"] == "PROCESSING_INTERRUPTED"
         assert client.post(
             "/api/v1/assistant/requests", json=request_payload(
                 UUID("55555555-5555-4555-8555-555555555555")
             )
         ).status_code == 503
         with application.state.session_factory() as session:
-            assert session.get(AssistantRequest, REQUEST_ID).status == "accepted"
+            assert session.get(AssistantRequest, REQUEST_ID).status == "completed"
             marker = session.get(AssistantRequest, SECOND_REQUEST_ID)
-            assert marker.status == "processing"
+            assert marker.status == "completed"
             assert marker.write_started is True
+            assert marker.result_json["code"] == "PROCESSING_INTERRUPTED"
+            assert session.scalar(sa.select(sa.func.count()).select_from(Schedule)) == 0
     application.state.engine.dispose()
 
 
@@ -378,15 +382,10 @@ def test_recovery_failure_rolls_back_and_releases_runtime_ownership(
         status="accepted",
     )
     engine.dispose()
-    original = assistant_repository.recover_prewrite_requests
-
-    def fail_after_update(session, *, result_json, at):
-        original(session, result_json=result_json, at=at)
+    def fail_after_update(_result):
         raise RuntimeError("injected recovery failure")
 
-    monkeypatch.setattr(
-        assistant_repository, "recover_prewrite_requests", fail_after_update
-    )
+    monkeypatch.setattr(assistant_recovery, "_require_one", fail_after_update)
     application = create_app(settings_for(database_path))
     with TestClient(application) as client:
         assert application.state.assistant_schema_ready is True
@@ -398,6 +397,159 @@ def test_recovery_failure_rolls_back_and_releases_runtime_ownership(
 
     ownership = AssistantRuntimeFileLock.acquire(database_path)
     ownership.release()
+    application.state.engine.dispose()
+
+
+def test_invalid_completed_uncertain_create_evidence_rolls_back_startup_recovery(
+    database_path: Path,
+) -> None:
+    engine, factory = standalone_factory(database_path)
+    schedule_id = UUID("77777777-7777-4777-8777-777777777777")
+    pending = {
+        "version": 1,
+        "operation": "create",
+        "title": "재고 확인",
+        "scheduledAt": (FIXED_NOW + timedelta(days=1))
+        .isoformat()
+        .replace("+00:00", "Z"),
+        "category": "INVENTORY",
+        "timeInterpretation": "absolute",
+    }
+    uncertain = {
+        "kind": "uncertain",
+        "text": "일정 변경 결과를 확인할 수 없습니다. 원래 요청 상태를 확인해 주세요.",
+        "code": "EXECUTION_RESULT_UNKNOWN",
+        "nextAction": "check_status",
+    }
+    with factory.begin() as session:
+        session.add(
+            AssistantConversation(
+                id=CONVERSATION_ID,
+                created_at=FIXED_NOW - timedelta(minutes=5),
+                last_valid_input_at=FIXED_NOW,
+                expired_at=None,
+                control_state_version=None,
+                control_state_json=None,
+            )
+        )
+        session.add(
+            AssistantRequest(
+                id=REQUEST_ID,
+                conversation_id=CONVERSATION_ID,
+                fingerprint_version=1,
+                fingerprint_hash="a" * 64,
+                normalized_body_json={"requestId": str(REQUEST_ID)},
+                status="completed",
+                result_kind="uncertain",
+                result_json=uncertain,
+                accepted_at=FIXED_NOW - timedelta(minutes=5),
+                processing_at=FIXED_NOW - timedelta(minutes=4),
+                completed_at=FIXED_NOW,
+                task_reference_accepted_at=FIXED_NOW - timedelta(minutes=5),
+                write_started=True,
+                write_started_at=FIXED_NOW - timedelta(minutes=1),
+                write_operation="create",
+                write_commit_mode="idempotent_external",
+                pending_write_version=1,
+                pending_write_json=pending,
+                create_idempotency_key=str(REQUEST_ID),
+                create_idempotency_scope="assistant-v1",
+                had_uncertain=True,
+                uncertain_at=FIXED_NOW,
+                uncertain_acknowledged_at=None,
+                uncertain_acknowledged_by_request_id=None,
+                uncertain_resolved_at=None,
+                retention_started_at=None,
+                tombstone=False,
+                tombstoned_at=None,
+                cancelled_at=None,
+            )
+        )
+        session.add(
+            Schedule(
+                id=schedule_id,
+                title="다른 일정",
+                scheduled_at=FIXED_NOW + timedelta(days=1),
+                category=Category.OTHER,
+                completed=False,
+                created_at=FIXED_NOW,
+                updated_at=FIXED_NOW,
+                deleted_at=None,
+            )
+        )
+        session.add(
+            IdempotencyRecord(
+                scope="assistant-v1",
+                idempotency_key=str(REQUEST_ID),
+                fingerprint="f" * 64,
+                schedule_id=schedule_id,
+                response_body="{}",
+                created_at=FIXED_NOW,
+                expires_at=FIXED_NOW + timedelta(hours=24),
+            )
+        )
+        gate = session.get(AssistantWriteGate, 1)
+        gate.owner_request_id = REQUEST_ID
+        gate.acquired_at = FIXED_NOW - timedelta(minutes=1)
+        gate.generation += 1
+
+    def recovery_state(session_factory) -> dict[str, object]:
+        with session_factory() as session:
+            return {
+                "request": dict(
+                    session.execute(
+                        sa.select(AssistantRequest.__table__).where(
+                            AssistantRequest.id == REQUEST_ID
+                        )
+                    )
+                    .mappings()
+                    .one()
+                ),
+                "gate": dict(
+                    session.execute(
+                        sa.select(AssistantWriteGate.__table__).where(
+                            AssistantWriteGate.singleton_key == 1
+                        )
+                    )
+                    .mappings()
+                    .one()
+                ),
+                "schedules": [
+                    dict(row)
+                    for row in session.execute(
+                        sa.select(Schedule.__table__).order_by(Schedule.id)
+                    ).mappings()
+                ],
+                "idempotency": [
+                    dict(row)
+                    for row in session.execute(
+                        sa.select(IdempotencyRecord.__table__).order_by(
+                            IdempotencyRecord.scope,
+                            IdempotencyRecord.idempotency_key,
+                        )
+                    ).mappings()
+                ],
+            }
+
+    before = recovery_state(factory)
+    engine.dispose()
+
+    application = create_app(settings_for(database_path))
+    application.state.clock = FixedClock(FIXED_NOW + timedelta(minutes=1))
+    with TestClient(application, raise_server_exceptions=False) as client:
+        assert application.state.assistant_schema_ready is True
+        assert application.state.assistant_runtime_owner is False
+        assert application.state.assistant_runtime is None
+        assert client.get(f"/api/v1/assistant/requests/{REQUEST_ID}").json() == {
+            "requestId": str(REQUEST_ID),
+            "conversationId": str(CONVERSATION_ID),
+            "status": "completed",
+            "result": uncertain,
+        }
+        after = recovery_state(application.state.session_factory)
+        assert after == before
+        assert len(after["schedules"]) == 1
+        assert len(after["idempotency"]) == 1
     application.state.engine.dispose()
 
 
@@ -1009,7 +1161,7 @@ def test_blocked_provider_shutdown_is_bounded_and_defers_lock_release(
     restarted.state.engine.dispose()
 
 
-def test_production_runtime_owner_still_rejects_new_post_without_insert(
+def test_production_safe_writer_ready_still_rejects_new_text_without_insert(
     database_path: Path,
 ) -> None:
     application = create_app(settings_for(database_path))
@@ -1017,7 +1169,7 @@ def test_production_runtime_owner_still_rejects_new_post_without_insert(
     with TestClient(application, raise_server_exceptions=False) as client:
         assert application.state.assistant_runtime_owner is True
         assert application.state.assistant_runtime_healthy is True
-        assert application.state.assistant_runtime_ready is False
+        assert application.state.assistant_runtime_ready is True
         response = client.post(
             "/api/v1/assistant/requests", json=request_payload()
         )

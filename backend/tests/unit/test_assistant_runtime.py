@@ -5,8 +5,6 @@ from pathlib import Path
 from threading import Event
 from uuid import UUID
 
-import sqlalchemy as sa
-
 from app.core.clock import FixedClock, FixedMonotonicClock
 from app.core.config import Settings
 from app.core.database import create_assistant_engine, create_session_factory
@@ -77,7 +75,7 @@ def add_request(factory, *, write_started: bool = False) -> None:
         )
 
 
-def make_runtime(database_path: Path, process_request):
+def make_runtime(database_path: Path, process_request, **runtime_options):
     settings = Settings(_env_file=None, database_url=f"sqlite:///{database_path}")
     engine = create_assistant_engine(settings)
     timeout_engine = create_assistant_engine(settings, busy_timeout_ms=0)
@@ -94,6 +92,7 @@ def make_runtime(database_path: Path, process_request):
         monotonic_clock=monotonic,
         cleanup_resources=lambda: (timeout_engine.dispose(), engine.dispose()),
         shutdown_grace_seconds=0.2,
+        **runtime_options,
     )
     return runtime, factory, monotonic, wall, ownership
 
@@ -210,6 +209,28 @@ def test_unexpected_worker_exception_keeps_sweeper_running_to_deadline(
         assert stored.result_json["code"] == "PROCESSING_TIMEOUT"
     assert runtime.snapshot().sweeper_alive is True
     assert runtime.snapshot().registered_count == 0
+    assert runtime.shutdown()
+    assert ownership.released
+
+
+def test_owner_sweeper_runs_injected_cleanup_on_bounded_interval(
+    database_path: Path,
+) -> None:
+    cleaned = Event()
+    runtime, _factory, monotonic, _wall, ownership = make_runtime(
+        database_path,
+        lambda _request_id, _guard: ProcessOneResult.COMPLETED,
+        cleanup_once=cleaned.set,
+        cleanup_interval_seconds=10.0,
+    )
+    assert runtime.start()
+    assert cleaned.is_set() is False
+    monotonic.advance(9.999)
+    runtime.wake()
+    assert cleaned.wait(0.05) is False
+    monotonic.advance(0.001)
+    runtime.wake()
+    assert cleaned.wait(1)
     assert runtime.shutdown()
     assert ownership.released
 

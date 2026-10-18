@@ -30,6 +30,7 @@ from app.modules.assistant.decisions import (
     TimeTrustSource,
     UntrustedTimeSource,
 )
+from app.modules.assistant.cleanup import cleanup_once
 from app.modules.assistant.router import router as assistant_router
 from app.modules.assistant.readiness import probe_assistant_schema
 from app.modules.assistant.processor import ProcessOneResult, process_one
@@ -46,6 +47,7 @@ from app.modules.assistant.runtime_lock import (
     AssistantRuntimeLockContended,
     AssistantRuntimeLockUnavailable,
 )
+from app.modules.assistant.safe_write import AssistantSafeWriter
 from app.modules.assistant.schedule_read import SqlAlchemyScheduleReader
 from app.modules.schedules.router import router as schedules_router
 from app.modules.system.router import router as system_router
@@ -91,7 +93,7 @@ def _install_openapi_contract(application: FastAPI) -> None:
 def create_app(
     settings: Settings | None = None,
     *,
-    _assistant_runtime_ready_for_tests: bool = False,
+    _assistant_runtime_ready_for_tests: bool | None = None,
     _assistant_decision_provider_for_tests: DecisionProvider | None = None,
     _assistant_time_trust_source_for_tests: TimeTrustSource | None = None,
     _assistant_uuid_factory_for_tests: Callable[[], UUID] | None = None,
@@ -109,7 +111,7 @@ def create_app(
 ) -> FastAPI:
     resolved = settings or get_settings()
     if resolved.app_env == "demo" and (
-        _assistant_runtime_ready_for_tests
+        _assistant_runtime_ready_for_tests is not None
         or _assistant_decision_provider_for_tests is not None
         or _assistant_time_trust_source_for_tests is not None
         or _assistant_uuid_factory_for_tests is not None
@@ -206,6 +208,36 @@ def create_app(
                 else:
                     timeout_session_factory = create_session_factory(timeout_engine)
 
+                    try:
+                        cleanup_once(
+                            application.state.assistant_session_factory,
+                            wall_clock=application.state.clock,
+                        )
+                    except Exception as exc:
+                        logging.getLogger(__name__).warning(
+                            "Assistant startup cleanup deferred: %s",
+                            type(exc).__name__,
+                            extra={"event": "assistant.cleanup_deferred"},
+                        )
+
+                    def mark_safe_writer_unhealthy() -> None:
+                        active_runtime = application.state.assistant_runtime
+                        if isinstance(active_runtime, AssistantRuntimeController):
+                            active_runtime.mark_unhealthy()
+                        else:
+                            application.state.assistant_runtime_ready = False
+                            application.state.assistant_runtime_healthy = False
+
+                    safe_writer = AssistantSafeWriter(
+                        assistant_session_factory=(
+                            application.state.assistant_session_factory
+                        ),
+                        schedule_session_factory=application.state.session_factory,
+                        clock=application.state.clock,
+                        uuid_factory=application.state.assistant_uuid_factory,
+                        on_unhealthy=mark_safe_writer_unhealthy,
+                    )
+
                     def run_process_one(
                         request_id: UUID, guard: ProcessDeadlineGuard
                     ) -> ProcessOneResult:
@@ -224,6 +256,7 @@ def create_app(
                             ),
                             uuid_factory=application.state.assistant_uuid_factory,
                             runtime_guard=guard,
+                            safe_writer=safe_writer,
                         )
 
                     def mark_runtime_unready() -> None:
@@ -250,13 +283,17 @@ def create_app(
                         ),
                         condition_waiter=_assistant_condition_waiter_for_tests,
                         on_unhealthy=mark_runtime_unready,
+                        cleanup_once=lambda: cleanup_once(
+                            application.state.assistant_session_factory,
+                            wall_clock=application.state.clock,
+                        ),
                     )
                     application.state.assistant_runtime = runtime
                     started = runtime.start()
                     application.state.assistant_runtime_owner = True
                     application.state.assistant_runtime_healthy = started
                     application.state.assistant_runtime_ready = bool(
-                        started and _assistant_runtime_ready_for_tests
+                        started and _assistant_runtime_ready_for_tests is not False
                     )
         finally:
             if probe_engine is not None:

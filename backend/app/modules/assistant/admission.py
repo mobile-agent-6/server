@@ -435,11 +435,17 @@ def _admit_in_transaction(
 
     if expired_active_question is not None:
         repository.expire_question(expired_active_question, at=accepted_at)
+        repository.start_question_source_retention(
+            session, expired_active_question, at=accepted_at
+        )
     if answered_question is not None:
         repository.answer_question(
             answered_question,
             answer_request_id=data.request_id,
             at=accepted_at,
+        )
+        repository.start_question_source_retention(
+            session, answered_question, at=accepted_at
         )
     if (
         acknowledgement_target is not None
@@ -448,6 +454,10 @@ def _admit_in_transaction(
     ):
         acknowledgement_target.uncertain_acknowledged_at = accepted_at
         acknowledgement_target.uncertain_acknowledged_by_request_id = data.request_id
+    if acknowledgement_target is not None:
+        repository.release_write_gate(
+            session, owner_request_id=acknowledgement_target.id
+        )
 
     conversation.last_valid_input_at = accepted_at
     return AdmissionResult(

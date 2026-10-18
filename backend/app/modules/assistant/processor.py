@@ -9,9 +9,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from enum import StrEnum
-from typing import Callable
+from typing import Callable, Protocol
 from uuid import RFC_4122, UUID
 
+import sqlalchemy as sa
 from pydantic import BaseModel, TypeAdapter, ValidationError
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -100,6 +101,12 @@ class ProcessOneResult(StrEnum):
     LOST_FINALIZE = "lost_finalize"
 
 
+class SafeWritePort(Protocol):
+    def execute(
+        self, *, request_id: UUID, runtime_guard: ProcessDeadlineGuard
+    ) -> ProcessOneResult: ...
+
+
 class _ClaimResult(StrEnum):
     CLAIMED = "claimed"
     SKIPPED = "skipped"
@@ -108,6 +115,10 @@ class _ClaimResult(StrEnum):
 
 
 class _InvalidDecision(ValueError):
+    pass
+
+
+class _FinalizeLost(RuntimeError):
     pass
 
 
@@ -814,76 +825,105 @@ def _finalize(
     now_factory: Callable[[], datetime],
     runtime_guard: ProcessDeadlineGuard,
 ) -> ProcessOneResult:
-    with session_factory() as session:
-        with session.begin():
-            request = repository.get_request(session, request_id)
-            if (
-                request is None
-                or request.status != AssistantRequestStatus.PROCESSING.value
-            ):
-                return ProcessOneResult.LOST_FINALIZE
+    try:
+        with session_factory() as session:
+            with session.begin():
+                request = repository.get_request(session, request_id)
+                if (
+                    request is None
+                    or request.status != AssistantRequestStatus.PROCESSING.value
+                ):
+                    return ProcessOneResult.LOST_FINALIZE
 
-            if runtime_guard.deadline_reached():
-                outcome = repository.complete_prewrite_request(
-                    session,
-                    request_id=request_id,
-                    result_json=timeout_snapshot(),
-                    at=_aware_utc(now_factory()),
+                if runtime_guard.deadline_reached():
+                    outcome = repository.complete_prewrite_request(
+                        session,
+                        request_id=request_id,
+                        result_json=timeout_snapshot(),
+                        at=_aware_utc(now_factory()),
+                    )
+                    if outcome is repository.PrewriteCompletionResult.WRITE_STARTED:
+                        raise RuntimeError("active write marker found during finalize")
+                    if outcome is repository.PrewriteCompletionResult.COMPLETED:
+                        return ProcessOneResult.COMPLETED
+                    return ProcessOneResult.LOST_FINALIZE
+                if runtime_guard.stop_requested():
+                    return ProcessOneResult.LOST_FINALIZE
+
+                if plan.question is not None:
+                    question = plan.question
+                    repository.add_question(
+                        session,
+                        AssistantQuestion(
+                            id=question.id,
+                            conversation_id=request.conversation_id,
+                            source_request_id=request.id,
+                            kind=question.kind,
+                            payload_json=question.payload,
+                            candidates_json=question.candidates,
+                            candidate_intents_json=question.intents,
+                            status=AssistantQuestionStatus.ACTIVE.value,
+                            created_at=question.created_at,
+                            expires_at=question.expires_at,
+                            deactivated_at=None,
+                            answered_by_request_id=None,
+                        ),
+                    )
+
+                if plan.control_state is not None:
+                    conversation = repository.get_conversation(
+                        session, request.conversation_id
+                    )
+                    if conversation is None:
+                        raise RuntimeError("Assistant conversation disappeared")
+                    conversation.control_state_version = plan.control_state_version
+                    conversation.control_state_json = plan.control_state
+
+                if plan.pending_write is not None:
+                    pending = session.execute(
+                        sa.update(AssistantRequest)
+                        .where(
+                            AssistantRequest.id == request_id,
+                            AssistantRequest.status
+                            == AssistantRequestStatus.PROCESSING.value,
+                            AssistantRequest.write_started.is_(False),
+                        )
+                        .values(
+                            pending_write_version=plan.pending_write_version,
+                            pending_write_json=plan.pending_write,
+                        )
+                    )
+                    if int(pending.rowcount or 0) != 1:
+                        raise _FinalizeLost
+                    return ProcessOneResult.PENDING_WRITE
+
+                if plan.result is None or plan.result_kind is None:
+                    raise RuntimeError(
+                        "finalized request has neither result nor pending write"
+                    )
+                completed = session.execute(
+                    sa.update(AssistantRequest)
+                    .where(
+                        AssistantRequest.id == request_id,
+                        AssistantRequest.status
+                        == AssistantRequestStatus.PROCESSING.value,
+                        AssistantRequest.write_started.is_(False),
+                    )
+                    .values(
+                        status=AssistantRequestStatus.COMPLETED.value,
+                        result_kind=plan.result_kind,
+                        result_json=plan.result,
+                        completed_at=now,
+                        retention_started_at=(
+                            None if plan.question is not None else now
+                        ),
+                    )
                 )
-                if outcome is repository.PrewriteCompletionResult.WRITE_STARTED:
-                    raise RuntimeError("active write marker found during finalize")
-                if outcome is repository.PrewriteCompletionResult.COMPLETED:
-                    return ProcessOneResult.COMPLETED
-                return ProcessOneResult.LOST_FINALIZE
-            if runtime_guard.stop_requested():
-                return ProcessOneResult.LOST_FINALIZE
-
-            if plan.question is not None:
-                question = plan.question
-                repository.add_question(
-                    session,
-                    AssistantQuestion(
-                        id=question.id,
-                        conversation_id=request.conversation_id,
-                        source_request_id=request.id,
-                        kind=question.kind,
-                        payload_json=question.payload,
-                        candidates_json=question.candidates,
-                        candidate_intents_json=question.intents,
-                        status=AssistantQuestionStatus.ACTIVE.value,
-                        created_at=question.created_at,
-                        expires_at=question.expires_at,
-                        deactivated_at=None,
-                        answered_by_request_id=None,
-                    ),
-                )
-
-            if plan.control_state is not None:
-                conversation = repository.get_conversation(
-                    session, request.conversation_id
-                )
-                if conversation is None:
-                    raise RuntimeError("Assistant conversation disappeared")
-                conversation.control_state_version = plan.control_state_version
-                conversation.control_state_json = plan.control_state
-
-            if plan.pending_write is not None:
-                request.pending_write_version = plan.pending_write_version
-                request.pending_write_json = plan.pending_write
-                session.flush()
-                return ProcessOneResult.PENDING_WRITE
-
-            if plan.result is None or plan.result_kind is None:
-                raise RuntimeError("finalized request has neither result nor pending write")
-            request.status = AssistantRequestStatus.COMPLETED.value
-            request.result_kind = plan.result_kind
-            request.result_json = plan.result
-            request.completed_at = now
-            request.retention_started_at = (
-                None if plan.question is not None else now
-            )
-            session.flush()
-            return ProcessOneResult.COMPLETED
+                if int(completed.rowcount or 0) != 1:
+                    raise _FinalizeLost
+                return ProcessOneResult.COMPLETED
+    except _FinalizeLost:
+        return ProcessOneResult.LOST_FINALIZE
 
 
 def process_one(
@@ -896,8 +936,9 @@ def process_one(
     time_trust_source: TimeTrustSource,
     uuid_factory: Callable[[], UUID],
     runtime_guard: ProcessDeadlineGuard,
+    safe_writer: SafeWritePort,
 ) -> ProcessOneResult:
-    """Claim and deterministically process one accepted Assistant request."""
+    """Claim, decide, persist an intent, and execute it in this worker call."""
 
     now_method = getattr(clock, "now", None)
     if not callable(now_method):
@@ -1001,7 +1042,7 @@ def process_one(
         if prepared.question is not None
         else _aware_utc(now_method())
     )
-    return _finalize(
+    finalized = _finalize(
         session_factory,
         request_id=request_id,
         plan=prepared,
@@ -1009,3 +1050,8 @@ def process_one(
         now_factory=now_method,
         runtime_guard=runtime_guard,
     )
+    if finalized is ProcessOneResult.PENDING_WRITE:
+        return safe_writer.execute(
+            request_id=request_id, runtime_guard=runtime_guard
+        )
+    return finalized

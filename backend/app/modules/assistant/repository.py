@@ -14,6 +14,7 @@ from app.modules.assistant.model import (
     AssistantQuestion,
     AssistantQuestionStatus,
     AssistantRequest,
+    AssistantWriteGate,
 )
 
 
@@ -62,6 +63,13 @@ def find_active_question(
 
 def get_question(session: Session, question_id: UUID) -> AssistantQuestion | None:
     return session.get(AssistantQuestion, question_id)
+
+
+def get_write_gate(session: Session) -> AssistantWriteGate:
+    gate = session.get(AssistantWriteGate, 1)
+    if gate is None:
+        raise RuntimeError("Assistant write gate singleton is missing")
+    return gate
 
 
 def find_answered_question(
@@ -225,19 +233,61 @@ def answer_question(
 
 
 def complete_request_as_cancelled(
-    request: AssistantRequest,
+    session: Session,
     *,
+    request_id: UUID,
     result_json: dict[str, object],
     at: datetime,
+) -> bool:
+    result = session.execute(
+        sa.update(AssistantRequest)
+        .where(
+            AssistantRequest.id == request_id,
+            AssistantRequest.status.in_(("accepted", "processing")),
+            AssistantRequest.write_started.is_(False),
+        )
+        .values(
+            status="completed",
+            result_kind="outcome",
+            result_json=result_json,
+            completed_at=at,
+            cancelled_at=at,
+            retention_started_at=at,
+            pending_write_version=None,
+            pending_write_json=None,
+        )
+    )
+    return int(result.rowcount or 0) == 1
+
+
+def start_question_source_retention(
+    session: Session, question: AssistantQuestion, *, at: datetime
 ) -> None:
-    request.status = "completed"
-    request.result_kind = "outcome"
-    request.result_json = result_json
-    request.completed_at = at
-    request.cancelled_at = at
-    request.retention_started_at = at
-    request.pending_write_version = None
-    request.pending_write_json = None
+    """Start retention exactly when an active question becomes inactive."""
+
+    session.execute(
+        sa.update(AssistantRequest)
+        .where(
+            AssistantRequest.id == question.source_request_id,
+            AssistantRequest.status == "completed",
+            AssistantRequest.retention_started_at.is_(None),
+        )
+        .values(retention_started_at=at)
+    )
+
+
+def release_write_gate(session: Session, *, owner_request_id: UUID) -> bool:
+    """Release only the gate generation still owned by the given request."""
+
+    result = session.execute(
+        sa.update(AssistantWriteGate)
+        .where(
+            AssistantWriteGate.singleton_key == 1,
+            AssistantWriteGate.owner_request_id == owner_request_id,
+        )
+        .values(owner_request_id=None, acquired_at=None)
+    )
+    return int(result.rowcount or 0) == 1
 
 
 def cancel_question(question: AssistantQuestion, *, at: datetime) -> None:
