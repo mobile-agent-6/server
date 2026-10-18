@@ -92,6 +92,40 @@ def create_api_engine(settings: Settings) -> Engine:
     return engine
 
 
+def create_assistant_engine(
+    settings: Settings, *, busy_timeout_ms: int | None = None
+) -> Engine:
+    """Create the isolated BEGIN IMMEDIATE engine used by Assistant write CAS."""
+
+    timeout_ms = (
+        settings.sqlite_busy_timeout_ms
+        if busy_timeout_ms is None
+        else busy_timeout_ms
+    )
+    engine = sa.create_engine(
+        api_database_url(settings),
+        connect_args={
+            "check_same_thread": False,
+            "timeout": timeout_ms / 1000,
+        },
+        pool_timeout=settings.db_pool_timeout_seconds,
+    )
+
+    def configure_assistant_connection(
+        connection: sqlite3.Connection, record: object
+    ) -> None:
+        connection.isolation_level = None
+        _configure_sqlite_connection(connection, record, timeout_ms=timeout_ms)
+
+    event.listen(engine, "connect", configure_assistant_connection)
+    event.listen(
+        engine,
+        "begin",
+        lambda connection: connection.exec_driver_sql("BEGIN IMMEDIATE"),
+    )
+    return engine
+
+
 def create_session_factory(engine: Engine) -> sessionmaker[Session]:
     return sessionmaker(bind=engine, expire_on_commit=False, autoflush=False)
 

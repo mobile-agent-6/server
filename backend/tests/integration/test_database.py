@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import Settings
 from app.core.database import Base, UTCDateTime, create_api_engine, create_session_factory
+from app.modules.assistant import model as assistant_models  # noqa: F401
 from app.modules.schedules.category import Category
 from app.modules.schedules.model import Schedule
 from tests.conftest import alembic_config
@@ -27,6 +28,10 @@ def test_migration_upgrade_downgrade_upgrade_and_schema_contract(tmp_path: Path)
     inspector = sa.inspect(sa.create_engine(f"sqlite:///{database}"))
     assert set(inspector.get_table_names()) == {
         "alembic_version",
+        "assistant_conversations",
+        "assistant_questions",
+        "assistant_requests",
+        "assistant_write_gate",
         "idempotency_records",
         "schedules",
     }
@@ -69,7 +74,14 @@ def test_migration_upgrade_downgrade_upgrade_and_schema_contract(tmp_path: Path)
 @pytest.mark.integration
 def test_metadata_has_same_business_tables_columns_and_indexes(database_path: Path) -> None:
     inspector = sa.inspect(sa.create_engine(f"sqlite:///{database_path}"))
-    for table_name in ("schedules", "idempotency_records"):
+    for table_name in (
+        "schedules",
+        "idempotency_records",
+        "assistant_conversations",
+        "assistant_requests",
+        "assistant_questions",
+        "assistant_write_gate",
+    ):
         reflected = {column["name"] for column in inspector.get_columns(table_name)}
         assert reflected == set(Base.metadata.tables[table_name].columns.keys())
         actual_indexes = {

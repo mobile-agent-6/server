@@ -106,6 +106,23 @@ downgrade는 `reminder_minutes_before`를 nullable 컬럼으로 다시 만들지
 `409 IDEMPOTENCY_KEY_CONFLICT`다. 기존 기록을 수정하거나 충돌 뒤 새 key로 자동
 등록하지 않는다.
 
+## Assistant 영속 migration downgrade
+
+`20261017_0004`는 Assistant 대화·요청·질문·write gate 테이블을 추가한다.
+downgrade는 반드시 서버를 중지하고 대상 DB·revision·검증 backup을 확인한 상태에서
+수행한다.
+
+```bash
+python -m alembic downgrade 20261017_0003
+```
+
+accepted 또는 processing 요청이나 아직 outcome/failure로 확정되지 않은 uncertain
+기록이 있으면 downgrade는 첫 DDL 전에 거절된다. 안전 검사를 통과한 downgrade도
+Assistant table과 tombstone을 모두 삭제하므로 `REQUEST_EXPIRED` 최소 기록 보장이
+사라지는 파괴적 관리 작업이다. 이는 `docs/api.md` §16.8의 DB 초기화 같은 운영
+예외로만 취급하고, Schedule·idempotency 데이터를 보존하더라도 구버전 코드와 검증
+backup 없이 일반 rollback 수단으로 사용하지 않는다.
+
 ## 모바일 앱 연결
 
 - iOS Simulator: 일반적으로 `http://127.0.0.1:8000`

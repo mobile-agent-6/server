@@ -10,6 +10,7 @@ from sqlalchemy import engine_from_config, pool
 
 from app.core.config import load_settings
 from app.core.database import Base, UTCDateTime
+from app.modules.assistant import model as assistant_models  # noqa: F401
 from app.modules.schedules import model as schedule_models  # noqa: F401
 
 config = context.config

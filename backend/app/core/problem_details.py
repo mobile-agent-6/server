@@ -19,10 +19,22 @@ logger = logging.getLogger(__name__)
 
 PROBLEM_TITLES = {
     "MALFORMED_REQUEST": "Malformed request",
+    "REQUEST_BODY_TOO_LARGE": "Request body too large",
     "SCHEDULE_NOT_FOUND": "Schedule not found",
+    "ASSISTANT_REQUEST_NOT_FOUND": "Assistant request not found",
+    "ASSISTANT_CONVERSATION_NOT_FOUND": "Assistant conversation not found",
+    "ASSISTANT_TARGET_NOT_FOUND": "Assistant target not found",
     "ROUTE_NOT_FOUND": "Route not found",
     "METHOD_NOT_ALLOWED": "Method not allowed",
     "IDEMPOTENCY_KEY_CONFLICT": "Idempotency key conflict",
+    "REQUEST_ID_CONFLICT": "Request ID conflict",
+    "CONVERSATION_BUSY": "Conversation busy",
+    "UNRESOLVED_UNCERTAIN": "Unresolved uncertain result",
+    "STALE_QUESTION": "Stale question",
+    "QUESTION_EXPIRED": "Question expired",
+    "ACKNOWLEDGEMENT_NOT_APPLICABLE": "Acknowledgement not applicable",
+    "REQUEST_EXPIRED": "Request expired",
+    "CONVERSATION_EXPIRED": "Conversation expired",
     "CLOCK_AUTO_SYNC_ACTIVE": "Automatic time synchronization is active",
     "VALIDATION_ERROR": "Request validation failed",
     "EMPTY_UPDATE": "Empty update",
@@ -33,6 +45,7 @@ PROBLEM_TITLES = {
     "INTERNAL_ERROR": "Internal server error",
     "DATABASE_UNAVAILABLE": "Database unavailable",
     "TIME_SYNC_UNAVAILABLE": "Time synchronization unavailable",
+    "ASSISTANT_UNAVAILABLE": "Assistant unavailable",
 }
 
 
@@ -57,6 +70,18 @@ class Problem(BaseModel):
     code: str
     request_id: UUID = Field(serialization_alias="requestId")
     errors: list[ValidationErrorItem] | None = None
+    assistant_request_id: UUID | None = Field(
+        default=None, serialization_alias="assistantRequestId"
+    )
+    blocking_request_id: UUID | None = Field(
+        default=None, serialization_alias="blockingRequestId"
+    )
+    active_question_id: UUID | None = Field(
+        default=None, serialization_alias="activeQuestionId"
+    )
+    active_question_request_id: UUID | None = Field(
+        default=None, serialization_alias="activeQuestionRequestId"
+    )
 
 
 def _problem_type(code: str) -> str:
@@ -75,6 +100,10 @@ def problem_response(
     detail: str,
     errors: list[dict[str, Any]] | None = None,
     headers: dict[str, str] | None = None,
+    assistant_request_id: UUID | str | None = None,
+    blocking_request_id: UUID | str | None = None,
+    active_question_id: UUID | str | None = None,
+    active_question_request_id: UUID | str | None = None,
 ) -> JSONResponse:
     request_id = _request_id(request)
     body: dict[str, Any] = {
@@ -88,6 +117,15 @@ def problem_response(
     }
     if errors is not None:
         body["errors"] = errors
+    optional_fields = {
+        "assistantRequestId": assistant_request_id,
+        "blockingRequestId": blocking_request_id,
+        "activeQuestionId": active_question_id,
+        "activeQuestionRequestId": active_question_request_id,
+    }
+    body.update(
+        {name: str(value) for name, value in optional_fields.items() if value is not None}
+    )
     response_headers = {"X-Request-ID": request_id}
     if headers:
         response_headers.update(headers)
@@ -109,6 +147,8 @@ _PARAMETER_NAMES = {
     "from_": "from",
     "to": "to",
     "schedule_id": "scheduleId",
+    "request_id": "requestId",
+    "conversation_id": "conversationId",
     "idempotency_key": "Idempotency-Key",
 }
 
@@ -123,8 +163,10 @@ def _validation_code(error: dict[str, Any]) -> str:
         return "UNKNOWN_FIELD"
     if error.get("input") is None and len(tuple(error.get("loc", ()))) > 1:
         return "NULL_NOT_ALLOWED"
-    if error_type in {"enum", "literal_error"}:
-        return "INVALID_ENUM" if error_type == "enum" else "INVALID_VALUE"
+    if error_type in {"enum", "union_tag_invalid", "literal_error"}:
+        return "INVALID_ENUM" if error_type != "literal_error" else "INVALID_VALUE"
+    if error_type == "union_tag_not_found":
+        return "REQUIRED"
     if error_type in {"string_too_short", "too_short"}:
         return "TOO_SHORT"
     if error_type in {"string_too_long", "too_long"}:
@@ -170,6 +212,24 @@ def validation_items(errors: list[dict[str, Any]]) -> list[dict[str, Any]]:
         raw_location = str(loc[0]) if loc else "body"
         location = raw_location if raw_location in {"body", "query", "header", "path"} else "body"
         rest = loc[1:] if loc and raw_location == location else loc
+        if error["type"] in {"union_tag_invalid", "union_tag_not_found"}:
+            rest = (*rest, "type")
+        if (
+            len(rest) >= 3
+            and rest[0] in {"input", "result"}
+            and rest[1]
+            in {
+                "text",
+                "selection",
+                "confirmation",
+                "need_more_info",
+                "candidate_selection",
+                "outcome",
+                "failure",
+                "uncertain",
+            }
+        ):
+            rest = (rest[0], *rest[2:])
         code = _validation_code(error)
         item: dict[str, Any] = {
             "location": location,
@@ -205,7 +265,17 @@ def _allowed_methods(request: Request) -> str:
 async def application_error_handler(request: Request, exc: ApplicationError) -> Response:
     errors = exc.errors if isinstance(exc, ValidationFailure) else None
     return problem_response(
-        request, status=exc.status, code=exc.code, detail=exc.detail, errors=errors
+        request,
+        status=exc.status,
+        code=exc.code,
+        detail=exc.detail,
+        errors=errors,
+        assistant_request_id=getattr(exc, "assistant_request_id", None),
+        blocking_request_id=getattr(exc, "blocking_request_id", None),
+        active_question_id=getattr(exc, "active_question_id", None),
+        active_question_request_id=getattr(
+            exc, "active_question_request_id", None
+        ),
     )
 
 
