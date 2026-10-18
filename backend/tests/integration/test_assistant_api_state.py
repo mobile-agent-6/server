@@ -22,6 +22,7 @@ from app.modules.assistant.admission import AdmissionKind, AdmissionResult
 from app.modules.assistant.model import AssistantConversation, AssistantRequest
 from app.modules.assistant.schemas import AssistantRequestCreate
 from app.modules.schedules.model import Schedule
+from tests.fakes.assistant import ScriptedDecisionProvider
 from tests.conftest import FIXED_NOW, alembic_config
 
 REQUEST_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
@@ -102,7 +103,8 @@ def ready_application(database_path: Path):
     settings = Settings(_env_file=None, database_url=f"sqlite:///{database_path}")
     application = create_app(
         settings,
-        _assistant_new_requests_enabled_for_tests=True,
+        _assistant_runtime_ready_for_tests=True,
+        _assistant_decision_provider_for_tests=ScriptedDecisionProvider([]),
     )
     application.state.clock = FixedClock(FIXED_NOW)
     application.state.assistant_uuid_factory = lambda: CONVERSATION_ID
@@ -365,7 +367,7 @@ def test_replay_and_conflict_precede_disabled_readiness_and_conversation_state(
         conversation = session.get(AssistantConversation, CONVERSATION_ID)
         assert conversation is not None
         conversation.expired_at = FIXED_NOW
-    ready_client.app.state.assistant_new_requests_enabled = False
+    ready_client.app.state.assistant_runtime_ready = False
 
     replay = ready_client.post("/api/v1/assistant/requests", json=payload())
     conflict = ready_client.post(
@@ -632,7 +634,8 @@ def test_schema_not_ready_does_not_block_app_and_isolates_assistant(
         assert_problem(cancel, 503, "ASSISTANT_UNAVAILABLE")
         assert_problem(health, 503, "DATABASE_UNAVAILABLE")
         assert application.state.assistant_schema_ready is False
-        assert application.state.assistant_new_requests_enabled is False
+        assert application.state.assistant_runtime_ready is False
+        assert application.state.assistant_provider_available is False
         assert not hasattr(application.state, "assistant_worker")
         if database_kind == "old":
             schedule = client.post(
@@ -664,7 +667,8 @@ def test_lifespan_disposes_assistant_engine_and_starts_no_runtime_components(
 
         monkeypatch.setattr(engine, "dispose", dispose)
         assert client.app.state.assistant_schema_ready is True
-        assert client.app.state.assistant_new_requests_enabled is True
+        assert client.app.state.assistant_runtime_ready is True
+        assert client.app.state.assistant_provider_available is True
         for name in ("assistant_worker", "assistant_thread", "assistant_file_lock"):
             assert not hasattr(client.app.state, name)
 
@@ -672,3 +676,5 @@ def test_lifespan_disposes_assistant_engine_and_starts_no_runtime_components(
     assert ready_application.state.assistant_engine is None
     assert ready_application.state.assistant_session_factory is None
     assert ready_application.state.assistant_schema_ready is False
+    assert ready_application.state.assistant_runtime_ready is False
+    assert ready_application.state.assistant_provider_available is False

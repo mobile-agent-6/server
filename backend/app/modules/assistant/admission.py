@@ -8,10 +8,15 @@ from datetime import datetime, timedelta
 from enum import StrEnum
 from uuid import RFC_4122, UUID
 
+from pydantic import TypeAdapter, ValidationError
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.database import is_database_unavailable
 from app.modules.assistant import repository
+from app.modules.assistant.decisions import (
+    ConfirmationQuestionIntent,
+    PendingTargetIntent,
+)
 from app.modules.assistant.enums import AssistantResultKind
 from app.modules.assistant.fingerprint import FINGERPRINT_VERSION, canonical_fingerprint
 from app.modules.assistant.model import (
@@ -29,6 +34,7 @@ from app.modules.assistant.schemas import (
 
 CONVERSATION_INACTIVITY_LIMIT = timedelta(hours=24)
 _LOWER_SHA256 = re.compile(r"^[0-9a-f]{64}$")
+_PENDING_TARGET_ADAPTER = TypeAdapter(PendingTargetIntent)
 
 
 class AdmissionKind(StrEnum):
@@ -145,6 +151,32 @@ def _question_accepts_input(
     return isinstance(data.input, expected_type)
 
 
+def _candidate_intent_state(
+    question: AssistantQuestion, candidate_id: str
+) -> tuple[bool, bool]:
+    snapshot = question.candidate_intents_json
+    if not isinstance(snapshot, dict):
+        return False, False
+    candidates = snapshot.get("candidates")
+    if not isinstance(candidates, dict) or candidate_id not in candidates:
+        return False, False
+    if snapshot.get("version") != 1:
+        return True, False
+    try:
+        _PENDING_TARGET_ADAPTER.validate_python(candidates[candidate_id])
+    except ValidationError:
+        return True, False
+    return True, True
+
+
+def _confirmation_intent_is_complete(question: AssistantQuestion) -> bool:
+    try:
+        ConfirmationQuestionIntent.model_validate(question.candidate_intents_json)
+    except ValidationError:
+        return False
+    return True
+
+
 def _stale_result(
     data: AssistantRequestCreate,
     *,
@@ -169,7 +201,8 @@ def _admit_in_transaction(
     fingerprint: RequestFingerprint,
     accepted_at: datetime,
     new_conversation_id: UUID,
-    new_requests_enabled: bool,
+    runtime_ready: bool,
+    provider_available: bool,
 ) -> AdmissionResult:
     existing = repository.get_request(session, data.request_id)
     if existing is not None:
@@ -186,7 +219,7 @@ def _admit_in_transaction(
             conversation_id=existing.conversation_id,
         )
 
-    if not new_requests_enabled:
+    if not runtime_ready:
         return AdmissionResult(
             kind=AdmissionKind.ASSISTANT_UNAVAILABLE,
             request_id=data.request_id,
@@ -262,6 +295,7 @@ def _admit_in_transaction(
         )
 
     answered_question: AssistantQuestion | None = None
+    selection_intent_complete = False
     if valid_active_question is not None:
         if (
             supplied_question_id != valid_active_question.id
@@ -273,6 +307,16 @@ def _admit_in_transaction(
                 active_question=valid_active_question,
             )
         answered_question = valid_active_question
+        if isinstance(data.input, AssistantInputSelection):
+            candidate_exists, selection_intent_complete = _candidate_intent_state(
+                valid_active_question, data.input.candidate_id
+            )
+            if not candidate_exists:
+                return _stale_result(
+                    data,
+                    conversation_id=conversation_id,
+                    active_question=valid_active_question,
+                )
     elif supplied_question_id is not None:
         supplied_question = repository.get_question(session, supplied_question_id)
         if (
@@ -317,6 +361,28 @@ def _admit_in_transaction(
             request_id=data.request_id,
             conversation_id=conversation_id,
             blocking_request_id=unresolved.id,
+        )
+
+    if isinstance(data.input, AssistantInputConfirmation):
+        assert answered_question is not None
+        if not _confirmation_intent_is_complete(answered_question):
+            return AdmissionResult(
+                kind=AdmissionKind.ASSISTANT_UNAVAILABLE,
+                request_id=data.request_id,
+                conversation_id=conversation_id,
+            )
+    elif isinstance(data.input, AssistantInputSelection):
+        if not selection_intent_complete and not provider_available:
+            return AdmissionResult(
+                kind=AdmissionKind.ASSISTANT_UNAVAILABLE,
+                request_id=data.request_id,
+                conversation_id=conversation_id,
+            )
+    elif not provider_available:
+        return AdmissionResult(
+            kind=AdmissionKind.ASSISTANT_UNAVAILABLE,
+            request_id=data.request_id,
+            conversation_id=conversation_id,
         )
 
     if new_conversation:
@@ -399,7 +465,8 @@ def admit_request(
     fingerprint: RequestFingerprint,
     accepted_at: datetime,
     new_conversation_id: UUID,
-    new_requests_enabled: bool,
+    runtime_ready: bool,
+    provider_available: bool,
 ) -> AdmissionResult:
     """Run all admission decisions and successful mutations in one transaction."""
 
@@ -417,7 +484,8 @@ def admit_request(
                     fingerprint=fingerprint,
                     accepted_at=accepted_at,
                     new_conversation_id=new_conversation_id,
-                    new_requests_enabled=new_requests_enabled,
+                    runtime_ready=runtime_ready,
+                    provider_available=provider_available,
                 )
     except Exception as exc:
         if is_database_unavailable(exc):

@@ -197,7 +197,8 @@ def admit_assistant_request(
     data: AssistantRequestCreate,
     accepted_at: datetime,
     new_conversation_id: UUID,
-    new_requests_enabled: bool,
+    runtime_ready: bool,
+    provider_available: bool,
 ) -> AssistantRequestAcceptedResponse | AssistantRequestStatusResponse:
     """Admit validated input and map every persistent result to the public contract."""
 
@@ -208,7 +209,8 @@ def admit_assistant_request(
             fingerprint=request_fingerprint(data),
             accepted_at=accepted_at,
             new_conversation_id=new_conversation_id,
-            new_requests_enabled=new_requests_enabled,
+            runtime_ready=runtime_ready,
+            provider_available=provider_available,
         )
     except Exception as exc:
         _raise_storage_error(exc, assistant_request_id=data.request_id)

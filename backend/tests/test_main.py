@@ -16,7 +16,8 @@ def test_development_app_starts_with_docs_and_openapi() -> None:
     application = create_app(Settings(_env_file=None))
 
     assert application.state.assistant_schema_ready is False
-    assert application.state.assistant_new_requests_enabled is False
+    assert application.state.assistant_runtime_ready is False
+    assert application.state.assistant_provider_available is False
 
     with TestClient(application) as client:
         assert client.get("/docs").status_code == 200
@@ -37,10 +38,10 @@ def test_demo_rejects_test_only_assistant_readiness(tmp_path: Path) -> None:
         backup_dir=tmp_path / "backups",
     )
 
-    with pytest.raises(ValueError, match="test readiness"):
+    with pytest.raises(ValueError, match="test-only dependencies"):
         create_app(
             settings,
-            _assistant_new_requests_enabled_for_tests=True,
+            _assistant_runtime_ready_for_tests=True,
         )
 
 

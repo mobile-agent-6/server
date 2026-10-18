@@ -57,6 +57,37 @@ def get_question(session: Session, question_id: UUID) -> AssistantQuestion | Non
     return session.get(AssistantQuestion, question_id)
 
 
+def find_answered_question(
+    session: Session, answer_request_id: UUID
+) -> AssistantQuestion | None:
+    return session.scalar(
+        sa.select(AssistantQuestion)
+        .where(
+            AssistantQuestion.answered_by_request_id == answer_request_id,
+            AssistantQuestion.status == AssistantQuestionStatus.ANSWERED.value,
+        )
+        .limit(1)
+    )
+
+
+def claim_accepted_request(
+    session: Session, *, request_id: UUID, processing_at: datetime
+) -> bool:
+    result = session.execute(
+        sa.update(AssistantRequest)
+        .where(
+            AssistantRequest.id == request_id,
+            AssistantRequest.status == "accepted",
+        )
+        .values(status="processing", processing_at=processing_at)
+    )
+    return int(result.rowcount or 0) == 1
+
+
+def add_question(session: Session, question: AssistantQuestion) -> None:
+    session.add(question)
+
+
 def find_oldest_unacknowledged_uncertain(
     session: Session, *, excluding_request_id: UUID | None = None
 ) -> AssistantRequest | None:
@@ -125,6 +156,8 @@ def complete_request_as_cancelled(
     request.completed_at = at
     request.cancelled_at = at
     request.retention_started_at = at
+    request.pending_write_version = None
+    request.pending_write_json = None
 
 
 def cancel_question(question: AssistantQuestion, *, at: datetime) -> None:

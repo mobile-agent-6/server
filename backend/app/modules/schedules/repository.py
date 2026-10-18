@@ -19,6 +19,7 @@ def list_active(
     to_utc: datetime,
     category: Category | None,
     completed: bool | None,
+    limit: int | None = None,
 ) -> list[Schedule]:
     statement = sa.select(Schedule).where(
         Schedule.deleted_at.is_(None),
@@ -32,6 +33,8 @@ def list_active(
     statement = statement.order_by(
         Schedule.scheduled_at.asc(), Schedule.created_at.asc(), Schedule.id.asc()
     )
+    if limit is not None:
+        statement = statement.limit(limit)
     return list(session.scalars(statement))
 
 

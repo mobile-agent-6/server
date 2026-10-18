@@ -79,7 +79,8 @@ def create_assistant_request(
         data=data,
         accepted_at=request.app.state.clock.now(),
         new_conversation_id=request.app.state.assistant_uuid_factory(),
-        new_requests_enabled=request.app.state.assistant_new_requests_enabled,
+        runtime_ready=request.app.state.assistant_runtime_ready,
+        provider_available=request.app.state.assistant_provider_available,
     )
     if isinstance(response, AssistantRequestStatusResponse):
         return JSONResponse(

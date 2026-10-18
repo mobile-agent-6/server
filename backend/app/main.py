@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import logging
 import threading
+from collections.abc import Callable
 from contextlib import asynccontextmanager
 from typing import Any
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,6 +23,11 @@ from app.core.database import (
 from app.core.logging import configure_logging
 from app.core.middleware import AssistantRequestBodyMiddleware, RequestIdMiddleware
 from app.core.problem_details import ProblemBoundaryMiddleware, register_exception_handlers
+from app.modules.assistant.decisions import (
+    DecisionProvider,
+    TimeTrustSource,
+    UntrustedTimeSource,
+)
 from app.modules.assistant.router import router as assistant_router
 from app.modules.assistant.readiness import probe_assistant_schema
 from app.modules.schedules.router import router as schedules_router
@@ -68,12 +74,20 @@ def _install_openapi_contract(application: FastAPI) -> None:
 def create_app(
     settings: Settings | None = None,
     *,
-    _assistant_new_requests_enabled_for_tests: bool = False,
+    _assistant_runtime_ready_for_tests: bool = False,
+    _assistant_decision_provider_for_tests: DecisionProvider | None = None,
+    _assistant_time_trust_source_for_tests: TimeTrustSource | None = None,
+    _assistant_uuid_factory_for_tests: Callable[[], UUID] | None = None,
 ) -> FastAPI:
     resolved = settings or get_settings()
-    if resolved.app_env == "demo" and _assistant_new_requests_enabled_for_tests:
+    if resolved.app_env == "demo" and (
+        _assistant_runtime_ready_for_tests
+        or _assistant_decision_provider_for_tests is not None
+        or _assistant_time_trust_source_for_tests is not None
+        or _assistant_uuid_factory_for_tests is not None
+    ):
         raise ValueError(
-            "Assistant test readiness cannot be enabled in the demo environment"
+            "Assistant test-only dependencies cannot be enabled in the demo environment"
         )
     configure_logging(resolved)
 
@@ -99,14 +113,22 @@ def create_app(
                 assistant_engine
             )
             application.state.assistant_schema_ready = True
-            application.state.assistant_new_requests_enabled = (
-                _assistant_new_requests_enabled_for_tests
+            application.state.assistant_runtime_ready = (
+                _assistant_runtime_ready_for_tests
+            )
+            application.state.assistant_decision_provider = (
+                _assistant_decision_provider_for_tests
+            )
+            application.state.assistant_provider_available = (
+                _assistant_decision_provider_for_tests is not None
             )
         try:
             yield
         finally:
             application.state.assistant_schema_ready = False
-            application.state.assistant_new_requests_enabled = False
+            application.state.assistant_runtime_ready = False
+            application.state.assistant_provider_available = False
+            application.state.assistant_decision_provider = None
             engine = application.state.assistant_engine
             application.state.assistant_session_factory = None
             application.state.assistant_engine = None
@@ -130,8 +152,15 @@ def create_app(
     application.state.assistant_engine = None
     application.state.assistant_session_factory = None
     application.state.assistant_schema_ready = False
-    application.state.assistant_new_requests_enabled = False
-    application.state.assistant_uuid_factory = uuid4
+    application.state.assistant_runtime_ready = False
+    application.state.assistant_provider_available = False
+    application.state.assistant_decision_provider = None
+    application.state.assistant_time_trust_source = (
+        _assistant_time_trust_source_for_tests or UntrustedTimeSource()
+    )
+    application.state.assistant_uuid_factory = (
+        _assistant_uuid_factory_for_tests or uuid4
+    )
     application.state.expected_alembic_head = resolve_expected_head()
     application.state.time_sync_lock = threading.Lock()
     application.state.time_sync_adapter = DisabledTimeSyncAdapter(
