@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sqlite3
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from threading import Barrier
 from uuid import UUID
@@ -19,12 +19,18 @@ from app.core.database import create_assistant_engine, create_session_factory
 from app.main import create_app
 from app.modules.assistant import state_service
 from app.modules.assistant.admission import AdmissionKind, AdmissionResult
-from app.modules.assistant.model import AssistantConversation, AssistantRequest
+from app.modules.assistant.model import (
+    AssistantConversation,
+    AssistantQuestion,
+    AssistantQuestionStatus,
+    AssistantRequest,
+)
 from app.modules.assistant.processor import ProcessOneResult
 from app.modules.assistant.schemas import AssistantRequestCreate
 from app.modules.schedules.model import Schedule
 from tests.fakes.assistant import ScriptedDecisionProvider
 from tests.conftest import FIXED_NOW, alembic_config
+from tests.problem_assertions import assert_problem_contract
 
 REQUEST_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
 SECOND_REQUEST_ID = "dddddddd-dddd-4ddd-8ddd-dddddddddddd"
@@ -123,13 +129,7 @@ def ready_client(ready_application):
 
 
 def assert_problem(response, status: int, code: str) -> dict[str, object]:
-    assert response.status_code == status
-    assert response.headers["content-type"].startswith("application/problem+json")
-    body = response.json()
-    assert body["status"] == status
-    assert body["code"] == code
-    assert body["requestId"] == response.headers["X-Request-ID"]
-    return body
+    return assert_problem_contract(response, status, code)
 
 
 def assistant_counts(client: TestClient) -> tuple[int, int]:
@@ -201,6 +201,103 @@ def insert_completed_request(
                 cancelled_at=None,
             )
         )
+
+
+def insert_inactive_question(
+    client: TestClient, *, question_id: UUID, status: AssistantQuestionStatus
+) -> None:
+    source_request_id = UUID("11111111-1111-4111-8111-111111111111")
+    insert_completed_request(
+        client,
+        request_id=source_request_id,
+        conversation_id=CONVERSATION_ID,
+        result={
+            "kind": "need_more_info",
+            "text": "Provide more information.",
+            "questionId": str(question_id),
+        },
+    )
+    with client.app.state.assistant_session_factory.begin() as session:
+        session.add(
+            AssistantQuestion(
+                id=question_id,
+                conversation_id=CONVERSATION_ID,
+                source_request_id=source_request_id,
+                kind="need_more_info",
+                payload_json={
+                    "kind": "need_more_info",
+                    "text": "Provide more information.",
+                    "questionId": str(question_id),
+                },
+                candidates_json=None,
+                candidate_intents_json=None,
+                status=status.value,
+                created_at=FIXED_NOW - timedelta(minutes=2),
+                expires_at=(
+                    FIXED_NOW - timedelta(minutes=1)
+                    if status is AssistantQuestionStatus.EXPIRED
+                    else None
+                ),
+                deactivated_at=FIXED_NOW - timedelta(minutes=1),
+                answered_by_request_id=(
+                    source_request_id
+                    if status is AssistantQuestionStatus.ANSWERED
+                    else None
+                ),
+            )
+        )
+
+
+@pytest.mark.parametrize(
+    ("question_status", "expected_code"),
+    [
+        (AssistantQuestionStatus.EXPIRED, "QUESTION_EXPIRED"),
+        (AssistantQuestionStatus.ANSWERED, "STALE_QUESTION"),
+        (AssistantQuestionStatus.CANCELLED, "STALE_QUESTION"),
+    ],
+)
+def test_inactive_question_without_active_rejects_without_request_or_recovery_ids(
+    ready_client: TestClient,
+    question_status: AssistantQuestionStatus,
+    expected_code: str,
+) -> None:
+    question_id = UUID("44444444-4444-4444-8444-444444444444")
+    rejected_request_id = UUID(SECOND_REQUEST_ID)
+    insert_inactive_question(
+        ready_client,
+        question_id=question_id,
+        status=question_status,
+    )
+    previous_last_valid_input_at = FIXED_NOW - timedelta(minutes=5)
+    with ready_client.app.state.assistant_session_factory.begin() as session:
+        conversation = session.get(AssistantConversation, CONVERSATION_ID)
+        assert conversation is not None
+        conversation.last_valid_input_at = previous_last_valid_input_at
+
+    response = ready_client.post(
+        "/api/v1/assistant/requests",
+        json={
+            "requestId": str(rejected_request_id),
+            "conversationId": str(CONVERSATION_ID),
+            "input": {
+                "type": "text",
+                "questionId": str(question_id),
+                "text": "오후 3시",
+            },
+        },
+    )
+
+    body = assert_problem(response, 409, expected_code)
+    assert body["assistantRequestId"] == str(rejected_request_id)
+    assert {"activeQuestionId", "activeQuestionRequestId"}.isdisjoint(body)
+    with ready_client.app.state.assistant_session_factory() as session:
+        assert session.get(AssistantRequest, rejected_request_id) is None
+        stored_question = session.get(AssistantQuestion, question_id)
+        assert stored_question is not None
+        assert stored_question.status == question_status.value
+        conversation = session.get(AssistantConversation, CONVERSATION_ID)
+        assert conversation is not None
+        assert conversation.last_valid_input_at == previous_last_valid_input_at
 
 
 def test_ready_post_persists_accepted_and_get_is_read_only(

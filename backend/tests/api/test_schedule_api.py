@@ -12,6 +12,7 @@ from app.core.config import Settings
 from app.main import create_app
 from app.modules.schedules import repository
 from tests.conftest import FIXED_NOW
+from tests.problem_assertions import assert_problem_contract
 
 
 def create_payload(**overrides: object) -> dict[str, object]:
@@ -38,7 +39,8 @@ def assert_request_id(response) -> None:
     identifier = UUID(response.headers["X-Request-ID"])
     assert identifier.version == 4
     if response.headers.get("content-type", "").startswith("application/problem+json"):
-        assert response.json()["requestId"] == str(identifier)
+        body = response.json()
+        assert_problem_contract(response, response.status_code, body["code"])
 
 
 def test_create_get_list_patch_delete_vertical_flow(client: TestClient) -> None:

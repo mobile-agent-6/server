@@ -17,6 +17,7 @@ from app.modules.assistant.model import (
     AssistantQuestion,
     AssistantRequest,
 )
+from tests.problem_assertions import assert_problem_contract
 
 REQUEST_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
 CONVERSATION_ID = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"
@@ -47,14 +48,7 @@ def padded(payload: object, size: int) -> bytes:
 
 
 def assert_problem(response, status: int, code: str) -> dict[str, Any]:
-    assert response.status_code == status
-    assert response.headers["content-type"].startswith("application/problem+json")
-    request_id = UUID(response.headers["X-Request-ID"])
-    body = response.json()
-    assert body["status"] == status
-    assert body["code"] == code
-    assert body["requestId"] == str(request_id)
-    return body
+    return assert_problem_contract(response, status, code)
 
 
 def direct_asgi_call(
