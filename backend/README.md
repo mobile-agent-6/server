@@ -29,9 +29,10 @@ python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 ## 카테고리 migration 적용
 
 `20261008_0002`는 카테고리 CHECK를 `INBOUND`, `INVENTORY`, `OUTBOUND`, `RETURN`,
-`OTHER`로 교체한다. 현재 `head`는 알림 컬럼 제거 revision인 `20261017_0003`까지
-포함한다. 따라서 `20260927_0001` DB에서 `upgrade head`를 실행하면 카테고리
-변경에 이어 알림 컬럼 제거도 적용된다. 최신 서버 코드를 사용할 DB는 전체
+`OTHER`로 교체한다. 현재 `head`는 Assistant 영속 revision인 `20261017_0004`이며
+알림 컬럼 제거 revision `20261017_0003`도 포함한다. 따라서 `20260927_0001` DB에서
+`upgrade head`를 실행하면 카테고리 변경과 알림 컬럼 제거 뒤 Assistant 영속 schema도
+적용된다. 최신 서버 코드를 사용할 DB는 전체
 `upgrade head`를 적용해야 한다. 카테고리 migration만 별도로 점검해야 할 때는
 `upgrade 20261008_0002`를 명시하고, 그 상태에서 최신 서버를 사용하지 않는다.
 
@@ -122,6 +123,28 @@ Assistant table과 tombstone을 모두 삭제하므로 `REQUEST_EXPIRED` 최소 
 사라지는 파괴적 관리 작업이다. 이는 `docs/api.md` §16.8의 DB 초기화 같은 운영
 예외로만 취급하고, Schedule·idempotency 데이터를 보존하더라도 구버전 코드와 검증
 backup 없이 일반 rollback 수단으로 사용하지 않는다.
+
+## Assistant runtime 운영
+
+Assistant runtime은 Schedule DB 파일마다 POSIX advisory lock 하나를 사용하며 lock
+경로는 같은 디렉터리의 `{DB 파일명}.assistant-runtime.lock`이다. lock 파일의 존재는
+현재 ownership의 근거가 아니므로 실행 중이거나 장애를 조사할 때 수동 삭제하지 않는다.
+같은 DB를 사용하는 서버는 `uvicorn` worker 1개로 운영한다.
+
+runtime owner는 단일 worker와 deadline sweeper를 실행한다. provider hang,
+worker/sweeper unhealthy 또는 startup recovery 실패로 Assistant가 비활성화되면 서버
+process를 재시작해 lock 획득과 근거 기반 recovery를 다시 수행한다. 재시작은 모델이나
+Schedule write를 다시 실행하지 않는다.
+
+현재 production `DecisionProvider`는 연결되지 않았다. 따라서 새 text와 자연어 후속
+입력은 request를 insert하지 않고 `503 ASSISTANT_UNAVAILABLE`을 반환한다. 저장된
+질문의 target·changes가 완전한 selection/confirmation은 provider 없이 접수되어
+backend safe writer까지 처리할 수 있다. 테스트 전용 scripted provider·시각·UUID
+주입은 demo 환경에서 사용할 수 없다.
+
+`20261017_0004` downgrade 전에는 위 runtime을 포함한 서버를 먼저 중지하고 정확한
+대상 DB·revision·검증 backup을 확인해야 한다. 기존 downgrade 제한과 backup 복구
+우선 원칙은 그대로 적용한다.
 
 ## 모바일 앱 연결
 

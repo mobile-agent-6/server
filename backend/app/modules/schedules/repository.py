@@ -19,6 +19,7 @@ def list_active(
     to_utc: datetime,
     category: Category | None,
     completed: bool | None,
+    limit: int | None = None,
 ) -> list[Schedule]:
     statement = sa.select(Schedule).where(
         Schedule.deleted_at.is_(None),
@@ -32,6 +33,8 @@ def list_active(
     statement = statement.order_by(
         Schedule.scheduled_at.asc(), Schedule.created_at.asc(), Schedule.id.asc()
     )
+    if limit is not None:
+        statement = statement.limit(limit)
     return list(session.scalars(statement))
 
 
@@ -65,6 +68,17 @@ def find_active_idempotency(
             IdempotencyRecord.expires_at > now,
         )
     )
+
+
+def find_idempotency_exact(
+    session: Session,
+    *,
+    scope: str,
+    idempotency_key: str,
+) -> IdempotencyRecord | None:
+    """Read recovery evidence without applying the public API TTL rule."""
+
+    return session.get(IdempotencyRecord, (scope, idempotency_key))
 
 
 def delete_expired_idempotency(
@@ -112,6 +126,50 @@ def soft_delete_active(
     result = session.execute(
         sa.update(Schedule)
         .where(Schedule.id == schedule_id, Schedule.deleted_at.is_(None))
+        .values(deleted_at=deleted_at, updated_at=deleted_at)
+    )
+    return int(result.rowcount or 0)
+
+
+def update_active_if_unchanged(
+    session: Session,
+    *,
+    schedule_id: UUID,
+    expected_updated_at: datetime,
+    changes: dict[str, object],
+    updated_at: datetime,
+) -> int:
+    """Apply an Assistant update CAS without committing the caller transaction."""
+
+    values = {**changes, "updated_at": updated_at}
+    result = session.execute(
+        sa.update(Schedule)
+        .where(
+            Schedule.id == schedule_id,
+            Schedule.deleted_at.is_(None),
+            Schedule.updated_at == expected_updated_at,
+        )
+        .values(**values)
+    )
+    return int(result.rowcount or 0)
+
+
+def soft_delete_active_if_unchanged(
+    session: Session,
+    *,
+    schedule_id: UUID,
+    expected_updated_at: datetime,
+    deleted_at: datetime,
+) -> int:
+    """Apply an Assistant delete CAS without committing the caller transaction."""
+
+    result = session.execute(
+        sa.update(Schedule)
+        .where(
+            Schedule.id == schedule_id,
+            Schedule.deleted_at.is_(None),
+            Schedule.updated_at == expected_updated_at,
+        )
         .values(deleted_at=deleted_at, updated_at=deleted_at)
     )
     return int(result.rowcount or 0)

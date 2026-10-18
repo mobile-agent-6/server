@@ -95,7 +95,8 @@ def admit(
     now: datetime = NOW,
     new_conversation_id: UUID | None = None,
     fingerprint: RequestFingerprint | None = None,
-    new_requests_enabled: bool = True,
+    runtime_ready: bool = True,
+    provider_available: bool = True,
 ):
     return admit_request(
         factory,
@@ -103,7 +104,8 @@ def admit(
         fingerprint=fingerprint or request_fingerprint(data),
         accepted_at=now,
         new_conversation_id=new_conversation_id or uuid4(),
-        new_requests_enabled=new_requests_enabled,
+        runtime_ready=runtime_ready,
+        provider_available=provider_available,
     )
 
 
@@ -253,17 +255,17 @@ def test_readiness_blocks_only_new_ids_after_existing_id_decisions(
     accepted_data = request_data(text="same")
     assert admit(factory, accepted_data).kind is AdmissionKind.ACCEPTED
 
-    replay = admit(factory, accepted_data, new_requests_enabled=False)
+    replay = admit(factory, accepted_data, runtime_ready=False)
     conflict = admit(
         factory,
         request_data(request_id=accepted_data.request_id, text="different"),
-        new_requests_enabled=False,
+        runtime_ready=False,
     )
     unavailable_data = request_data()
     unavailable = admit(
         factory,
         unavailable_data,
-        new_requests_enabled=False,
+        runtime_ready=False,
     )
 
     assert replay.kind is AdmissionKind.REPLAY
