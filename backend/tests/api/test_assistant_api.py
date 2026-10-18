@@ -128,24 +128,28 @@ def direct_asgi_call(
 
 
 @pytest.mark.parametrize(
-    ("path", "payload"),
+    ("path", "payload", "expected_status"),
     [
-        ("/api/v1/assistant/requests", request_payload()),
+        ("/api/v1/assistant/requests", request_payload(), 503),
         (
             f"/api/v1/assistant/conversations/{CONVERSATION_ID}/cancel",
             cancel_payload(),
+            404,
         ),
     ],
 )
 def test_assistant_post_body_size_boundaries(
-    client: TestClient, path: str, payload: dict[str, object]
+    client: TestClient,
+    path: str,
+    payload: dict[str, object],
+    expected_status: int,
 ) -> None:
     allowed = client.post(
         path,
         content=padded(payload, 16_384),
         headers={"Content-Type": "application/json"},
     )
-    assert allowed.status_code == 503
+    assert allowed.status_code == expected_status
 
     rejected = client.post(
         path,
@@ -464,28 +468,22 @@ def test_path_and_body_validation_precede_unavailable(client: TestClient) -> Non
     assert_problem(cancel_body, 422, "VALIDATION_ERROR")
 
 
-def test_valid_skeleton_endpoints_return_unavailable_without_side_effects(
-    client: TestClient, monkeypatch: pytest.MonkeyPatch
+def test_production_post_is_unavailable_but_reads_use_persistent_contract(
+    client: TestClient,
 ) -> None:
-    def unexpected_side_effect(*args, **kwargs):
-        raise AssertionError((args, kwargs))
-
-    monkeypatch.setattr(client.app.state, "session_factory", unexpected_side_effect)
-    monkeypatch.setattr(client.app.state.engine, "connect", unexpected_side_effect)
-
     post = client.post("/api/v1/assistant/requests", json=request_payload())
     post_body = assert_problem(post, 503, "ASSISTANT_UNAVAILABLE")
     assert post_body["assistantRequestId"] == REQUEST_ID
 
     get = client.get(f"/api/v1/assistant/requests/{REQUEST_ID.upper()}")
-    get_body = assert_problem(get, 503, "ASSISTANT_UNAVAILABLE")
+    get_body = assert_problem(get, 404, "ASSISTANT_REQUEST_NOT_FOUND")
     assert get_body["assistantRequestId"] == REQUEST_ID
 
     cancel = client.post(
         f"/api/v1/assistant/conversations/{CONVERSATION_ID}/cancel",
         json=cancel_payload(),
     )
-    cancel_body = assert_problem(cancel, 503, "ASSISTANT_UNAVAILABLE")
+    cancel_body = assert_problem(cancel, 404, "ASSISTANT_CONVERSATION_NOT_FOUND")
     assert "assistantRequestId" not in cancel_body
 
 
@@ -521,11 +519,11 @@ def test_skeleton_endpoints_do_not_create_assistant_rows(client: TestClient) -> 
     ).status_code == 503
     assert client.get(
         f"/api/v1/assistant/requests/{REQUEST_ID}"
-    ).status_code == 503
+    ).status_code == 404
     assert client.post(
         f"/api/v1/assistant/conversations/{CONVERSATION_ID}/cancel",
         json=cancel_payload(),
-    ).status_code == 503
+    ).status_code == 404
     assert counts() == before == (0, 0, 0)
 
 

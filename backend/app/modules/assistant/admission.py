@@ -34,6 +34,7 @@ _LOWER_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 class AdmissionKind(StrEnum):
     ACCEPTED = "accepted"
     REPLAY = "replay"
+    ASSISTANT_UNAVAILABLE = "assistant_unavailable"
     REQUEST_ID_CONFLICT = "request_id_conflict"
     REQUEST_EXPIRED = "request_expired"
     CONVERSATION_NOT_FOUND = "conversation_not_found"
@@ -168,6 +169,7 @@ def _admit_in_transaction(
     fingerprint: RequestFingerprint,
     accepted_at: datetime,
     new_conversation_id: UUID,
+    new_requests_enabled: bool,
 ) -> AdmissionResult:
     existing = repository.get_request(session, data.request_id)
     if existing is not None:
@@ -182,6 +184,13 @@ def _admit_in_transaction(
             kind=AdmissionKind.REQUEST_ID_CONFLICT,
             request_id=data.request_id,
             conversation_id=existing.conversation_id,
+        )
+
+    if not new_requests_enabled:
+        return AdmissionResult(
+            kind=AdmissionKind.ASSISTANT_UNAVAILABLE,
+            request_id=data.request_id,
+            conversation_id=data.conversation_id,
         )
 
     new_conversation = data.conversation_id is None
@@ -390,6 +399,7 @@ def admit_request(
     fingerprint: RequestFingerprint,
     accepted_at: datetime,
     new_conversation_id: UUID,
+    new_requests_enabled: bool,
 ) -> AdmissionResult:
     """Run all admission decisions and successful mutations in one transaction."""
 
@@ -407,6 +417,7 @@ def admit_request(
                     fingerprint=fingerprint,
                     accepted_at=accepted_at,
                     new_conversation_id=new_conversation_id,
+                    new_requests_enabled=new_requests_enabled,
                 )
     except Exception as exc:
         if is_database_unavailable(exc):

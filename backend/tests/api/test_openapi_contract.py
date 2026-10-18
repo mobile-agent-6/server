@@ -246,7 +246,15 @@ def test_openapi_problem_content_and_headers(client: TestClient) -> None:
         "getSchedule": {"404", "422", "500", "503"},
         "updateSchedule": {"400", "404", "422", "500", "503"},
         "deleteSchedule": {"404", "422", "500", "503"},
-        "createAssistantRequest": {"400", "409", "413", "422", "500", "503"},
+        "createAssistantRequest": {
+            "400",
+            "404",
+            "409",
+            "413",
+            "422",
+            "500",
+            "503",
+        },
         "getAssistantRequest": {"404", "410", "422", "500", "503"},
         "cancelAssistantTarget": {"400", "404", "413", "422", "500", "503"},
     }

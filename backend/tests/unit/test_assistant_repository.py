@@ -95,6 +95,7 @@ def admit(
     now: datetime = NOW,
     new_conversation_id: UUID | None = None,
     fingerprint: RequestFingerprint | None = None,
+    new_requests_enabled: bool = True,
 ):
     return admit_request(
         factory,
@@ -102,6 +103,7 @@ def admit(
         fingerprint=fingerprint or request_fingerprint(data),
         accepted_at=now,
         new_conversation_id=new_conversation_id or uuid4(),
+        new_requests_enabled=new_requests_enabled,
     )
 
 
@@ -242,6 +244,33 @@ def test_first_text_is_atomic_and_replay_does_not_extend_conversation(
         assert request is not None
         assert request.normalized_body_json["input"]["text"] == "재고 확인"
         assert request.task_reference_accepted_at == NOW
+
+
+def test_readiness_blocks_only_new_ids_after_existing_id_decisions(
+    assistant_store,
+) -> None:
+    factory, _, _ = assistant_store
+    accepted_data = request_data(text="same")
+    assert admit(factory, accepted_data).kind is AdmissionKind.ACCEPTED
+
+    replay = admit(factory, accepted_data, new_requests_enabled=False)
+    conflict = admit(
+        factory,
+        request_data(request_id=accepted_data.request_id, text="different"),
+        new_requests_enabled=False,
+    )
+    unavailable_data = request_data()
+    unavailable = admit(
+        factory,
+        unavailable_data,
+        new_requests_enabled=False,
+    )
+
+    assert replay.kind is AdmissionKind.REPLAY
+    assert conflict.kind is AdmissionKind.REQUEST_ID_CONFLICT
+    assert unavailable.kind is AdmissionKind.ASSISTANT_UNAVAILABLE
+    with factory() as session:
+        assert session.get(AssistantRequest, unavailable_data.request_id) is None
 
 
 def test_same_request_id_different_fingerprint_conflicts_without_writes(

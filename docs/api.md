@@ -175,9 +175,9 @@ MVP 카테고리는 입고, 재고, 출고, 반품, 기타 5개이며 API 값은
 | `getSchedule` | GET | `/api/v1/schedules/{scheduleId}` | 200 | 일정 단건 조회 | 구현됨 |
 | `updateSchedule` | PATCH | `/api/v1/schedules/{scheduleId}` | 200 | 일정 부분 수정 | 구현됨 |
 | `deleteSchedule` | DELETE | `/api/v1/schedules/{scheduleId}` | 204 | 일정 soft delete | 구현됨 |
-| `createAssistantRequest` | POST | `/api/v1/assistant/requests` | 202/200 | 새 입력 접수·동일 요청 복구 | 계약 확정·미구현 |
-| `getAssistantRequest` | GET | `/api/v1/assistant/requests/{requestId}` | 200 | 입력 상태·결과 조회 | 계약 확정·미구현 |
-| `cancelAssistantTarget` | POST | `/api/v1/assistant/conversations/{conversationId}/cancel` | 200 | 요청 또는 질문 취소 판정 | 계약 확정·미구현 |
+| `createAssistantRequest` | POST | `/api/v1/assistant/requests` | 202/200 | 새 입력 접수·동일 요청 복구 | 계약 확정·부분 구현(기존 ID 복구, production 기본 신규 접수 503) |
+| `getAssistantRequest` | GET | `/api/v1/assistant/requests/{requestId}` | 200 | 입력 상태·결과 조회 | 계약 확정·부분 구현(Assistant schema·영속 기록 준비 시 동작) |
+| `cancelAssistantTarget` | POST | `/api/v1/assistant/conversations/{conversationId}/cancel` | 200 | 요청 또는 질문 취소 판정 | 계약 확정·부분 구현(Assistant schema·영속 기록 준비 시 동작) |
 
 ## 5. 상태 확인
 
@@ -609,7 +609,7 @@ ValidationErrorItem
 
 > 상태: `BE-FE-AGREED`
 >
-> 구현: 미구현. 이 절은 구현 목표 계약이며 현재 서버 동작을 나타내지 않는다.
+> 구현: 부분 구현. Assistant schema가 준비되면 기존 ID POST 복구와 GET·cancel이 영속 기록으로 동작한다. 신규 POST는 production 기본값에서 insert 없이 `503 ASSISTANT_UNAVAILABLE`이며, production DecisionProvider·worker·Schedule 실행은 아직 연결하지 않았다.
 
 ### 16.1 역할과 기본 흐름
 

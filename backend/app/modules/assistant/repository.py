@@ -111,3 +111,22 @@ def answer_question(
     question.status = AssistantQuestionStatus.ANSWERED.value
     question.deactivated_at = at
     question.answered_by_request_id = answer_request_id
+
+
+def complete_request_as_cancelled(
+    request: AssistantRequest,
+    *,
+    result_json: dict[str, object],
+    at: datetime,
+) -> None:
+    request.status = "completed"
+    request.result_kind = "outcome"
+    request.result_json = result_json
+    request.completed_at = at
+    request.cancelled_at = at
+    request.retention_started_at = at
+
+
+def cancel_question(question: AssistantQuestion, *, at: datetime) -> None:
+    question.status = AssistantQuestionStatus.CANCELLED.value
+    question.deactivated_at = at
