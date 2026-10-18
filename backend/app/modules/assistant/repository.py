@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from enum import StrEnum
 from uuid import UUID
 
 import sqlalchemy as sa
@@ -14,6 +15,12 @@ from app.modules.assistant.model import (
     AssistantQuestionStatus,
     AssistantRequest,
 )
+
+
+class PrewriteCompletionResult(StrEnum):
+    COMPLETED = "completed"
+    NOOP = "noop"
+    WRITE_STARTED = "write_started"
 
 
 def get_request(session: Session, request_id: UUID) -> AssistantRequest | None:
@@ -82,6 +89,79 @@ def claim_accepted_request(
         .values(status="processing", processing_at=processing_at)
     )
     return int(result.rowcount or 0) == 1
+
+
+def has_active_write_marker(session: Session) -> bool:
+    return (
+        session.scalar(
+            sa.select(sa.literal(True))
+            .where(
+                AssistantRequest.status.in_(("accepted", "processing")),
+                AssistantRequest.write_started.is_(True),
+            )
+            .limit(1)
+        )
+        is True
+    )
+
+
+def recover_prewrite_requests(
+    session: Session, *, result_json: dict[str, object], at: datetime
+) -> int:
+    result = session.execute(
+        sa.update(AssistantRequest)
+        .where(
+            AssistantRequest.status.in_(("accepted", "processing")),
+            AssistantRequest.write_started.is_(False),
+        )
+        .values(
+            status="completed",
+            result_kind="failure",
+            result_json=result_json,
+            completed_at=at,
+            retention_started_at=at,
+            pending_write_version=None,
+            pending_write_json=None,
+        )
+    )
+    return int(result.rowcount or 0)
+
+
+def complete_prewrite_request(
+    session: Session,
+    *,
+    request_id: UUID,
+    result_json: dict[str, object],
+    at: datetime,
+) -> PrewriteCompletionResult:
+    result = session.execute(
+        sa.update(AssistantRequest)
+        .where(
+            AssistantRequest.id == request_id,
+            AssistantRequest.status.in_(("accepted", "processing")),
+            AssistantRequest.write_started.is_(False),
+        )
+        .values(
+            status="completed",
+            result_kind="failure",
+            result_json=result_json,
+            completed_at=at,
+            retention_started_at=at,
+            pending_write_version=None,
+            pending_write_json=None,
+        )
+    )
+    if int(result.rowcount or 0) == 1:
+        return PrewriteCompletionResult.COMPLETED
+    marker = session.scalar(
+        sa.select(AssistantRequest.write_started).where(
+            AssistantRequest.id == request_id,
+            AssistantRequest.status.in_(("accepted", "processing")),
+        )
+    )
+    if marker is True:
+        return PrewriteCompletionResult.WRITE_STARTED
+    return PrewriteCompletionResult.NOOP
 
 
 def add_question(session: Session, question: AssistantQuestion) -> None:

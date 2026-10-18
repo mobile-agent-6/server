@@ -70,6 +70,8 @@ from app.modules.assistant.serialization import (
     SnapshotSerializationError,
     serialize_snapshot,
 )
+from app.modules.assistant.runtime_failures import timeout_snapshot
+from app.modules.assistant.runtime_guard import ProcessDeadlineGuard
 from app.modules.schedules.schemas import ScheduleCreate, ScheduleUpdate
 
 QUESTION_TTL = timedelta(minutes=10)
@@ -96,6 +98,13 @@ class ProcessOneResult(StrEnum):
     COMPLETED = "completed"
     PENDING_WRITE = "pending_write"
     LOST_FINALIZE = "lost_finalize"
+
+
+class _ClaimResult(StrEnum):
+    CLAIMED = "claimed"
+    SKIPPED = "skipped"
+    TIMED_OUT = "timed_out"
+    STOPPED = "stopped"
 
 
 class _InvalidDecision(ValueError):
@@ -175,13 +184,33 @@ def _failure(
 
 
 def _claim(
-    session_factory: sessionmaker[Session], *, request_id: UUID, now: datetime
-) -> bool:
+    session_factory: sessionmaker[Session],
+    *,
+    request_id: UUID,
+    now_factory: Callable[[], datetime],
+    runtime_guard: ProcessDeadlineGuard,
+) -> _ClaimResult:
     with session_factory() as session:
         with session.begin():
-            return repository.claim_accepted_request(
+            now = _aware_utc(now_factory())
+            if runtime_guard.stop_requested():
+                return _ClaimResult.STOPPED
+            if runtime_guard.deadline_reached():
+                outcome = repository.complete_prewrite_request(
+                    session,
+                    request_id=request_id,
+                    result_json=timeout_snapshot(),
+                    at=now,
+                )
+                if outcome is repository.PrewriteCompletionResult.WRITE_STARTED:
+                    raise RuntimeError("active write marker found before claim")
+                if outcome is repository.PrewriteCompletionResult.COMPLETED:
+                    return _ClaimResult.TIMED_OUT
+                return _ClaimResult.SKIPPED
+            claimed = repository.claim_accepted_request(
                 session, request_id=request_id, processing_at=now
             )
+            return _ClaimResult.CLAIMED if claimed else _ClaimResult.SKIPPED
 
 
 def _load_stored_input(
@@ -782,6 +811,8 @@ def _finalize(
     request_id: UUID,
     plan: _PreparedPlan,
     now: datetime,
+    now_factory: Callable[[], datetime],
+    runtime_guard: ProcessDeadlineGuard,
 ) -> ProcessOneResult:
     with session_factory() as session:
         with session.begin():
@@ -790,6 +821,21 @@ def _finalize(
                 request is None
                 or request.status != AssistantRequestStatus.PROCESSING.value
             ):
+                return ProcessOneResult.LOST_FINALIZE
+
+            if runtime_guard.deadline_reached():
+                outcome = repository.complete_prewrite_request(
+                    session,
+                    request_id=request_id,
+                    result_json=timeout_snapshot(),
+                    at=_aware_utc(now_factory()),
+                )
+                if outcome is repository.PrewriteCompletionResult.WRITE_STARTED:
+                    raise RuntimeError("active write marker found during finalize")
+                if outcome is repository.PrewriteCompletionResult.COMPLETED:
+                    return ProcessOneResult.COMPLETED
+                return ProcessOneResult.LOST_FINALIZE
+            if runtime_guard.stop_requested():
                 return ProcessOneResult.LOST_FINALIZE
 
             if plan.question is not None:
@@ -849,15 +895,23 @@ def process_one(
     clock: object,
     time_trust_source: TimeTrustSource,
     uuid_factory: Callable[[], UUID],
+    runtime_guard: ProcessDeadlineGuard,
 ) -> ProcessOneResult:
     """Claim and deterministically process one accepted Assistant request."""
 
     now_method = getattr(clock, "now", None)
     if not callable(now_method):
         raise TypeError("clock must provide now()")
-    claim_time = _aware_utc(now_method())
-    if not _claim(session_factory, request_id=request_id, now=claim_time):
+    claim = _claim(
+        session_factory,
+        request_id=request_id,
+        now_factory=now_method,
+        runtime_guard=runtime_guard,
+    )
+    if claim in {_ClaimResult.SKIPPED, _ClaimResult.STOPPED}:
         return ProcessOneResult.SKIPPED
+    if claim is _ClaimResult.TIMED_OUT:
+        return ProcessOneResult.COMPLETED
 
     try:
         stored = _load_stored_input(session_factory, request_id=request_id)
@@ -952,4 +1006,6 @@ def process_one(
         request_id=request_id,
         plan=prepared,
         now=completed_at,
+        now_factory=now_method,
+        runtime_guard=runtime_guard,
     )

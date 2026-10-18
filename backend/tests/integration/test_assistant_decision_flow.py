@@ -20,6 +20,7 @@ from app.modules.assistant.model import (
     AssistantQuestionStatus,
     AssistantRequest,
 )
+from app.modules.assistant.processor import ProcessOneResult
 from app.modules.assistant.schedule_read import (
     ScheduleReadUnavailable,
     SqlAlchemyScheduleReader,
@@ -48,6 +49,9 @@ def make_app(
         Settings(_env_file=None, database_url=f"sqlite:///{database_path}"),
         _assistant_runtime_ready_for_tests=runtime_ready,
         _assistant_decision_provider_for_tests=provider,
+        _assistant_process_one_for_tests=(
+            lambda _request_id, _guard: ProcessOneResult.PENDING_WRITE
+        ),
     )
     application.state.clock = FixedClock(FIXED_NOW)
     application.state.assistant_uuid_factory = lambda: UUID(

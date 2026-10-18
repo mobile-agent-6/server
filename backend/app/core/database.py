@@ -61,6 +61,13 @@ def api_database_url(settings: Settings) -> str:
     return f"sqlite+pysqlite:///file:{encoded_path}?mode=rw&uri=true"
 
 
+def assistant_probe_database_url(settings: Settings) -> str:
+    """Return a SQLite URI that cannot create or mutate the configured file."""
+
+    encoded_path = quote(settings.database_path.as_posix(), safe="/")
+    return f"sqlite+pysqlite:///file:{encoded_path}?mode=ro&uri=true"
+
+
 def _configure_sqlite_connection(
     dbapi_connection: sqlite3.Connection, _connection_record: object, *, timeout_ms: int
 ) -> None:
@@ -89,6 +96,32 @@ def create_api_engine(settings: Settings) -> Engine:
             connection, record, timeout_ms=settings.sqlite_busy_timeout_ms
         ),
     )
+    return engine
+
+
+def create_assistant_probe_engine(settings: Settings) -> Engine:
+    """Create the deferred, query-only engine used for Assistant schema probes."""
+
+    engine = sa.create_engine(
+        assistant_probe_database_url(settings),
+        connect_args={
+            "check_same_thread": False,
+            "timeout": settings.sqlite_busy_timeout_ms / 1000,
+        },
+        pool_timeout=settings.db_pool_timeout_seconds,
+    )
+
+    def configure_probe_connection(
+        connection: sqlite3.Connection, _record: object
+    ) -> None:
+        cursor = connection.cursor()
+        try:
+            cursor.execute("PRAGMA query_only=ON")
+            cursor.execute(f"PRAGMA busy_timeout={settings.sqlite_busy_timeout_ms}")
+        finally:
+            cursor.close()
+
+    event.listen(engine, "connect", configure_probe_connection)
     return engine
 
 

@@ -10,7 +10,7 @@ import pytest
 import sqlalchemy as sa
 from sqlalchemy.orm import Session
 
-from app.core.clock import FixedClock
+from app.core.clock import FixedClock, FixedMonotonicClock
 from app.core.config import Settings
 from app.core.database import create_assistant_engine, create_session_factory
 from app.modules.assistant import repository
@@ -28,6 +28,7 @@ from app.modules.assistant.model import (
     AssistantRequest,
 )
 from app.modules.assistant.processor import ProcessOneResult, process_one
+from app.modules.assistant.runtime_guard import ProcessDeadlineGuard
 from app.modules.assistant.schedule_read import (
     ScheduleRead,
     ScheduleReadPort,
@@ -211,7 +212,19 @@ def run(
     trusted: bool = True,
     uuid_factory=None,
     clock=None,
+    monotonic_clock=None,
+    stop_signal=None,
+    deadline: float = 300.0,
 ) -> ProcessOneResult:
+    runtime_guard = ProcessDeadlineGuard(
+        monotonic_clock=(
+            FixedMonotonicClock()
+            if monotonic_clock is None
+            else monotonic_clock
+        ),
+        deadline=deadline,
+        stop_signal=Event() if stop_signal is None else stop_signal,
+    )
     return process_one(
         factory,
         request_id=request_id,
@@ -220,7 +233,121 @@ def run(
         clock=FixedClock(NOW) if clock is None else clock,
         time_trust_source=TrustSource(trusted),
         uuid_factory=uuid_factory or UuidSequence(),
+        runtime_guard=runtime_guard,
     )
+
+
+@pytest.mark.parametrize(
+    ("monotonic_now", "expected_timeout"),
+    [(299.999, False), (300.0, True)],
+)
+def test_claim_deadline_guard_uses_exact_300_second_boundary(
+    processor_store, monotonic_now: float, expected_timeout: bool
+) -> None:
+    admit(processor_store, request_data())
+    provider = ScriptedDecisionProvider(
+        [envelope({"kind": "ask", "text": "몇 시인가요?"})]
+    )
+    reader = MemoryScheduleReader([schedule()])
+
+    result = run(
+        processor_store,
+        provider,
+        reader,
+        monotonic_clock=FixedMonotonicClock(monotonic_now),
+    )
+
+    assert result is ProcessOneResult.COMPLETED
+    stored = stored_request(processor_store)
+    assert stored.status == "completed"
+    assert stored.pending_write_json is None
+    if expected_timeout:
+        assert stored.result_json["code"] == "PROCESSING_TIMEOUT"
+        assert provider.call_count == 0
+    else:
+        assert stored.result_json["kind"] == "need_more_info"
+        assert provider.call_count == 1
+    assert reader.get_calls == []
+    assert reader.list_limits == []
+
+
+def test_finalize_guard_makes_timeout_win_after_late_provider_result(
+    processor_store,
+) -> None:
+    admit(processor_store, request_data())
+    monotonic = FixedMonotonicClock(299.999)
+
+    class DeadlineCrossingProvider:
+        def __init__(self) -> None:
+            self.call_count = 0
+
+        def decide(self, _context):
+            self.call_count += 1
+            monotonic.advance(0.001)
+            return envelope({"kind": "ask", "text": "늦은 질문"})
+
+    provider = DeadlineCrossingProvider()
+    result = run(
+        processor_store,
+        provider,
+        MemoryScheduleReader(),
+        monotonic_clock=monotonic,
+    )
+
+    assert result is ProcessOneResult.COMPLETED
+    stored = stored_request(processor_store)
+    assert stored.result_json["code"] == "PROCESSING_TIMEOUT"
+    assert provider.call_count == 1
+    with processor_store() as session:
+        assert session.scalar(sa.select(sa.func.count()).select_from(AssistantQuestion)) == 0
+
+
+def test_shutdown_guard_before_claim_leaves_request_for_recovery(
+    processor_store,
+) -> None:
+    admit(processor_store, request_data())
+    stopped = Event()
+    stopped.set()
+    provider = ScriptedDecisionProvider(
+        [envelope({"kind": "ask", "text": "호출되면 안 됨"})]
+    )
+
+    result = run(
+        processor_store,
+        provider,
+        MemoryScheduleReader(),
+        stop_signal=stopped,
+    )
+
+    assert result is ProcessOneResult.SKIPPED
+    assert stored_request(processor_store).status == "accepted"
+    assert provider.call_count == 0
+
+
+def test_shutdown_guard_after_provider_discards_late_result(
+    processor_store,
+) -> None:
+    admit(processor_store, request_data())
+    stopped = Event()
+
+    class StoppingProvider:
+        def decide(self, _context):
+            stopped.set()
+            return envelope({"kind": "ask", "text": "늦은 질문"})
+
+    result = run(
+        processor_store,
+        StoppingProvider(),
+        MemoryScheduleReader(),
+        stop_signal=stopped,
+    )
+
+    assert result is ProcessOneResult.LOST_FINALIZE
+    stored = stored_request(processor_store)
+    assert stored.status == "processing"
+    assert stored.result_json is None
+    with processor_store() as session:
+        assert session.scalar(sa.select(sa.func.count()).select_from(AssistantQuestion)) == 0
 
 
 def stored_request(factory, request_id: UUID = REQUEST_ID) -> AssistantRequest:

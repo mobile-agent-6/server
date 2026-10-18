@@ -12,8 +12,14 @@ def test_module_exposes_importable_app() -> None:
     assert app.state.settings.app_env == "development"
 
 
-def test_development_app_starts_with_docs_and_openapi() -> None:
-    application = create_app(Settings(_env_file=None))
+def test_development_app_starts_with_docs_and_openapi(tmp_path: Path) -> None:
+    from tests.conftest import migrate
+
+    database = tmp_path / "app.db"
+    migrate(database)
+    application = create_app(
+        Settings(_env_file=None, database_url=f"sqlite:///{database}")
+    )
 
     assert application.state.assistant_schema_ready is False
     assert application.state.assistant_runtime_ready is False

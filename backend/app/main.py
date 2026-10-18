@@ -6,6 +6,7 @@ import logging
 import threading
 from collections.abc import Callable
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -18,6 +19,7 @@ from app.core.config import Settings, get_settings
 from app.core.database import (
     create_api_engine,
     create_assistant_engine,
+    create_assistant_probe_engine,
     create_session_factory,
 )
 from app.core.logging import configure_logging
@@ -30,6 +32,21 @@ from app.modules.assistant.decisions import (
 )
 from app.modules.assistant.router import router as assistant_router
 from app.modules.assistant.readiness import probe_assistant_schema
+from app.modules.assistant.processor import ProcessOneResult, process_one
+from app.modules.assistant.runtime import (
+    AssistantRuntimeController,
+    DEFAULT_SHUTDOWN_GRACE_SECONDS,
+    RuntimeOwnershipLock,
+    UnsafeActiveWriteMarker,
+    recover_startup_requests,
+)
+from app.modules.assistant.runtime_guard import MonotonicClock, ProcessDeadlineGuard
+from app.modules.assistant.runtime_lock import (
+    AssistantRuntimeFileLock,
+    AssistantRuntimeLockContended,
+    AssistantRuntimeLockUnavailable,
+)
+from app.modules.assistant.schedule_read import SqlAlchemyScheduleReader
 from app.modules.schedules.router import router as schedules_router
 from app.modules.system.router import router as system_router
 from app.modules.system.service import resolve_expected_head
@@ -78,6 +95,17 @@ def create_app(
     _assistant_decision_provider_for_tests: DecisionProvider | None = None,
     _assistant_time_trust_source_for_tests: TimeTrustSource | None = None,
     _assistant_uuid_factory_for_tests: Callable[[], UUID] | None = None,
+    _assistant_runtime_lock_factory_for_tests: (
+        Callable[[Path], RuntimeOwnershipLock] | None
+    ) = None,
+    _assistant_monotonic_clock_for_tests: MonotonicClock | None = None,
+    _assistant_process_one_for_tests: (
+        Callable[[UUID, ProcessDeadlineGuard], ProcessOneResult] | None
+    ) = None,
+    _assistant_shutdown_grace_seconds_for_tests: float | None = None,
+    _assistant_condition_waiter_for_tests: (
+        Callable[[threading.Condition, float | None], None] | None
+    ) = None,
 ) -> FastAPI:
     resolved = settings or get_settings()
     if resolved.app_env == "demo" and (
@@ -85,6 +113,11 @@ def create_app(
         or _assistant_decision_provider_for_tests is not None
         or _assistant_time_trust_source_for_tests is not None
         or _assistant_uuid_factory_for_tests is not None
+        or _assistant_runtime_lock_factory_for_tests is not None
+        or _assistant_monotonic_clock_for_tests is not None
+        or _assistant_process_one_for_tests is not None
+        or _assistant_shutdown_grace_seconds_for_tests is not None
+        or _assistant_condition_waiter_for_tests is not None
     ):
         raise ValueError(
             "Assistant test-only dependencies cannot be enabled in the demo environment"
@@ -93,28 +126,46 @@ def create_app(
 
     @asynccontextmanager
     async def lifespan(application: FastAPI):
+        probe_engine = None
         assistant_engine = None
+        timeout_engine = None
+        ownership_lock: RuntimeOwnershipLock | None = None
+        runtime: AssistantRuntimeController | None = None
         try:
-            assistant_engine = create_assistant_engine(resolved)
+            probe_engine = create_assistant_probe_engine(resolved)
             probe_assistant_schema(
-                assistant_engine,
+                probe_engine,
                 expected_head=application.state.expected_alembic_head,
             )
         except Exception:
-            if assistant_engine is not None:
-                assistant_engine.dispose()
             logging.getLogger(__name__).warning(
                 "Assistant persistence is unavailable",
                 extra={"event": "assistant.initialization_unavailable"},
             )
         else:
+            application.state.assistant_schema_ready = True
+            lock_factory = (
+                _assistant_runtime_lock_factory_for_tests
+                or AssistantRuntimeFileLock.acquire
+            )
+            try:
+                ownership_lock = lock_factory(resolved.database_path)
+            except AssistantRuntimeLockContended:
+                logging.getLogger(__name__).warning(
+                    "Assistant runtime ownership is contended",
+                    extra={"event": "assistant.runtime_lock_contended"},
+                )
+            except (AssistantRuntimeLockUnavailable, OSError) as exc:
+                logging.getLogger(__name__).warning(
+                    "Assistant runtime ownership failed: %s",
+                    type(exc).__name__,
+                    extra={"event": "assistant.runtime_lock_failed"},
+                )
+
+            assistant_engine = create_assistant_engine(resolved)
             application.state.assistant_engine = assistant_engine
             application.state.assistant_session_factory = create_session_factory(
                 assistant_engine
-            )
-            application.state.assistant_schema_ready = True
-            application.state.assistant_runtime_ready = (
-                _assistant_runtime_ready_for_tests
             )
             application.state.assistant_decision_provider = (
                 _assistant_decision_provider_for_tests
@@ -122,6 +173,94 @@ def create_app(
             application.state.assistant_provider_available = (
                 _assistant_decision_provider_for_tests is not None
             )
+            if ownership_lock is not None:
+                try:
+                    timeout_engine = create_assistant_engine(
+                        resolved, busy_timeout_ms=0
+                    )
+                    recover_startup_requests(
+                        application.state.assistant_session_factory,
+                        wall_clock=application.state.clock,
+                    )
+                except UnsafeActiveWriteMarker:
+                    logging.getLogger(__name__).error(
+                        "Assistant runtime found an active write marker",
+                        extra={"event": "assistant.active_write_marker"},
+                    )
+                    if timeout_engine is not None:
+                        timeout_engine.dispose()
+                        timeout_engine = None
+                    ownership_lock.release()
+                    ownership_lock = None
+                except Exception as exc:
+                    logging.getLogger(__name__).error(
+                        "Assistant startup recovery failed: %s",
+                        type(exc).__name__,
+                        extra={"event": "assistant.recovery_failed"},
+                    )
+                    if timeout_engine is not None:
+                        timeout_engine.dispose()
+                        timeout_engine = None
+                    ownership_lock.release()
+                    ownership_lock = None
+                else:
+                    timeout_session_factory = create_session_factory(timeout_engine)
+
+                    def run_process_one(
+                        request_id: UUID, guard: ProcessDeadlineGuard
+                    ) -> ProcessOneResult:
+                        if _assistant_process_one_for_tests is not None:
+                            return _assistant_process_one_for_tests(request_id, guard)
+                        return process_one(
+                            application.state.assistant_session_factory,
+                            request_id=request_id,
+                            provider=application.state.assistant_decision_provider,
+                            schedule_reader=SqlAlchemyScheduleReader(
+                                application.state.session_factory
+                            ),
+                            clock=application.state.clock,
+                            time_trust_source=(
+                                application.state.assistant_time_trust_source
+                            ),
+                            uuid_factory=application.state.assistant_uuid_factory,
+                            runtime_guard=guard,
+                        )
+
+                    def mark_runtime_unready() -> None:
+                        application.state.assistant_runtime_ready = False
+                        application.state.assistant_runtime_healthy = False
+
+                    def cleanup_runtime_resources() -> None:
+                        assert timeout_engine is not None
+                        timeout_engine.dispose()
+                        assert assistant_engine is not None
+                        assistant_engine.dispose()
+
+                    runtime = AssistantRuntimeController(
+                        ownership_lock=ownership_lock,
+                        timeout_session_factory=timeout_session_factory,
+                        process_request=run_process_one,
+                        wall_clock=application.state.clock,
+                        monotonic_clock=application.state.monotonic_clock,
+                        cleanup_resources=cleanup_runtime_resources,
+                        shutdown_grace_seconds=(
+                            DEFAULT_SHUTDOWN_GRACE_SECONDS
+                            if _assistant_shutdown_grace_seconds_for_tests is None
+                            else _assistant_shutdown_grace_seconds_for_tests
+                        ),
+                        condition_waiter=_assistant_condition_waiter_for_tests,
+                        on_unhealthy=mark_runtime_unready,
+                    )
+                    application.state.assistant_runtime = runtime
+                    started = runtime.start()
+                    application.state.assistant_runtime_owner = True
+                    application.state.assistant_runtime_healthy = started
+                    application.state.assistant_runtime_ready = bool(
+                        started and _assistant_runtime_ready_for_tests
+                    )
+        finally:
+            if probe_engine is not None:
+                probe_engine.dispose()
         try:
             yield
         finally:
@@ -129,11 +268,15 @@ def create_app(
             application.state.assistant_runtime_ready = False
             application.state.assistant_provider_available = False
             application.state.assistant_decision_provider = None
-            engine = application.state.assistant_engine
             application.state.assistant_session_factory = None
             application.state.assistant_engine = None
-            if engine is not None:
-                engine.dispose()
+            application.state.assistant_runtime_owner = False
+            application.state.assistant_runtime_healthy = False
+            if runtime is not None:
+                runtime.shutdown()
+            elif assistant_engine is not None:
+                assistant_engine.dispose()
+            application.state.assistant_runtime = None
 
     application = FastAPI(
         title="Schedule API",
@@ -146,7 +289,9 @@ def create_app(
     )
     application.state.settings = resolved
     application.state.clock = SystemClock()
-    application.state.monotonic_clock = SystemMonotonicClock()
+    application.state.monotonic_clock = (
+        _assistant_monotonic_clock_for_tests or SystemMonotonicClock()
+    )
     application.state.engine = create_api_engine(resolved)
     application.state.session_factory = create_session_factory(application.state.engine)
     application.state.assistant_engine = None
@@ -155,6 +300,9 @@ def create_app(
     application.state.assistant_runtime_ready = False
     application.state.assistant_provider_available = False
     application.state.assistant_decision_provider = None
+    application.state.assistant_runtime = None
+    application.state.assistant_runtime_owner = False
+    application.state.assistant_runtime_healthy = False
     application.state.assistant_time_trust_source = (
         _assistant_time_trust_source_for_tests or UntrustedTimeSource()
     )

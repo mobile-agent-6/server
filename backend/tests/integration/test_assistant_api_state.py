@@ -20,6 +20,7 @@ from app.main import create_app
 from app.modules.assistant import state_service
 from app.modules.assistant.admission import AdmissionKind, AdmissionResult
 from app.modules.assistant.model import AssistantConversation, AssistantRequest
+from app.modules.assistant.processor import ProcessOneResult
 from app.modules.assistant.schemas import AssistantRequestCreate
 from app.modules.schedules.model import Schedule
 from tests.fakes.assistant import ScriptedDecisionProvider
@@ -105,6 +106,9 @@ def ready_application(database_path: Path):
         settings,
         _assistant_runtime_ready_for_tests=True,
         _assistant_decision_provider_for_tests=ScriptedDecisionProvider([]),
+        _assistant_process_one_for_tests=(
+            lambda _request_id, _guard: ProcessOneResult.PENDING_WRITE
+        ),
     )
     application.state.clock = FixedClock(FIXED_NOW)
     application.state.assistant_uuid_factory = lambda: CONVERSATION_ID
@@ -653,7 +657,7 @@ def test_schema_not_ready_does_not_block_app_and_isolates_assistant(
     application.state.engine.dispose()
 
 
-def test_lifespan_disposes_assistant_engine_and_starts_no_runtime_components(
+def test_lifespan_starts_runtime_and_disposes_assistant_engine_on_shutdown(
     ready_application, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     dispose_calls: list[bool] = []
@@ -669,6 +673,11 @@ def test_lifespan_disposes_assistant_engine_and_starts_no_runtime_components(
         assert client.app.state.assistant_schema_ready is True
         assert client.app.state.assistant_runtime_ready is True
         assert client.app.state.assistant_provider_available is True
+        snapshot = client.app.state.assistant_runtime.snapshot()
+        assert snapshot.owner is True
+        assert snapshot.healthy is True
+        assert snapshot.worker_alive is True
+        assert snapshot.sweeper_alive is True
         for name in ("assistant_worker", "assistant_thread", "assistant_file_lock"):
             assert not hasattr(client.app.state, name)
 
