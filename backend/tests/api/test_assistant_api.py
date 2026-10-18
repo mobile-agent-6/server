@@ -6,10 +6,17 @@ from typing import Any
 from uuid import UUID
 
 import pytest
+import sqlalchemy as sa
 from fastapi.testclient import TestClient
+from sqlalchemy.orm import Session
 from starlette.types import Message, Scope
 
 from app.core.middleware import AssistantRequestBodyMiddleware
+from app.modules.assistant.model import (
+    AssistantConversation,
+    AssistantQuestion,
+    AssistantRequest,
+)
 
 REQUEST_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
 CONVERSATION_ID = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"
@@ -480,6 +487,46 @@ def test_valid_skeleton_endpoints_return_unavailable_without_side_effects(
     )
     cancel_body = assert_problem(cancel, 503, "ASSISTANT_UNAVAILABLE")
     assert "assistantRequestId" not in cancel_body
+
+
+def test_skeleton_endpoints_do_not_create_assistant_rows(client: TestClient) -> None:
+    def counts() -> tuple[int, int, int]:
+        with Session(client.app.state.engine) as session:
+            return (
+                int(
+                    session.scalar(
+                        sa.select(sa.func.count()).select_from(
+                            AssistantConversation
+                        )
+                    )
+                    or 0
+                ),
+                int(
+                    session.scalar(
+                        sa.select(sa.func.count()).select_from(AssistantRequest)
+                    )
+                    or 0
+                ),
+                int(
+                    session.scalar(
+                        sa.select(sa.func.count()).select_from(AssistantQuestion)
+                    )
+                    or 0
+                ),
+            )
+
+    before = counts()
+    assert client.post(
+        "/api/v1/assistant/requests", json=request_payload()
+    ).status_code == 503
+    assert client.get(
+        f"/api/v1/assistant/requests/{REQUEST_ID}"
+    ).status_code == 503
+    assert client.post(
+        f"/api/v1/assistant/conversations/{CONVERSATION_ID}/cancel",
+        json=cancel_payload(),
+    ).status_code == 503
+    assert counts() == before == (0, 0, 0)
 
 
 def test_assistant_error_contract_isolated_from_schedule_errors(client: TestClient) -> None:

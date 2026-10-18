@@ -166,7 +166,7 @@ def test_reminder_upgrade_preserves_schedules_and_idempotency_records(
         before_schedules = _protected_schedule_rows(connection)
         before_idempotency = _idempotency_rows(connection)
 
-    command.upgrade(config, "head")
+    command.upgrade(config, CURRENT_REVISION)
 
     with engine.connect() as connection:
         assert _revision(connection) == CURRENT_REVISION
@@ -205,7 +205,7 @@ def test_reminder_downgrade_restores_nullable_column_with_only_null_values(
         )
         protected = _protected_schedule_rows(connection)
 
-    command.upgrade(config, "head")
+    command.upgrade(config, CURRENT_REVISION)
     command.downgrade(config, PREVIOUS_REVISION)
 
     with engine.connect() as connection:
@@ -220,7 +220,7 @@ def test_reminder_downgrade_restores_nullable_column_with_only_null_values(
             "SELECT COUNT(*) FROM schedules WHERE reminder_minutes_before IS NOT NULL"
         ).scalar_one() == 0
 
-    command.upgrade(config, "head")
+    command.upgrade(config, CURRENT_REVISION)
     with engine.connect() as connection:
         assert _revision(connection) == CURRENT_REVISION
         assert _protected_schedule_rows(connection) == protected
@@ -249,7 +249,7 @@ def test_reminder_upgrade_preflight_failure_keeps_previous_revision_and_schema(
         connection.exec_driver_sql("PRAGMA ignore_check_constraints=OFF")
 
     with pytest.raises(RuntimeError, match="unexpected categories"):
-        command.upgrade(config, "head")
+        command.upgrade(config, CURRENT_REVISION)
 
     with engine.connect() as connection:
         assert _revision(connection) == PREVIOUS_REVISION
@@ -295,7 +295,7 @@ def test_reminder_upgrade_rejects_leftover_batch_table_without_writes(
         leftover_before = _table_state(connection, "_alembic_tmp_schedules")
 
     with pytest.raises(RuntimeError, match="leftover batch table"):
-        command.upgrade(config, "head")
+        command.upgrade(config, CURRENT_REVISION)
 
     with engine.connect() as connection:
         assert _revision(connection) == PREVIOUS_REVISION
@@ -333,7 +333,7 @@ def test_reminder_upgrade_rejects_unexpected_columns_without_writes(
         source_before = _table_state(connection, "schedules")
 
     with pytest.raises(RuntimeError, match="unexpected source schema"):
-        command.upgrade(config, "head")
+        command.upgrade(config, CURRENT_REVISION)
 
     with engine.connect() as connection:
         assert _revision(connection) == PREVIOUS_REVISION
@@ -365,7 +365,7 @@ def test_reminder_upgrade_rejects_unexpected_indexes_without_writes(
         source_before = _table_state(connection, "schedules")
 
     with pytest.raises(RuntimeError, match="unexpected indexes"):
-        command.upgrade(config, "head")
+        command.upgrade(config, CURRENT_REVISION)
 
     with engine.connect() as connection:
         assert _revision(connection) == PREVIOUS_REVISION
