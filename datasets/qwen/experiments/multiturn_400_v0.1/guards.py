@@ -8,6 +8,9 @@ CATEGORY_WORDS = {'INBOUND': r'입고', 'INVENTORY': r'재고',
                   'OUTBOUND': r'출고|피킹|포장', 'RETURN': r'반품',
                   'OTHER': r'기타|회의|인수인계|안전\s*점검|장비\s*점검'}
 
+def requests_reminder(text):
+    return '알림' in text or bool(re.search(r'\d+\s*분\s*전에?\s*(?:알려|보여)|미리\s*알려', text))
+
 def task_evidence(users):
     """Bounded warehouse vocabulary; unknown tasks remain unverified, not OTHER."""
     result = {'status': 'missing', 'category': None, 'source': None}
@@ -65,7 +68,7 @@ def query_date_range(users,now):
     return result
 
 def evidence(users,now):
-    day=None;clock=None;ambiguous=False;reminder=None
+    day=None;clock=None;ambiguous=False
     for text in users:
         # Quoted titles and task-target dates are not schedule date evidence.
         source=re.sub(r'["“‘\'][^"”’\']*["”’\']','',text)
@@ -79,14 +82,14 @@ def evidence(users,now):
                 if period in {'오후','저녁'} and hour<12: hour+=12
                 if period in {'오전','아침'} and hour==12: hour=0
                 clock=(hour,minute)
-        if re.search(r'알림.*(?:꺼|끄|해제|없)',text): reminder=None
-        elif re.search(r'10\s*분\s*전',text): reminder=10
     value=None
     if day is not None and clock is not None:
         value=datetime.combine(day,datetime.min.time(),tzinfo=now.tzinfo).replace(hour=clock[0],minute=clock[1])
-    return {'day':day,'clock':clock,'ambiguous':ambiguous,'datetime':value,'reminder':reminder}
+    return {'day':day,'clock':clock,'ambiguous':ambiguous,'datetime':value}
 
 def validate_write(body,users,now,operation='create',current=None):
+    if users and requests_reminder(users[-1]):
+        return '알림 요청은 지원하지 않습니다. 알림 없는 일정 작업에 대한 확인이 필요합니다.'
     facts=evidence(users,now)
     if operation=='create':
         task=task_evidence(users)
@@ -114,16 +117,14 @@ def validate_write(body,users,now,operation='create',current=None):
     if 'scheduledAt' in body:
         expected=facts['datetime']
         if operation=='update' and expected is None and facts['clock'] and current:
-            base=datetime.fromisoformat(current['scheduledAt'].replace('Z','+00:00'))
+            base=datetime.fromisoformat(current['scheduledAt'].replace('Z','+00:00')).astimezone(now.tzinfo)
             expected=base.replace(hour=facts['clock'][0],minute=facts['clock'][1],second=0,microsecond=0)
         if expected is None: return '시각의 발화 근거가 없거나 날짜·오전/오후가 불명확합니다.'
         actual=datetime.fromisoformat(body['scheduledAt'].replace('Z','+00:00'))
         if actual!=expected: return '모델이 만든 시각이 사용자 발화의 시각과 다릅니다.'
         if actual<now: return '이미 지난 시각입니다.'
-    if 'reminderMinutesBefore' in body:
-        if operation=='update' and not any('알림' in u or re.search(r'\d+\s*분\s*전',u) for u in users):
-            return '알림 변경 요청이 없습니다.'
-        if body['reminderMinutesBefore']!=facts['reminder']: return '알림 값의 발화 근거가 없습니다.'
+    if 'reminderMinutesBefore' in body or 'reminderAt' in body:
+        return '지원하지 않는 알림 필드입니다.'
     return None
 
 # A conservative lexical rubric, not a general Korean semantic judge.
@@ -132,6 +133,7 @@ def check_question(kind,text,selection_active=False):
     if not isinstance(text,str): return False
     # A keyword in a statement is not a question to the user.
     asks=bool(re.search(r'[?？]|(?:까요|나요|세요|주세요|줘요|줘)\s*[.!?]?(?:\s|$)',text))
+    if kind=='unsupported_reminder': return asks and '알림' in text and '지원하지' in text
     if kind=='selection': return asks and selection_active and ('번호' in text or ('1번' in text and '2번' in text))
     if kind=='scope': return asks and bool(re.search(r'(?:범위|날짜|제목).*(?:좁혀|구체적으로|다시)',text))
     if kind=='change': return asks and bool(re.search(r'변경.*(?:내용|말씀|알려)',text))

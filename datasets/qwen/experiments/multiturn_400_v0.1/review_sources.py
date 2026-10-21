@@ -25,7 +25,7 @@ from runtime.replay_multiturn_pilot import ActionError, load_cases, replay, vali
 
 SOURCE_VERSION = "review-source-v0.1"
 SPLITS = ("train", "validation", "test")
-QUESTION_TYPES = {"selection", "change", "ampm", "date", "task", "category", "time", "past_time"}
+QUESTION_TYPES = {"selection", "change", "ampm", "date", "task", "category", "time", "past_time", "unsupported_reminder"}
 CASE_ID = re.compile(r"[a-z0-9][a-z0-9_-]*\Z")
 
 

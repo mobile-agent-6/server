@@ -14,6 +14,9 @@
   "inv-create-reminder": {
     "1": "time"
   },
+  "inv-update-alarm-off": {
+    "1": "unsupported_reminder"
+  },
   "out-create-ampm": {
     "1": "ampm"
   },
@@ -42,6 +45,9 @@
   },
   "other-update-different-target": {
     "1": "selection"
+  },
+  "other-update-reminder": {
+    "1": "unsupported_reminder"
   },
   "train-inbound-001": {
     "1": "past_time"
@@ -112,11 +118,17 @@
   "train-inventory-002": {
     "1": "time"
   },
+  "train-inventory-006": {
+    "1": "unsupported_reminder"
+  },
   "train-inventory-007": {
     "1": "date"
   },
   "train-inventory-008": {
     "1": "time"
+  },
+  "train-inventory-012": {
+    "1": "unsupported_reminder"
   },
   "train-inventory-013": {
     "1": "date"
@@ -124,11 +136,17 @@
   "train-inventory-014": {
     "1": "time"
   },
+  "train-inventory-018": {
+    "1": "unsupported_reminder"
+  },
   "train-inventory-019": {
     "1": "date"
   },
   "train-inventory-020": {
     "1": "time"
+  },
+  "train-inventory-024": {
+    "1": "unsupported_reminder"
   },
   "train-inventory-025": {
     "1": "date"
@@ -136,17 +154,26 @@
   "train-inventory-026": {
     "1": "time"
   },
+  "train-inventory-030": {
+    "1": "unsupported_reminder"
+  },
   "train-inventory-031": {
     "1": "date"
   },
   "train-inventory-032": {
     "1": "time"
   },
+  "train-inventory-036": {
+    "1": "unsupported_reminder"
+  },
   "train-inventory-037": {
     "1": "date"
   },
   "train-inventory-038": {
     "1": "time"
+  },
+  "train-inventory-042": {
+    "1": "unsupported_reminder"
   },
   "train-outbound-001": {
     "1": "ampm"
@@ -291,6 +318,9 @@
   "train-other-005": {
     "1": "selection"
   },
+  "train-other-006": {
+    "1": "unsupported_reminder"
+  },
   "train-other-007": {
     "1": "category",
     "2": "time"
@@ -300,6 +330,9 @@
   },
   "train-other-011": {
     "1": "selection"
+  },
+  "train-other-012": {
+    "1": "unsupported_reminder"
   },
   "train-other-013": {
     "1": "category",
@@ -311,6 +344,9 @@
   "train-other-017": {
     "1": "selection"
   },
+  "train-other-018": {
+    "1": "unsupported_reminder"
+  },
   "train-other-019": {
     "1": "category",
     "2": "time"
@@ -320,6 +356,9 @@
   },
   "train-other-023": {
     "1": "selection"
+  },
+  "train-other-024": {
+    "1": "unsupported_reminder"
   },
   "train-other-025": {
     "1": "category",
@@ -331,6 +370,9 @@
   "train-other-029": {
     "1": "selection"
   },
+  "train-other-030": {
+    "1": "unsupported_reminder"
+  },
   "train-other-031": {
     "1": "category",
     "2": "time"
@@ -341,6 +383,9 @@
   "train-other-035": {
     "1": "selection"
   },
+  "train-other-036": {
+    "1": "unsupported_reminder"
+  },
   "train-other-037": {
     "1": "category",
     "2": "time"
@@ -350,6 +395,24 @@
   },
   "train-other-041": {
     "1": "selection"
+  },
+  "train-other-042": {
+    "1": "unsupported_reminder"
+  },
+  "train-inbound-create-direct_train-02": {
+    "1": "unsupported_reminder"
+  },
+  "train-inventory-create-direct_train-04": {
+    "1": "unsupported_reminder"
+  },
+  "train-outbound-create-direct_train-06": {
+    "1": "unsupported_reminder"
+  },
+  "train-return-create-direct_train-08": {
+    "1": "unsupported_reminder"
+  },
+  "train-other-create-direct_train-10": {
+    "1": "unsupported_reminder"
   },
   "validation-inbound-create-task_date-01": {
     "1": "task",
@@ -364,6 +427,9 @@
   },
   "validation-inbound-query-missing_then_complete-01": {
     "1": "date"
+  },
+  "validation-inbound-update-title_alarm-01": {
+    "1": "unsupported_reminder"
   },
   "validation-inbound-delete-missing_date_single-01": {
     "1": "date"
@@ -385,6 +451,9 @@
   "validation-inventory-query-missing_then_complete-02": {
     "1": "date"
   },
+  "validation-inventory-update-title_alarm-02": {
+    "1": "unsupported_reminder"
+  },
   "validation-inventory-delete-missing_date_single-02": {
     "1": "date"
   },
@@ -404,6 +473,9 @@
   },
   "validation-outbound-query-missing_then_complete-03": {
     "1": "date"
+  },
+  "validation-outbound-update-title_alarm-03": {
+    "1": "unsupported_reminder"
   },
   "validation-outbound-delete-missing_date_single-03": {
     "1": "date"
@@ -425,6 +497,9 @@
   "validation-return-query-missing_then_complete-04": {
     "1": "date"
   },
+  "validation-return-update-title_alarm-04": {
+    "1": "unsupported_reminder"
+  },
   "validation-return-delete-missing_date_single-04": {
     "1": "date"
   },
@@ -444,6 +519,9 @@
   },
   "validation-other-query-missing_then_complete-05": {
     "1": "date"
+  },
+  "validation-other-update-title_alarm-05": {
+    "1": "unsupported_reminder"
   },
   "validation-other-delete-missing_date_single-05": {
     "1": "date"

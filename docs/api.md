@@ -565,6 +565,9 @@ X-Request-ID: {재시도 요청의 새 ID}
   필드로 처리한다.
 - 새 API 응답에는 두 필드가 없으므로 구형 클라이언트·AI 제어부·평가 도구는 새
   서버 버전에 맞게 조정한 뒤 연동한다.
+- `ai/`의 로컬 시범 제어부와 `datasets/qwen/experiments/multiturn_400_v0.1/`의
+  미검수 초안은 알림 필드를 제거한 형식으로 조정했다. 이는 production
+  DecisionProvider 연결이나 FE·AI 적용 확인(`TBD-FE`, `TBD-AI`)의 완료를 뜻하지 않는다.
 - 과거 migration과 기존 멱등성 응답 snapshot에는 재현·보존 목적으로 알림 필드가
   남을 수 있다. 이를 현재 API가 알림을 지원한다는 뜻으로 해석하지 않는다.
 

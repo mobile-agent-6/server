@@ -23,7 +23,7 @@ NOW = datetime.fromisoformat("2026-10-10T09:00:00+09:00")
 WHEN = "2026-10-11T10:00:00+09:00"
 LATER = "2026-10-11T15:00:00+09:00"
 ITEM = {"id": ID, "title": "재고 실사", "scheduledAt": WHEN,
-        "category": "INVENTORY", "updatedAt": "v1", "reminderMinutesBefore": 10}
+        "category": "INVENTORY", "updatedAt": "v1"}
 
 
 def action(name, request=None, message=None):
@@ -69,7 +69,9 @@ class ActionTests(unittest.TestCase):
     def test_rejects_extra_fields_invalid_category_and_long_list(self):
         for raw in (
             '{"action":"ASK","message":"언제요?","request":null,"location":"B"}',
-            action("CREATE", {"title": "실사", "scheduledAt": WHEN, "category": "재고", "reminderMinutesBefore": 10}),
+            action("CREATE", {"title": "실사", "scheduledAt": WHEN, "category": "재고"}),
+            action("CREATE", {"title": "실사", "scheduledAt": WHEN, "category": "INVENTORY", "reminderMinutesBefore": None}),
+            action("CONFIRM_UPDATE", {"targetId": ID, "changes": {"reminderMinutesBefore": 10}}),
             action("LIST", {"from": WHEN, "to": "2027-02-01T10:00:00+09:00"}),
         ):
             with self.subTest(raw=raw), self.assertRaises(ActionError):
@@ -91,7 +93,7 @@ class ActionTests(unittest.TestCase):
                 parse_action(raw)
 
     def test_create_after_valid_action_only(self):
-        body = {"title": "재고 실사", "scheduledAt": WHEN, "category": "INVENTORY", "reminderMinutesBefore": 10}
+        body = {"title": "재고 실사", "scheduledAt": WHEN, "category": "INVENTORY"}
         schedules = FakeSchedules()
         service = ConversationService(FakeModel(action("CREATE", body)), schedules,
                                       lambda: datetime.fromisoformat("2026-10-10T09:00:00+09:00"))
@@ -100,9 +102,47 @@ class ActionTests(unittest.TestCase):
         self.assertEqual(schedules.writes, [("POST", body)])
         self.assertEqual(len(schedules.keys[0]), 36)
 
+    def test_reminder_request_never_writes_without_separate_consent(self):
+        body = {"title": "재고 실사", "scheduledAt": WHEN, "category": "INVENTORY"}
+        schedules = FakeSchedules()
+        service = ConversationService(FakeModel(
+            action("ASK", message="알림 기능은 지원하지 않아요. 다른 일정 요청이 있나요?"),
+            action("ASK", message="알림 기능은 지원하지 않아요. 알림 없이 일정 작업을 진행할까요?"),
+            action("CREATE", body)), schedules, lambda: NOW)
+        self.assertEqual(service.handle("내일 재고 실사 일정의 알림만 꺼줘.").kind, "ask")
+        self.assertEqual(schedules.writes, [])
+        reply = service.handle("내일 오전 10시에 재고 실사 등록해줘. 10분 전 알림도 부탁해.")
+        self.assertEqual(reply.kind, "ask")
+        self.assertIn("알림 없이", reply.message)
+        self.assertEqual(schedules.writes, [])
+        self.assertEqual(service.handle("응").kind, "created")
+        self.assertEqual(schedules.writes, [("POST", body)])
+
+    def test_cancel_mixed_reminder_request_does_not_write(self):
+        schedules = FakeSchedules()
+        service = ConversationService(FakeModel(
+            action("ASK", message="알림 기능은 지원하지 않아요. 알림 없이 일정 작업을 진행할까요?")),
+            schedules, lambda: NOW)
+        self.assertEqual(service.handle("내일 오전 10시에 재고 실사 등록해줘. 알림도 켜줘.").kind, "ask")
+        self.assertEqual(service.handle("아니요").kind, "cancelled")
+        self.assertEqual(schedules.writes, [])
+
+    def test_reminder_guard_blocks_model_write_and_recognizes_before_phrasing(self):
+        body = {"title": "재고 실사", "scheduledAt": WHEN, "category": "INVENTORY"}
+        schedules = FakeSchedules()
+        service = ConversationService(FakeModel(
+            action("CREATE", body),
+            action("ASK", message="몇 시에 등록할까요?")), schedules, lambda: NOW)
+        reply = service.handle("내일 재고 실사 넣고 10분 전에 알려줘.")
+        self.assertEqual(reply.kind, "ask")
+        self.assertIn("알림 없이", reply.message)
+        self.assertEqual(schedules.writes, [])
+        self.assertEqual(service.handle("응").kind, "ask")
+        self.assertEqual(schedules.writes, [])
+
     def test_past_create_asks_for_new_time_before_api(self):
         schedules = FakeSchedules()
-        body = {"title": "재고 실사", "scheduledAt": WHEN, "category": "INVENTORY", "reminderMinutesBefore": None}
+        body = {"title": "재고 실사", "scheduledAt": WHEN, "category": "INVENTORY"}
         service = ConversationService(FakeModel(action("CREATE", body)), schedules,
                                       lambda: datetime.fromisoformat("2026-10-12T09:00:00+09:00"))
         reply = service.handle("등록해")
@@ -304,7 +344,7 @@ class ActionTests(unittest.TestCase):
 
     def test_uncertain_create_reuses_key_and_blocks_new_model_request(self):
         body = {"title": "재고 실사", "scheduledAt": WHEN,
-                "category": "INVENTORY", "reminderMinutesBefore": None}
+                "category": "INVENTORY"}
 
         class UncertainSchedules(FakeSchedules):
             def create(self, payload, key):
@@ -327,7 +367,7 @@ class ActionTests(unittest.TestCase):
 
     def test_uncertain_create_does_not_retry_after_key_retention(self):
         body = {"title": "재고 실사", "scheduledAt": WHEN,
-                "category": "INVENTORY", "reminderMinutesBefore": None}
+                "category": "INVENTORY"}
 
         class UncertainSchedules(FakeSchedules):
             def create(self, payload, key):

@@ -142,6 +142,23 @@ class ReviewedTrainingTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Expected reviewed training export"):
             prepare.load_inputs(self.output)
 
+    def test_unsupported_and_mixed_reminder_cases_export_when_reviewed(self):
+        selected = {"train": "inv-update-alarm-off",
+                    "validation": "validation-inbound-update-title_alarm-01"}
+        for split, case_id in selected.items():
+            source = EXPERIMENT / split / "scenarios_UNREVIEWED.jsonl"
+            case = next(json.loads(line) for line in source.read_text(encoding="utf-8").splitlines()
+                        if json.loads(line)["id"] == case_id)
+            self.cases[split] = [case]
+            (self.root / split / "scenarios_UNREVIEWED.jsonl").write_text(
+                json.dumps(case, ensure_ascii=False) + "\n", encoding="utf-8")
+            self.review(split)
+        manifest = export_training.export_training(self.output, self.root)
+        self.assertEqual(manifest["scenario_counts"], {"train": 1, "validation": 1})
+        inputs, _ = prepare.load_inputs(self.output)
+        self.assertEqual(len(inputs["train"][1]), 1)
+        self.assertEqual(len(inputs["valid"][1]), 3)
+
 
 if __name__ == "__main__":
     unittest.main()

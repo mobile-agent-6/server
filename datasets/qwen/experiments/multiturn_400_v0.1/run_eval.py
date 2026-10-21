@@ -14,7 +14,7 @@ from runtime.replay_multiturn_pilot import load_cases,MemorySchedules,FaultingMe
 from runtime.schedule_assistant.service import ConversationService
 from runtime.schedule_assistant.actions import parse_action,ActionError
 from runtime.schedule_assistant.clients import ScheduleError
-from guards import evidence,validate_write,check_question,intent_from_users,task_evidence,query_scope,required_question,query_date_range
+from guards import evidence,validate_write,check_question,intent_from_users,task_evidence,query_scope,required_question,query_date_range,requests_reminder
 PROMPT=(ROOT/'prompt.txt').read_text(encoding='utf-8')
 OPTIONS={'temperature':0,'seed':42,'num_predict':1024,'num_ctx':8192}
 
@@ -24,8 +24,7 @@ def branch(name,request,message=None):
  return obj({'action':{'type':'string','enum':[name]},'message':message or {'type':'null'},'request':request})
 def schema_for(context):
  category={'type':'string','enum':['INBOUND','INVENTORY','OUTBOUND','RETURN','OTHER']}
- nullable_alarm={'anyOf':[{'type':'null'},{'type':'integer','enum':[10]}]}
- fields={'title':{'type':'string','minLength':1,'maxLength':100},'scheduledAt':{'type':'string'},'category':category,'reminderMinutesBefore':nullable_alarm}
+ fields={'title':{'type':'string','minLength':1,'maxLength':100},'scheduledAt':{'type':'string'},'category':category}
  choices=[branch('ASK',{'type':'null'},{'type':'string','minLength':1,'maxLength':240}),branch('ANSWER',{'type':'null'})]
  if not context['lookup_completed_this_turn']:
   choices.append(branch('LIST',obj({'from':{'type':'string'},'to':{'type':'string'},'category':category,'completed':{'type':'boolean'}},['from','to'])))
@@ -51,6 +50,7 @@ def schema_for(context):
   elif len(ids)>1: allowed={'ASK','SELECT_TARGET'}
   elif context['lookup_completed_this_turn']: allowed={'ANSWER','ASK'}
   else: allowed={'ASK'} if context['date_missing'] else {'LIST'}
+ if context.get('unsupported_reminder'): allowed={'ASK'}
  scope=context.get('query_scope',{})
  for choice in choices:
   if choice['properties']['action']['enum'][0]=='LIST' and scope.get('known'):
@@ -103,7 +103,7 @@ class RecordingModel:
    call['schema']=copy.deepcopy(getattr(self.client,'last_schema',None));call['wall_time_ms']=round((time.perf_counter()-started)*1000,1);self.calls.append(call)
 
 class GuardedSchedules(FaultingMemorySchedules):
- def __init__(self,initial,created_id,now,faults=None): super().__init__(initial,created_id,faults);self.users=[];self.now=now;self.guard_events=[];self.filter_events=[]
+ def __init__(self,initial,created_id,now,faults=None): super().__init__(initial,created_id,faults,now.isoformat());self.users=[];self.now=now;self.guard_events=[];self.filter_events=[]
  def guard(self,body,operation,current=None):
   error=validate_write(body,self.users,self.now,operation,current)
   if error:
@@ -137,10 +137,11 @@ class Service(ConversationService):
   if history and history[-1]['role']=='assistant':
    try: after_lookup=json.loads(history[-1]['content']).get('action')=='LIST'
    except (ValueError,AttributeError): pass
-  context={'intent':intent_from_users(self.schedules.users),'reference_datetime':now.isoformat(timespec='seconds'),'lookup_completed_this_turn':after_lookup,'schedule_candidates':list(self.state.candidates.values()),'last_schedule_result':self.state.last_result,'verified_user_datetime':facts['datetime'].isoformat(timespec='seconds') if facts['datetime'] else None,'user_time_in_past':bool(facts['datetime'] and facts['datetime']<now),'requested_reminder_minutes':facts['reminder'],'date_missing':facts['day'] is None,'time_missing':facts['clock'] is None,'ampm_ambiguous':facts['ambiguous']}
+  context={'intent':intent_from_users(self.schedules.users),'reference_datetime':now.isoformat(timespec='seconds'),'lookup_completed_this_turn':after_lookup,'schedule_candidates':list(self.state.candidates.values()),'last_schedule_result':self.state.last_result,'verified_user_datetime':facts['datetime'].isoformat(timespec='seconds') if facts['datetime'] else None,'user_time_in_past':bool(facts['datetime'] and facts['datetime']<now),'date_missing':facts['day'] is None,'time_missing':facts['clock'] is None,'ampm_ambiguous':facts['ambiguous']}
   context['task_evidence']=task_evidence(self.schedules.users)
   context['query_scope']=query_scope(self.schedules.users)
   context['query_date_range']=query_date_range(self.schedules.users,now)
+  context['unsupported_reminder']=requests_reminder(self.schedules.users[-1])
   if context['intent'] in {'query','update','delete'}:
    context['date_missing']=context['query_date_range']['status']!='known'
   context['required_question']=required_question(self.schedules.users,now) if context['intent']=='create' else None
@@ -199,7 +200,7 @@ class ReferenceClient:
 
 def business_state(items):
  # Server-maintained timestamps are outside the requested business change.
- return {x['id']:{k:v for k,v in x.items() if k not in {'createdAt','updatedAt','reminderAt'}} for x in items}
+ return {x['id']:{k:v for k,v in x.items() if k not in {'createdAt','updatedAt'}} for x in items}
 
 def pending_value(service):
  p=service.state.pending
@@ -208,7 +209,7 @@ def pending_value(service):
 def reference_trace(case):
  """Independent scorer-only trace. Never provided to the live model/client."""
  client=ReferenceClient([a for t in case['turns'] for a in t['model_outputs']])
- schedules=FaultingMemorySchedules(case['initial_schedules'],case.get('created_id'),case.get('faults'))
+ schedules=FaultingMemorySchedules(case['initial_schedules'],case.get('created_id'),case.get('faults'),case['reference_datetime'])
  service=ConversationService(client,schedules,lambda:datetime.fromisoformat(case['reference_datetime']))
  result=[]
  for t in case['turns']:

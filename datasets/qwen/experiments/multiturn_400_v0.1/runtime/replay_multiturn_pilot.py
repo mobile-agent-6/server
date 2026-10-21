@@ -6,7 +6,7 @@ import argparse
 import copy
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 from uuid import UUID
@@ -17,10 +17,17 @@ from runtime.schedule_assistant.actions import ActionError, parse_action  # noqa
 from runtime.schedule_assistant.clients import ScheduleError  # noqa: E402
 from runtime.schedule_assistant.service import ConversationService  # noqa: E402
 
-SCHEMA_VERSION = "pilot-v0.1"
+SCHEMA_VERSION = "pilot-v0.2"
 STATUSES = {"proposed_unreviewed", "reviewed", "rejected"}
 REQUIRED_SCHEDULE = {"id", "title", "scheduledAt", "category", "completed",
-                     "reminderMinutesBefore", "createdAt", "updatedAt"}
+                     "createdAt", "updatedAt"}
+
+
+def _utc_timestamp(value: str) -> str:
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ValueError("schedule timestamp needs an offset")
+    return parsed.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def _fields(value: Any, required: set[str], optional: set[str] = frozenset()) -> dict[str, Any]:
@@ -47,12 +54,12 @@ def validate_scenario(value: Any) -> dict[str, Any]:
     if "created_id" in case:
         UUID(case["created_id"])
     for item in case["initial_schedules"]:
-        _fields(item, REQUIRED_SCHEDULE, {"reminderAt"})
+        _fields(item, REQUIRED_SCHEDULE)
         UUID(item["id"])
     if len({item["id"] for item in case["initial_schedules"]}) != len(case["initial_schedules"]):
         raise ValueError("duplicate initial schedule ID")
     for item in case["expect_final"]:
-        _fields(item, {"id"}, {"title", "scheduledAt", "category", "completed", "reminderMinutesBefore"})
+        _fields(item, {"id"}, {"title", "scheduledAt", "category", "completed"})
         UUID(item["id"])
     if len({item["id"] for item in case["expect_final"]}) != len(case["expect_final"]):
         raise ValueError("duplicate final schedule ID")
@@ -105,9 +112,12 @@ class ScriptedModel:
 
 
 class MemorySchedules:
-    def __init__(self, initial: list[dict[str, Any]], created_id: str | None = None) -> None:
+    def __init__(self, initial: list[dict[str, Any]], created_id: str | None = None,
+                 reference_datetime: str | None = None) -> None:
         self.items = {item["id"]: copy.deepcopy(item) for item in initial}
         self.created_id = created_id
+        self.reference_datetime = (_utc_timestamp(reference_datetime)
+                                   if reference_datetime is not None else None)
         self.calls: list[dict[str, Any]] = []
         self.created_keys: dict[str, tuple[dict[str, Any], dict[str, Any]]] = {}
 
@@ -129,6 +139,7 @@ class MemorySchedules:
         return copy.deepcopy(self.items[schedule_id])
 
     def create(self, body: dict[str, Any], key: str) -> dict[str, Any]:
+        _fields(body, {"title", "scheduledAt", "category"})
         self.calls.append({"method": "POST", "body": copy.deepcopy(body), "key": key})
         if key in self.created_keys:
             original_body, result = self.created_keys[key]
@@ -137,18 +148,28 @@ class MemorySchedules:
             return copy.deepcopy(result)
         if self.created_id is None or self.created_id in self.items:
             raise ScheduleError("NO_CREATED_ID")
+        if self.reference_datetime is None:
+            raise ValueError("reference_datetime required for write replay")
         result = {"id": self.created_id, **copy.deepcopy(body), "completed": False,
-                  "createdAt": "pilot-created", "updatedAt": "pilot-created"}
+                  "createdAt": self.reference_datetime, "updatedAt": self.reference_datetime}
+        result["scheduledAt"] = _utc_timestamp(result["scheduledAt"])
         self.items[self.created_id] = copy.deepcopy(result)
         self.created_keys[key] = (copy.deepcopy(body), copy.deepcopy(result))
         return result
 
     def update(self, schedule_id: str, changes: dict[str, Any]) -> dict[str, Any]:
+        _fields(changes, set(), {"title", "scheduledAt", "category", "completed"})
+        if not changes or any(value is None for value in changes.values()):
+            raise ValueError("invalid schedule update")
         self.calls.append({"method": "PATCH", "id": schedule_id, "body": copy.deepcopy(changes)})
         if schedule_id not in self.items:
             raise ScheduleError("NOT_FOUND")
+        if self.reference_datetime is None:
+            raise ValueError("reference_datetime required for write replay")
         self.items[schedule_id].update(changes)
-        self.items[schedule_id]["updatedAt"] = "pilot-updated"
+        if "scheduledAt" in changes:
+            self.items[schedule_id]["scheduledAt"] = _utc_timestamp(changes["scheduledAt"])
+        self.items[schedule_id]["updatedAt"] = self.reference_datetime
         return copy.deepcopy(self.items[schedule_id])
 
     def delete(self, schedule_id: str) -> None:
@@ -162,8 +183,9 @@ class FaultingMemorySchedules(MemorySchedules):
     """DATA-only deterministic write failures and pre-read stale state."""
 
     def __init__(self, initial: list[dict[str, Any]], created_id: str | None = None,
-                 faults: list[dict[str, Any]] | None = None) -> None:
-        super().__init__(initial, created_id)
+                 faults: list[dict[str, Any]] | None = None,
+                 reference_datetime: str | None = None) -> None:
+        super().__init__(initial, created_id, reference_datetime)
         self.faults = faults or []
         self.post_count = 0
         self.patch_count = 0
@@ -176,7 +198,10 @@ class FaultingMemorySchedules(MemorySchedules):
         if any(fault == {"method": "GET", "occurrence": self.get_count,
                          "effect": "stale_before_read"} for fault in self.faults):
             if schedule_id in self.items:
-                self.items[schedule_id]["updatedAt"] = "pilot-external-change"
+                if self.reference_datetime is None:
+                    raise ValueError("reference_datetime required for stale replay")
+                changed = datetime.fromisoformat(self.reference_datetime.replace("Z", "+00:00")) + timedelta(seconds=1)
+                self.items[schedule_id]["updatedAt"] = changed.isoformat().replace("+00:00", "Z")
             self.fault_events.append({"method": "GET", "occurrence": self.get_count,
                                       "effect": "stale_before_read"})
         return super().get(schedule_id)
@@ -228,7 +253,8 @@ class FaultingMemorySchedules(MemorySchedules):
 def replay(case: dict[str, Any]) -> None:
     validate_scenario(case)
     model = ScriptedModel()
-    schedules = FaultingMemorySchedules(case["initial_schedules"], case.get("created_id"), case.get("faults"))
+    schedules = FaultingMemorySchedules(case["initial_schedules"], case.get("created_id"),
+                                        case.get("faults"), case["reference_datetime"])
     now = datetime.fromisoformat(case["reference_datetime"])
     service = ConversationService(model, schedules, lambda: now)
     for index, turn in enumerate(case["turns"], 1):

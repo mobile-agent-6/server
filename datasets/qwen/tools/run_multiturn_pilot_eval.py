@@ -12,11 +12,11 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "ai"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "experiments" / "multiturn_pilot" / "runtime"))
 
-from schedule_assistant.actions import ActionError, parse_action  # noqa: E402
-from schedule_assistant.clients import OllamaClient  # noqa: E402
-from schedule_assistant.service import ConversationService, PROMPT  # noqa: E402
+from legacy_schedule_assistant.actions import ActionError, parse_action  # noqa: E402
+from legacy_schedule_assistant.clients import OllamaClient  # noqa: E402
+from legacy_schedule_assistant.service import ConversationService, PROMPT  # noqa: E402
 
 from replay_multiturn_pilot import MemorySchedules, load_cases  # noqa: E402
 

@@ -106,7 +106,7 @@ class ConversationService:
         if operation == "delete":
             return f"{subject} 일정을 삭제할까요?"
         labels = {"title": "제목", "scheduledAt": "시각", "category": "카테고리",
-                  "completed": "완료", "reminderMinutesBefore": "알림(분 전)"}
+                  "completed": "완료"}
         details = ", ".join(f"{labels[key]}={json.dumps(value, ensure_ascii=False)}"
                             for key, value in (changes or {}).items())
         return f"{subject} 일정을 {details}로 변경할까요?"

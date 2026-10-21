@@ -65,12 +65,6 @@ def _category(value: Any) -> str:
     return value
 
 
-def _reminder(value: Any) -> int | None:
-    if value is not None and (type(value) is not int or value != 10):
-        raise ActionError("invalid reminder")
-    return value
-
-
 def _uuid(value: Any) -> str:
     if not isinstance(value, str):
         raise ActionError("invalid target ID")
@@ -117,14 +111,14 @@ def parse_action(raw: str) -> Action:
         if "completed" in request and type(request["completed"]) is not bool:
             raise ActionError("invalid completed")
     elif name == "CREATE":
-        request = _fields(request, {"title", "scheduledAt", "category", "reminderMinutesBefore"})
+        request = _fields(request, {"title", "scheduledAt", "category"})
         request = {"title": _title(request["title"]), "scheduledAt": _datetime(request["scheduledAt"]),
-                   "category": _category(request["category"]), "reminderMinutesBefore": _reminder(request["reminderMinutesBefore"])}
+                   "category": _category(request["category"])}
     elif name == "CONFIRM_UPDATE" or (name == "SELECT_TARGET" and isinstance(request, dict)
                                       and request.get("operation") == "update"):
         request = _fields(request, {"targetId", "changes"} if name == "CONFIRM_UPDATE"
                           else {"operation", "changes"})
-        changes = _fields(request["changes"], set(), {"title", "scheduledAt", "category", "completed", "reminderMinutesBefore"})
+        changes = _fields(request["changes"], set(), {"title", "scheduledAt", "category", "completed"})
         if not changes:
             raise ActionError("empty update")
         checked: dict[str, Any] = {}
@@ -139,8 +133,6 @@ def parse_action(raw: str) -> Action:
                 if type(item) is not bool:
                     raise ActionError("invalid completed")
                 checked[key] = item
-            else:
-                checked[key] = _reminder(item)
         request = ({"targetId": _uuid(request["targetId"]), "changes": checked}
                    if name == "CONFIRM_UPDATE" else {"operation": "update", "changes": checked})
     elif name == "SELECT_TARGET":

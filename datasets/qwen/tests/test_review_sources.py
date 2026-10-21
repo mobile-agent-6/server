@@ -81,6 +81,19 @@ class ReviewSourcesTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             review_sources.load_reviewed(self.root)
 
+    def test_unsupported_reminder_question_can_be_reviewed(self) -> None:
+        source = EXPERIMENT / "train" / "scenarios_UNREVIEWED.jsonl"
+        case = next(json.loads(line) for line in source.read_text(encoding="utf-8").splitlines()
+                    if json.loads(line)["id"] == "inv-update-alarm-off")
+        self.cases["train"] = case
+        (self.root / "train" / "scenarios_UNREVIEWED.jsonl").write_text(
+            json.dumps(case, ensure_ascii=False) + "\n", encoding="utf-8")
+        rubric = json.loads((self.root / "question_rubric.json").read_text(encoding="utf-8"))
+        rubric[case["id"]] = {"1": "unsupported_reminder"}
+        review_sources.save_json(self.root / "question_rubric.json", rubric)
+        self._approve("train")
+        self.assertEqual(len(review_sources.load_reviewed(self.root)), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

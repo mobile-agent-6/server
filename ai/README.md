@@ -18,11 +18,11 @@ Ollama와 백엔드가 먼저 실행돼 있어야 한다. 위 명령은 지정�
 | `CONFIRM_DELETE` | 조회 후보가 1건이면 해당 ID를 확인; 승인 시 재조회 후 `DELETE`                       |
 | `ANSWER`         | `message=null`. 조회 결과가 있으면 API 응답에서 안내를 만들고, 그 외에는 고정 안내 표시 |
 
-모델 출력은 `action`, `message`, `request`의 세 키만 허용한다. `ASK.message`에는 질문을 넣고 `SELECT_TARGET.message`와 `ANSWER.message`는 `null`이다. 상세 필드와 다섯 category는 [검증 코드](schedule_assistant/actions.py), 지시문은 [프롬프트](schedule_assistant/prompt.txt)에 있다. 위치 필드는 없다. 수정·삭제 조회 결과가 0건이면 없음을 안내하고, 1건이면 해당 UUID로 확인을 시작한다. 2~10건이면 `SELECT_TARGET`에 `targetId` 없이 번호 선택을 요구하며, 10건 초과면 날짜·제목으로 범위를 좁히도록 묻는다. 선택한 대상·변경값을 사용자에게 확인받기 전이나 거절 뒤에는 쓰지 않는다. 확인 문구에 모델의 `message`를 사용하지 않는다. 등록과 수정·삭제 성공 문구는 API 성공 뒤에만 표시한다. 확인 중 승인·거절 외 새 발화는 기존 확인을 취소하고 새 요청으로 처리한다.
+모델 출력은 `action`, `message`, `request`의 세 키만 허용한다. `ASK.message`에는 질문을 넣고 `SELECT_TARGET.message`와 `ANSWER.message`는 `null`이다. 상세 필드와 다섯 category는 [검증 코드](schedule_assistant/actions.py), 지시문은 [프롬프트](schedule_assistant/prompt.txt)에 있다. 위치 필드는 없다. 현행 Schedule API에 없는 알림 필드는 생성·수정 요청에서 거절한다. 알림만 요청하면 지원하지 않는다고 안내하고, 일정 작업과 함께 요청하면 알림 없이 진행할지 확인한 뒤 일정 작업만 처리한다. 수정·삭제 조회 결과가 0건이면 없음을 안내하고, 1건이면 해당 UUID로 확인을 시작한다. 2~10건이면 `SELECT_TARGET`에 `targetId` 없이 번호 선택을 요구하며, 10건 초과면 날짜·제목으로 범위를 좁히도록 묻는다. 선택한 대상·변경값을 사용자에게 확인받기 전이나 거절 뒤에는 쓰지 않는다. 확인 문구에 모델의 `message`를 사용하지 않는다. 등록과 수정·삭제 성공 문구는 API 성공 뒤에만 표시한다. 확인 중 승인·거절 외 새 발화는 기존 확인을 취소하고 새 요청으로 처리한다.
 
 등록 결과가 불확실하면 새 생성 요청을 막고, 사용자가 `재시도`라고 입력했을 때 같은 본문·키로만 다시 요청한다. 24시간이 지났으면 자동 재시도를 막고 서버 확인을 안내한다. 이 보관은 프로세스 메모리에서만 유효하므로 재시작 뒤 중복 등록 위험은 남는다.
 
-등록·변경할 시각이 이미 지났으면 다음 날로 넘기지 않고 새 시각을 묻는다. 수정·삭제 응답이 불확실하면 성공이라고 말하지 않고 대상 일정을 다시 조회해 현재 상태를 안내한다. 이후 변경은 새 요청과 확인이 필요하다. [멀티턴 시범 자료](../datasets/qwen/experiments/multiturn_pilot/README.md)는 이 제어부를 모의 일정으로 재생한다.
+등록·변경할 시각이 이미 지났으면 다음 날로 넘기지 않고 새 시각을 묻는다. 수정·삭제 응답이 불확실하면 성공이라고 말하지 않고 대상 일정을 다시 조회해 현재 상태를 안내한다. 이후 변경은 새 요청과 확인이 필요하다. [과거 멀티턴 시범 자료](../datasets/qwen/experiments/multiturn_pilot/README.md)는 당시 제어부의 보존본으로 재생한다.
 
 ```powershell
 python -m unittest discover -s ai/tests -v

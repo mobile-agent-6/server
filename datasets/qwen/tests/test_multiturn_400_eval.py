@@ -7,6 +7,7 @@ import json
 import re
 import sys
 import unittest
+from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
 
@@ -14,8 +15,9 @@ EXPERIMENT = Path(__file__).resolve().parents[1] / "experiments" / "multiturn_40
 sys.path.insert(0, str(EXPERIMENT))
 
 import run_eval as evaluator  # noqa: E402
-from guards import check_question, intent_from_users, validate_write  # noqa: E402
+from guards import check_question, intent_from_users, validate_write, requests_reminder  # noqa: E402
 from runtime.schedule_assistant.service import ConversationService, Reply  # noqa: E402
+from runtime.replay_multiturn_pilot import MemorySchedules  # noqa: E402
 
 
 class Multiturn400EvalTests(unittest.TestCase):
@@ -50,6 +52,64 @@ class Multiturn400EvalTests(unittest.TestCase):
                             for action in turn["model_outputs"]))
         self.assertTrue(any("T21:00:00" in case["reference_datetime"]
                             for case in splits["train"]))
+
+    def test_current_drafts_do_not_reintroduce_removed_alarm_field(self) -> None:
+        paths = (EXPERIMENT / "scenarios_all_400_UNREVIEWED.jsonl",
+                 EXPERIMENT / "diagnostic" / "scenarios_UNREVIEWED.jsonl")
+        for path in paths:
+            for case in evaluator.load_cases(path):
+                with self.subTest(case=case["id"]):
+                    self.assertEqual(case["schema_version"], "pilot-v0.2")
+                    for schedule in case["initial_schedules"] + case["expect_final"]:
+                        self.assertFalse({"reminderMinutesBefore", "reminderAt"} & schedule.keys())
+                    for turn in case["turns"]:
+                        if requests_reminder(turn["user"]):
+                            self.assertEqual(turn["expect"]["reply_kind"], "ask")
+                            self.assertEqual(turn["expect"]["writes"], 0)
+                            self.assertEqual(turn["model_outputs"][0]["action"], "ASK")
+                        for output in turn["model_outputs"]:
+                            request = output["request"] or {}
+                            payload = request.get("changes", request)
+                            self.assertFalse({"reminderMinutesBefore", "reminderAt"} & payload.keys())
+                        self.assertNotIn("reminderMinutesBefore", turn["expect"].get("post_body", {}))
+        self.assertEqual(self.cases["inv-update-alarm-off"]["turns"][0]["expect"]["writes"], 0)
+        self.assertEqual(self.cases["other-update-reminder"]["turns"][0]["expect"]["writes"], 0)
+        mixed = [case for path in paths[:1] for case in evaluator.load_cases(path)
+                 if "알림" in case["turns"][0]["user"] and len(case["turns"]) > 1]
+        self.assertEqual(len(mixed), 10)
+        for case in mixed:
+            with self.subTest(mixed_case=case["id"]):
+                first = case["turns"][0]
+                self.assertEqual(first["model_outputs"][0]["action"], "ASK")
+                self.assertEqual(first["expect"]["writes"], 0)
+                self.assertEqual(case["turns"][1]["user"], "응")
+
+    def test_schedule_responses_use_backend_utc_timestamps(self) -> None:
+        cases = evaluator.load_cases(EXPERIMENT / "scenarios_all_400_UNREVIEWED.jsonl")
+        for case in cases:
+            for item in case["initial_schedules"]:
+                for key in ("scheduledAt", "createdAt", "updatedAt"):
+                    self.assertTrue(item[key].endswith("Z"), f"{case['id']} {key}")
+            for item in case["expect_final"]:
+                if "scheduledAt" in item:
+                    self.assertTrue(item["scheduledAt"].endswith("Z"), case["id"])
+
+        case = self.cases["in-create-time"]
+        schedules = MemorySchedules(case["initial_schedules"], case["created_id"],
+                                    case["reference_datetime"])
+        body = {"title": "입고 상품 검수", "scheduledAt": "2026-10-11T10:00:00+09:00",
+                "category": "INBOUND"}
+        created = schedules.create(body, "key-1")
+        self.assertEqual(created["scheduledAt"], "2026-10-11T01:00:00Z")
+        self.assertTrue(created["createdAt"].endswith("Z"))
+        self.assertTrue(created["updatedAt"].endswith("Z"))
+        updated = schedules.update(created["id"], {"scheduledAt": "2026-10-11T11:00:00+09:00"})
+        self.assertEqual(updated["scheduledAt"], "2026-10-11T02:00:00Z")
+        self.assertTrue(updated["updatedAt"].endswith("Z"))
+        self.assertIsNone(validate_write(
+            {"scheduledAt": "2026-10-11T12:00:00+09:00"},
+            ["오후 12시로 변경해줘."], datetime.fromisoformat(case["reference_datetime"]),
+            "update", updated))
 
     def test_natural_delete_and_update_phrases_keep_their_intent(self) -> None:
         self.assertEqual(intent_from_users(["내일 반품 일정 하나 지우고 싶어."]), "delete")

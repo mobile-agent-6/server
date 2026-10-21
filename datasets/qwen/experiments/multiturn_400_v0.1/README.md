@@ -6,13 +6,13 @@
 
 | 파일 | 역할 |
 |---|---|
-| `prompt.txt` | 다음 실제 평가에 사용할 v2.5 제안 프롬프트. action별 적용 범위와 JSON 예시를 정리했으며 성능은 아직 측정하지 않음 |
+| `prompt.txt` | 다음 실제 평가에 사용할 v2.6 제안 프롬프트. 현행 Schedule API에서 제거된 알림 필드를 출력하지 않으며 성능은 아직 측정하지 않음 |
 | `build_dataset.py` | 원본 대화·생성 규칙으로 400개 생성 및 정답 재생. 필요한 원본 30개는 코드에 포함 |
 | `review_sources.py` | 사례별 검수 원본 생성·검증 및 승인 사례만 별도 출력 |
 | `export_training.py` | 승인된 train/validation을 재생해 현재 프롬프트의 학습 JSONL과 원본 추적표 생성 |
 | `pilot_review_cases_v0.1.txt` | train 25건·validation 5건의 재현 가능한 시범 검수 표본. test는 포함하지 않음 |
 | `scenarios_all_400_UNREVIEWED.jsonl` | 전체 400개 대화 |
-| `scenarios_all_400_UNREVIEWED_turns.csv` | 전체 400개 대화의 979개 사용자 턴을 한 행씩 펼친 검토용 CSV |
+| `scenarios_all_400_UNREVIEWED_turns.csv` | 전체 400개 대화의 973개 사용자 턴을 한 행씩 펼친 검토용 CSV |
 | `train/scenarios_UNREVIEWED.jsonl` | 학습 후보 250개 |
 | `validation/scenarios_UNREVIEWED.jsonl` | 검증 후보 50개 |
 | `test/scenarios_UNREVIEWED.jsonl` | 테스트 예약 후보 100개 |
@@ -27,13 +27,19 @@
 
 `runtime/schedule_assistant/prompt.txt`는 내부 기반 클래스가 읽는 기본 프롬프트다. 실제 Qwen 평가에는 최상위 `prompt.txt`를 사용한다. 실행 의존 파일을 제외하면 import 또는 실행이 실패한다. 이 폴더는 DATA 내부 재현 실험이며 저장소의 `ai/`·`backend/` 구현을 변경하지 않는다.
 
-### 프롬프트 v2.5 제안 — 2026-10-16
+### 알림 제거 정합성 개정 — 2026-10-21
+
+현재 생성본은 `qwen-dataset-400-v0.1.4-proposed`, 시나리오 schema는 `pilot-v0.2`, 프롬프트는 v2.6 제안이다. Schedule API의 확정된 알림 제외 결정에 맞춰 400건의 생성·수정 정답, 초기·최종 일정, 평가 JSON schema와 메모리 API에서 알림 필드를 제거했다. 알림만 요청하던 기존 2개 원본과 그 train 변형은 지원하지 않는다는 질문으로 바꾸고 쓰기를 없앴다. 일정 작업과 알림을 함께 요청하던 초안은 대부분 알림 문구를 제거한 일정 작업 사례로 바꿨다. 별도 10건(train 5·validation 5)은 알림 없이 진행할지 먼저 묻고 사용자가 수락한 뒤 일정 작업을 실행하도록 구성했다. 기존 사례 ID의 `alarm`·`reminder` 부분은 추적용 이름이며 해당 이름만으로 알림 작업의 유무를 판단하지 않는다. 검수에서 발견한 비정상 발화 `10분 전에 보여줘`의 원본 요청을 수정했다. API 응답 모의 데이터와 생성·수정 반환값의 시각은 백엔드 직렬화에 맞춰 UTC `Z`로 표시한다. 사용자 요청과 API 쓰기 입력의 `+09:00` 시각은 허용하며 같은 시점을 비교한다.
+
+새 초안도 전부 `proposed_unreviewed`다. 400건 스크립트 정답 재생, 10건 별도 진단 재생, 백엔드 Pydantic 스키마에 대한 초기 일정 597건·생성 요청 122건·수정 요청 95건의 형식 검사를 확인했다. 실제 Qwen 기준선, 사람 검수, 재학습, 백엔드 HTTP 통합 시험은 아직 하지 않았다. 이전 어댑터와 학습 전후 수치는 이 버전의 성능 근거가 아니다. 이전 검수 원본은 시나리오 해시가 달라 자동 승계할 수 없다. 알림 기능 제외는 `TEAM-CONFIRMED`지만 공유 AI 출력·DATA schema의 채택은 각각 `TBD-AI`·`TBD-DATA`다.
+
+### 프롬프트 v2.5 제안 — 2026-10-16 (과거 기록)
 
 등록의 `required_question=null` 조건을 `intent=create`와 확인된 업무·시각 조건으로 한정했다. 조회 범위 규칙도 조회·수정·삭제의 조회 전 단계에 한정했다. 후보가 1건일 때의 `CONFIRM_UPDATE`/`CONFIRM_DELETE`와 다중 후보의 `SELECT_TARGET`을 완전한 JSON 예시로 구분한다. action·필드 계약과 제어부는 변경하지 않았다.
 
 기존 20-step 시험 및 23/114 → 43/114 비교는 **v2.4 프롬프트** 결과다. v2.5 개선 효과는 아직 측정하지 않았으며 기존 결과를 새 버전의 성능으로 표시하지 않는다. 평가기 버전 `eval-v2.7-proposed`는 프롬프트 버전과 별개이며 원출력 action·JSON 일치를 가드 보정 후 시스템 결과와 분리하고 주입된 장애 사건을 기록한다.
 
-학습 JSONL에는 생성 당시 시스템 프롬프트가 포함된다. 미검수 재현 시험은 `build_dataset.py`, 승인본은 아래 `export_training.py`로 새 입력을 생성하고 별도 출력 폴더에서 토큰 길이·마스크를 다시 검사한다. 과거 학습 폴더·어댑터·결과는 보존한다. 학습 전후 비교는 동일한 v2.5 프롬프트를 사용해야 한다. 프롬프트 정리와 승인본 변환 도구 구현은 검수 승인·본 학습·평가기 개선의 완료를 뜻하지 않는다.
+학습 JSONL에는 생성 당시 시스템 프롬프트가 포함된다. 미검수 재현 시험은 `build_dataset.py`, 승인본은 아래 `export_training.py`로 새 입력을 생성하고 별도 출력 폴더에서 토큰 길이·마스크를 다시 검사한다. 과거 학습 폴더·어댑터·결과는 보존한다. 새 학습 전후 비교는 두 모델에 동일한 현재 v2.6 프롬프트를 사용해야 한다. 프롬프트 정리와 승인본 변환 도구 구현은 검수 승인·본 학습·평가기 개선의 완료를 뜻하지 않는다.
 
 v2.5 JSON 예시 8개는 기존 action 검증기와 해당 상황의 동적 schema를 통과했다. 기존 651/114행의 시스템 프롬프트만 메모리에서 교체한 tokenizer 검사에서는 최대 train 4,183·validation 3,854토큰이며 마지막 응답 마스크가 일치했다. 기존 3,328 설정은 모든 행에 부족하다. 현재 준비 도구의 256토큰 단위 올림 방식으로 새 설정은 4,352가 필요하다. 이는 파일 재생성이나 GPU 학습 결과가 아닌 읽기 전용 검사이며, 예시 추가로 문맥 길이와 연산 부담이 증가한다. 새로 생성한 실제 입력에서도 다시 확인한다.
 
@@ -47,7 +53,7 @@ CSV는 JSONL 원본을 수정하지 않고 만든 검토용 사본이다. `scena
 
 ### 기본 발화·검증 범위 개정 — 2026-10-16
 
-현재 생성본은 `qwen-dataset-400-v0.1.2-proposed`다. 전체 400건은 유지하고 반복 train 변형 20건을 줄여 train 250·validation 50·test 예약 100건으로 재분할했다. 날짜·시각·업무가 모두 있는 직접 등록을 train 10·validation 5·test 5건 넣고, validation에는 별도 대화 가족의 다중 후보 삭제 선택 5건을 넣었다. train 변형의 첫 요청 동사를 일부 바꾸고 기준 시각 밤 9시 사례를 train 60·validation 20·test 47건 포함했다. train의 고유 첫 발화는 이전 88/260에서 109/250으로 늘었지만 실제 음성 표현의 대표성을 입증하지 않는다. 검토용 CSV는 400건 JSONL에서 매번 다시 만들며 학습·평가 기준은 계속 JSONL이다.
+당시 생성본은 `qwen-dataset-400-v0.1.2-proposed`였다. 전체 400건은 유지하고 반복 train 변형 20건을 줄여 train 250·validation 50·test 예약 100건으로 재분할했다. 날짜·시각·업무가 모두 있는 직접 등록을 train 10·validation 5·test 5건 넣고, validation에는 별도 대화 가족의 다중 후보 삭제 선택 5건을 넣었다. train 변형의 첫 요청 동사를 일부 바꾸고 기준 시각 밤 9시 사례를 train 60·validation 20·test 47건 포함했다. train의 고유 첫 발화는 이전 88/260에서 109/250으로 늘었지만 실제 음성 표현의 대표성을 입증하지 않는다. 검토용 CSV는 400건 JSONL에서 매번 다시 만들며 학습·평가 기준은 계속 JSONL이다.
 
 과거 validation 40건의 실제 Qwen 점수와 기존 651/114행의 tokenizer 검사는 수정된 validation 50건·학습 행 612/129건의 결과가 아니다. 시범 승인본도 새 초안과 해시·분할을 대조하기 전까지 자동 승계하지 않는다. 새 정답은 모두 `proposed_unreviewed`이며 실제 Qwen 기준선과 tokenizer 길이·마스크 검사는 재실행해야 한다.
 
@@ -63,8 +69,8 @@ CSV는 JSONL 원본을 수정하지 않고 만든 검토용 사본이다. `scena
 
 | 분할 | 대화 | 그룹 | 생성되는 학습/참조 행 |
 |---|---:|---:|---:|
-| train | 250 | 28 | 612 |
-| validation | 50 | 10 | 129 |
+| train | 250 | 28 | 601 |
+| validation | 50 | 10 | 134 |
 | test | 100 | 11 | 327 |
 
 각 업무 카테고리(INBOUND·INVENTORY·OUTBOUND·RETURN·OTHER)는 train 50개·validation 10개·test 20개다. train의 등록/조회/수정/삭제는 74/56/64/56개, validation은 15/10/10/15개, test는 30/20/25/25개다.
@@ -147,7 +153,7 @@ python ../mlx_smoke_v0.1/prepare.py \
 
 ### 30건 시범 검수
 
-`pilot_review_cases_v0.1.txt`는 업무 분류별 등록·조회·수정·삭제 20건, 확인 거절·알림·대상 정정 등 추가 5건, validation 5건을 고정한다. test 사례는 포함하지 않는다. 다음 명령은 정답 재생 결과를 새 로컬 폴더에 만들며 실제 Qwen을 호출하지 않는다.
+`pilot_review_cases_v0.1.txt`는 업무 분류별 등록·조회·수정·삭제 20건, 확인 거절·지원하지 않는 알림 요청·대상 정정 등 추가 5건, validation 5건을 고정한다. test 사례는 포함하지 않는다. 다음 명령은 정답 재생 결과를 새 로컬 폴더에 만들며 실제 Qwen을 호출하지 않는다.
 
 ```bash
 python3 run_eval.py --scripted --scenarios train/scenarios_UNREVIEWED.jsonl --additional-scenarios validation/scenarios_UNREVIEWED.jsonl --case-file pilot_review_cases_v0.1.txt --output-dir runs/pilot_review_001

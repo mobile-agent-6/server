@@ -7,6 +7,7 @@ through the Schedule API. Public AI endpoint and shared schema remain TBD-AI.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -70,6 +71,7 @@ class State:
     pending: Pending | None = None
     selection: Selection | None = None
     uncertain_create: UncertainCreate | None = None
+    pending_without_reminder: str | None = None
     last_result: dict[str, Any] | None = None
 
 
@@ -106,7 +108,7 @@ class ConversationService:
         if operation == "delete":
             return f"{subject} 일정을 삭제할까요?"
         labels = {"title": "제목", "scheduledAt": "시각", "category": "카테고리",
-                  "completed": "완료", "reminderMinutesBefore": "알림(분 전)"}
+                  "completed": "완료"}
         details = ", ".join(f"{labels[key]}={json.dumps(value, ensure_ascii=False)}"
                             for key, value in (changes or {}).items())
         return f"{subject} 일정을 {details}로 변경할까요?"
@@ -254,13 +256,34 @@ class ConversationService:
     def handle(self, utterance: str) -> Reply:
         if not isinstance(utterance, str) or not utterance.strip() or len(utterance) > 500:
             return Reply("error", "짧은 일정 요청을 입력해 주세요.")
-        prior = self._retry_create(utterance)
+        answer = utterance.strip()
+        consented = False
+        if self.state.pending_without_reminder is not None:
+            pending = self.state.pending_without_reminder
+            self.state.pending_without_reminder = None
+            if answer in YES or re.fullmatch(r"알림\s*없이\s*(?:진행해|해줘|등록해줘|변경해줘|좋아|네|응)\.?", answer):
+                if pending == "only":
+                    message = "알림 기능은 지원하지 않아요. 다른 일정 요청이 있나요?"
+                    self.state.history.append({"role": "user", "content": answer})
+                    self.state.history.append({"role": "assistant", "content": message})
+                    return Reply("ask", message)
+                consented = True
+            if answer in NO:
+                self.state.history.append({"role": "user", "content": answer})
+                self.state.history.append({"role": "assistant", "content": "취소했어요."})
+                return Reply("cancelled", "취소했어요.")
+        reminder = not consented and ("알림" in answer or bool(re.search(r"\d+\s*분\s*전|미리\s*알려", answer)))
+        reminder_kind = "mixed" if re.search(r"등록|잡아|넣어|넣고|바꿔|변경|수정|완료로|삭제|지워", answer) else "only"
+        if reminder:
+            self.state.pending = None
+            self.state.selection = None
+        prior = None if reminder else self._retry_create(utterance)
         if prior is not None:
             return prior
-        prior = self._select(utterance)
+        prior = None if reminder else self._select(utterance)
         if prior is not None:
             return prior
-        prior = self._confirm(utterance)
+        prior = None if reminder else self._confirm(utterance)
         if prior is not None:
             return prior
         self.state.history.append({"role": "user", "content": utterance.strip()})
@@ -270,7 +293,24 @@ class ConversationService:
                 raw = self.model.generate(self._messages())
                 action = parse_action(raw)
             except (ActionError, RuntimeError, ValueError):
+                if reminder:
+                    self.state.pending_without_reminder = reminder_kind
+                    message = ("알림 기능은 지원하지 않아요. 알림 없이 일정 작업을 진행할까요?"
+                               if reminder_kind == "mixed" else
+                               "알림 기능은 지원하지 않아요. 다른 일정 요청이 있나요?")
+                    self.state.history.append({"role": "assistant", "content": message})
+                    return Reply("ask", message)
                 return Reply("error", "요청을 이해하지 못했어요. 다시 말씀해 주세요.")
+            if reminder:
+                self.state.pending_without_reminder = reminder_kind
+                valid_ask = (action.name == "ASK" and action.message and
+                             "알림" in action.message and "지원하지" in action.message)
+                message = (action.message if valid_ask else
+                           "알림 기능은 지원하지 않아요. 알림 없이 일정 작업을 진행할까요?"
+                           if reminder_kind == "mixed" else
+                           "알림 기능은 지원하지 않아요. 다른 일정 요청이 있나요?")
+                self.state.history.append({"role": "assistant", "content": raw if valid_ask else message})
+                return Reply("ask", message)
             self.state.history.append({"role": "assistant", "content": raw})
             request = action.request
             if action.name == "ASK":

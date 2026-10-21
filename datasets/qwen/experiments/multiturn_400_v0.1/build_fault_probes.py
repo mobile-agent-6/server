@@ -55,7 +55,7 @@ stale["faults"] = [{"method": "GET", "occurrence": 2, "effect": "stale_before_re
 stale["turns"][1]["expect"] = {"reply_kind": "stale", "writes": 0,
                                  "api_methods": ["GET"]}
 stale["expect_final"] = [{key: value for key, value in item.items()
-                          if key not in {"createdAt", "updatedAt", "reminderAt"}}
+                          if key not in {"createdAt", "updatedAt"}}
                          for item in stale["initial_schedules"]]
 add_case(stale, {}, 1)
 
@@ -70,7 +70,7 @@ for index in range(9):
     extra["title"] = f"반품 추가 확인 {index + 1}"
     crowded["initial_schedules"].append(extra)
 crowded["expect_final"] = [{key: value for key, value in item.items()
-                            if key not in {"createdAt", "updatedAt", "reminderAt"}}
+                            if key not in {"createdAt", "updatedAt"}}
                            for item in crowded["initial_schedules"]]
 add_case(crowded, {"1": "scope"}, 0)
 
@@ -103,7 +103,7 @@ for method, source_id in (("PATCH", "in-update-approve"),
         if effect == "reject_before_commit":
             case["expect_final"] = [
                 {key: value for key, value in item.items()
-                 if key not in {"createdAt", "updatedAt", "reminderAt"}}
+                 if key not in {"createdAt", "updatedAt"}}
                 for item in case["initial_schedules"]]
         add_case(case, {}, 1)
 

@@ -13,7 +13,7 @@ python datasets/qwen/tools/replay_multiturn_pilot.py --scenarios datasets/qwen/e
 python -m unittest discover -s datasets/qwen/tests -v
 ```
 
-재생 도구는 [AI 대화 제어부](../../../../ai/schedule_assistant/service.py)에 지정된 action을 순서대로 넣고 메모리 일정 저장소로 API 호출 순서·쓰기 횟수·최종 상태를 확인한다. 이는 Qwen의 실제 출력 정확도나 음성 성능을 측정하지 않는다. HTTP 503·timeout·응답 유실의 클라이언트 동작은 [AI 모의 HTTP 테스트](../../../../ai/tests/test_schedule_assistant.py)에서 별도로 확인한다. 정답 검수 시에는 발화 근거와 허용 대화 경로를 별도 단계에서 확인하고 `label_status`를 갱신해야 한다. 검수 전 행을 학습이나 잠근 test에 사용하지 않는다.
+재생 도구는 이 실험의 `runtime/legacy_schedule_assistant/`에 보존한 당시 AI 대화 제어부에 지정된 action을 순서대로 넣고 메모리 일정 저장소로 API 호출 순서·쓰기 횟수·최종 상태를 확인한다. 현재 AI 제어부와 Schedule API는 알림 필드를 허용하지 않으므로 이 역사적 5건을 현재 계약의 학습·평가 입력으로 사용하지 않는다. 이는 Qwen의 실제 출력 정확도나 음성 성능을 측정하지 않는다. HTTP 503·timeout·응답 유실의 클라이언트 동작은 [AI 모의 HTTP 테스트](../../../../ai/tests/test_schedule_assistant.py)에서 별도로 확인한다. 정답 검수 시에는 발화 근거와 허용 대화 경로를 별도 단계에서 확인하고 `label_status`를 갱신해야 한다. 검수 전 행을 학습이나 잠근 test에 사용하지 않는다.
 
 ## 실제 Qwen을 쓰는 시범 평가
 

@@ -15,7 +15,7 @@
 ## 처리 흐름
 
 1. `ConversationService.handle()`이 사용자 발화와 메모리의 대화 문맥을 `OllamaClient`에 전달한다.
-2. `parse_action()`이 모델 응답의 세 키(`action`, `message`, `request`)와 action별 요청 형식을 검사한다. `ASK.message`는 표시할 질문이고 `ANSWER.message`는 `null`이어야 한다. 잘못된 응답은 Schedule API로 보내지 않는다.
+2. `parse_action()`이 모델 응답의 세 키(`action`, `message`, `request`)와 action별 요청 형식을 검사한다. `ASK.message`는 표시할 질문이고 `ANSWER.message`는 `null`이어야 한다. 잘못된 응답과 알림 필드는 Schedule API로 보내지 않는다. 알림 요청은 지원하지 않는다고 안내하며, 일정 작업이 함께 있으면 알림 없이 진행할지 먼저 묻는다.
 3. `LIST`는 Schedule API에서 후보 일정을 읽고 모델을 한 번 더 호출한다. `CREATE`는 유효한 요청에 `Idempotency-Key`를 붙여 등록한다.
 4. 수정·삭제의 조회 후보가 1건이면 `CONFIRM_UPDATE` 또는 `CONFIRM_DELETE`에 해당 ID를 넣는다. 2~10건이면 ID 없는 `SELECT_TARGET`으로 번호를 고르게 하고, 10건 초과면 범위를 좁혀 달라고 묻는다. 선택한 대상·변경 내용을 확인받은 뒤 재조회하여 변경 여부를 검사한다. 승인 뒤에만 PATCH 또는 DELETE를 호출한다.
 5. 성공·실패 안내는 API 결과를 기준으로 만든다. 등록 결과가 불확실하면 같은 본문과 키를 보관하며, 사용자의 `재시도` 입력에만 재요청한다.
