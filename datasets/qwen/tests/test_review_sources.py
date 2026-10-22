@@ -25,6 +25,7 @@ class ReviewSourcesTests(unittest.TestCase):
         for split in review_sources.SPLITS:
             case = json.loads((EXPERIMENT / split / "scenarios_UNREVIEWED.jsonl")
                               .read_text(encoding="utf-8").splitlines()[0])
+            case["label_status"] = "proposed_unreviewed"
             self.cases[split] = case
             rubric[case["id"]] = original_rubric.get(case["id"], {})
             target = self.root / split

@@ -1,4 +1,4 @@
-"""Deterministic, unreviewed dialogue drafts. Never consumes live model answers."""
+"""Deterministic dialogues with content-bound approval. Never consumes live model answers."""
 import copy, csv, hashlib, json, sys, shutil, re
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
@@ -287,7 +287,20 @@ for split,families in FAMILIES.items():
   for family,build,n in families:
    for v in range(n):build(Builder(split,cat,family,v+ci),family.split(':')[1])
 
-# Preserve draft scenarios even if a verification fails, with no release manifest.
+# A batch approval applies only to the exact content, split and rubric approved.
+approval_path=ROOT/'review_status.json'
+approval=json.loads(approval_path.read_text(encoding='utf-8')) if approval_path.exists() else {}
+approval_payload={'scenarios':[{k:v for k,v in c.items() if k!='label_status'} for c in ALL],
+                  'splits':{m['case_id']:m['split'] for m in META},'question_rubric':RUBRIC}
+approval_hash=hashlib.sha256(json.dumps(approval_payload,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode('utf-8')).hexdigest()
+batch_approved=approval.get('label_status')=='reviewed' and approval.get('content_sha256')==approval_hash
+label_status='reviewed' if batch_approved else 'proposed_unreviewed'
+for c in ALL:c['label_status']=label_status
+for m in META:
+ m['label_status']=label_status
+ if batch_approved:m.update(reviewer=approval['approved_by'],review_note=approval['basis'])
+
+# Keep existing filenames for compatibility; label_status is authoritative.
 app.save_jsonl(ROOT/'scenarios_all_400_UNREVIEWED.jsonl',ALL)
 app.save_json(ROOT/'question_rubric.json',RUBRIC)
 app.save_jsonl(ROOT/'case_manifest.jsonl',META)
@@ -355,11 +368,11 @@ for split in ['train','validation','test']:
     sample={'messages':m['messages']+[{'role':'assistant','content':m['raw']}]}
     key=hashlib.sha256(json.dumps(sample,ensure_ascii=False,sort_keys=True).encode()).hexdigest()
     if key not in seen:rows.append(sample);seen[key]=len(rows)
-    maps.append({'row':seen[key],'row_sha256':key,'case_id':r['case_id'],'conversation_group_id':r['conversation_group_id'],'turn':t['index'],'call':callindex,'label_status':'proposed_unreviewed','schema':m['schema']})
+    maps.append({'row':seen[key],'row_sha256':key,'case_id':r['case_id'],'conversation_group_id':r['conversation_group_id'],'turn':t['index'],'call':callindex,'label_status':label_status,'schema':m['schema']})
  name='training_UNREVIEWED.jsonl' if split=='train' else 'validation_UNREVIEWED.jsonl' if split=='validation' else 'reference_actions_DO_NOT_TRAIN.jsonl'
  app.save_jsonl(dest/name,rows);app.save_jsonl(dest/'row_map.jsonl',maps)
- app.save_jsonl(dest/'review_decisions_TEMPLATE.jsonl',[{'case_id':c['id'],'conversation_group_id':c['conversation_group_id'],'label_status':'proposed_unreviewed','reviewer':None,'reviewed_at':None,'note':None} for c in cases])
- lines=['# '+split+' 대화 정답 검수표','','모두 미검수 초안입니다. 자동 통과는 실제 Qwen 성능이나 사람의 정답 승인을 뜻하지 않습니다.','']
+ app.save_jsonl(dest/'review_decisions_TEMPLATE.jsonl',[{'case_id':c['id'],'conversation_group_id':c['conversation_group_id'],'label_status':label_status,'reviewer':approval['approved_by'] if batch_approved else None,'reviewed_at':approval['approved_at'] if batch_approved else None,'note':approval['basis'] if batch_approved else None} for c in cases])
+ lines=['# '+split+' 대화 정답 검수표','',('사용자 지시에 따라 검수 완료(reviewed)로 처리했습니다.' if batch_approved else '미검수 초안입니다.')+' 자동 통과는 실제 Qwen 성능이나 별도의 사람 검수 결과를 뜻하지 않습니다.','']
  for c in cases:
   lines += ['## '+c['id'],'','대화 그룹: '+c['conversation_group_id'],'기준 시각: '+c['reference_datetime'],'검수자 / 승인·수정·제외 / 이유: ____________________','','초기 일정:','```json',json.dumps(c['initial_schedules'],ensure_ascii=False,indent=2),'```']
   for n,t in enumerate(c['turns'],1):
@@ -399,7 +412,7 @@ for case in ALL:
 with csv_path.open('w',encoding='utf-8-sig',newline='') as target:
  writer=csv.DictWriter(target,fieldnames=fieldnames,lineterminator='\r\n')
  writer.writeheader();writer.writerows(csv_rows)
-app.save_json(ROOT/'verification_summary.json',{'status':'scripted_reference_passed_NOT_MODEL_ACCURACY','cases':len(results),'matches':len(results),'filter_corrections':0,'blocked_writes':0,'group_overlap':0,'exact_row_overlap':0,'human_reviewed':0,'dynamic_action_schema_errors':0,'exact_dialogue_duplicates_ignoring_uuid':0,'splits':stats})
+app.save_json(ROOT/'verification_summary.json',{'status':'scripted_reference_passed_NOT_MODEL_ACCURACY','cases':len(results),'matches':len(results),'filter_corrections':0,'blocked_writes':0,'group_overlap':0,'exact_row_overlap':0,'human_reviewed':0,'user_approved':len(ALL) if batch_approved else 0,'dynamic_action_schema_errors':0,'exact_dialogue_duplicates_ignoring_uuid':0,'splits':stats})
 files=[p for p in ROOT.rglob('*') if p.is_file() and p.name!='manifest.json' and '__pycache__' not in str(p)]
-app.save_json(ROOT/'manifest.json',{'dataset_version':'qwen-dataset-400-v0.1.4-proposed','label_status':'proposed_unreviewed','source_run_for_context_only':'eval_20261011_230323_c4efb5','source_run_answers_used':False,'split_unit':'conversation_group_id','test_status':'reserved_draft_not_human_reviewed_not_final_locked_benchmark','supervision':'only final assistant action per row; prior assistant messages are context','splits':stats,'sha256':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(files)}})
-print(json.dumps(stats,ensure_ascii=False,indent=2));print('400 scripted reference dialogues passed; human reviewed: 0')
+app.save_json(ROOT/'manifest.json',{'dataset_version':'qwen-dataset-400-v0.1.4-proposed','label_status':label_status,'approval':approval if batch_approved else None,'source_run_for_context_only':'eval_20261011_230323_c4efb5','source_run_answers_used':False,'split_unit':'conversation_group_id','test_status':'reserved_reviewed_not_final_locked_benchmark' if batch_approved else 'reserved_draft_not_human_reviewed_not_final_locked_benchmark','supervision':'only final assistant action per row; prior assistant messages are context','splits':stats,'sha256':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(files)}})
+print(json.dumps(stats,ensure_ascii=False,indent=2));print(f'400 scripted reference dialogues passed; label status: {label_status}; independently human reviewed: 0')
