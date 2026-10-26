@@ -528,6 +528,91 @@ def test_confirm_uses_current_database_snapshot_and_removes_noop_fields(
     )
 
 
+def test_confirm_scheduled_at_change_serializes_offset_and_fraction(
+    processor_store,
+) -> None:
+    current = schedule()
+    reader = MemoryScheduleReader([current])
+    admit(processor_store, request_data())
+    provider = ScriptedDecisionProvider(
+        [
+            envelope(
+                {
+                    "kind": "confirm",
+                    "text": "수정할까요?",
+                    "scheduleId": str(SCHEDULE_A),
+                    "operation": "update",
+                    "changes": {
+                        "scheduledAt": "2026-10-19T09:00:00.123456+09:00"
+                    },
+                    "timeInterpretation": "absolute",
+                }
+            )
+        ]
+    )
+
+    assert run(processor_store, provider, reader) is ProcessOneResult.COMPLETED
+
+    expected = {"scheduledAt": "2026-10-19T00:00:00.123456Z"}
+    request = stored_request(processor_store)
+    assert request.result_kind == "confirmation"
+    assert request.result_json["changes"] == expected
+    question = active_question(processor_store)
+    assert question.candidate_intents_json["intent"]["changes"] == expected
+    assert request.pending_write_json is None
+    assert request.write_started is False
+
+
+def test_scheduled_at_candidate_changes_are_serialized_before_selection(
+    processor_store,
+) -> None:
+    first = schedule()
+    second = schedule(
+        SCHEDULE_B,
+        title="반품 확인",
+        at=NOW + timedelta(hours=2),
+        category=Category.RETURN,
+    )
+    reader = MemoryScheduleReader([first, second])
+    admit(processor_store, request_data())
+    change = {"scheduledAt": "2026-10-19T09:00:00.123456+09:00"}
+    provider = ScriptedDecisionProvider(
+        [
+            envelope(
+                {
+                    "kind": "select_candidate",
+                    "text": "대상을 선택하세요.",
+                    "candidates": [
+                        {
+                            "scheduleId": str(SCHEDULE_A),
+                            "operation": "update",
+                            "changes": change,
+                            "timeInterpretation": "absolute",
+                        },
+                        {
+                            "scheduleId": str(SCHEDULE_B),
+                            "operation": "update",
+                            "changes": change,
+                            "timeInterpretation": "absolute",
+                        },
+                    ],
+                }
+            )
+        ]
+    )
+
+    assert run(processor_store, provider, reader) is ProcessOneResult.COMPLETED
+
+    request = stored_request(processor_store)
+    assert request.result_kind == "candidate_selection"
+    question = active_question(processor_store)
+    expected = {"scheduledAt": "2026-10-19T00:00:00.123456Z"}
+    assert {
+        tuple(intent["changes"].items())
+        for intent in question.candidate_intents_json["candidates"].values()
+    } == {tuple(expected.items())}
+
+
 def test_all_noop_update_completes_no_match_without_question(processor_store) -> None:
     current = schedule(title="현재 제목", completed=True)
     admit(processor_store, request_data())
@@ -1127,7 +1212,13 @@ def test_provider_free_selection_handles_deleted_target_and_read_failure(
     assert no_provider.call_count == 0
 
 
-def test_incomplete_saved_selection_falls_back_to_provider(processor_store) -> None:
+@pytest.mark.parametrize(
+    "corruption",
+    ["version_missing", "version", "intent", "candidate_map"],
+)
+def test_selection_snapshot_corrupted_after_admission_fails_without_provider(
+    processor_store, corruption: str
+) -> None:
     first = schedule()
     second = schedule(
         SCHEDULE_B,
@@ -1159,13 +1250,6 @@ def test_incomplete_saved_selection_falls_back_to_provider(processor_store) -> N
     )
     question = active_question(processor_store)
     selected = question.candidates_json[0]["candidateId"]
-    with processor_store.begin() as session:
-        stored = session.get(AssistantQuestion, question.id)
-        assert stored is not None
-        stored.candidate_intents_json = {
-            "version": 1,
-            "candidates": {selected: {"operation": "delete"}},
-        }
     follow_id = UUID("dddddddd-dddd-4ddd-8ddd-dddddddddddd")
     follow = request_data(
         follow_id,
@@ -1176,7 +1260,25 @@ def test_incomplete_saved_selection_falls_back_to_provider(processor_store) -> N
             "candidateId": selected,
         },
     )
-    admit(processor_store, follow, provider_available=True)
+    admit(processor_store, follow, provider_available=False)
+    with processor_store.begin() as session:
+        stored = session.get(AssistantQuestion, question.id)
+        assert stored is not None
+        if corruption == "version_missing":
+            snapshot = dict(stored.candidate_intents_json)
+            snapshot.pop("version")
+            stored.candidate_intents_json = snapshot
+        elif corruption == "version":
+            snapshot = dict(stored.candidate_intents_json)
+            snapshot["version"] = 2
+            stored.candidate_intents_json = snapshot
+        elif corruption == "intent":
+            stored.candidate_intents_json = {
+                "version": 1,
+                "candidates": {selected: {"operation": "delete"}},
+            }
+        else:
+            stored.candidate_intents_json = {"version": 1, "candidates": {}}
     fallback = ScriptedDecisionProvider(
         [envelope({"kind": "ask", "text": "다시 설명해 주세요."})]
     )
@@ -1189,9 +1291,12 @@ def test_incomplete_saved_selection_falls_back_to_provider(processor_store) -> N
         uuid_factory=uuids,
     )
 
-    assert fallback.call_count == 1
-    assert fallback.contexts[0].pending_context is not None
-    assert stored_request(processor_store, follow_id).result_kind == "need_more_info"
+    assert fallback.call_count == 0
+    request = stored_request(processor_store, follow_id)
+    assert request.result_kind == "failure"
+    assert request.result_json["code"] == "INTERNAL_ERROR"
+    assert request.pending_write_json is None
+    assert request.write_started is False
 
 
 def test_approved_confirmation_and_create_stop_at_pending_write(processor_store) -> None:

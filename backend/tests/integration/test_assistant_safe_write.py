@@ -51,6 +51,7 @@ OLD = NOW - timedelta(minutes=5)
 REQUEST_ID = UUID("aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa")
 CONVERSATION_ID = UUID("bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb")
 SCHEDULE_ID = UUID("77777777-7777-4777-8777-777777777777")
+SCHEDULE_B = UUID("88888888-8888-4888-8888-888888888888")
 CREATE_PENDING = {
     "version": 1,
     "operation": "create",
@@ -289,6 +290,200 @@ def test_create_intent_executes_once_and_records_assistant_idempotency(stores) -
         assert session.scalar(sa.select(sa.func.count()).select_from(Schedule)) == 1
 
 
+def test_candidate_selection_to_approved_scheduled_at_update_executes_once(
+    stores,
+) -> None:
+    assistant, api = stores
+    schedule(api)
+    with api.begin() as session:
+        session.add(
+            Schedule(
+                id=SCHEDULE_B,
+                title="반품 확인",
+                scheduled_at=NOW + timedelta(hours=2),
+                category=Category.RETURN,
+                completed=False,
+                created_at=OLD,
+                updated_at=OLD,
+                deleted_at=None,
+            )
+        )
+
+    initial = AssistantRequestCreate.model_validate(
+        {
+            "requestId": str(REQUEST_ID),
+            "input": {"type": "text", "text": "재고 확인 시간을 바꿔 줘"},
+        }
+    )
+    admitted = admit_request(
+        assistant,
+        data=initial,
+        fingerprint=request_fingerprint(initial),
+        accepted_at=NOW,
+        new_conversation_id=CONVERSATION_ID,
+        runtime_ready=True,
+        provider_available=True,
+    )
+    assert admitted.kind.value == "accepted"
+
+    target_text = "2026-10-19T09:00:00.123456+09:00"
+    target_utc = datetime(2026, 10, 19, 0, 0, 0, 123456, tzinfo=timezone.utc)
+    provider = ScriptedDecisionProvider(
+        [
+            DecisionEnvelope.model_validate(
+                {
+                    "decision": {
+                        "kind": "select_candidate",
+                        "text": "대상을 선택하세요.",
+                        "candidates": [
+                            {
+                                "scheduleId": str(SCHEDULE_ID),
+                                "operation": "update",
+                                "changes": {"scheduledAt": target_text},
+                                "timeInterpretation": "absolute",
+                            },
+                            {
+                                "scheduleId": str(SCHEDULE_B),
+                                "operation": "update",
+                                "changes": {"scheduledAt": target_text},
+                                "timeInterpretation": "absolute",
+                            },
+                        ],
+                    }
+                }
+            )
+        ]
+    )
+    uuids = Uuids()
+    assert (
+        process_one(
+            assistant,
+            request_id=REQUEST_ID,
+            provider=provider,
+            schedule_reader=SqlAlchemyScheduleReader(api),
+            clock=FixedClock(NOW),
+            time_trust_source=TrustedTime(),
+            uuid_factory=uuids,
+            runtime_guard=guard(),
+            safe_writer=writer(assistant, api),
+        )
+        is ProcessOneResult.COMPLETED
+    )
+    assert provider.call_count == 1
+
+    with assistant() as session:
+        candidate_question = session.scalar(
+            sa.select(AssistantQuestion).where(AssistantQuestion.status == "active")
+        )
+        assert candidate_question is not None
+        selected = next(
+            candidate_id
+            for candidate_id, intent in candidate_question.candidate_intents_json[
+                "candidates"
+            ].items()
+            if intent["targetScheduleId"] == str(SCHEDULE_ID)
+        )
+        assert candidate_question.candidate_intents_json["candidates"][selected][
+            "changes"
+        ] == {"scheduledAt": "2026-10-19T00:00:00.123456Z"}
+
+    selection_id = UUID("dddddddd-dddd-4ddd-8ddd-dddddddddddd")
+    selection = AssistantRequestCreate.model_validate(
+        {
+            "requestId": str(selection_id),
+            "conversationId": str(CONVERSATION_ID),
+            "input": {
+                "type": "selection",
+                "questionId": str(candidate_question.id),
+                "candidateId": selected,
+            },
+        }
+    )
+    selected_admission = admit_request(
+        assistant,
+        data=selection,
+        fingerprint=request_fingerprint(selection),
+        accepted_at=NOW + timedelta(seconds=1),
+        new_conversation_id=CONVERSATION_ID,
+        runtime_ready=True,
+        provider_available=False,
+    )
+    assert selected_admission.kind.value == "accepted"
+    no_provider = ScriptedDecisionProvider([])
+    assert (
+        process_one(
+            assistant,
+            request_id=selection_id,
+            provider=no_provider,
+            schedule_reader=SqlAlchemyScheduleReader(api),
+            clock=FixedClock(NOW + timedelta(seconds=1)),
+            time_trust_source=TrustedTime(),
+            uuid_factory=uuids,
+            runtime_guard=guard(),
+            safe_writer=writer(assistant, api),
+        )
+        is ProcessOneResult.COMPLETED
+    )
+
+    with assistant() as session:
+        confirmation = session.scalar(
+            sa.select(AssistantQuestion).where(AssistantQuestion.status == "active")
+        )
+        assert confirmation is not None
+        assert confirmation.kind == "confirmation"
+        assert confirmation.candidate_intents_json["intent"]["changes"] == {
+            "scheduledAt": "2026-10-19T00:00:00.123456Z"
+        }
+
+    approval_id = UUID("eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee")
+    approval = AssistantRequestCreate.model_validate(
+        {
+            "requestId": str(approval_id),
+            "conversationId": str(CONVERSATION_ID),
+            "input": {
+                "type": "confirmation",
+                "questionId": str(confirmation.id),
+                "approved": True,
+            },
+        }
+    )
+    approved_admission = admit_request(
+        assistant,
+        data=approval,
+        fingerprint=request_fingerprint(approval),
+        accepted_at=NOW + timedelta(seconds=2),
+        new_conversation_id=CONVERSATION_ID,
+        runtime_ready=True,
+        provider_available=False,
+    )
+    assert approved_admission.kind.value == "accepted"
+    assert (
+        process_one(
+            assistant,
+            request_id=approval_id,
+            provider=no_provider,
+            schedule_reader=SqlAlchemyScheduleReader(api),
+            clock=FixedClock(NOW + timedelta(seconds=2)),
+            time_trust_source=TrustedTime(),
+            uuid_factory=uuids,
+            runtime_guard=guard(),
+            safe_writer=writer(assistant, api),
+        )
+        is ProcessOneResult.COMPLETED
+    )
+
+    assert no_provider.call_count == 0
+    with api() as session:
+        changed = session.get(Schedule, SCHEDULE_ID)
+        untouched = session.get(Schedule, SCHEDULE_B)
+        completed = session.get(AssistantRequest, approval_id)
+        assert changed.scheduled_at == target_utc
+        assert untouched.scheduled_at == NOW + timedelta(hours=2)
+        assert completed.result_json["outcome"] == "success"
+        assert completed.result_json["affectedScheduleIds"] == [str(SCHEDULE_ID)]
+        assert session.get(AssistantWriteGate, 1).owner_request_id is None
+
+
 @pytest.mark.parametrize("operation", ["update", "delete"])
 def test_expected_updated_at_atomic_write_and_gate_release(
     stores, operation: str
@@ -353,6 +548,48 @@ def test_updated_target_is_not_overwritten_and_gets_fresh_confirmation(stores) -
             "2026-10-18T05:00:00Z"
         )
         assert question.expires_at == NOW + timedelta(minutes=10)
+
+
+def test_updated_target_scheduled_at_gets_fresh_confirmation(stores) -> None:
+    assistant, api = stores
+    schedule(api, updated_at=NOW)
+    pending_request(
+        assistant,
+        pending={
+            "version": 1,
+            "operation": "update",
+            "targetScheduleId": str(SCHEDULE_ID),
+            "expectedUpdatedAt": OLD.isoformat().replace("+00:00", "Z"),
+            "changes": {
+                "title": "재고 확인",
+                "scheduledAt": "2026-10-19T09:00:00.123456+09:00",
+            },
+            "timeInterpretation": "absolute",
+        },
+    )
+
+    assert (
+        writer(assistant, api).execute(request_id=REQUEST_ID, runtime_guard=guard())
+        is ProcessOneResult.COMPLETED
+    )
+
+    with api() as session:
+        stored = session.get(Schedule, SCHEDULE_ID)
+        request = session.get(AssistantRequest, REQUEST_ID)
+        question = session.scalar(sa.select(AssistantQuestion))
+        assert stored.scheduled_at == NOW + timedelta(hours=1)
+        assert request.result_kind == "confirmation"
+        assert request.retention_started_at is None
+        assert request.result_json["changes"] == {
+            "scheduledAt": "2026-10-19T00:00:00.123456Z"
+        }
+        assert question.candidate_intents_json["intent"]["changes"] == {
+            "scheduledAt": "2026-10-19T00:00:00.123456Z"
+        }
+        assert question.candidate_intents_json["intent"]["expectedUpdatedAt"] == (
+            "2026-10-18T05:00:00Z"
+        )
+        assert session.get(AssistantWriteGate, 1).owner_request_id is None
 
 
 def test_marker_crash_recovery_never_reexecutes_create(stores) -> None:

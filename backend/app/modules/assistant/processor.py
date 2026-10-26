@@ -37,6 +37,7 @@ from app.modules.assistant.decisions import (
     PendingWriteIntent,
     TimeInterpretation,
     TimeTrustSource,
+    validated_candidate_intent,
 )
 from app.modules.assistant.enums import (
     AssistantConfirmationOperation,
@@ -90,7 +91,6 @@ MODEL_TIMEOUT_TEXT = "모델 응답 시간이 초과되었습니다. 나중에 �
 SCHEDULE_UNAVAILABLE_TEXT = "일정 정보를 읽을 수 없습니다. 나중에 다시 시도해 주세요."
 INTERNAL_ERROR_TEXT = "요청을 처리하지 못했습니다."
 
-_PENDING_TARGET_ADAPTER = TypeAdapter(PendingTargetIntent)
 _PENDING_WRITE_ADAPTER = TypeAdapter(PendingWriteIntent)
 
 
@@ -341,16 +341,19 @@ def _already_applied() -> _FinalizePlan:
 def _changes_without_noops(
     changes: AssistantConfirmationChanges, schedule: ScheduleRead
 ) -> AssistantConfirmationChanges | None:
-    kept: dict[str, object] = {}
-    for field in changes.model_fields_set:
-        value = getattr(changes, field)
-        if value != getattr(schedule, field):
-            kept[field] = value
-    if not kept:
+    kept_fields = {
+        field
+        for field in changes.model_fields_set
+        if getattr(changes, field) != getattr(schedule, field)
+    }
+    if not kept_fields:
         return None
     # Reuse both the public confirmation and Schedule update validators.
-    json_values = AssistantConfirmationChanges.model_validate(kept).model_dump(
-        mode="json", by_alias=True, exclude_none=True
+    json_values = changes.model_dump(
+        mode="json",
+        by_alias=True,
+        exclude_none=True,
+        include=kept_fields,
     )
     ScheduleUpdate.model_validate(json_values)
     return AssistantConfirmationChanges.model_validate(json_values)
@@ -482,18 +485,15 @@ def _from_saved_selection(
     issue_time_factory: Callable[[], datetime],
     uuid_factory: Callable[[], UUID],
     server_time_trusted: bool,
-) -> _FinalizePlan | None:
+) -> _FinalizePlan:
     candidate_id = stored.input.get("candidateId")
     raw = stored.pending_context
-    if not isinstance(candidate_id, str) or not isinstance(raw, dict):
-        return None
-    candidates = raw.get("candidates")
-    if not isinstance(candidates, dict) or candidate_id not in candidates:
-        return None
+    if not isinstance(candidate_id, str):
+        raise RuntimeError("stored selection candidate is invalid")
     try:
-        saved = _PENDING_TARGET_ADAPTER.validate_python(candidates[candidate_id])
-    except ValidationError:
-        return None
+        saved = validated_candidate_intent(raw, candidate_id)
+    except (ValidationError, KeyError, ValueError) as exc:
+        raise RuntimeError("stored selection intent is incomplete") from exc
     if (
         saved.time_interpretation is TimeInterpretation.RELATIVE
         and not server_time_trusted
@@ -972,18 +972,6 @@ def process_one(
                 uuid_factory=uuid_factory,
                 server_time_trusted=server_time_trusted,
             )
-            if plan is None:
-                context = _decision_context(
-                    stored, server_time_trusted=server_time_trusted
-                )
-                envelope = _call_provider(provider, context)
-                plan = _provider_decision_plan(
-                    envelope,
-                    schedule_reader=schedule_reader,
-                    issue_time_factory=issue_time_factory,
-                    uuid_factory=uuid_factory,
-                    server_time_trusted=server_time_trusted,
-                )
         elif input_type == "confirmation":
             plan = _from_saved_confirmation(
                 stored=stored,

@@ -8,14 +8,14 @@ from datetime import datetime, timedelta
 from enum import StrEnum
 from uuid import RFC_4122, UUID
 
-from pydantic import TypeAdapter, ValidationError
+from pydantic import ValidationError
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.database import is_database_unavailable
 from app.modules.assistant import repository
 from app.modules.assistant.decisions import (
     ConfirmationQuestionIntent,
-    PendingTargetIntent,
+    validated_candidate_intent,
 )
 from app.modules.assistant.enums import AssistantResultKind
 from app.modules.assistant.fingerprint import FINGERPRINT_VERSION, canonical_fingerprint
@@ -30,11 +30,11 @@ from app.modules.assistant.schemas import (
     AssistantInputSelection,
     AssistantInputText,
     AssistantRequestCreate,
+    AssistantResultCandidateSelection,
 )
 
 CONVERSATION_INACTIVITY_LIMIT = timedelta(hours=24)
 _LOWER_SHA256 = re.compile(r"^[0-9a-f]{64}$")
-_PENDING_TARGET_ADAPTER = TypeAdapter(PendingTargetIntent)
 
 
 class AdmissionKind(StrEnum):
@@ -154,17 +154,17 @@ def _question_accepts_input(
 def _candidate_intent_state(
     question: AssistantQuestion, candidate_id: str
 ) -> tuple[bool, bool]:
-    snapshot = question.candidate_intents_json
-    if not isinstance(snapshot, dict):
-        return False, False
-    candidates = snapshot.get("candidates")
-    if not isinstance(candidates, dict) or candidate_id not in candidates:
-        return False, False
-    if snapshot.get("version") != 1:
-        return True, False
     try:
-        _PENDING_TARGET_ADAPTER.validate_python(candidates[candidate_id])
+        public_result = AssistantResultCandidateSelection.model_validate(
+            question.payload_json
+        )
     except ValidationError:
+        return True, False
+    if not any(item.candidate_id == candidate_id for item in public_result.candidates):
+        return False, False
+    try:
+        validated_candidate_intent(question.candidate_intents_json, candidate_id)
+    except (ValidationError, KeyError, ValueError):
         return True, False
     return True, True
 
@@ -372,7 +372,7 @@ def _admit_in_transaction(
                 conversation_id=conversation_id,
             )
     elif isinstance(data.input, AssistantInputSelection):
-        if not selection_intent_complete and not provider_available:
+        if not selection_intent_complete:
             return AdmissionResult(
                 kind=AdmissionKind.ASSISTANT_UNAVAILABLE,
                 request_id=data.request_id,

@@ -272,6 +272,20 @@ class CandidateQuestionIntents(_InternalModel):
     candidates: dict[str, PendingTargetIntent]
 
 
+def validated_candidate_intent(
+    snapshot: object, candidate_id: str
+) -> PendingTargetIntent:
+    """Return one intent only after validating the entire stored snapshot."""
+
+    if not isinstance(snapshot, dict):
+        raise ValueError("candidate intent snapshot must be an object")
+    version = snapshot.get("version")
+    if type(version) is not int or version != 1:
+        raise ValueError("candidate intent snapshot version must be explicitly 1")
+    parsed = CandidateQuestionIntents.model_validate(snapshot)
+    return parsed.candidates[candidate_id]
+
+
 class ConfirmationQuestionIntent(_InternalModel):
     version: Literal[1] = 1
     intent: PendingTargetIntent

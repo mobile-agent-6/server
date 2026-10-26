@@ -266,6 +266,56 @@ def test_complete_selection_is_admitted_without_provider(database_path: Path) ->
     application.state.engine.dispose()
 
 
+@pytest.mark.parametrize(
+    "corruption",
+    ["missing_version", "unsupported_version", "missing_intent"],
+)
+def test_issued_selection_requires_complete_versioned_intent_snapshot(
+    database_path: Path, corruption: str
+) -> None:
+    provider = ScriptedDecisionProvider([])
+    application = make_app(database_path, runtime_ready=True, provider=provider)
+    snapshot = {
+        "version": 1,
+        "candidates": {
+            "opaque-a": {
+                "version": 1,
+                "operation": "delete",
+                "targetScheduleId": str(TARGET_ID),
+                "expectedUpdatedAt": "2026-09-13T04:00:00Z",
+                "timeInterpretation": "absolute",
+            }
+        },
+    }
+    if corruption == "missing_version":
+        snapshot.pop("version")
+    elif corruption == "unsupported_version":
+        snapshot["version"] = 2
+    else:
+        snapshot["candidates"] = {}
+
+    with TestClient(application, raise_server_exceptions=False) as client:
+        add_question_state(
+            application,
+            kind="candidate_selection",
+            intents=snapshot,
+        )
+        response = client.post(
+            "/api/v1/assistant/requests",
+            json=selection_payload("dddddddd-dddd-4ddd-8ddd-dddddddddddd"),
+        )
+        assert response.status_code == 503
+        assert response.json()["code"] == "ASSISTANT_UNAVAILABLE"
+        assert request_count(application) == 1
+        assert provider.call_count == 0
+        with application.state.assistant_session_factory() as session:
+            question = session.get(AssistantQuestion, QUESTION_ID)
+            assert question is not None
+            assert question.status == "active"
+            assert question.answered_by_request_id is None
+    application.state.engine.dispose()
+
+
 def test_invalid_candidate_precedes_missing_provider_and_keeps_question_active(
     database_path: Path,
 ) -> None:
@@ -302,7 +352,7 @@ def test_invalid_candidate_precedes_missing_provider_and_keeps_question_active(
     application.state.engine.dispose()
 
 
-def test_incomplete_selection_needs_provider_but_first_503_is_read_only(
+def test_incomplete_selection_is_never_reinterpreted_by_provider(
     database_path: Path,
 ) -> None:
     provider = ScriptedDecisionProvider([])
@@ -328,8 +378,14 @@ def test_incomplete_selection_needs_provider_but_first_503_is_read_only(
             "/api/v1/assistant/requests",
             json=selection_payload("eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee"),
         )
-        assert second.status_code == 202
+        assert second.status_code == 503
+        assert request_count(application) == 1
         assert provider.call_count == 0
+        with application.state.assistant_session_factory() as session:
+            question = session.get(AssistantQuestion, QUESTION_ID)
+            assert question is not None
+            assert question.status == "active"
+            assert question.answered_by_request_id is None
     application.state.engine.dispose()
 
 
