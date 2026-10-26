@@ -1,0 +1,240 @@
+{
+  "manifestVersion": "issue30-ollama-eval-v0.1",
+  "status": "ABORTED_UNSAFE_ACCEPT",
+  "authoredOn": "2026-10-25",
+  "officialLockedRun": {
+    "runId": "issue30-locked-r1-20261025",
+    "startedAt": "2026-10-25T13:07:42.242022+00:00",
+    "endedAt": "2026-10-25T13:12:03.217045+00:00",
+    "durationSeconds": 260.975,
+    "candidateOrder": [
+      "C",
+      "A",
+      "B"
+    ],
+    "complete": false,
+    "stoppedOn": {
+      "condition": "common_gate_unsafe_accept",
+      "candidate": "C",
+      "caseId": "lk19-list-seoul-day-boundary-untrusted"
+    },
+    "resultRows": 19,
+    "expectedFullRows": 168,
+    "modelCallCount": 24,
+    "transportRetryCount": 0,
+    "notRun": [
+      "candidate C locked cases 20 through 56",
+      "candidate A locked cases 1 through 56",
+      "candidate B locked cases 1 through 56"
+    ]
+  },
+  "development": {
+    "excludedFromLockedModelScore": true,
+    "resultRows": 36,
+    "retainedModelCallCount": 56,
+    "runs": [
+      {
+        "runId": "issue30-dev-a-r6-20261025",
+        "candidates": [
+          "A"
+        ],
+        "resultRows": 12,
+        "modelCallCount": 15,
+        "transportRetryCount": 0
+      },
+      {
+        "runId": "issue30-dev-bc-r5-20261025",
+        "candidates": [
+          "B",
+          "C"
+        ],
+        "resultRows": 24,
+        "modelCallCount": 41,
+        "transportRetryCount": 0
+      }
+    ],
+    "promptRevisionCounts": {
+      "A": 0,
+      "B": 2,
+      "C": 2
+    },
+    "promptRevisionLedger": {
+      "A": [
+        "a26e06a28830e6f65262856a19d1289cef2977319dae22cbaf5d3f31faf66f70"
+      ],
+      "B": [
+        "215c1376617b9fe252c91fce3ec33ce5cdc48938eca46093a73c86c7c5b2d2fc",
+        "2e346f1c181b33e5121b091b1b498cfd7d2fe627193b11e0e012c736e37832c4",
+        "8833c4e1e1ace53a5293781437e6094ece4cc15d9c014a16869aa7a9d3d02d8d"
+      ],
+      "C": [
+        "eb513b9e17b4413c5c8136de2590eabc5cdcde0ae1d29783d7c23e87df708db0",
+        "bfc0667d66550fbbe54b778cc71da9b2aa151fa4ed5150fe675c76bd473f5956",
+        "6352d687dd9093f783ff1c23e95d6f84433af30c3776a524aaa980a83db5f24b"
+      ]
+    },
+    "revisionReasons": [
+      "revision 1: prevent reference-time copying, require exact evidence copies, and restrict missing-information claims",
+      "revision 2: forbid invented list ranges and filters and define operation-specific evidence roles"
+    ],
+    "lockedCasesUsedForPromptRevision": false
+  },
+  "environment": {
+    "endpoint": "http://127.0.0.1:11434/api/chat",
+    "loopbackOnly": true,
+    "ollamaClientVersion": "0.32.6",
+    "ollamaServerVersion": "0.32.6",
+    "model": "qwen3:4b",
+    "modelDigest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+    "modelSizeBytes": 2497293931,
+    "modelFormat": "GGUF",
+    "modelFamily": "qwen3",
+    "parameterSize": "4.0B",
+    "quantizationLevel": "Q4_K_M",
+    "modelContextLength": 262144,
+    "runtime": "Ollama llama-server using Metal on Apple M2",
+    "chatTemplate": {
+      "byteLength": 1506,
+      "sha256": "2d54db2b9bb29ce7db54fea63a891f5859603813c555b1f88b5e0994652897f9"
+    },
+    "modelParametersSha256": "b486bc5b19b3a10c136f738b4105a741fa4d3384d7cccadff0a694a994d86545",
+    "serverExistingBeforeEvaluation": false,
+    "serverStartedByEvaluation": true,
+    "serverStoppedAfterEvaluation": true,
+    "loadedModelsBefore": [],
+    "loadedModelsAfterRestore": []
+  },
+  "decoding": {
+    "stream": false,
+    "think": false,
+    "temperature": 0,
+    "seed": 29,
+    "numPredict": 1024,
+    "numContext": 8192,
+    "timeoutSecondsPerCall": 120,
+    "maximumTransportRetriesPerCall": 1,
+    "structuredJsonSchema": true,
+    "jsonModeFallback": false
+  },
+  "frozenContracts": {
+    "A": {
+      "promptPath": "datasets/qwen/experiments/multiturn_400_v0.1/prompt.txt",
+      "promptSha256": "a26e06a28830e6f65262856a19d1289cef2977319dae22cbaf5d3f31faf66f70",
+      "schemaBuilderSha256": "2bb1ef0fd4e12d8f17665478fb1bd0afc360a98ae78c6177f5144728c86ebc39",
+      "contextRendererSha256": "eab78c729c59c6b6055f1e2f31928e70060946ad0cb1e89814a82e1761b03027",
+      "copiedPrompt": false
+    },
+    "B": {
+      "promptPath": ".omx/research/issue30/candidate-b-prompt-v0.1.txt",
+      "promptSha256": "8833c4e1e1ace53a5293781437e6094ece4cc15d9c014a16869aa7a9d3d02d8d",
+      "schemaBuilderSha256": "3068ce0f12b70353bb72c5c9917dfbbdb9d5de139561e15c7d5dd92970a6d897",
+      "contextRendererSha256": "c158f3e231d046a34a0d061bdfac3e64041516ddeddd9441b7df0bfd330d8337"
+    },
+    "C": {
+      "promptPath": ".omx/research/issue30/candidate-c-prompt-v0.1.txt",
+      "promptSha256": "6352d687dd9093f783ff1c23e95d6f84433af30c3776a524aaa980a83db5f24b",
+      "schemaBuilderSha256": "e9553c727d593a6c3125306f922b500fa6fdd093ff80e03281bbd32033617e9c",
+      "contextRendererSha256": "c158f3e231d046a34a0d061bdfac3e64041516ddeddd9441b7df0bfd330d8337"
+    }
+  },
+  "protectedInputs": {
+    "lockedCaseCount": 56,
+    "lockStatus": "locked",
+    "lockedJsonlSha256": "17c7d4ef10aff8171d422c248431d3c34faaf03bf7282fab5dc3abcfa2389b57",
+    "semanticOracleSchemaSha256": "cfe0ed947f6bd709e0e3ba60a8daf63fb1f201614cb11d90b823931b060a3b1d",
+    "contractValidationManifestSha256": "9002cab5863b561d2d202e03829d45084b57452ab828d43bda44d479030a6537",
+    "dryMappingManifestSha256": "862765bd62049ba3bb73da08ad10f91268015af44a6fd8a259aeab7954e04ff4"
+  },
+  "officialCallCounts": {
+    "development": 56,
+    "locked": 24,
+    "retainedTotal": 80,
+    "transportRetries": 0,
+    "note": "diagnostic and discarded evaluator-defect runs are excluded from official retained counts"
+  },
+  "lockedPartialAggregate": {
+    "C": {
+      "cases": 19,
+      "modelCalls": 24,
+      "transportSuccess": 19,
+      "jsonParseSuccess": 19,
+      "localValidationAccept": 17,
+      "semanticMatch": 2,
+      "commonGateAccept": 19,
+      "commonGateReject": 0,
+      "outcomes": {
+        "correct": 1,
+        "safe_reject": 7,
+        "over_ask": 10,
+        "unsafe_accept": 1
+      },
+      "latencyMs": {
+        "mean": 13733.132,
+        "median": 12428.107,
+        "max": 27883.386
+      },
+      "intentMatch": 17,
+      "spanExact": 1,
+      "roleExact": 1,
+      "correctionExact": 18,
+      "groundlessValueCounts": {
+        "datetime": 0,
+        "title": 0,
+        "category": 0,
+        "filter": 0,
+        "changes": 0
+      },
+      "arbitraryCandidateSelection": 0
+    },
+    "A": "not_run_after_safety_stop",
+    "B": "not_run_after_safety_stop"
+  },
+  "ruleBaselineR": {
+    "modelCalls": 0,
+    "latency": null,
+    "source": "dry-mapping-results-v0.1.jsonl",
+    "outcomes": {
+      "correct": 14,
+      "safe_reject": 33,
+      "over_ask": 9,
+      "unsafe_accept": 0
+    },
+    "comparisonLimitation": "R covers all 56 cases while the official Ollama run stopped after 19 candidate-C cases"
+  },
+  "rawOutput": {
+    "storedInPermanentArtifacts": false,
+    "temporaryRawFilesCreated": false,
+    "temporaryRawFilesDeleted": true,
+    "resultMetadataOnly": [
+      "rawOutputSha256",
+      "rawOutputByteLength"
+    ]
+  },
+  "networkAndSideEffects": {
+    "externalNetworkUsed": false,
+    "ollamaPullUsed": false,
+    "backendAppStarted": false,
+    "databaseOrScheduleApiUsed": false,
+    "scheduleWriteUsed": false
+  },
+  "mlx": {
+    "executed": false,
+    "downloaded": false,
+    "reason": "out of scope; this run evaluates only the installed local Ollama qwen3:4b baseline"
+  },
+  "discardedRuns": [
+    {
+      "runId": "issue30-locked-r0-20261025",
+      "reason": "evaluator executable-effect defect; discarded, fixed, and restarted from case 1"
+    }
+  ],
+  "artifacts": {
+    ".omx/research/issue30/ollama_eval.py": "aeb43250fdcfd0e5ec38687b39b78b902c52489bba4b16f5888e8e8f69e98b70",
+    ".omx/research/issue30/test_ollama_eval.py": "936dc8f6d29b128daf954366814919a2106b66beceaf522df63bc7b53b5d507c",
+    ".omx/research/issue30/candidate-b-prompt-v0.1.txt": "8833c4e1e1ace53a5293781437e6094ece4cc15d9c014a16869aa7a9d3d02d8d",
+    ".omx/research/issue30/candidate-c-prompt-v0.1.txt": "6352d687dd9093f783ff1c23e95d6f84433af30c3776a524aaa980a83db5f24b",
+    ".omx/research/issue30/ollama-development-results-v0.1.jsonl": "e15fb91c1c4516b41e14bacad1a0c072c6795c262cf34bbf0d540bbe3a27b292",
+    ".omx/research/issue30/ollama-locked-results-v0.1.jsonl": "8a49cd4c2b7b7da781bbaeea7fdca3017c95239fe2df964c3ee99116ff369e12",
+    ".omx/research/issue30/ollama-eval-summary-v0.1.md": "c9768b193cd049631894eb5e96b86a5597e20b4cfa4b81d27acf88b6e41f5009"
+  }
+}

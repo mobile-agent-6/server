@@ -1,0 +1,198 @@
+{
+  "manifestVersion": "issue30-dry-mapping-v0.1",
+  "status": "PROPOSED",
+  "authoredOn": "2026-10-25",
+  "scope": "DecisionEnvelope and Assistant processor dry mapping without model, server, database, or Schedule write",
+  "artifacts": {
+    "dry_mapping.py": {
+      "path": ".omx/research/issue30/dry_mapping.py",
+      "sha256": "ecf7f23d8248c2562973ab8b4c98cf7506bbf287cd454f6d814cd128d9322bb0"
+    },
+    "test_dry_mapping.py": {
+      "path": ".omx/research/issue30/test_dry_mapping.py",
+      "sha256": "b98b00ea29c7ae3137c06fca16ecde66506da4838effa9176d96af3dd0ac671f"
+    },
+    "dry-mapping-results-v0.1.jsonl": {
+      "path": ".omx/research/issue30/dry-mapping-results-v0.1.jsonl",
+      "sha256": "e8a202762b4d9f288e7da01b2b8e4c3c14cb119dbfdf8f65e4fc22ac1b78388f",
+      "recordCount": 224
+    },
+    "dry-mapping-summary-v0.1.md": {
+      "path": ".omx/research/issue30/dry-mapping-summary-v0.1.md",
+      "sha256": "9955178c050cdef505cc1303bddd233cf05679bab19c14d58b4904a9fa1b6981"
+    },
+    "dry-mapping-frontend-impact-v0.1.md": {
+      "path": ".omx/research/issue30/dry-mapping-frontend-impact-v0.1.md",
+      "sha256": "818a88215d20b602c04deeec9f737f56c594310ef5939fb893d2f923917d6a05"
+    }
+  },
+  "fixedInputs": {
+    "lockedCases": {
+      "path": ".omx/research/issue30/locked-cases-v0.1.jsonl",
+      "count": 56,
+      "lockStatus": "locked",
+      "sha256": "17c7d4ef10aff8171d422c248431d3c34faaf03bf7282fab5dc3abcfa2389b57"
+    },
+    "semanticOracleSchema": {
+      "path": ".omx/research/issue30/semantic-oracle-schema-v0.1.json",
+      "sha256": "cfe0ed947f6bd709e0e3ba60a8daf63fb1f201614cb11d90b823931b060a3b1d"
+    },
+    "contractValidationManifest": {
+      "path": ".omx/research/issue30/contract-validation-manifest-v0.1.json",
+      "sha256": "9002cab5863b561d2d202e03829d45084b57452ab828d43bda44d479030a6537",
+      "verifiedArtifactCount": 7
+    }
+  },
+  "protectedContractValidationArtifacts": {
+    "contracts.py": "d68469a7e5a71ebdeb3ea693d895d1faecc8aa959125cfc94e15766dc82b5f62",
+    "rule_baseline.py": "c9a5dc2321ff18f9247ecc405385ebc9ad7310613bab7abc6b4477ecda5fb9c3",
+    "validate_contracts.py": "31fc4faac3f950cb03a21b01f9fac94edd69ac286d9ff7355b4c0aeb252ef7e2",
+    "mutation-fixtures-v0.1.jsonl": "4f333dd03d55e1f53211cc1f76114f0125acc983967ff7c9395b8324268c8355",
+    "contract-validation-results-v0.1.jsonl": "2a2810a2475263d7e1b014a688b094421acda8c9d30b178c8672f57282bf0916",
+    "contract-validation-summary-v0.1.md": "b1936ffd117d83f5fc3293583d8413a105b2927400da4071f6e019564a783814",
+    "test_contracts.py": "b13f42c4f280ee5e3da4120bfa2b23420d3474502c926ef693fe9cd9e7ce15ba"
+  },
+  "productionFunctionsUsed": [
+    "app.modules.assistant.processor._provider_decision_plan",
+    "app.modules.assistant.processor._prepare",
+    "app.modules.assistant.processor._from_saved_selection",
+    "app.modules.assistant.processor._from_saved_confirmation",
+    "app.modules.assistant.processor._call_provider",
+    "app.modules.assistant.processor._failure"
+  ],
+  "privateProductionDependency": true,
+  "fakeScheduleReadPort": {
+    "source": "locked case context.initialSchedules only",
+    "methods": [
+      "get(schedule_id)",
+      "list(from_utc, to_utc, category, completed, limit)"
+    ],
+    "semantics": [
+      "deleted schedules excluded",
+      "[from,to) range",
+      "category and completed filters",
+      "scheduledAt ascending",
+      "limit applied",
+      "calls recorded"
+    ],
+    "writeMethods": 0,
+    "researchAdapterGap": "adapter_title_search records the missing all-retention title lookup boundary",
+    "researchAdapterPolicyStatus": "fixture-only exact/substring matcher; not production support or a product policy",
+    "researchAdapterRows": 54
+  },
+  "determinism": {
+    "clock": "locked case referenceTime; wall clock unused",
+    "serverTimeTrusted": "locked case value",
+    "uuid": "SHA-256(caseId:candidate:counter) converted to RFC-variant UUIDv4",
+    "rerunIdentical": true,
+    "questionCandidateAndScheduleIdCollisions": 0
+  },
+  "resultCounts": {
+    "total": 224,
+    "candidateCount": 4,
+    "caseCount": 56,
+    "outcomes": {
+      "A": {"correct": 5, "safe_reject": 47, "over_ask": 4, "unsafe_accept": 0},
+      "B": {"correct": 26, "safe_reject": 27, "over_ask": 3, "unsafe_accept": 0},
+      "C": {"correct": 26, "safe_reject": 27, "over_ask": 3, "unsafe_accept": 0},
+      "R": {"correct": 14, "safe_reject": 33, "over_ask": 9, "unsafe_accept": 0}
+    },
+    "localValidation": {
+      "A": {"accept": 10, "reject": 3, "not_run": 43},
+      "B": {"accept": 49, "reject": 3, "not_run": 4},
+      "C": {"accept": 56, "reject": 0, "not_run": 0},
+      "R": {"accept": 52, "reject": 0, "not_run": 4}
+    },
+    "commonGate": {
+      "A": {"accept": 9, "reject": 1, "not_run": 46},
+      "B": {"accept": 48, "reject": 1, "not_run": 7},
+      "C": {"accept": 55, "reject": 1, "not_run": 0},
+      "R": {"accept": 50, "reject": 2, "not_run": 4}
+    },
+    "allTurnProcessorPlans": {
+      "need_more_info": 66,
+      "candidate_selection": 9,
+      "confirmation": 19,
+      "outcome": 19,
+      "failure": 20,
+      "pending_write": 51,
+      "none": 109
+    },
+    "finalPendingWrite": {
+      "total": 51,
+      "A": 4,
+      "B": 18,
+      "C": 18,
+      "R": 11,
+      "maximumTargetsPerTurn": 1
+    },
+    "scheduleReadCalls": 138,
+    "unexpectedScheduleReadCalls": 0,
+    "processorExceptionTurns": 18,
+    "finalUnsafeAccept": 0
+  },
+  "classificationAxes": {
+    "causes": [
+      "FORMAT",
+      "MODEL_SEMANTIC",
+      "NORMALIZER",
+      "MAPPING",
+      "ORACLE_ERROR",
+      "CONTRACT_GAP"
+    ],
+    "outcomes": [
+      "correct",
+      "safe_reject",
+      "over_ask",
+      "unsafe_accept"
+    ],
+    "transportExcluded": true
+  },
+  "runtime": {
+    "python": "CPython 3.11.16",
+    "environment": "existing sibling backend virtual environment",
+    "pydantic": "2.13.5",
+    "sqlalchemy": "2.0.54",
+    "newPackagesInstalled": false,
+    "bytecodeDisabled": true
+  },
+  "validation": {
+    "testCount": 19,
+    "status": "passed",
+    "command": "../server/backend/.venv/bin/python -B -m unittest discover -s .omx/research/issue30 -p 'test_dry_mapping.py' -v",
+    "publicResultSchemaValidated": true,
+    "candidateCSpanCasesValidated": 56,
+    "savedSelectionAndConfirmationModelCalls": 0,
+    "networkAndDatabaseEngineFailClosedProbe": true,
+    "listWriteCount": 0,
+    "artifactResidue": 0
+  },
+  "actualExternalCalls": {
+    "model": 0,
+    "server": 0,
+    "database": 0,
+    "scheduleApi": 0,
+    "scheduleWrite": 0
+  },
+  "notExecuted": [
+    "Ollama",
+    "MLX",
+    "Qwen",
+    "model transport",
+    "backend app startup",
+    "backend server",
+    "database engine or session",
+    "ORM",
+    "Schedule API HTTP",
+    "Schedule write",
+    "frontend mutation",
+    "GitHub mutation"
+  ],
+  "limitations": [
+    "single-review proposed",
+    "production private functions are an intentionally unsupported research dependency",
+    "all-retention title search is a recorded research adapter because ScheduleReadPort lacks it",
+    "write execution and post-commit success text are outside this dry mapping",
+    "exact user-facing wording, TTS, and card layout are excluded from model scoring"
+  ]
+}

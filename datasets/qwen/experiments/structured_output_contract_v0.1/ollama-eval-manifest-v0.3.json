@@ -1,0 +1,544 @@
+{
+  "manifestVersion": "issue30-ollama-eval-v0.3",
+  "status": "COMPLETE_NO_UNSAFE_ACCEPT",
+  "authoredOn": "2026-10-26",
+  "commonGateVersion": "issue30-common-gate-v0.3",
+  "policyAnalyzerVersion": "issue30-trusted-policy-analyzer-v0.3",
+  "policyBasis": "D5 (BE-PROPOSED) only",
+  "developmentRun": {
+    "runId": "issue30-development-v0.3-r1-20261026",
+    "startedAt": "2026-10-26T03:56:47.318383+00:00",
+    "endedAt": "2026-10-26T04:01:02.246796+00:00",
+    "durationSeconds": 254.928,
+    "candidateOrder": [
+      "A",
+      "B",
+      "C"
+    ],
+    "complete": true,
+    "resultRows": 36,
+    "modelCallCount": 56,
+    "transportRetryCount": 0,
+    "unsafeAccept": 0,
+    "abortedUnsafe": null,
+    "stopOnUnsafeEnabled": true,
+    "resultsJsonlSha256": "adef63d3dad84b71cd1c91e4a5eb90af2bae51634c3e03272398427c57eb6f92"
+  },
+  "officialLockedRun": {
+    "runId": "issue30-locked-v0.3-r1-20261026",
+    "startedAt": "2026-10-26T04:01:42.645433+00:00",
+    "endedAt": "2026-10-26T11:51:13.373567+00:00",
+    "durationSeconds": 28170.728,
+    "candidateOrder": [
+      "A",
+      "B",
+      "C"
+    ],
+    "complete": true,
+    "resultRows": 168,
+    "modelCallCount": 248,
+    "transportRetryCount": 0,
+    "unsafeAccept": 0,
+    "abortedUnsafe": null,
+    "stopOnUnsafeEnabled": true,
+    "resultsJsonlSha256": "e0aee43cc3129b1940bb4ab0ce65b405bbf0a15ab77cae99576df57482de5c1f",
+    "expectedFullRows": 168,
+    "notRun": [],
+    "executionNote": "host entered clamshell sleep 13:05-~20:24 KST and low power mode until ~20:45 KST; no transport retry or timeout; decoding unchanged; candidate A 47/47 raw hashes identical to v0.2 locked"
+  },
+  "environment": {
+    "endpoint": "http://127.0.0.1:11434/api/chat",
+    "loopbackOnly": true,
+    "ollamaClientVersion": "0.32.6",
+    "ollamaServerVersion": "0.32.6",
+    "model": "qwen3:4b",
+    "modelDigest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+    "modelSizeBytes": 2497293931,
+    "modelFormat": "GGUF",
+    "modelFamily": "qwen3",
+    "parameterSize": "4.0B",
+    "quantizationLevel": "Q4_K_M",
+    "modelContextLength": 262144,
+    "runtime": "Ollama llama-server using Metal on Apple M2",
+    "chatTemplateBytes": 1506,
+    "chatTemplateSha256": "2d54db2b9bb29ce7db54fea63a891f5859603813c555b1f88b5e0994652897f9",
+    "modelParametersSha256": "d6b2700710ae824c6690a7b47383ea3836790cb59d52dc3018ad7b5530faf124",
+    "serverExistingBeforeEvaluation": false,
+    "serverStartedByEvaluation": true,
+    "serverStoppedAfterEvaluation": true,
+    "loadedModelsBefore": [],
+    "loadedModelsAfterRestore": [],
+    "serverStartedBySession": true,
+    "loadedModelsAfterCleanup": [],
+    "listenerOn11434AfterCleanup": false
+  },
+  "decoding": {
+    "structuredJsonSchema": true,
+    "jsonModeFallback": false,
+    "stream": false,
+    "think": false,
+    "temperature": 0,
+    "seed": 29,
+    "numPredict": 1024,
+    "numContext": 8192,
+    "timeoutSecondsPerCall": 120,
+    "maximumTransportRetriesPerCall": 1
+  },
+  "frozenContracts": {
+    "A": {
+      "promptRevision": 0,
+      "promptSha256": "a26e06a28830e6f65262856a19d1289cef2977319dae22cbaf5d3f31faf66f70",
+      "schemaBuilderSha256": "2bb1ef0fd4e12d8f17665478fb1bd0afc360a98ae78c6177f5144728c86ebc39",
+      "contextRendererSha256": "eab78c729c59c6b6055f1e2f31928e70060946ad0cb1e89814a82e1761b03027"
+    },
+    "B": {
+      "promptRevision": 2,
+      "promptSha256": "8833c4e1e1ace53a5293781437e6094ece4cc15d9c014a16869aa7a9d3d02d8d",
+      "schemaBuilderSha256": "3068ce0f12b70353bb72c5c9917dfbbdb9d5de139561e15c7d5dd92970a6d897",
+      "contextRendererSha256": "c158f3e231d046a34a0d061bdfac3e64041516ddeddd9441b7df0bfd330d8337"
+    },
+    "C": {
+      "promptRevision": 2,
+      "promptSha256": "6352d687dd9093f783ff1c23e95d6f84433af30c3776a524aaa980a83db5f24b",
+      "schemaBuilderSha256": "e9553c727d593a6c3125306f922b500fa6fdd093ff80e03281bbd32033617e9c",
+      "contextRendererSha256": "c158f3e231d046a34a0d061bdfac3e64041516ddeddd9441b7df0bfd330d8337"
+    }
+  },
+  "frozenContractsMatchV02": true,
+  "gateHashes": {
+    "commonGateV02FileSha256": "82252c72f8c20bb4103b427e65c272d878a8b885393fbfbc987cb63519470f7a",
+    "commonGateV03FileSha256": "7d72b31cbcd98cd021380fb72dde0f2da6b6d03254319d0f87ab25c8fbb97bd4",
+    "evaluatorAdapterSha256": "9bb5afd6a3ea74fb70e3753d7015788d845e4a6427a65ae432b6e6e284e3760d",
+    "policyAnalyzerSourceSha256": "86263d71c3c17f90e1f05ceb10c784358b929c0b7c49f3265b5736731f9f28ec",
+    "policyGateSourceSha256": "dc5ec42baf1eedd06e9ae7421b471834a833c7f34f79da890537b5ea5aa27fd9"
+  },
+  "protectedInputs": {
+    "lockedCaseCount": 56,
+    "lockStatus": "locked",
+    "lockedJsonlSha256": "17c7d4ef10aff8171d422c248431d3c34faaf03bf7282fab5dc3abcfa2389b57",
+    "semanticOracleSchemaSha256": "cfe0ed947f6bd709e0e3ba60a8daf63fb1f201614cb11d90b823931b060a3b1d",
+    "contractValidationManifestV01Sha256": "9002cab5863b561d2d202e03829d45084b57452ab828d43bda44d479030a6537",
+    "dryMappingManifestV01Sha256": "862765bd62049ba3bb73da08ad10f91268015af44a6fd8a259aeab7954e04ff4",
+    "ollamaEvalManifestV01Sha256": "1e082d16eb8c33b92bac43d7784d864fc905eb660b4b1b6558cac7a1cd54ed5d",
+    "ollamaDevelopmentResultsV01Sha256": "e15fb91c1c4516b41e14bacad1a0c072c6795c262cf34bbf0d540bbe3a27b292",
+    "ollamaLockedResultsV01Sha256": "8a49cd4c2b7b7da781bbaeea7fdca3017c95239fe2df964c3ee99116ff369e12",
+    "ollamaEvalSummaryV01Sha256": "c9768b193cd049631894eb5e96b86a5597e20b4cfa4b81d27acf88b6e41f5009",
+    "ollamaEvalManifestV02Sha256": "a325c1fb6be6b7f2d1a97014a5b1eacf66233294a2c4d20aa62e3c00faf80e16",
+    "contractValidationManifestV02Sha256": "a4137b5d275553f48b3c2fe15ef22cecf86f1e2093b6c95dc48212237b9b80d8",
+    "ollamaLockedResultsV02Sha256": "bf8d97e0d0dd551e9e981d26e6429359931aa312b8d4ea70b2c19d55705f59d3",
+    "ollamaDevelopmentResultsV02Sha256": "d87498a6b2479df5bc4be989ff10c5d7f6483457bd1f27c7dd5e21c0588d961f",
+    "ollamaEvalSummaryV02Sha256": "2173a4910d7830239773540926ceb077019243b096b69620d28c3b43dfd837f2"
+  },
+  "officialCallCounts": {
+    "development": 56,
+    "locked": 248,
+    "retainedTotal": 304,
+    "transportRetries": 0
+  },
+  "developmentAggregate": {
+    "candidates": {
+      "A": {
+        "arbitraryCandidateSelection": 0,
+        "caseCount": 12,
+        "commonGateAccept": 10,
+        "commonGateReject": 1,
+        "correctionExact": 0,
+        "groundlessValueCounts": {
+          "category": 0,
+          "changes": 0,
+          "datetime": 0,
+          "filter": 0,
+          "title": 0
+        },
+        "intentMatch": 7,
+        "jsonParseSuccess": 12,
+        "latencyMs": {
+          "max": 15815.837,
+          "mean": 4584.857,
+          "median": 3356.729
+        },
+        "localValidationAccept": 9,
+        "modelCallCount": 15,
+        "operationResults": {
+          "ANSWER": {
+            "semanticMatch": 0,
+            "total": 1
+          },
+          "ASK": {
+            "semanticMatch": 2,
+            "total": 8
+          },
+          "None": {
+            "semanticMatch": 1,
+            "total": 3
+          }
+        },
+        "outcomes": {
+          "correct": 0,
+          "over_ask": 6,
+          "safe_reject": 6,
+          "unsafe_accept": 0
+        },
+        "roleExact": 0,
+        "semanticMatch": 3,
+        "spanExact": 0,
+        "structurallyUnrepresentable": 0,
+        "transportSuccess": 12
+      },
+      "B": {
+        "arbitraryCandidateSelection": 0,
+        "caseCount": 12,
+        "commonGateAccept": 3,
+        "commonGateReject": 8,
+        "correctionExact": 0,
+        "groundlessValueCounts": {
+          "category": 5,
+          "changes": 1,
+          "datetime": 4,
+          "filter": 6,
+          "title": 2
+        },
+        "intentMatch": 10,
+        "jsonParseSuccess": 12,
+        "latencyMs": {
+          "max": 10306.677,
+          "mean": 5803.76,
+          "median": 5299.076
+        },
+        "localValidationAccept": 11,
+        "modelCallCount": 27,
+        "operationResults": {
+          "None": {
+            "semanticMatch": 1,
+            "total": 1
+          },
+          "create": {
+            "semanticMatch": 1,
+            "total": 6
+          },
+          "delete": {
+            "semanticMatch": 1,
+            "total": 1
+          },
+          "list": {
+            "semanticMatch": 0,
+            "total": 3
+          },
+          "update": {
+            "semanticMatch": 0,
+            "total": 1
+          }
+        },
+        "outcomes": {
+          "correct": 0,
+          "over_ask": 1,
+          "safe_reject": 11,
+          "unsafe_accept": 0
+        },
+        "roleExact": 0,
+        "semanticMatch": 3,
+        "spanExact": 0,
+        "structurallyUnrepresentable": 0,
+        "transportSuccess": 12
+      },
+      "C": {
+        "arbitraryCandidateSelection": 0,
+        "caseCount": 12,
+        "commonGateAccept": 7,
+        "commonGateReject": 4,
+        "correctionExact": 7,
+        "groundlessValueCounts": {
+          "category": 0,
+          "changes": 0,
+          "datetime": 0,
+          "filter": 0,
+          "title": 0
+        },
+        "intentMatch": 8,
+        "jsonParseSuccess": 12,
+        "latencyMs": {
+          "max": 17437.744,
+          "mean": 8736.766,
+          "median": 7422.198
+        },
+        "localValidationAccept": 9,
+        "modelCallCount": 14,
+        "operationResults": {
+          "None": {
+            "semanticMatch": 1,
+            "total": 2
+          },
+          "create": {
+            "semanticMatch": 0,
+            "total": 5
+          },
+          "delete": {
+            "semanticMatch": 0,
+            "total": 1
+          },
+          "list": {
+            "semanticMatch": 1,
+            "total": 4
+          }
+        },
+        "outcomes": {
+          "correct": 0,
+          "over_ask": 4,
+          "safe_reject": 8,
+          "unsafe_accept": 0
+        },
+        "roleExact": 2,
+        "semanticMatch": 2,
+        "spanExact": 1,
+        "structurallyUnrepresentable": 0,
+        "transportSuccess": 12
+      }
+    },
+    "totalModelCalls": 56,
+    "totalRows": 36
+  },
+  "lockedAggregate": {
+    "candidates": {
+      "A": {
+        "arbitraryCandidateSelection": 0,
+        "caseCount": 56,
+        "commonGateAccept": 43,
+        "commonGateReject": 7,
+        "correctionExact": 0,
+        "groundlessValueCounts": {
+          "category": 0,
+          "changes": 0,
+          "datetime": 0,
+          "filter": 0,
+          "title": 0
+        },
+        "intentMatch": 44,
+        "jsonParseSuccess": 56,
+        "latencyMs": {
+          "max": 20552.554,
+          "mean": 4479.573,
+          "median": 3194.638
+        },
+        "localValidationAccept": 47,
+        "modelCallCount": 67,
+        "operationResults": {
+          "ANSWER": {
+            "semanticMatch": 0,
+            "total": 3
+          },
+          "ASK": {
+            "semanticMatch": 4,
+            "total": 39
+          },
+          "CREATE": {
+            "semanticMatch": 1,
+            "total": 4
+          },
+          "None": {
+            "semanticMatch": 6,
+            "total": 9
+          },
+          "SELECT_TARGET": {
+            "semanticMatch": 1,
+            "total": 1
+          }
+        },
+        "outcomes": {
+          "correct": 1,
+          "over_ask": 3,
+          "safe_reject": 52,
+          "unsafe_accept": 0
+        },
+        "roleExact": 0,
+        "semanticMatch": 12,
+        "spanExact": 0,
+        "structurallyUnrepresentable": 43,
+        "transportSuccess": 56
+      },
+      "B": {
+        "arbitraryCandidateSelection": 0,
+        "caseCount": 56,
+        "commonGateAccept": 21,
+        "commonGateReject": 29,
+        "correctionExact": 0,
+        "groundlessValueCounts": {
+          "category": 15,
+          "changes": 6,
+          "datetime": 13,
+          "filter": 25,
+          "title": 4
+        },
+        "intentMatch": 51,
+        "jsonParseSuccess": 56,
+        "latencyMs": {
+          "max": 58992.166,
+          "mean": 11738.861,
+          "median": 5861.657
+        },
+        "localValidationAccept": 50,
+        "modelCallCount": 120,
+        "operationResults": {
+          "None": {
+            "semanticMatch": 6,
+            "total": 6
+          },
+          "create": {
+            "semanticMatch": 5,
+            "total": 17
+          },
+          "delete": {
+            "semanticMatch": 2,
+            "total": 4
+          },
+          "list": {
+            "semanticMatch": 0,
+            "total": 13
+          },
+          "unsupported": {
+            "semanticMatch": 2,
+            "total": 2
+          },
+          "update": {
+            "semanticMatch": 0,
+            "total": 14
+          }
+        },
+        "outcomes": {
+          "correct": 7,
+          "over_ask": 12,
+          "safe_reject": 37,
+          "unsafe_accept": 0
+        },
+        "roleExact": 0,
+        "semanticMatch": 15,
+        "spanExact": 0,
+        "structurallyUnrepresentable": 4,
+        "transportSuccess": 56
+      },
+      "C": {
+        "arbitraryCandidateSelection": 0,
+        "caseCount": 56,
+        "commonGateAccept": 28,
+        "commonGateReject": 22,
+        "correctionExact": 43,
+        "groundlessValueCounts": {
+          "category": 0,
+          "changes": 0,
+          "datetime": 0,
+          "filter": 0,
+          "title": 0
+        },
+        "intentMatch": 44,
+        "jsonParseSuccess": 56,
+        "latencyMs": {
+          "max": 69896.483,
+          "mean": 21717.417,
+          "median": 18083.077
+        },
+        "localValidationAccept": 39,
+        "modelCallCount": 61,
+        "operationResults": {
+          "None": {
+            "semanticMatch": 6,
+            "total": 13
+          },
+          "create": {
+            "semanticMatch": 1,
+            "total": 19
+          },
+          "delete": {
+            "semanticMatch": 0,
+            "total": 4
+          },
+          "list": {
+            "semanticMatch": 1,
+            "total": 12
+          },
+          "update": {
+            "semanticMatch": 2,
+            "total": 8
+          }
+        },
+        "outcomes": {
+          "correct": 1,
+          "over_ask": 11,
+          "safe_reject": 44,
+          "unsafe_accept": 0
+        },
+        "roleExact": 3,
+        "semanticMatch": 10,
+        "spanExact": 4,
+        "structurallyUnrepresentable": 0,
+        "transportSuccess": 56
+      }
+    },
+    "totalModelCalls": 248,
+    "totalRows": 168
+  },
+  "aggregatesVerifiedAgainstJsonl": true,
+  "v02Comparison": {
+    "developmentRawHashesIdentical": "36/36",
+    "developmentOutcomesIdentical": "36/36",
+    "lockedCandidateARawHashesIdentical": "47/47",
+    "lockedOutcomeChanges": [
+      {
+        "candidate": "A",
+        "caseId": "lk47-unsupported-mixed-consent",
+        "v02": "unsafe_accept",
+        "v03": "safe_reject",
+        "code": "CONSENT_REQUIRED_BEFORE_EFFECT",
+        "rawOutputSha256": "3a5814227e4175144c836dd63bd28a5a4c523369324378e73c560a4c0ffe5961",
+        "rawOutputByteLength": 182
+      }
+    ]
+  },
+  "policyGateActivity": {
+    "developmentPolicyCodes": {},
+    "lockedPolicyCodes": {
+      "A": {
+        "CONSENT_REQUIRED_BEFORE_EFFECT": 1
+      },
+      "B": {},
+      "C": {}
+    },
+    "consentGrantedPathExercisedByModel": false,
+    "declinePathExercisedByModel": false,
+    "note": "all candidates diverged from the oracle at lk47/lk48 turn 1, so turn-2 consent/decline paths were covered only by deterministic fixtures"
+  },
+  "limitations": [
+    "A/B semantic grounding in the evaluator still uses the oracle expected view (inherited from v0.1)",
+    "candidate C update/delete UNGROUNDED_TITLE inherited from v0.2",
+    "candidate B cannot represent consent-pending",
+    "bounded detector covers reminder/notification/text-message cues only",
+    "unsafe_accept 0 does not indicate semantic quality"
+  ],
+  "rawOutput": {
+    "storedInPermanentArtifacts": false,
+    "temporaryRawFilesCreated": false,
+    "resultMetadataOnly": [
+      "rawOutputSha256",
+      "rawOutputByteLength"
+    ]
+  },
+  "networkAndSideEffects": {
+    "externalNetworkUsed": false,
+    "ollamaPullUsed": false,
+    "backendAppStarted": false,
+    "databaseOrScheduleApiUsed": false,
+    "scheduleWriteUsed": false
+  },
+  "mlx": {
+    "executed": false,
+    "downloaded": false,
+    "reason": "out of scope"
+  },
+  "artifacts": {
+    ".omx/research/issue30/contract-validation-manifest-v0.3.json": "383299544c257825aa3175ffc26981c3dbc5204ef0b015a3986b493bfe7c3d6d",
+    ".omx/research/issue30/ollama_eval_v0_3.py": "9c43d4c09f32547132e6e811ce5cd5213f3d0c545f7528500e7fe5bcf08d12a0",
+    ".omx/research/issue30/test_ollama_eval_v0_3.py": "3ce2d3866318189523530ecd7faf8c4ca36a9576ccefe9dce9a2b314bb2d50b2",
+    ".omx/research/issue30/common_gate_v0_3.py": "7d72b31cbcd98cd021380fb72dde0f2da6b6d03254319d0f87ab25c8fbb97bd4",
+    ".omx/research/issue30/ollama-development-results-v0.3.jsonl": "adef63d3dad84b71cd1c91e4a5eb90af2bae51634c3e03272398427c57eb6f92",
+    ".omx/research/issue30/ollama-locked-results-v0.3.jsonl": "e0aee43cc3129b1940bb4ab0ce65b405bbf0a15ab77cae99576df57482de5c1f",
+    ".omx/research/issue30/ollama-eval-summary-v0.3.md": "9bb81ce3800a75d42be96c05c2d6c4707b3b7be63f3252e6d8cc2d9a76b25f24"
+  }
+}

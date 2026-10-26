@@ -1,0 +1,183 @@
+{
+  "artifacts": {
+    "contract-validation-results-v0.1.jsonl": {
+      "path": ".omx/research/issue30/contract-validation-results-v0.1.jsonl",
+      "sha256": "2a2810a2475263d7e1b014a688b094421acda8c9d30b178c8672f57282bf0916"
+    },
+    "contract-validation-summary-v0.1.md": {
+      "path": ".omx/research/issue30/contract-validation-summary-v0.1.md",
+      "sha256": "b1936ffd117d83f5fc3293583d8413a105b2927400da4071f6e019564a783814"
+    },
+    "contracts.py": {
+      "path": ".omx/research/issue30/contracts.py",
+      "sha256": "d68469a7e5a71ebdeb3ea693d895d1faecc8aa959125cfc94e15766dc82b5f62"
+    },
+    "mutation-fixtures-v0.1.jsonl": {
+      "path": ".omx/research/issue30/mutation-fixtures-v0.1.jsonl",
+      "sha256": "4f333dd03d55e1f53211cc1f76114f0125acc983967ff7c9395b8324268c8355"
+    },
+    "rule_baseline.py": {
+      "path": ".omx/research/issue30/rule_baseline.py",
+      "sha256": "c9a5dc2321ff18f9247ecc405385ebc9ad7310613bab7abc6b4477ecda5fb9c3"
+    },
+    "test_contracts.py": {
+      "path": ".omx/research/issue30/test_contracts.py",
+      "sha256": "b13f42c4f280ee5e3da4120bfa2b23420d3474502c926ef693fe9cd9e7ce15ba"
+    },
+    "validate_contracts.py": {
+      "path": ".omx/research/issue30/validate_contracts.py",
+      "sha256": "31fc4faac3f950cb03a21b01f9fac94edd69ac286d9ff7355b4c0aeb252ef7e2"
+    }
+  },
+  "classificationAxes": {
+    "causes": [
+      "FORMAT",
+      "MODEL_SEMANTIC",
+      "NORMALIZER",
+      "MAPPING",
+      "ORACLE_ERROR",
+      "CONTRACT_GAP"
+    ],
+    "outcomes": [
+      "correct",
+      "safe_reject",
+      "over_ask",
+      "unsafe_accept"
+    ],
+    "transportExcluded": true
+  },
+  "contracts": {
+    "A": {
+      "knownGaps": [
+        "half-minute loss",
+        "LIST completed is not grounded by dynamic schema",
+        "single-action state machine"
+      ],
+      "modelCallsPerTextTurn": 2,
+      "output": "action/message/request; seven existing actions; controller context + dynamic schema + write guard",
+      "version": "data-v2.6-observed"
+    },
+    "B": {
+      "knownGaps": [
+        "normalized values remain untrusted",
+        "ordered multiple operations are structurally unsupported"
+      ],
+      "modelCallsPerTextTurn": 2,
+      "output": "one intent object followed by one operation-specific normalized extraction object",
+      "version": "issue30-B-v0.1"
+    },
+    "C": {
+      "knownGaps": [
+        "normalization and final missing-information decision remain backend responsibilities"
+      ],
+      "modelCallsPerTextTurn": 1,
+      "output": "ordered operations with role evidence spans; no normalized execution value",
+      "version": "issue30-C-v0.1"
+    },
+    "R": {
+      "intentCardinality": "exactly one",
+      "knownLimits": [
+        "ordered multiple operations are structurally unrepresentable",
+        "correction choice, similar-title matching, and weekday grammar fail closed"
+      ],
+      "modelOutput": {
+        "intent": [
+          "CREATE",
+          "DELETE",
+          "LIST",
+          "UNRELATED",
+          "UNSUPPORTED",
+          "UPDATE"
+        ]
+      },
+      "slotOwner": "deterministic backend rules",
+      "unsupportedBehavior": "safe reject or ask; never fabricate a slot",
+      "version": "issue30-rule-baseline-R-v0.1"
+    }
+  },
+  "externalValidatorInstalledOrUsed": false,
+  "inputs": {
+    "lockedCases": {
+      "count": 56,
+      "path": ".omx/research/issue30/locked-cases-v0.1.jsonl",
+      "sha256": "17c7d4ef10aff8171d422c248431d3c34faaf03bf7282fab5dc3abcfa2389b57"
+    },
+    "mutationFixtures": {
+      "count": 42,
+      "path": ".omx/research/issue30/mutation-fixtures-v0.1.jsonl",
+      "sha256": "4f333dd03d55e1f53211cc1f76114f0125acc983967ff7c9395b8324268c8355"
+    },
+    "semanticOracleSchema": {
+      "path": ".omx/research/issue30/semantic-oracle-schema-v0.1.json",
+      "sha256": "cfe0ed947f6bd709e0e3ba60a8daf63fb1f201614cb11d90b823931b060a3b1d"
+    }
+  },
+  "limitations": [
+    "single-review proposed",
+    "candidate B v0.1 is single-intent and at most two calls; ordered multi-operation is not invented",
+    "rule baseline R v0.1 has exactly one intent; unsupported grammar fails closed",
+    "locked semantic schema is hash-checked but not revalidated with a third-party JSON Schema package"
+  ],
+  "manifestVersion": "issue30-contract-validation-v0.1",
+  "notExecuted": [
+    "Ollama",
+    "MLX",
+    "Qwen",
+    "model transport",
+    "backend server",
+    "Schedule DB",
+    "Schedule API",
+    "production write"
+  ],
+  "outputs": {
+    "results": ".omx/research/issue30/contract-validation-results-v0.1.jsonl",
+    "summary": ".omx/research/issue30/contract-validation-summary-v0.1.md"
+  },
+  "python": "3.14.7",
+  "resultCounts": {
+    "candidateCSpanCasesValidated": 56,
+    "commonGate": {
+      "not_run": 39,
+      "reject": 102
+    },
+    "databaseCalls": 0,
+    "finalUnsafeAccept": 0,
+    "localValidation": {
+      "accept": 102,
+      "reject": 39
+    },
+    "lockedIntegrity": {
+      "caseCount": 56,
+      "lockStatus": "locked",
+      "lockedSha256": "17c7d4ef10aff8171d422c248431d3c34faaf03bf7282fab5dc3abcfa2389b57",
+      "schemaSha256": "cfe0ed947f6bd709e0e3ba60a8daf63fb1f201614cb11d90b823931b060a3b1d"
+    },
+    "modelCalls": 0,
+    "mutationCandidateExecutions": 141,
+    "mutationFixtureCount": 42,
+    "representability": {
+      "A": {
+        "representable": 9,
+        "safe_reject": 4,
+        "structurally_unrepresentable": 43
+      },
+      "B": {
+        "representable": 52,
+        "structurally_unrepresentable": 4
+      },
+      "C": {
+        "representable": 56
+      },
+      "R": {
+        "representable": 42,
+        "safe_reject": 10,
+        "structurally_unrepresentable": 4
+      }
+    },
+    "serverCalls": 0,
+    "status": "PROPOSED",
+    "version": "issue30-contract-validation-v0.1"
+  },
+  "status": "PROPOSED",
+  "stdlibOnly": true
+}
