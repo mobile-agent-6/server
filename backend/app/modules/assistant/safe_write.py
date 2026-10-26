@@ -209,16 +209,20 @@ def _update_values(update: ScheduleUpdate) -> dict[str, object]:
 def _remaining_changes(
     update: ScheduleUpdate, schedule: Schedule
 ) -> AssistantConfirmationChanges | None:
-    remaining = {
-        field: getattr(update, field)
+    remaining_fields = {
+        field
         for field in update.model_fields_set
         if getattr(update, field) != getattr(schedule, field)
     }
-    if not remaining:
+    if not remaining_fields:
         return None
-    json_values = ScheduleUpdate.model_validate(remaining).model_dump(
-        mode="json", by_alias=True, exclude_none=True
+    json_values = update.model_dump(
+        mode="json",
+        by_alias=True,
+        exclude_none=True,
+        include=remaining_fields,
     )
+    ScheduleUpdate.model_validate(json_values)
     return AssistantConfirmationChanges.model_validate(json_values)
 
 
