@@ -1,0 +1,467 @@
+{
+  "artifacts": [
+    {
+      "bytes": 3905,
+      "kind": "package_support",
+      "path": "README.md",
+      "sha256": "9ad525a09d88c488c4a1585777460db77e3aed47a93dddd43ad200b19a8a8dff",
+      "stageForTests": false
+    },
+    {
+      "bytes": 5649,
+      "kind": "package_support",
+      "path": "audit_existing_400.py",
+      "sha256": "e7508b5eb7d0549a2d5dcb21eaf005f5828a8e07644dba1f57ccad64ef26215a",
+      "stageForTests": false
+    },
+    {
+      "bytes": 4011,
+      "kind": "research_snapshot",
+      "path": "candidate-b-prompt-v0.1.txt",
+      "sha256": "8833c4e1e1ace53a5293781437e6094ece4cc15d9c014a16869aa7a9d3d02d8d",
+      "stageForTests": true
+    },
+    {
+      "bytes": 3678,
+      "kind": "research_snapshot",
+      "path": "candidate-c-prompt-v0.1.txt",
+      "sha256": "6352d687dd9093f783ff1c23e95d6f84433af30c3776a524aaa980a83db5f24b",
+      "stageForTests": true
+    },
+    {
+      "bytes": 12916,
+      "kind": "research_snapshot",
+      "path": "common_gate_v0_2.py",
+      "sha256": "82252c72f8c20bb4103b427e65c272d878a8b885393fbfbc987cb63519470f7a",
+      "stageForTests": true
+    },
+    {
+      "bytes": 17463,
+      "kind": "research_snapshot",
+      "path": "common_gate_v0_3.py",
+      "sha256": "7d72b31cbcd98cd021380fb72dde0f2da6b6d03254319d0f87ab25c8fbb97bd4",
+      "stageForTests": true
+    },
+    {
+      "bytes": 3396,
+      "kind": "research_snapshot",
+      "path": "common_gate_v0_4.py",
+      "sha256": "7185baf7f7bde15359d17d76b3aa659587c0127f1e792549d2c11d873291963b",
+      "stageForTests": true
+    },
+    {
+      "bytes": 5864,
+      "kind": "research_snapshot",
+      "path": "contract-validation-manifest-v0.1.json",
+      "sha256": "9002cab5863b561d2d202e03829d45084b57452ab828d43bda44d479030a6537",
+      "stageForTests": true
+    },
+    {
+      "bytes": 3385,
+      "kind": "research_snapshot",
+      "path": "contract-validation-manifest-v0.2.json",
+      "sha256": "a4137b5d275553f48b3c2fe15ef22cecf86f1e2093b6c95dc48212237b9b80d8",
+      "stageForTests": true
+    },
+    {
+      "bytes": 9113,
+      "kind": "research_snapshot",
+      "path": "contract-validation-manifest-v0.3.json",
+      "sha256": "383299544c257825aa3175ffc26981c3dbc5204ef0b015a3986b493bfe7c3d6d",
+      "stageForTests": true
+    },
+    {
+      "bytes": 1659,
+      "kind": "research_snapshot",
+      "path": "contract-validation-manifest-v0.4.json",
+      "sha256": "339f7cfda48dddfd719da622266cc5ddda0d940ac0421df61f893dc15c1f0d60",
+      "stageForTests": true
+    },
+    {
+      "bytes": 126082,
+      "kind": "research_snapshot",
+      "path": "contract-validation-results-v0.1.jsonl",
+      "sha256": "2a2810a2475263d7e1b014a688b094421acda8c9d30b178c8672f57282bf0916",
+      "stageForTests": true
+    },
+    {
+      "bytes": 27199,
+      "kind": "research_snapshot",
+      "path": "contract-validation-results-v0.2.jsonl",
+      "sha256": "57462b983492b7e6a35666aab821d15d3c7ec1bc59166ab6618840ff4adf4ec1",
+      "stageForTests": true
+    },
+    {
+      "bytes": 72979,
+      "kind": "research_snapshot",
+      "path": "contract-validation-results-v0.3.jsonl",
+      "sha256": "c782833e0dbfa1a7cde682247ab3554e44b3e9ab3753dba2c7d85ad22147e2a1",
+      "stageForTests": true
+    },
+    {
+      "bytes": 8766,
+      "kind": "research_snapshot",
+      "path": "contract-validation-summary-v0.1.md",
+      "sha256": "b1936ffd117d83f5fc3293583d8413a105b2927400da4071f6e019564a783814",
+      "stageForTests": true
+    },
+    {
+      "bytes": 3299,
+      "kind": "research_snapshot",
+      "path": "contract-validation-summary-v0.2.md",
+      "sha256": "bf3f76ba51f45c029b4a786fb5f216d535e8de9ad744b4e95dbffb15a31e9414",
+      "stageForTests": true
+    },
+    {
+      "bytes": 10412,
+      "kind": "research_snapshot",
+      "path": "contract-validation-summary-v0.3.md",
+      "sha256": "187d714995f82453daccfe1403502d91637d445b8d7c10a9edaa59ed92cdb97a",
+      "stageForTests": true
+    },
+    {
+      "bytes": 2457,
+      "kind": "research_snapshot",
+      "path": "contract-validation-summary-v0.4.md",
+      "sha256": "b273dfcff33516764b16883e034a6ac4b27b78fd96bca57c0529f6f002b7a363",
+      "stageForTests": true
+    },
+    {
+      "bytes": 35418,
+      "kind": "research_snapshot",
+      "path": "contracts.py",
+      "sha256": "d68469a7e5a71ebdeb3ea693d895d1faecc8aa959125cfc94e15766dc82b5f62",
+      "stageForTests": true
+    },
+    {
+      "bytes": 84432,
+      "kind": "research_snapshot",
+      "path": "development-cases-v0.1.jsonl",
+      "sha256": "18d3b4a595132cad0b1bb6092a4a26c180496aedfccb90bb4baac0301eb7e024",
+      "stageForTests": true
+    },
+    {
+      "bytes": 1642,
+      "kind": "research_snapshot",
+      "path": "dry-mapping-frontend-impact-v0.1.md",
+      "sha256": "818a88215d20b602c04deeec9f737f56c594310ef5939fb893d2f923917d6a05",
+      "stageForTests": true
+    },
+    {
+      "bytes": 7232,
+      "kind": "research_snapshot",
+      "path": "dry-mapping-manifest-v0.1.json",
+      "sha256": "862765bd62049ba3bb73da08ad10f91268015af44a6fd8a259aeab7954e04ff4",
+      "stageForTests": true
+    },
+    {
+      "bytes": 365388,
+      "kind": "research_snapshot",
+      "path": "dry-mapping-results-v0.1.jsonl",
+      "sha256": "e8a202762b4d9f288e7da01b2b8e4c3c14cb119dbfdf8f65e4fc22ac1b78388f",
+      "stageForTests": true
+    },
+    {
+      "bytes": 11784,
+      "kind": "research_snapshot",
+      "path": "dry-mapping-summary-v0.1.md",
+      "sha256": "9955178c050cdef505cc1303bddd233cf05679bab19c14d58b4904a9fa1b6981",
+      "stageForTests": true
+    },
+    {
+      "bytes": 76678,
+      "kind": "research_snapshot",
+      "path": "dry_mapping.py",
+      "sha256": "ecf7f23d8248c2562973ab8b4c98cf7506bbf287cd454f6d814cd128d9322bb0",
+      "stageForTests": true
+    },
+    {
+      "bytes": 6587,
+      "kind": "package_support",
+      "path": "existing-400-audit-v0.1.json",
+      "sha256": "1ef9f641bd5373e795f6b6c311d8d166dcc7b00de2c45bb3e0488e957a1aec48",
+      "stageForTests": false
+    },
+    {
+      "bytes": 1619,
+      "kind": "package_support",
+      "path": "historical-path-map-v0.1.json",
+      "sha256": "59f4aed751f62f160a2605b61d24be763664712ce95cfa1b44dae026f0f65fd0",
+      "stageForTests": false
+    },
+    {
+      "bytes": 4691,
+      "kind": "research_snapshot",
+      "path": "locked-cases-manifest-v0.1.json",
+      "sha256": "b7689ac5eebc4700ca493131c84b9492136cbf789a3c1e5250af07da6c39f23d",
+      "stageForTests": true
+    },
+    {
+      "bytes": 365787,
+      "kind": "research_snapshot",
+      "path": "locked-cases-v0.1.jsonl",
+      "sha256": "17c7d4ef10aff8171d422c248431d3c34faaf03bf7282fab5dc3abcfa2389b57",
+      "stageForTests": true
+    },
+    {
+      "bytes": 27664,
+      "kind": "research_snapshot",
+      "path": "mutation-fixtures-v0.1.jsonl",
+      "sha256": "4f333dd03d55e1f53211cc1f76114f0125acc983967ff7c9395b8324268c8355",
+      "stageForTests": true
+    },
+    {
+      "bytes": 12456,
+      "kind": "research_snapshot",
+      "path": "mutation-fixtures-v0.2.jsonl",
+      "sha256": "542106cf47a965cb0807e38a76832e9e6b7a61a842571763762288d53b6b8ada",
+      "stageForTests": true
+    },
+    {
+      "bytes": 34633,
+      "kind": "research_snapshot",
+      "path": "mutation-fixtures-v0.3.jsonl",
+      "sha256": "c013594c0b5ee13dec54825e85f53856e84a55d071b9e980f77ca073c31b9ff4",
+      "stageForTests": true
+    },
+    {
+      "bytes": 51435,
+      "kind": "research_snapshot",
+      "path": "ollama-development-results-v0.1.jsonl",
+      "sha256": "e15fb91c1c4516b41e14bacad1a0c072c6795c262cf34bbf0d540bbe3a27b292",
+      "stageForTests": true
+    },
+    {
+      "bytes": 54550,
+      "kind": "research_snapshot",
+      "path": "ollama-development-results-v0.2.jsonl",
+      "sha256": "d87498a6b2479df5bc4be989ff10c5d7f6483457bd1f27c7dd5e21c0588d961f",
+      "stageForTests": true
+    },
+    {
+      "bytes": 63001,
+      "kind": "research_snapshot",
+      "path": "ollama-development-results-v0.3.jsonl",
+      "sha256": "adef63d3dad84b71cd1c91e4a5eb90af2bae51634c3e03272398427c57eb6f92",
+      "stageForTests": true
+    },
+    {
+      "bytes": 8455,
+      "kind": "research_snapshot",
+      "path": "ollama-eval-manifest-v0.1.json",
+      "sha256": "1e082d16eb8c33b92bac43d7784d864fc905eb660b4b1b6558cac7a1cd54ed5d",
+      "stageForTests": true
+    },
+    {
+      "bytes": 8166,
+      "kind": "research_snapshot",
+      "path": "ollama-eval-manifest-v0.2.json",
+      "sha256": "a325c1fb6be6b7f2d1a97014a5b1eacf66233294a2c4d20aa62e3c00faf80e16",
+      "stageForTests": true
+    },
+    {
+      "bytes": 17173,
+      "kind": "research_snapshot",
+      "path": "ollama-eval-manifest-v0.3.json",
+      "sha256": "8f4f2bb09d6eb7074f131e75474864295f95e7ae60a0e9cee2818585be339939",
+      "stageForTests": true
+    },
+    {
+      "bytes": 8354,
+      "kind": "research_snapshot",
+      "path": "ollama-eval-summary-v0.1.md",
+      "sha256": "c9768b193cd049631894eb5e96b86a5597e20b4cfa4b81d27acf88b6e41f5009",
+      "stageForTests": true
+    },
+    {
+      "bytes": 5361,
+      "kind": "research_snapshot",
+      "path": "ollama-eval-summary-v0.2.md",
+      "sha256": "2173a4910d7830239773540926ceb077019243b096b69620d28c3b43dfd837f2",
+      "stageForTests": true
+    },
+    {
+      "bytes": 9848,
+      "kind": "research_snapshot",
+      "path": "ollama-eval-summary-v0.3.md",
+      "sha256": "9bb81ce3800a75d42be96c05c2d6c4707b3b7be63f3252e6d8cc2d9a76b25f24",
+      "stageForTests": true
+    },
+    {
+      "bytes": 26114,
+      "kind": "research_snapshot",
+      "path": "ollama-locked-results-v0.1.jsonl",
+      "sha256": "8a49cd4c2b7b7da781bbaeea7fdca3017c95239fe2df964c3ee99116ff369e12",
+      "stageForTests": true
+    },
+    {
+      "bytes": 71427,
+      "kind": "research_snapshot",
+      "path": "ollama-locked-results-v0.2.jsonl",
+      "sha256": "bf8d97e0d0dd551e9e981d26e6429359931aa312b8d4ea70b2c19d55705f59d3",
+      "stageForTests": true
+    },
+    {
+      "bytes": 292511,
+      "kind": "research_snapshot",
+      "path": "ollama-locked-results-v0.3.jsonl",
+      "sha256": "e0aee43cc3129b1940bb4ab0ce65b405bbf0a15ab77cae99576df57482de5c1f",
+      "stageForTests": true
+    },
+    {
+      "bytes": 59856,
+      "kind": "research_snapshot",
+      "path": "ollama_eval.py",
+      "sha256": "aeb43250fdcfd0e5ec38687b39b78b902c52489bba4b16f5888e8e8f69e98b70",
+      "stageForTests": true
+    },
+    {
+      "bytes": 17638,
+      "kind": "research_snapshot",
+      "path": "ollama_eval_v0_2.py",
+      "sha256": "90699b6094fb2a115437e539d0ac28b6427c91e65004e10b8908705f7aabcf69",
+      "stageForTests": true
+    },
+    {
+      "bytes": 16710,
+      "kind": "research_snapshot",
+      "path": "ollama_eval_v0_3.py",
+      "sha256": "9c43d4c09f32547132e6e811ce5cd5213f3d0c545f7528500e7fe5bcf08d12a0",
+      "stageForTests": true
+    },
+    {
+      "bytes": 7386,
+      "kind": "research_snapshot",
+      "path": "rule_baseline.py",
+      "sha256": "c9a5dc2321ff18f9247ecc405385ebc9ad7310613bab7abc6b4477ecda5fb9c3",
+      "stageForTests": true
+    },
+    {
+      "bytes": 66942,
+      "kind": "research_snapshot",
+      "path": "semantic-oracle-schema-v0.1.json",
+      "sha256": "cfe0ed947f6bd709e0e3ba60a8daf63fb1f201614cb11d90b823931b060a3b1d",
+      "stageForTests": true
+    },
+    {
+      "bytes": 7663,
+      "kind": "research_snapshot",
+      "path": "test_common_gate_v0_2.py",
+      "sha256": "f3d41817c4270e6a71f3c177ba29f24f03674fb8d63f4e0beba1fd48a592e4a3",
+      "stageForTests": true
+    },
+    {
+      "bytes": 9873,
+      "kind": "research_snapshot",
+      "path": "test_common_gate_v0_3.py",
+      "sha256": "f9f149edbb4dcb4ce9c84704d0127789cc8b1c11df5584d1576575755627cc2f",
+      "stageForTests": true
+    },
+    {
+      "bytes": 4293,
+      "kind": "research_snapshot",
+      "path": "test_common_gate_v0_4.py",
+      "sha256": "b31e7baf4efeafc67fd0e849730207352ef38bb439676767a25faa097da5d256",
+      "stageForTests": true
+    },
+    {
+      "bytes": 8272,
+      "kind": "research_snapshot",
+      "path": "test_contracts.py",
+      "sha256": "b13f42c4f280ee5e3da4120bfa2b23420d3474502c926ef693fe9cd9e7ce15ba",
+      "stageForTests": true
+    },
+    {
+      "bytes": 16267,
+      "kind": "research_snapshot",
+      "path": "test_dry_mapping.py",
+      "sha256": "b98b00ea29c7ae3137c06fca16ecde66506da4838effa9176d96af3dd0ac671f",
+      "stageForTests": true
+    },
+    {
+      "bytes": 11477,
+      "kind": "research_snapshot",
+      "path": "test_ollama_eval.py",
+      "sha256": "936dc8f6d29b128daf954366814919a2106b66beceaf522df63bc7b53b5d507c",
+      "stageForTests": true
+    },
+    {
+      "bytes": 7146,
+      "kind": "research_snapshot",
+      "path": "test_ollama_eval_v0_2.py",
+      "sha256": "1030cffb1ce57a597cef571e6fb9012506cb3bbca3816abdd3fc633d944afa35",
+      "stageForTests": true
+    },
+    {
+      "bytes": 8419,
+      "kind": "research_snapshot",
+      "path": "test_ollama_eval_v0_3.py",
+      "sha256": "3ce2d3866318189523530ecd7faf8c4ca36a9576ccefe9dce9a2b314bb2d50b2",
+      "stageForTests": true
+    },
+    {
+      "bytes": 24670,
+      "kind": "research_snapshot",
+      "path": "validate_contracts.py",
+      "sha256": "31fc4faac3f950cb03a21b01f9fac94edd69ac286d9ff7355b4c0aeb252ef7e2",
+      "stageForTests": true
+    },
+    {
+      "bytes": 6906,
+      "kind": "research_snapshot",
+      "path": "validate_contracts_v0_2.py",
+      "sha256": "a1ad50d77f8d655c75a105ce7aac9b7405e57ac6cc145184f43263faf35c8932",
+      "stageForTests": true
+    },
+    {
+      "bytes": 16507,
+      "kind": "research_snapshot",
+      "path": "validate_contracts_v0_3.py",
+      "sha256": "1ad7916943cf2f6364c5e82aeb9b4ec3c6f4837cc1e5655ad658ff9c2748dae0",
+      "stageForTests": true
+    },
+    {
+      "bytes": 2946,
+      "kind": "package_support",
+      "path": "verify_shared.py",
+      "sha256": "56aa4f4deb29932fcb1e2faf437927b62a573928711344666ecb389f487b3333",
+      "stageForTests": false
+    },
+    {
+      "bytes": 16223,
+      "kind": "proposal",
+      "path": "../../../../docs/ai_structured_output_contract_proposal.md",
+      "sha256": "98cb2bc90fae47ff4701dbc4495d4268943b8dd71efd43d59628d1b4c3d55877",
+      "stageForTests": false
+    }
+  ],
+  "createdDate": "2026-10-26",
+  "executionBoundary": {
+    "defaultVerificationRunsModel": false,
+    "defaultVerificationStartsBackend": false,
+    "defaultVerificationUsesDatabase": false,
+    "defaultVerificationUsesNetwork": false,
+    "defaultVerificationWritesSchedule": false,
+    "v04ModelRerunPerformed": false
+  },
+  "protectedInputs": {
+    "contractManifestV03Sha256": "383299544c257825aa3175ffc26981c3dbc5204ef0b015a3986b493bfe7c3d6d",
+    "contractManifestV04Sha256": "339f7cfda48dddfd719da622266cc5ddda0d940ac0421df61f893dc15c1f0d60",
+    "lockedCasesSha256": "17c7d4ef10aff8171d422c248431d3c34faaf03bf7282fab5dc3abcfa2389b57",
+    "ollamaDevelopmentV03Sha256": "adef63d3dad84b71cd1c91e4a5eb90af2bae51634c3e03272398427c57eb6f92",
+    "ollamaLockedV03Sha256": "e0aee43cc3129b1940bb4ab0ce65b405bbf0a15ab77cae99576df57482de5c1f",
+    "ollamaManifestV03Sha256": "8f4f2bb09d6eb7074f131e75474864295f95e7ae60a0e9cee2818585be339939",
+    "semanticSchemaSha256": "cfe0ed947f6bd709e0e3ba60a8daf63fb1f201614cb11d90b823931b060a3b1d"
+  },
+  "schemaVersion": "issue30-shared-manifest-v0.1",
+  "status": "BE-PROPOSED",
+  "summary": {
+    "artifactCount": 62,
+    "developmentCaseCount": 12,
+    "lockedCandidateRuns": 168,
+    "lockedCaseCount": 56,
+    "lockedUnsafeAcceptV03": 0,
+    "researchSnapshotCount": 56,
+    "testCount": 92
+  }
+}

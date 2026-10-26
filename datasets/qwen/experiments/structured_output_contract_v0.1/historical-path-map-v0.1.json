@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "issue30-historical-path-map-v0.1",
+  "status": "BE-PROPOSED",
+  "reason": "Preserve locked and historical manifest hashes while providing team-readable current sources.",
+  "mappings": [
+    {
+      "historicalPattern": "../.omx/plans/ai-structured-output-contract-validation.md",
+      "currentSources": [
+        "docs/ai_structured_output_contract_proposal.md",
+        "datasets/qwen/experiments/structured_output_contract_v0.1/README.md"
+      ],
+      "use": "D1-D12, TP rules, execution plan and proposal status"
+    },
+    {
+      "historicalPattern": ".omx/research/issue30/manual-contract-preflight-v0.1.md",
+      "currentSources": [
+        "docs/ai_structured_output_contract_proposal.md",
+        "datasets/qwen/experiments/structured_output_contract_v0.1/contract-validation-summary-v0.1.md"
+      ],
+      "use": "preflight conclusions and candidate-independent policy rationale"
+    },
+    {
+      "historicalPattern": ".omx/research/issue30/development-cases-v0.1.jsonl",
+      "currentSources": [
+        "datasets/qwen/experiments/structured_output_contract_v0.1/development-cases-v0.1.jsonl"
+      ],
+      "use": "development-case contamination provenance"
+    },
+    {
+      "historicalPattern": ".omx/research/issue30/",
+      "currentSources": [
+        "datasets/qwen/experiments/structured_output_contract_v0.1/"
+      ],
+      "use": "versioned research artifacts promoted without modifying protected inputs"
+    }
+  ],
+  "normativeRule": "Historical local paths are provenance strings only. The tracked proposal and package README define the current shared status."
+}

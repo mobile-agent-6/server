@@ -1,0 +1,1733 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:mobile-agent-6:issue30:semantic-oracle:v0.1",
+  "title": "Issue #30 semantic oracle case v0.1 (PROPOSED)",
+  "description": "Evaluator answer schema for one evaluation case. This is NOT a model output schema. It is independent of candidate contracts A, B, C, R and of any model or runtime. Layer 1 (context) and layer 2 (semantics) live in one record; layer 3 (contract-specific JSON) is derived elsewhere. Product rules D1-D9 are BE-PROPOSED shared-contract proposals (proposed by BE; confirmation pending from AI, DATA and the relevant FE items; not team-confirmed, per TEAM_GUIDELINES.md). Zero open product CONTRACT_GAP means evaluator answers can be written on the BE-PROPOSED basis, not that the rules are confirmed; the contractGaps structure is kept for gaps found later.",
+  "$comment": "Status PROPOSED, single-review proposed. Rules that JSON Schema cannot express (span substring check, scheduleRef existence, ordering, cross-field consistency) are listed in data-layers-v0.1.md section 6 and must be enforced by the evaluator lint.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "context", "semantics"],
+  "properties": {
+    "meta": { "$ref": "#/$defs/meta" },
+    "context": { "$ref": "#/$defs/context" },
+    "semantics": { "$ref": "#/$defs/semantics" }
+  },
+  "$defs": {
+    "caseId": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{2,79}$"
+    },
+    "scheduleRef": {
+      "description": "Case-local fixture label such as K1 or M2. Never a model-visible Schedule ID.",
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9]{0,15}$"
+    },
+    "uuidV4": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "dateTime": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,6})?(Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "turnNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 50
+    },
+    "operationIndex": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10
+    },
+    "userText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "shortText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "category": {
+      "enum": ["INBOUND", "INVENTORY", "OUTBOUND", "RETURN", "OTHER"]
+    },
+    "decisionId": {
+      "enum": ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12"]
+    },
+    "verificationId": {
+      "enum": ["V1", "V2", "V3", "V4", "V5", "V6", "V7"]
+    },
+    "implementationId": {
+      "enum": ["I1", "I2", "I3", "I4", "I5", "I6"]
+    },
+    "contractGapId": {
+      "type": "string",
+      "pattern": "^G[0-9]{1,2}$"
+    },
+    "policyId": {
+      "description": "D1-D12 BE-PROPOSED product rules, TP1-TP6 time rules (status per rule, see data-layers-v0.1.md section 8), API-* public contract rules, CODE-* current code facts, BE-CONTROL-STATE-SCOPE (BE-CONFIRMED backend-internal control state storage scope), AR1-AR6 adapter rules, G* contract gaps, I* internal items, V* verification items.",
+      "type": "string",
+      "pattern": "^(D([1-9]|1[0-2])|TP[1-6]|API-[A-Z0-9-]{1,40}|CODE-[A-Z0-9-]{1,40}|BE-CONTROL-STATE-SCOPE|AR[1-6]|G[0-9]{1,2}|I[1-9][0-9]?|V[1-9][0-9]?)$"
+    },
+    "policyStatus": {
+      "description": "Team status labels follow TEAM_GUIDELINES.md section 1. BE-PROPOSED: proposed by BE, confirmation from the affected areas still pending. BE-CONFIRMED: a backend-internal storage or safety policy confirmed within the BE area; it is not a public output contract and not a joint AI/DATA/FE confirmation; allowed only for BE-* policy IDs (currently BE-CONTROL-STATE-SCOPE) and never for D rules. TEAM-CONFIRMED / BE-FE-AGREED: only when that status is already recorded in a team document. The remaining values are schema-local classifications, not team decision states: EXISTING-CODE describes current code behaviour; PROPOSED is advisory output of an AI tool that no area has adopted yet; INTERNAL-UNDECIDED is an open implementation choice; CONTRACT_GAP is an open product policy.",
+      "enum": [
+        "BE-PROPOSED",
+        "BE-CONFIRMED",
+        "TEAM-CONFIRMED",
+        "BE-FE-AGREED",
+        "EXISTING-CODE",
+        "PROPOSED",
+        "INTERNAL-UNDECIDED",
+        "CONTRACT_GAP"
+      ]
+    },
+    "causeAxis": {
+      "enum": [
+        "TRANSPORT",
+        "FORMAT",
+        "MODEL_SEMANTIC",
+        "NORMALIZER",
+        "MAPPING",
+        "ORACLE_ERROR",
+        "CONTRACT_GAP"
+      ]
+    },
+    "outcomeAxis": {
+      "enum": ["correct", "safe_reject", "over_ask", "unsafe_accept", "transport_fail"]
+    },
+    "sourceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "lines": {
+          "type": "string",
+          "pattern": "^[0-9]+(-[0-9]+)?(,[0-9]+(-[0-9]+)?)*$"
+        }
+      }
+    },
+    "policyRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policyId", "status", "sources"],
+      "properties": {
+        "policyId": { "$ref": "#/$defs/policyId" },
+        "status": { "$ref": "#/$defs/policyStatus" },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "items": { "$ref": "#/$defs/sourceRef" }
+        },
+        "note": { "type": "string", "maxLength": 500 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "policyId": { "pattern": "^D([1-9]|1[0-2])$" } }
+          },
+          "then": {
+            "properties": { "status": { "enum": ["BE-PROPOSED", "TEAM-CONFIRMED"] } }
+          }
+        },
+        {
+          "if": {
+            "properties": { "policyId": { "pattern": "^G[0-9]{1,2}$" } }
+          },
+          "then": {
+            "properties": { "status": { "const": "CONTRACT_GAP" } }
+          }
+        },
+        {
+          "if": {
+            "properties": { "policyId": { "pattern": "^I[1-9][0-9]?$" } }
+          },
+          "then": {
+            "properties": { "status": { "const": "INTERNAL-UNDECIDED" } }
+          }
+        },
+        {
+          "if": {
+            "properties": { "policyId": { "pattern": "^BE-" } }
+          },
+          "then": {
+            "properties": { "status": { "const": "BE-CONFIRMED" } }
+          }
+        },
+        {
+          "if": {
+            "properties": { "status": { "const": "BE-CONFIRMED" } }
+          },
+          "then": {
+            "properties": { "policyId": { "pattern": "^BE-" } }
+          }
+        }
+      ]
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "caseId",
+        "status",
+        "reviewState",
+        "datasetRole",
+        "scenarioTags"
+      ],
+      "properties": {
+        "schemaVersion": { "const": "issue30-semantic-oracle-v0.1" },
+        "caseId": { "$ref": "#/$defs/caseId" },
+        "variantOf": { "$ref": "#/$defs/caseId" },
+        "variantAxis": {
+          "enum": ["serverTimeTrusted", "fixture", "answer", "phrasing", "input_source"]
+        },
+        "status": { "const": "PROPOSED" },
+        "reviewState": { "enum": ["single-review proposed", "independent-reviewed"] },
+        "datasetRole": {
+          "description": "Separates evaluation input from training input. Locked cases must never become training rows.",
+          "enum": ["development_probe", "locked_comparison", "training_candidate", "illustration"]
+        },
+        "scenarioTags": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "create",
+              "list",
+              "update",
+              "delete",
+              "complete_status",
+              "candidates_0",
+              "candidates_1",
+              "candidates_2_10",
+              "candidates_over_10",
+              "same_display_candidates",
+              "relative_time",
+              "absolute_time_with_year",
+              "year_boundary",
+              "ampm_missing",
+              "clock_24h",
+              "untrusted_server_time",
+              "missing_information",
+              "unsupported_mixed",
+              "unsupported_only",
+              "multiple_operations",
+              "follow_up_answer",
+              "correction",
+              "no_target_date",
+              "title_exact_match",
+              "title_partial_match",
+              "title_similar_match",
+              "time_only_change",
+              "unspecified_period_query",
+              "future_scope_query",
+              "large_result_query",
+              "category_other",
+              "task_unclear",
+              "stt_source"
+            ]
+          }
+        },
+        "contamination": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["checkedAgainst", "exactMatchFound", "maxCharTrigramJaccard"],
+          "properties": {
+            "checkedAgainst": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 10,
+              "items": { "$ref": "#/$defs/shortText" }
+            },
+            "exactMatchFound": { "type": "boolean" },
+            "maxCharTrigramJaccard": { "type": "number", "minimum": 0, "maximum": 1 },
+            "slotSignature": { "$ref": "#/$defs/shortText" },
+            "nearDuplicatesReviewed": {
+              "type": "array",
+              "maxItems": 20,
+              "items": { "$ref": "#/$defs/shortText" }
+            }
+          }
+        },
+        "authoredOn": { "type": "string", "format": "date" },
+        "notes": { "type": "string", "maxLength": 1000 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "datasetRole": { "const": "locked_comparison" } }
+          },
+          "then": { "required": ["contamination"] }
+        },
+        {
+          "if": { "required": ["variantOf"] },
+          "then": { "required": ["variantAxis"] }
+        }
+      ]
+    },
+    "scheduleFixture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ref",
+        "id",
+        "title",
+        "scheduledAt",
+        "category",
+        "completed",
+        "deleted",
+        "updatedAt"
+      ],
+      "properties": {
+        "ref": { "$ref": "#/$defs/scheduleRef" },
+        "id": { "$ref": "#/$defs/uuidV4" },
+        "title": { "$ref": "#/$defs/title" },
+        "scheduledAt": { "$ref": "#/$defs/dateTime" },
+        "category": { "$ref": "#/$defs/category" },
+        "completed": { "type": "boolean" },
+        "deleted": {
+          "description": "Soft-deleted fixtures must never appear as candidates or list results.",
+          "type": "boolean"
+        },
+        "createdAt": { "$ref": "#/$defs/dateTime" },
+        "updatedAt": { "$ref": "#/$defs/dateTime" }
+      }
+    },
+    "questionPurpose": {
+      "enum": [
+        "missing_information",
+        "ampm",
+        "absolute_datetime_required",
+        "past_time_replacement",
+        "task_or_title_unclear",
+        "consent_without_unsupported",
+        "approve_create",
+        "next_operation",
+        "distinguish_candidates",
+        "narrow_scope",
+        "unsupported_only_guidance"
+      ]
+    },
+    "priorContext": {
+      "description": "Bounded context that exists before turn 1 of this case. Mirrors the BE-CONFIRMED backend-internal control state storage policy (policyId BE-CONTROL-STATE-SCOPE, not a public output contract): first user input up to 500 chars plus the short follow-up answers needed to resolve the active question. Full transcripts, prompts and raw model output are never stored. Source-request linkage, task boundary and reset remain internal item I3 (INTERNAL-UNDECIDED).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": { "enum": ["none", "active_question", "pending_operation_queue"] },
+        "originalUserInput": { "$ref": "#/$defs/userText" },
+        "boundedAnswers": {
+          "type": "array",
+          "maxItems": 5,
+          "items": { "$ref": "#/$defs/userText" }
+        },
+        "pendingQuestionPurpose": { "$ref": "#/$defs/questionPurpose" },
+        "remainingOperationSummaries": {
+          "type": "array",
+          "maxItems": 10,
+          "items": { "$ref": "#/$defs/shortText" }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "kind": { "const": "none" } }
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                { "required": ["originalUserInput"] },
+                { "required": ["boundedAnswers"] },
+                { "required": ["pendingQuestionPurpose"] },
+                { "required": ["remainingOperationSummaries"] }
+              ]
+            }
+          },
+          "else": { "required": ["originalUserInput"] }
+        }
+      ]
+    },
+    "turnInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["turn", "inputType", "inputSource"],
+      "properties": {
+        "turn": { "$ref": "#/$defs/turnNumber" },
+        "inputType": { "enum": ["text", "selection", "confirmation"] },
+        "answersQuestionOfTurn": { "$ref": "#/$defs/turnNumber" },
+        "startsNewTask": {
+          "description": "True when this text starts a new task in the same conversation, so a new reference time applies.",
+          "type": "boolean"
+        },
+        "acceptedAt": { "$ref": "#/$defs/dateTime" },
+        "text": { "$ref": "#/$defs/userText" },
+        "selectedScheduleRef": { "$ref": "#/$defs/scheduleRef" },
+        "approved": { "type": "boolean" },
+        "inputSource": {
+          "description": "STT transcripts are used as the same user text; the source is metadata only and does not create a separate processing path.",
+          "enum": ["typed_text", "stt_transcript", "authored"]
+        },
+        "sourceNote": { "$ref": "#/$defs/shortText" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "inputType": { "const": "text" } }
+          },
+          "then": {
+            "required": ["text"],
+            "not": {
+              "anyOf": [
+                { "required": ["selectedScheduleRef"] },
+                { "required": ["approved"] }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "inputType": { "const": "selection" } }
+          },
+          "then": {
+            "required": ["selectedScheduleRef", "answersQuestionOfTurn"],
+            "not": {
+              "anyOf": [
+                { "required": ["text"] },
+                { "required": ["approved"] },
+                { "required": ["startsNewTask"] }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "inputType": { "const": "confirmation" } }
+          },
+          "then": {
+            "required": ["approved", "answersQuestionOfTurn"],
+            "not": {
+              "anyOf": [
+                { "required": ["text"] },
+                { "required": ["selectedScheduleRef"] },
+                { "required": ["startsNewTask"] }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "inputSource": { "const": "stt_transcript" } }
+          },
+          "then": {
+            "properties": { "inputType": { "const": "text" } }
+          }
+        },
+        {
+          "if": {
+            "properties": { "startsNewTask": { "const": true } },
+            "required": ["startsNewTask"]
+          },
+          "then": {
+            "required": ["acceptedAt"],
+            "not": { "required": ["answersQuestionOfTurn"] }
+          }
+        }
+      ]
+    },
+    "context": {
+      "description": "Layer 1. Raw input and execution context. Must not contain any answer.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "referenceTime",
+        "timezone",
+        "serverTimeTrusted",
+        "priorContext",
+        "turns",
+        "initialSchedules"
+      ],
+      "properties": {
+        "referenceTime": {
+          "description": "Server acceptance time of the first valid input of the task. Follow-up answers inherit it.",
+          "$ref": "#/$defs/dateTime"
+        },
+        "timezone": { "const": "Asia/Seoul" },
+        "serverTimeTrusted": { "type": "boolean" },
+        "priorContext": { "$ref": "#/$defs/priorContext" },
+        "turns": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "items": { "$ref": "#/$defs/turnInput" }
+        },
+        "initialSchedules": {
+          "type": "array",
+          "maxItems": 200,
+          "items": { "$ref": "#/$defs/scheduleFixture" }
+        }
+      }
+    },
+    "span": {
+      "description": "Verbatim substring of a user text turn after NFKC and whitespace normalization. occurrence selects the n-th match when the substring repeats.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["turn", "text"],
+      "properties": {
+        "turn": { "$ref": "#/$defs/turnNumber" },
+        "text": { "$ref": "#/$defs/userText" },
+        "occurrence": { "type": "integer", "minimum": 1, "maximum": 20 }
+      }
+    },
+    "spanList": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": { "$ref": "#/$defs/span" }
+    },
+    "evidenceValue": {
+      "description": "adoptedSpans may combine several spans across turns (for example a time in turn 1 and its am/pm answer in turn 2). supersededSpans are values the user corrected away and must not be used.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adoptedSpans"],
+      "properties": {
+        "adoptedSpans": { "$ref": "#/$defs/spanList" },
+        "supersededSpans": { "$ref": "#/$defs/spanList" },
+        "correctionMarkerSpans": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": { "$ref": "#/$defs/span" }
+        }
+      },
+      "dependentRequired": {
+        "correctionMarkerSpans": ["supersededSpans"]
+      }
+    },
+    "targetEvidence": {
+      "description": "Evidence used to find an existing schedule.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "title": { "$ref": "#/$defs/evidenceValue" },
+        "date": { "$ref": "#/$defs/evidenceValue" },
+        "time": { "$ref": "#/$defs/evidenceValue" },
+        "category": { "$ref": "#/$defs/evidenceValue" },
+        "completedState": { "$ref": "#/$defs/evidenceValue" }
+      }
+    },
+    "changeEvidence": {
+      "description": "Evidence for new values (create values or update changes).",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "title": { "$ref": "#/$defs/evidenceValue" },
+        "date": { "$ref": "#/$defs/evidenceValue" },
+        "time": { "$ref": "#/$defs/evidenceValue" },
+        "category": { "$ref": "#/$defs/evidenceValue" },
+        "completed": { "$ref": "#/$defs/evidenceValue" }
+      }
+    },
+    "filterEvidence": {
+      "description": "Evidence for list conditions. futureScope is only present when the user explicitly limits to future schedules (D7).",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "title": { "$ref": "#/$defs/evidenceValue" },
+        "date": { "$ref": "#/$defs/evidenceValue" },
+        "time": { "$ref": "#/$defs/evidenceValue" },
+        "category": { "$ref": "#/$defs/evidenceValue" },
+        "completed": { "$ref": "#/$defs/evidenceValue" },
+        "futureScope": { "$ref": "#/$defs/evidenceValue" }
+      }
+    },
+    "operationEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "change", "filter"],
+      "properties": {
+        "operationCue": { "$ref": "#/$defs/evidenceValue" },
+        "target": { "$ref": "#/$defs/targetEvidence" },
+        "change": { "$ref": "#/$defs/changeEvidence" },
+        "filter": { "$ref": "#/$defs/filterEvidence" }
+      }
+    },
+    "timeInterpretation": {
+      "description": "absolute only when every date used for target lookup, filter and change is an absolute date with year, month and day (TP1). Exception: when changeExpectation.dateSource is target_existing_date, the change date is the existing date of the target schedule that the backend re-verified (candidate membership and snapshot) and the user stated the new time explicitly; the combined value is treated as absolute at execution time and dependsOnReferenceTime stays false. This is not a promotion of relative time and not a model-generated date. The exception does not apply while the target is unconfirmed or its existing date is not verified by the backend, and it never covers lookup or filter dates. The backend may only downgrade absolute to relative (TP6).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["interpretation", "basis"],
+      "properties": {
+        "interpretation": { "enum": ["absolute", "relative", "not_applicable"] },
+        "dependsOnReferenceTime": { "type": "boolean" },
+        "basis": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/policyId" }
+        }
+      }
+    },
+    "titleMatchExpectation": {
+      "description": "D3. Exact matches first, partial matches included, similar matches only as candidates. No single partial or similar match may be confirmed or executed without user selection and confirmation.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["normalizedQuery", "matches"],
+      "properties": {
+        "normalizedQuery": { "$ref": "#/$defs/title" },
+        "matches": {
+          "type": "array",
+          "maxItems": 200,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["scheduleRef", "matchClass"],
+            "properties": {
+              "scheduleRef": { "$ref": "#/$defs/scheduleRef" },
+              "matchClass": { "enum": ["exact", "partial", "similar"] },
+              "pendingImplementation": { "const": "I4" }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": { "matchClass": { "const": "similar" } }
+                },
+                "then": { "required": ["pendingImplementation"] }
+              }
+            ]
+          }
+        },
+        "nonMatchingRefs": {
+          "type": "array",
+          "maxItems": 200,
+          "items": { "$ref": "#/$defs/scheduleRef" }
+        }
+      }
+    },
+    "lookupExpectation": {
+      "description": "How the backend must look up target schedules for update or delete.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "includeDeleted"],
+      "properties": {
+        "mode": {
+          "enum": ["date_range", "title_search_all_periods", "date_range_and_title"]
+        },
+        "fromAt": { "$ref": "#/$defs/dateTime" },
+        "toAt": { "$ref": "#/$defs/dateTime" },
+        "category": { "$ref": "#/$defs/category" },
+        "completedFilter": {
+          "description": "Only when the user describes the target's current completion state. A requested completion change is never a lookup filter.",
+          "type": "boolean"
+        },
+        "includePast": { "type": "boolean" },
+        "includeCompleted": { "type": "boolean" },
+        "includeDeleted": { "const": false },
+        "titleMatch": { "$ref": "#/$defs/titleMatchExpectation" },
+        "expectedCandidateRefs": {
+          "type": "array",
+          "maxItems": 200,
+          "items": { "$ref": "#/$defs/scheduleRef" }
+        },
+        "pendingItems": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 4,
+          "items": { "enum": ["I4", "I5", "V2", "V7"] }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "mode": { "const": "title_search_all_periods" } }
+          },
+          "then": {
+            "required": ["titleMatch", "includePast", "includeCompleted"],
+            "properties": {
+              "includePast": { "const": true },
+              "includeCompleted": { "const": true }
+            },
+            "not": {
+              "anyOf": [
+                { "required": ["fromAt"] },
+                { "required": ["toAt"] }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "mode": { "enum": ["date_range", "date_range_and_title"] } }
+          },
+          "then": { "required": ["fromAt", "toAt"] }
+        },
+        {
+          "if": {
+            "properties": { "mode": { "const": "date_range_and_title" } }
+          },
+          "then": { "required": ["titleMatch"] }
+        }
+      ]
+    },
+    "changeExpectation": {
+      "description": "Normalized values for create or the changed fields for update. dateSource target_existing_date applies D4.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "title": { "$ref": "#/$defs/title" },
+        "scheduledAt": { "$ref": "#/$defs/dateTime" },
+        "category": { "$ref": "#/$defs/category" },
+        "completed": { "type": "boolean" },
+        "dateSource": {
+          "enum": ["explicit_change_date", "target_existing_date", "not_applicable"]
+        },
+        "categoryBasis": { "enum": ["explicit_cue", "D1_other_for_clear_task"] }
+      },
+      "dependentRequired": {
+        "categoryBasis": ["category"]
+      }
+    },
+    "queryExpectation": {
+      "description": "D7, D9 and D10. Scored meaning: rangeMode, title and completion filters and the set of matching schedules (expectedMatchingRefs, which the backend read confirms). Hard safety gate: structured items match the backend read, no schedule information outside the backend result, no write from a list result. Presentation (voiceResponseMode, displayOrder, expectedDisplayOrderRefs and list-turn requiredResponseFacts) is a BE-PROPOSED experiment excluded from scoring; pending_fe_review leaves it undecided. rangeMode distinguishes a user-specified range, an unspecified period (all non-deleted schedules including past and completed) and an explicit future-only scope. responseFocus is the answer focus only; results always come from the backend read. voiceResponseMode follows D9: 1-5 results are read out in full, 6 or more results are summarised with the total count and the first schedule in display order, followed by a question about period or completion state. The screen may still show the full result list. D10 (BE-PROPOSED): when context.serverTimeTrusted is false and the period is unspecified, the backend does not infer upcoming, past or nearest-upcoming status. D10 hard safety gate (scored, lint L23): no current-time-relative future/past wording, no schedule information outside the backend result, no write from a list result, no model text shown as fact without backend confirmation. displayOrder D10_scheduled_at_ascending, voiceResponseMode all_date_time_listing and the date/time-only fact set are a BE-PROPOSED presentation experiment only: not a model-accuracy pass criterion, not the only correct D10 expression, not an FE or team contract and not a sentence-style answer for locked comparison; excluded from model scoring and pending V6 and the FE batch review (lint L24, recorded only). Structured items come from the backend read; the user-facing text, cards and TTS are FE presentation. The current API requires text on every result (docs/api.md:730); its exact wording and how many schedules are read out wait for V6 and the FE batch review.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rangeMode", "responseFocus", "includeDeleted", "voiceResponseMode"],
+      "properties": {
+        "rangeMode": {
+          "enum": ["user_specified", "unspecified_all_periods", "future_only_explicit"]
+        },
+        "fromAt": { "$ref": "#/$defs/dateTime" },
+        "toAt": { "$ref": "#/$defs/dateTime" },
+        "category": { "$ref": "#/$defs/category" },
+        "completed": { "type": "boolean" },
+        "titleMatch": { "$ref": "#/$defs/titleMatchExpectation" },
+        "responseFocus": { "enum": ["existence", "date", "list", "details", "count"] },
+        "includeDeleted": { "const": false },
+        "includePast": { "type": "boolean" },
+        "includeCompleted": { "type": "boolean" },
+        "displayOrder": {
+          "description": "Presentation only. D7_default (D7/D9 order with a trusted server clock) and D10_scheduled_at_ascending are BE-PROPOSED presentation experiments, excluded from model semantic scoring, from locked sentence-style answers and from candidate-contract acceptance (pending V6 and the FE batch review). D7_default: D7/D9 order with a trusted server clock. D10_scheduled_at_ascending: BE-PROPOSED presentation experiment only: not a model-accuracy pass criterion, not the only correct D10 expression, not an FE or team contract and not a sentence-style answer for locked comparison; excluded from model scoring and pending V6 and the FE batch review; all non-deleted matching schedules, completed and incomplete together, by scheduledAt ascending, without an upcoming/past split single_or_empty: one or zero results. pending_fe_review: neutral value meaning presentation is waiting for the FE batch review and is excluded from scoring; it requires pendingItems to contain V6, and lint L26 also requires the list turn representation to be pending_verification with V6 and no presentation facts. D10 cases may use it.",
+          "enum": ["D7_default", "D10_scheduled_at_ascending", "single_or_empty", "pending_fe_review"]
+        },
+        "voiceResponseMode": {
+          "description": "Presentation only. full_listing, summary_with_scope_question and all_date_time_listing are BE-PROPOSED presentation experiments (D9, D10), excluded from model semantic scoring, from locked sentence-style answers and from candidate-contract acceptance, pending V6 and the FE batch review. pending_fe_review: neutral value meaning presentation is waiting for the FE batch review and is excluded from scoring; it requires pendingItems to contain V6, and lint L26 also requires the list turn representation to be pending_verification with V6 and no presentation facts. D10 cases may use it. empty: 0 results. full_listing: 1-5 results under D9, every schedule is read out. summary_with_scope_question: 6 or more results under D9 (trusted clock), with a period or completion-state question. all_date_time_listing: D10 only (untrusted clock, unspecified period), 1 or more results: the stored date and time of every matching schedule regardless of the result count, with no summary and no question. BE-PROPOSED presentation experiment only: not a model-accuracy pass criterion, not the only correct D10 expression, not an FE or team contract and not a sentence-style answer for locked comparison; excluded from model scoring and pending V6 and the FE batch review",
+          "enum": ["empty", "full_listing", "summary_with_scope_question", "all_date_time_listing", "pending_fe_review"]
+        },
+        "expectedMatchingRefs": {
+          "description": "Unordered set of fixtures the backend read must return.",
+          "type": "array",
+          "maxItems": 200,
+          "items": { "$ref": "#/$defs/scheduleRef" }
+        },
+        "expectedDisplayOrderRefs": {
+          "description": "Presentation experiment (BE-PROPOSED, not scored, not needed when displayOrder is pending_fe_review). Ordered refs. With a trusted server clock (D7, D9): nearest upcoming incomplete, other upcoming incomplete, most recent past incomplete, then completed schedules by scheduledAt, most recent first. With an untrusted server clock and an unspecified period (D10): all matching schedules by scheduledAt ascending, completed and incomplete together, without an upcoming/past split. updatedAt is never used as a completion time.",
+          "type": "array",
+          "maxItems": 200,
+          "items": { "$ref": "#/$defs/scheduleRef" }
+        },
+        "pendingItems": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 4,
+          "items": { "enum": ["I4", "I5", "V6", "V7"] }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "rangeMode": { "const": "unspecified_all_periods" } }
+          },
+          "then": {
+            "required": ["includePast", "includeCompleted", "displayOrder"],
+            "properties": {
+              "includePast": { "const": true },
+              "includeCompleted": { "const": true }
+            },
+            "not": {
+              "anyOf": [
+                { "required": ["fromAt"] },
+                { "required": ["toAt"] }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "rangeMode": { "const": "user_specified" } }
+          },
+          "then": { "required": ["fromAt", "toAt"] }
+        },
+        {
+          "if": {
+            "properties": { "rangeMode": { "const": "future_only_explicit" } }
+          },
+          "then": {
+            "required": ["fromAt", "includePast"],
+            "properties": { "includePast": { "const": false } }
+          }
+        },
+        {
+          "if": {
+            "anyOf": [
+              {
+                "required": ["voiceResponseMode"],
+                "properties": { "voiceResponseMode": { "const": "pending_fe_review" } }
+              },
+              {
+                "required": ["displayOrder"],
+                "properties": { "displayOrder": { "const": "pending_fe_review" } }
+              }
+            ]
+          },
+          "then": {
+            "required": ["pendingItems"],
+            "properties": { "pendingItems": { "contains": { "const": "V6" } } }
+          }
+        },
+        {
+          "if": {
+            "required": ["displayOrder"],
+            "properties": { "displayOrder": { "const": "D10_scheduled_at_ascending" } }
+          },
+          "then": {
+            "properties": {
+              "rangeMode": { "const": "unspecified_all_periods" },
+              "voiceResponseMode": { "enum": ["empty", "all_date_time_listing", "pending_fe_review"] }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "voiceResponseMode": { "const": "all_date_time_listing" } }
+          },
+          "then": {
+            "required": ["displayOrder"],
+            "properties": { "displayOrder": { "const": "D10_scheduled_at_ascending" } }
+          }
+        }
+      ]
+    },
+    "normalizedOperation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timeInterpretation", "ruleRefs"],
+      "properties": {
+        "timeInterpretation": { "$ref": "#/$defs/timeInterpretation" },
+        "targetLookup": { "$ref": "#/$defs/lookupExpectation" },
+        "change": { "$ref": "#/$defs/changeExpectation" },
+        "query": { "$ref": "#/$defs/queryExpectation" },
+        "ruleRefs": {
+          "description": "Policies that justify each normalized value. Every id must also appear in semantics.policyRefs.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/policyId" }
+        }
+      }
+    },
+    "missingItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["item", "detectedAtTurn"],
+      "properties": {
+        "item": {
+          "enum": [
+            "task_or_title",
+            "date",
+            "time",
+            "ampm",
+            "target",
+            "change_value",
+            "query_scope",
+            "absolute_datetime_due_to_untrusted_time",
+            "past_time_replacement",
+            "user_consent",
+            "candidate_choice"
+          ]
+        },
+        "detectedAtTurn": { "$ref": "#/$defs/turnNumber" },
+        "resolvedAtTurn": { "$ref": "#/$defs/turnNumber" }
+      }
+    },
+    "operation": {
+      "description": "One supported schedule operation. Several operations from one input are ordered by user utterance order (D6). A completion change is kind update with change.completed.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "kind",
+        "sourceTurn",
+        "evidence",
+        "normalized",
+        "missingInformation",
+        "appliedDecisions",
+        "expectedFinalStatus"
+      ],
+      "properties": {
+        "index": { "$ref": "#/$defs/operationIndex" },
+        "kind": { "enum": ["create", "list", "update", "delete"] },
+        "isCompletionChange": { "type": "boolean" },
+        "sourceTurn": { "$ref": "#/$defs/turnNumber" },
+        "evidence": { "$ref": "#/$defs/operationEvidence" },
+        "normalized": { "$ref": "#/$defs/normalizedOperation" },
+        "missingInformation": {
+          "type": "array",
+          "maxItems": 10,
+          "items": { "$ref": "#/$defs/missingItem" }
+        },
+        "appliedDecisions": {
+          "type": "array",
+          "maxItems": 9,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/decisionId" }
+        },
+        "expectedFinalStatus": {
+          "description": "Evaluator-internal end status of the operation, not a public API enum. schedule_rejected: the backend rejected the operation before any write (expected public result failure / SCHEDULE_REJECTED, for example a past schedule time); the expected write count is 0.",
+          "enum": [
+            "success",
+            "rejected_by_user",
+            "cancelled",
+            "no_match",
+            "skipped_by_user",
+            "stopped_by_user",
+            "target_ambiguous",
+            "not_executed_pending_info",
+            "beyond_case",
+            "schedule_rejected"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "kind": { "const": "create" } }
+          },
+          "then": {
+            "properties": {
+              "normalized": { "required": ["change"] }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "kind": { "const": "update" } }
+          },
+          "then": {
+            "properties": {
+              "normalized": { "required": ["targetLookup", "change"] }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "kind": { "const": "delete" } }
+          },
+          "then": {
+            "properties": {
+              "normalized": {
+                "required": ["targetLookup"],
+                "not": { "required": ["change"] }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "kind": { "const": "list" } }
+          },
+          "then": {
+            "properties": {
+              "normalized": {
+                "required": ["query"],
+                "not": {
+                  "anyOf": [
+                    { "required": ["change"] },
+                    { "required": ["targetLookup"] }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "isCompletionChange": { "const": true } },
+            "required": ["isCompletionChange"]
+          },
+          "then": {
+            "properties": {
+              "kind": { "const": "update" },
+              "normalized": {
+                "properties": {
+                  "change": { "required": ["completed"] }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "queueDecision": {
+      "description": "D8. proceed: run the asked operation. skip_current: a plain no skips only the asked operation; if operations remain, the next one is asked again. stop_all: only when the user clearly states a stop-all intent (for example 그만, 전부 취소, 나머지도 하지 마); all remaining operations end. Skipped or stopped operations are never written.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["turn", "askedOperationIndex", "decision", "policy"],
+      "properties": {
+        "turn": { "$ref": "#/$defs/turnNumber" },
+        "askedOperationIndex": { "$ref": "#/$defs/operationIndex" },
+        "decision": { "enum": ["proceed", "skip_current", "stop_all"] },
+        "cue": { "$ref": "#/$defs/evidenceValue" },
+        "endedOperationIndexes": {
+          "type": "array",
+          "maxItems": 10,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/operationIndex" }
+        },
+        "nextAskedOperationIndex": { "$ref": "#/$defs/operationIndex" },
+        "policy": { "const": "D8" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "decision": { "const": "stop_all" } }
+          },
+          "then": {
+            "required": ["cue", "endedOperationIndexes"],
+            "not": { "required": ["nextAskedOperationIndex"] }
+          }
+        },
+        {
+          "if": {
+            "properties": { "decision": { "const": "skip_current" } }
+          },
+          "then": { "required": ["endedOperationIndexes"] }
+        },
+        {
+          "if": {
+            "properties": { "decision": { "const": "proceed" } }
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                { "required": ["endedOperationIndexes"] },
+                { "required": ["nextAskedOperationIndex"] }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "unsupportedRequest": {
+      "description": "D5. Mixed requests ask for consent before running the supported part; unsupported-only requests produce guidance without any write.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["feature", "cue", "mixedWithSupportedOperation", "policy"],
+      "properties": {
+        "feature": { "enum": ["reminder", "other"] },
+        "featureNote": { "$ref": "#/$defs/shortText" },
+        "cue": { "$ref": "#/$defs/evidenceValue" },
+        "mixedWithSupportedOperation": { "type": "boolean" },
+        "relatedOperationIndexes": {
+          "type": "array",
+          "maxItems": 10,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/operationIndex" }
+        },
+        "policy": { "const": "D5" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "mixedWithSupportedOperation": { "const": true } }
+          },
+          "then": { "required": ["relatedOperationIndexes"] }
+        },
+        {
+          "if": {
+            "properties": { "feature": { "const": "other" } }
+          },
+          "then": { "required": ["featureNote"] }
+        }
+      ]
+    },
+    "representation": {
+      "description": "Whether the expected public result is expressible with the current API and internal Decision, or still waits for dry-mapping verification (V) or an internal implementation choice (I). It never decides that a public API change is required.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "enum": ["current_api", "pending_verification", "internal_implementation_pending"]
+        },
+        "verificationIds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 7,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/verificationId" }
+        },
+        "implementationIds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/implementationId" }
+        },
+        "note": { "type": "string", "maxLength": 300 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "const": "pending_verification" } }
+          },
+          "then": { "required": ["verificationIds"] }
+        },
+        {
+          "if": {
+            "properties": { "status": { "const": "internal_implementation_pending" } }
+          },
+          "then": { "required": ["implementationIds"] }
+        }
+      ]
+    },
+    "confirmationExpectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["targetRef", "operation"],
+      "properties": {
+        "targetRef": { "$ref": "#/$defs/scheduleRef" },
+        "operation": { "enum": ["update", "delete"] },
+        "changes": { "$ref": "#/$defs/changeExpectation" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "operation": { "const": "update" } }
+          },
+          "then": { "required": ["changes"] },
+          "else": { "not": { "required": ["changes"] } }
+        }
+      ]
+    },
+    "expectedResult": {
+      "description": "Public result kind expected for the turn (docs/api.md 16.4) plus the semantic payload the evaluator checks. Display text is never fixed here; see requiredResponseFacts and forbiddenClaims.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "representation"],
+      "properties": {
+        "kind": {
+          "enum": [
+            "need_more_info",
+            "candidate_selection",
+            "confirmation",
+            "outcome",
+            "failure",
+            "uncertain"
+          ]
+        },
+        "operationIndex": { "$ref": "#/$defs/operationIndex" },
+        "questionPurpose": { "$ref": "#/$defs/questionPurpose" },
+        "candidateRefs": {
+          "description": "Expected candidates in expected display order.",
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 10,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/scheduleRef" }
+        },
+        "candidateOrderBasis": {
+          "type": "array",
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/policyId" }
+        },
+        "confirmation": { "$ref": "#/$defs/confirmationExpectation" },
+        "outcome": { "enum": ["success", "cancelled", "no_match"] },
+        "outcomeOperation": { "enum": ["create", "list", "update", "delete"] },
+        "listedRefs": {
+          "description": "Ordered refs the outcome must contain for a list result.",
+          "type": "array",
+          "maxItems": 100,
+          "items": { "$ref": "#/$defs/scheduleRef" }
+        },
+        "failureCode": {
+          "enum": [
+            "MODEL_OUTPUT_INVALID",
+            "SCHEDULE_REJECTED",
+            "TARGET_AMBIGUOUS",
+            "MODEL_TIMEOUT",
+            "SCHEDULE_UNAVAILABLE",
+            "PROCESSING_INTERRUPTED",
+            "PROCESSING_TIMEOUT",
+            "INTERNAL_ERROR"
+          ]
+        },
+        "representation": { "$ref": "#/$defs/representation" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "kind": { "const": "need_more_info" } }
+          },
+          "then": { "required": ["questionPurpose"] }
+        },
+        {
+          "if": {
+            "properties": { "kind": { "const": "candidate_selection" } }
+          },
+          "then": { "required": ["candidateRefs", "operationIndex"] }
+        },
+        {
+          "if": {
+            "properties": { "kind": { "const": "confirmation" } }
+          },
+          "then": { "required": ["confirmation", "operationIndex"] }
+        },
+        {
+          "if": {
+            "properties": { "kind": { "const": "outcome" } }
+          },
+          "then": { "required": ["outcome"] },
+          "else": {
+            "not": {
+              "anyOf": [
+                { "required": ["outcome"] },
+                { "required": ["listedRefs"] }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": { "const": "outcome" },
+              "outcome": { "const": "success" },
+              "outcomeOperation": { "const": "list" }
+            },
+            "required": ["outcome", "outcomeOperation"]
+          },
+          "then": { "required": ["listedRefs"] }
+        },
+        {
+          "if": {
+            "properties": { "kind": { "const": "failure" } }
+          },
+          "then": { "required": ["failureCode"] },
+          "else": { "not": { "required": ["failureCode"] } }
+        }
+      ]
+    },
+    "expectedWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "operationIndex"],
+      "properties": {
+        "operation": { "enum": ["create", "update", "delete"] },
+        "operationIndex": { "$ref": "#/$defs/operationIndex" },
+        "targetRef": { "$ref": "#/$defs/scheduleRef" },
+        "values": { "$ref": "#/$defs/changeExpectation" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "operation": { "const": "create" } }
+          },
+          "then": {
+            "required": ["values"],
+            "not": { "required": ["targetRef"] }
+          }
+        },
+        {
+          "if": {
+            "properties": { "operation": { "const": "update" } }
+          },
+          "then": { "required": ["targetRef", "values"] }
+        },
+        {
+          "if": {
+            "properties": { "operation": { "const": "delete" } }
+          },
+          "then": {
+            "required": ["targetRef"],
+            "not": { "required": ["values"] }
+          }
+        }
+      ]
+    },
+    "queueState": {
+      "description": "D6 ordered operation queue after this turn is processed.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "currentOperationIndex",
+        "finishedOperations",
+        "remainingOperationIndexes",
+        "awaitingNextOperationDecision"
+      ],
+      "properties": {
+        "totalOperations": { "$ref": "#/$defs/operationIndex" },
+        "currentOperationIndex": {
+          "description": "0 when no operation is in progress.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "finishedOperations": {
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["index", "endStatus"],
+            "properties": {
+              "index": { "$ref": "#/$defs/operationIndex" },
+              "endStatus": {
+                "description": "D8: skipped_by_user is only the operation the user declined; stopped_by_user marks operations ended by an explicit stop-all intent.",
+                "enum": ["success", "rejected_by_user", "cancelled", "no_match", "skipped_by_user", "stopped_by_user"]
+              }
+            }
+          }
+        },
+        "remainingOperationIndexes": {
+          "type": "array",
+          "maxItems": 10,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/operationIndex" }
+        },
+        "awaitingNextOperationDecision": { "type": "boolean" }
+      }
+    },
+    "responseFact": {
+      "description": "A fact the user-visible text must contain. Values must come from the backend result or fixtures, never from model text.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fact", "source"],
+      "properties": {
+        "fact": {
+          "enum": [
+            "total_count",
+            "schedule_date",
+            "schedule_time",
+            "schedule_full_title",
+            "schedule_completed_state",
+            "schedule_category",
+            "nearest_upcoming_incomplete",
+            "operation_count",
+            "current_operation_summary",
+            "change_summary",
+            "unsupported_feature_notice",
+            "supported_features_list",
+            "not_found_notice",
+            "next_operation_question",
+            "missing_item_question",
+            "narrowing_request",
+            "first_in_display_order",
+            "period_or_completion_question",
+            "skipped_operation_notice",
+            "all_remaining_operations_stopped_notice"
+          ]
+        },
+        "scheduleRef": { "$ref": "#/$defs/scheduleRef" },
+        "operationIndex": { "$ref": "#/$defs/operationIndex" },
+        "value": { "type": ["string", "number", "boolean"] },
+        "source": { "enum": ["backend_result", "fixture", "user_input", "oracle_constant"] }
+      }
+    },
+    "forbiddenClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim"],
+      "properties": {
+        "claim": {
+          "description": "Hard safety gate claims: schedule_not_in_backend_result, completion_time_from_updated_at, model_generated_text_as_fact, write_success_not_backed_by_result, reference_time_relative_wording (D10). Presentation experiment claims (BE-PROPOSED, not scored): existence_only_answer, no_upcoming_when_scope_unspecified, period_or_completion_reask. D10 claims: reference_time_relative_wording forbids current-time-relative wording such as upcoming, past or nearest upcoming schedule and is part of the D10 hard safety gate. period_or_completion_reask forbids asking for a period or completion state again; it belongs to the D10 BE-PROPOSED presentation experiment only: not a model-accuracy pass criterion, not the only correct D10 expression, not an FE or team contract and not a sentence-style answer for locked comparison; excluded from model scoring and pending V6 and the FE batch review",
+          "enum": [
+            "write_success_not_backed_by_result",
+            "schedule_not_in_backend_result",
+            "count_not_backed_by_result",
+            "existence_only_answer",
+            "no_upcoming_when_scope_unspecified",
+            "future_only_assumption",
+            "reminder_configured",
+            "unsupported_feature_executed",
+            "multiple_writes_executed",
+            "operation_silently_dropped",
+            "model_generated_text_as_fact",
+            "already_applied_without_backend_check",
+            "completion_time_from_updated_at",
+            "remaining_operations_dropped_without_stop_intent",
+            "skipped_operation_executed",
+            "reference_time_relative_wording",
+            "period_or_completion_reask"
+          ]
+        },
+        "detail": { "$ref": "#/$defs/shortText" },
+        "policyRefs": {
+          "type": "array",
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/policyId" }
+        }
+      }
+    },
+    "forbiddenValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "value", "reason", "classificationIfAccepted"],
+      "properties": {
+        "field": {
+          "enum": [
+            "title",
+            "scheduledAt",
+            "date",
+            "time",
+            "category",
+            "completed",
+            "scheduleId",
+            "targetScheduleRef",
+            "lookup.range",
+            "lookup.category",
+            "lookup.completed",
+            "lookup.mode",
+            "query.range",
+            "query.category",
+            "query.completed",
+            "query.rangeMode",
+            "timeInterpretation",
+            "reminderMinutesBefore",
+            "reminderAt",
+            "operationCount",
+            "writeCount",
+            "questionPurpose"
+          ]
+        },
+        "operationIndex": { "$ref": "#/$defs/operationIndex" },
+        "turn": { "$ref": "#/$defs/turnNumber" },
+        "value": { "type": ["string", "number", "boolean", "null"] },
+        "reason": { "$ref": "#/$defs/shortText" },
+        "classificationIfAccepted": {
+          "description": "How the evaluator classifies a run that accepts this value end-to-end. A value rejected by a deterministic backend gate is a model semantic miss, not a system safety failure.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["cause", "outcome"],
+          "properties": {
+            "cause": { "$ref": "#/$defs/causeAxis" },
+            "outcome": { "$ref": "#/$defs/outcomeAxis" }
+          }
+        }
+      }
+    },
+    "invariant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["check", "statement"],
+      "properties": {
+        "check": {
+          "enum": [
+            "no_write",
+            "max_one_write_per_turn",
+            "no_write_before_confirmation",
+            "no_write_before_consent",
+            "no_model_generated_schedule_id",
+            "candidate_membership",
+            "no_auto_select_partial_or_similar",
+            "no_unbacked_fact",
+            "no_reminder_fields",
+            "no_silent_operation_drop",
+            "relative_time_requires_trusted_clock",
+            "no_invented_date_or_time",
+            "target_existing_date_kept",
+            "no_model_call_after_zero_candidates",
+            "deleted_schedules_excluded",
+            "skip_only_current_operation",
+            "stop_all_only_on_explicit_intent",
+            "no_completion_time_from_updated_at"
+          ]
+        },
+        "statement": { "$ref": "#/$defs/shortText" },
+        "appliesToTurns": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/turnNumber" }
+        }
+      }
+    },
+    "policyOptionResult": {
+      "description": "Used only while a CONTRACT_GAP is open: the expected result under each candidate policy option.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gapId", "optionLabel", "expectedResult", "expectedWriteCount"],
+      "properties": {
+        "gapId": { "$ref": "#/$defs/contractGapId" },
+        "optionLabel": { "$ref": "#/$defs/shortText" },
+        "expectedResult": { "$ref": "#/$defs/expectedResult" },
+        "expectedWriteCount": { "type": "integer", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "turnExpectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "turn",
+        "expectedResult",
+        "expectedWriteCount",
+        "modelCallPolicy",
+        "requiredResponseFacts",
+        "forbiddenClaims"
+      ],
+      "properties": {
+        "turn": { "$ref": "#/$defs/turnNumber" },
+        "expectedResult": { "$ref": "#/$defs/expectedResult" },
+        "expectedWriteCount": {
+          "description": "At most one Schedule write per turn (D6). Single create without confirmation still counts as one.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "expectedWrite": { "$ref": "#/$defs/expectedWrite" },
+        "modelCallPolicy": {
+          "description": "Evaluator-internal expectation, not a public API value. no_model_call_after_candidate_lookup: the model may structure the user text of this turn at most once; the public result is then produced by the backend from its candidate lookup and fixed safety rules without another model call (D11 narrowing question for more than 10 candidates, D12 deterministic recommendation or renewed narrowing).",
+          "enum": [
+            "model_call_expected",
+            "no_model_call",
+            "no_model_call_after_zero_candidates",
+            "no_model_call_after_candidate_lookup",
+            "not_constrained"
+          ]
+        },
+        "queueState": { "$ref": "#/$defs/queueState" },
+        "requiredResponseFacts": {
+          "description": "Facts the user-facing response must contain, each backed by the backend result or fixture. On list turns these facts are presentation (BE-PROPOSED experiment, excluded from model scoring and candidate-contract acceptance) and stay empty when presentation is pending_fe_review. The 64-item limit therefore only bounds presentation experiments such as a full date/time listing; it is not a limit of the semantic contract.",
+          "type": "array",
+          "maxItems": 64,
+          "items": { "$ref": "#/$defs/responseFact" }
+        },
+        "forbiddenClaims": {
+          "type": "array",
+          "maxItems": 20,
+          "items": { "$ref": "#/$defs/forbiddenClaim" }
+        },
+        "turnInvariants": {
+          "type": "array",
+          "maxItems": 20,
+          "items": { "$ref": "#/$defs/invariant" }
+        },
+        "contractGapIds": {
+          "type": "array",
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/contractGapId" }
+        },
+        "resultByPolicyOption": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 6,
+          "items": { "$ref": "#/$defs/policyOptionResult" }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "expectedWriteCount": { "const": 1 } }
+          },
+          "then": { "required": ["expectedWrite"] },
+          "else": { "not": { "required": ["expectedWrite"] } }
+        },
+        {
+          "if": { "required": ["resultByPolicyOption"] },
+          "then": { "required": ["contractGapIds"] }
+        }
+      ]
+    },
+    "contractGap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "description",
+        "decisionOwner",
+        "blocksModelScore",
+        "affectedTurns",
+        "nonBlockingRationale"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/contractGapId" },
+        "status": { "const": "CONTRACT_GAP" },
+        "description": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "decisionOwner": { "$ref": "#/$defs/shortText" },
+        "blocksModelScore": { "type": "boolean" },
+        "affectedTurns": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/turnNumber" }
+        },
+        "nonBlockingRationale": { "type": "string", "minLength": 1, "maxLength": 500 }
+      }
+    },
+    "scoring": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["excludedFromModelScore", "primaryCauseOrder"],
+      "properties": {
+        "excludedFromModelScore": { "type": "boolean" },
+        "exclusionReason": { "enum": ["CONTRACT_GAP", "development_probe", "illustration"] },
+        "primaryCauseOrder": {
+          "description": "Primary cause is the first failing stage in this order; later failures are secondary.",
+          "const": ["TRANSPORT", "FORMAT", "MODEL_SEMANTIC", "NORMALIZER", "MAPPING"]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "excludedFromModelScore": { "const": true } }
+          },
+          "then": { "required": ["exclusionReason"] },
+          "else": { "not": { "required": ["exclusionReason"] } }
+        }
+      ]
+    },
+    "oracleErratum": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recordedOn", "description", "cause"],
+      "properties": {
+        "recordedOn": { "type": "string", "format": "date" },
+        "description": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "cause": { "const": "ORACLE_ERROR" }
+      }
+    },
+    "semantics": {
+      "description": "Layer 2. Candidate-independent semantic answer.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operations",
+        "unsupportedRequests",
+        "expectedTurns",
+        "appliedDecisions",
+        "policyRefs",
+        "policyIndependentInvariants",
+        "forbiddenValues",
+        "contractGaps",
+        "scoring"
+      ],
+      "properties": {
+        "operations": {
+          "description": "Ordered by user utterance order. Empty only for unsupported-only or unclear-task requests.",
+          "type": "array",
+          "maxItems": 10,
+          "items": { "$ref": "#/$defs/operation" }
+        },
+        "unsupportedRequests": {
+          "type": "array",
+          "maxItems": 5,
+          "items": { "$ref": "#/$defs/unsupportedRequest" }
+        },
+        "queueDecisions": {
+          "description": "D8. The user's answer to each next-operation question in a multi-operation queue.",
+          "type": "array",
+          "maxItems": 10,
+          "items": { "$ref": "#/$defs/queueDecision" }
+        },
+        "expectedTurns": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "items": { "$ref": "#/$defs/turnExpectation" }
+        },
+        "appliedDecisions": {
+          "type": "array",
+          "maxItems": 9,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/decisionId" }
+        },
+        "policyRefs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 40,
+          "items": { "$ref": "#/$defs/policyRef" }
+        },
+        "policyIndependentInvariants": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "items": { "$ref": "#/$defs/invariant" }
+        },
+        "forbiddenValues": {
+          "type": "array",
+          "maxItems": 40,
+          "items": { "$ref": "#/$defs/forbiddenValue" }
+        },
+        "contractGaps": {
+          "type": "array",
+          "maxItems": 5,
+          "items": { "$ref": "#/$defs/contractGap" }
+        },
+        "scoring": { "$ref": "#/$defs/scoring" },
+        "oracleErrata": {
+          "type": "array",
+          "maxItems": 20,
+          "items": { "$ref": "#/$defs/oracleErratum" }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "contractGaps": {
+                "contains": {
+                  "properties": { "blocksModelScore": { "const": true } },
+                  "required": ["blocksModelScore"]
+                }
+              }
+            },
+            "required": ["contractGaps"]
+          },
+          "then": {
+            "properties": {
+              "scoring": {
+                "properties": {
+                  "excludedFromModelScore": { "const": true },
+                  "exclusionReason": { "const": "CONTRACT_GAP" }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "operations": { "maxItems": 0 }
+            }
+          },
+          "then": {
+            "properties": {
+              "expectedTurns": {
+                "items": {
+                  "properties": { "expectedWriteCount": { "const": 0 } }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

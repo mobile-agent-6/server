@@ -1,0 +1,259 @@
+{
+  "all": {
+    "actionOccurrences": {
+      "ANSWER": 161,
+      "ASK": 249,
+      "CONFIRM_DELETE": 42,
+      "CONFIRM_UPDATE": 91,
+      "CREATE": 119,
+      "LIST": 348,
+      "SELECT_TARGET": 62
+    },
+    "conversationGroups": 49,
+    "conversations": 400,
+    "labelStatus": {
+      "reviewed": 400
+    },
+    "modelOutputs": 1072,
+    "topLevelKeyShapes": [
+      {
+        "count": 119,
+        "keys": [
+          "conversation_group_id",
+          "created_id",
+          "expect_final",
+          "id",
+          "initial_schedules",
+          "label_status",
+          "reference_datetime",
+          "schema_version",
+          "turns"
+        ]
+      },
+      {
+        "count": 281,
+        "keys": [
+          "conversation_group_id",
+          "expect_final",
+          "id",
+          "initial_schedules",
+          "label_status",
+          "reference_datetime",
+          "schema_version",
+          "turns"
+        ]
+      }
+    ],
+    "turnKeyShapes": [
+      {
+        "count": 973,
+        "keys": [
+          "expect",
+          "model_outputs",
+          "user"
+        ]
+      }
+    ],
+    "userTurns": 973
+  },
+  "notes": [
+    "reviewed is the 2026-10-22 user-directed status, not independent multi-review",
+    "the current dataset contract is not a TEAM-confirmed shared AI/DATA contract",
+    "the previous validation-40 Qwen score is not a result for the current validation-50 split"
+  ],
+  "reuseAssessment": {
+    "automaticDiscardCount": null,
+    "candidateCRoleEvidence": "requires_new_labeling_for_all_conversations",
+    "candidateNeutralSemanticOracle": "requires_conversion_and_review",
+    "candidateSpecificModelOutputs": "requires_reinspection_for_any_contract_other_than_A",
+    "independentReviewComplete": false,
+    "testSplitLockedIndependent": false,
+    "userTextAndContext": "conditionally_reusable_after_contamination_and_semantic_review"
+  },
+  "schemaVersion": "issue30-existing-400-audit-v0.1",
+  "source": {
+    "allPath": "datasets/qwen/experiments/multiturn_400_v0.1/scenarios_all_400_UNREVIEWED.jsonl",
+    "allSha256": "c08f776b87589cfe21f791443be50678e83e38f1f2fb95f839570dcc02b36f29",
+    "contractFormat": "DATA v2.6 candidate A seven-action format",
+    "datasetVersion": "qwen-dataset-400-v0.1.4-proposed"
+  },
+  "splits": {
+    "test": {
+      "actionOccurrences": {
+        "ANSWER": 50,
+        "ASK": 100,
+        "CONFIRM_UPDATE": 25,
+        "CREATE": 30,
+        "LIST": 100,
+        "SELECT_TARGET": 25
+      },
+      "conversationGroups": 11,
+      "conversations": 100,
+      "labelStatus": {
+        "reviewed": 100
+      },
+      "modelOutputs": 330,
+      "path": "datasets/qwen/experiments/multiturn_400_v0.1/test/scenarios_UNREVIEWED.jsonl",
+      "sha256": "afeff8a82bfc29c7deb9d22fd84915f955481ec4fa6931a632a20f187d8c1ccb",
+      "topLevelKeyShapes": [
+        {
+          "count": 30,
+          "keys": [
+            "conversation_group_id",
+            "created_id",
+            "expect_final",
+            "id",
+            "initial_schedules",
+            "label_status",
+            "reference_datetime",
+            "schema_version",
+            "turns"
+          ]
+        },
+        {
+          "count": 70,
+          "keys": [
+            "conversation_group_id",
+            "expect_final",
+            "id",
+            "initial_schedules",
+            "label_status",
+            "reference_datetime",
+            "schema_version",
+            "turns"
+          ]
+        }
+      ],
+      "turnKeyShapes": [
+        {
+          "count": 305,
+          "keys": [
+            "expect",
+            "model_outputs",
+            "user"
+          ]
+        }
+      ],
+      "userTurns": 305
+    },
+    "train": {
+      "actionOccurrences": {
+        "ANSWER": 96,
+        "ASK": 109,
+        "CONFIRM_DELETE": 32,
+        "CONFIRM_UPDATE": 56,
+        "CREATE": 74,
+        "LIST": 208,
+        "SELECT_TARGET": 32
+      },
+      "conversationGroups": 28,
+      "conversations": 250,
+      "labelStatus": {
+        "reviewed": 250
+      },
+      "modelOutputs": 607,
+      "path": "datasets/qwen/experiments/multiturn_400_v0.1/train/scenarios_UNREVIEWED.jsonl",
+      "sha256": "5c1f80d447f91ce0976416a17d263c321170bc53cc4799663598e9fed5b67367",
+      "topLevelKeyShapes": [
+        {
+          "count": 74,
+          "keys": [
+            "conversation_group_id",
+            "created_id",
+            "expect_final",
+            "id",
+            "initial_schedules",
+            "label_status",
+            "reference_datetime",
+            "schema_version",
+            "turns"
+          ]
+        },
+        {
+          "count": 176,
+          "keys": [
+            "conversation_group_id",
+            "expect_final",
+            "id",
+            "initial_schedules",
+            "label_status",
+            "reference_datetime",
+            "schema_version",
+            "turns"
+          ]
+        }
+      ],
+      "turnKeyShapes": [
+        {
+          "count": 543,
+          "keys": [
+            "expect",
+            "model_outputs",
+            "user"
+          ]
+        }
+      ],
+      "userTurns": 543
+    },
+    "validation": {
+      "actionOccurrences": {
+        "ANSWER": 15,
+        "ASK": 40,
+        "CONFIRM_DELETE": 10,
+        "CONFIRM_UPDATE": 10,
+        "CREATE": 15,
+        "LIST": 40,
+        "SELECT_TARGET": 5
+      },
+      "conversationGroups": 10,
+      "conversations": 50,
+      "labelStatus": {
+        "reviewed": 50
+      },
+      "modelOutputs": 135,
+      "path": "datasets/qwen/experiments/multiturn_400_v0.1/validation/scenarios_UNREVIEWED.jsonl",
+      "sha256": "06237d283ab969d2a34c241f0d66abe775c1c97531fe21d33de6f3ee90d70409",
+      "topLevelKeyShapes": [
+        {
+          "count": 15,
+          "keys": [
+            "conversation_group_id",
+            "created_id",
+            "expect_final",
+            "id",
+            "initial_schedules",
+            "label_status",
+            "reference_datetime",
+            "schema_version",
+            "turns"
+          ]
+        },
+        {
+          "count": 35,
+          "keys": [
+            "conversation_group_id",
+            "expect_final",
+            "id",
+            "initial_schedules",
+            "label_status",
+            "reference_datetime",
+            "schema_version",
+            "turns"
+          ]
+        }
+      ],
+      "turnKeyShapes": [
+        {
+          "count": 125,
+          "keys": [
+            "expect",
+            "model_outputs",
+            "user"
+          ]
+        }
+      ],
+      "userTurns": 125
+    }
+  },
+  "status": "BE-PROPOSED"
+}
