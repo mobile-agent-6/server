@@ -29,7 +29,6 @@ from app.modules.assistant.decisions import (
     DecisionProvider,
     TimeTrustSource,
     TrustedTimeSource,
-    UntrustedTimeSource,
 )
 from app.modules.assistant.cleanup import cleanup_once
 from app.modules.assistant.evidence.model_client import ChatCompletionsModel
@@ -56,6 +55,7 @@ from app.modules.schedules.router import router as schedules_router
 from app.modules.system.router import router as system_router
 from app.modules.system.service import resolve_expected_head
 from app.modules.system.time_sync import DisabledTimeSyncAdapter
+from app.modules.system.time_trust import SyncedTimeSource
 
 
 def _install_openapi_contract(application: FastAPI) -> None:
@@ -359,8 +359,15 @@ def create_app(
     application.state.assistant_runtime = None
     application.state.assistant_runtime_owner = False
     application.state.assistant_runtime_healthy = False
+    # The phone's time-sync makes the Pi clock trusted; the setting skips that on a dev Mac.
+    application.state.time_sync_trust = SyncedTimeSource(
+        lambda: application.state.clock.now(),
+        lambda: application.state.monotonic_clock.now(),
+    )
     application.state.assistant_time_trust_source = _assistant_time_trust_source_for_tests or (
-        TrustedTimeSource() if resolved.assistant_trust_server_time else UntrustedTimeSource()
+        TrustedTimeSource()
+        if resolved.assistant_trust_server_time
+        else application.state.time_sync_trust
     )
     application.state.assistant_uuid_factory = (
         _assistant_uuid_factory_for_tests or uuid4

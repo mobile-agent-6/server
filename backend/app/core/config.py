@@ -53,8 +53,9 @@ class Settings(BaseSettings):
     assistant_model_base_url: str = "http://127.0.0.1:8088"
     assistant_model_name: str | None = None
     assistant_model_timeout_seconds: Annotated[float, Field(gt=0, le=240)] = 60
-    # Treat the server clock as correct, so relative dates such as "내일" work.
-    # Keep it off on the Orange Pi until a time-sync based trust source exists.
+    # Treat the server clock as correct without a phone time-sync (development
+    # Mac only).  On the Orange Pi keep it off: a successful time-sync makes the
+    # clock trusted, so relative dates such as "내일" work.
     assistant_trust_server_time: bool = False
 
     @model_validator(mode="before")

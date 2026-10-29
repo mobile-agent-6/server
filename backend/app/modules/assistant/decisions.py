@@ -324,7 +324,7 @@ class TimeTrustSource(Protocol):
 
 
 class UntrustedTimeSource:
-    """Safe production default until a Pi time-trust source is defined."""
+    """Never trust the server clock (tests and fallback)."""
 
     def is_trusted(self) -> bool:
         return False

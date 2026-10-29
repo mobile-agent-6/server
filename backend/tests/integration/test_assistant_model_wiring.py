@@ -16,6 +16,7 @@ from app.core.config import Settings
 from app.main import create_app
 from app.modules.assistant.evidence.normalize import SEOUL
 from app.modules.schedules.model import Schedule
+from app.modules.system.time_sync import DisabledTimeSyncAdapter
 from tests.unit.test_assistant_evidence_model_client import FakeServer
 
 from datetime import datetime
@@ -89,6 +90,28 @@ def test_model_server_connects_and_creates(database_path: Path) -> None:
         user_message = server.requests[0]["body"]["messages"][1]["content"]
         assert '"serverTimeTrusted":true' in user_message
         assert '"taskReferenceTime":"2026-10-29T10:00:00+09:00"' in user_message
+    finally:
+        server.close()
+        application.state.engine.dispose()
+
+
+def test_phone_time_sync_lets_the_model_use_relative_dates(database_path: Path) -> None:
+    server = FakeServer()
+    server.body = {"choices": [{"message": {"content": json.dumps(CREATE_OUTPUT, ensure_ascii=False)}}]}
+    application = _app(database_path, assistant_model_enabled=True, assistant_model_base_url=server.url)
+    application.state.time_sync_adapter = DisabledTimeSyncAdapter(application.state.clock)
+    try:
+        with TestClient(application) as client:
+            synced = client.post("/api/v1/system/time-sync", json={"currentTime": "2026-10-29T10:00:10+09:00"})
+            assert synced.status_code == 200
+            request_id = str(uuid4())
+            client.post(
+                "/api/v1/assistant/requests",
+                json={"requestId": request_id, "input": {"type": "text", "text": "내일 오후 3시 반에 입고 검수 잡아 줘"}},
+            )
+            result = _wait(client, request_id)["result"]
+            assert (result["kind"], result["outcome"]) == ("outcome", "success")
+        assert '"serverTimeTrusted":true' in server.requests[0]["body"]["messages"][1]["content"]
     finally:
         server.close()
         application.state.engine.dispose()
