@@ -324,6 +324,26 @@ def is_future_scope(texts: Sequence[str]) -> bool:
     return bool(texts) and all(_FUTURE_SCOPE.search(normalize_text(text)) for text in texts)
 
 
+# Words that never say what the schedule is (Issue #35, user decision 2026-10-29).
+# Removal order matters: "일정" goes before "그일" so "그 일정" leaves only "그".
+_UNCLEAR_WORDS = (
+    "저번에", "스케줄", "일정", "그거", "그것", "이거", "이것", "저거", "저것", "그건",
+    "할일", "말한", "그때", "아까", "하나", "그일", "뭐", "좀",
+)
+# Pointing words and particles that may be left over ("그 일정" leaves "그").
+_LEFTOVER = set("그이저을를이가은는도만요의")
+
+
+def is_unclear_title(value: str) -> bool:
+    """True when nothing in the title says what the schedule is."""
+
+    remaining = "".join(unicodedata.normalize("NFKC", value).split())
+    remaining = re.sub(r"[^0-9A-Za-z가-힣]", "", remaining)
+    for word in _UNCLEAR_WORDS:
+        remaining = remaining.replace(word, "")
+    return all(character in _LEFTOVER for character in remaining)
+
+
 def _title_key(value: str) -> str:
     return "".join(unicodedata.normalize("NFKC", value).split()).casefold()
 

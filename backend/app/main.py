@@ -28,9 +28,12 @@ from app.core.problem_details import ProblemBoundaryMiddleware, register_excepti
 from app.modules.assistant.decisions import (
     DecisionProvider,
     TimeTrustSource,
+    TrustedTimeSource,
     UntrustedTimeSource,
 )
 from app.modules.assistant.cleanup import cleanup_once
+from app.modules.assistant.evidence.model_client import ChatCompletionsModel
+from app.modules.assistant.evidence.provider import EvidenceDecisionProvider
 from app.modules.assistant.router import router as assistant_router
 from app.modules.assistant.readiness import probe_assistant_schema
 from app.modules.assistant.processor import ProcessOneResult, process_one
@@ -88,6 +91,23 @@ def _install_openapi_contract(application: FastAPI) -> None:
         return schema
 
     application.openapi = custom_openapi  # type: ignore[method-assign]
+
+
+def _model_provider(settings: Settings, application: FastAPI) -> DecisionProvider | None:
+    """Connect the model server, or leave the Assistant unavailable (503) if it is down."""
+
+    model = ChatCompletionsModel(
+        base_url=settings.assistant_model_base_url,
+        timeout_seconds=settings.assistant_model_timeout_seconds,
+        model=settings.assistant_model_name or None,
+    )
+    if not model.is_ready():
+        logging.getLogger(__name__).warning(
+            "Assistant model server is not ready; the Assistant stays unavailable",
+            extra={"event": "assistant.model_unavailable"},
+        )
+        return None
+    return EvidenceDecisionProvider(model, SqlAlchemyScheduleReader(application.state.session_factory))
 
 
 def create_app(
@@ -169,12 +189,11 @@ def create_app(
             application.state.assistant_session_factory = create_session_factory(
                 assistant_engine
             )
-            application.state.assistant_decision_provider = (
-                _assistant_decision_provider_for_tests
-            )
-            application.state.assistant_provider_available = (
-                _assistant_decision_provider_for_tests is not None
-            )
+            provider = _assistant_decision_provider_for_tests
+            if provider is None and resolved.assistant_model_enabled:
+                provider = _model_provider(resolved, application)
+            application.state.assistant_decision_provider = provider
+            application.state.assistant_provider_available = provider is not None
             if ownership_lock is not None:
                 try:
                     timeout_engine = create_assistant_engine(
@@ -340,8 +359,8 @@ def create_app(
     application.state.assistant_runtime = None
     application.state.assistant_runtime_owner = False
     application.state.assistant_runtime_healthy = False
-    application.state.assistant_time_trust_source = (
-        _assistant_time_trust_source_for_tests or UntrustedTimeSource()
+    application.state.assistant_time_trust_source = _assistant_time_trust_source_for_tests or (
+        TrustedTimeSource() if resolved.assistant_trust_server_time else UntrustedTimeSource()
     )
     application.state.assistant_uuid_factory = (
         _assistant_uuid_factory_for_tests or uuid4

@@ -47,6 +47,15 @@ class Settings(BaseSettings):
     time_sync_max_utc: datetime = datetime(2035, 1, 1, tzinfo=timezone.utc)
     time_sync_lock_timeout_seconds: Annotated[float, Field(gt=0)] = 2
     time_sync_command_timeout_seconds: Annotated[float, Field(gt=0)] = 5
+    # Assistant model server (OpenAI-compatible /v1/chat/completions).  Off by
+    # default: without it the Assistant answers 503 and nothing else changes.
+    assistant_model_enabled: bool = False
+    assistant_model_base_url: str = "http://127.0.0.1:8088"
+    assistant_model_name: str | None = None
+    assistant_model_timeout_seconds: Annotated[float, Field(gt=0, le=240)] = 60
+    # Treat the server clock as correct, so relative dates such as "내일" work.
+    # Keep it off on the Orange Pi until a time-sync based trust source exists.
+    assistant_trust_server_time: bool = False
 
     @model_validator(mode="before")
     @classmethod

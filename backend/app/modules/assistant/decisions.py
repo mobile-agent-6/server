@@ -328,3 +328,10 @@ class UntrustedTimeSource:
 
     def is_trusted(self) -> bool:
         return False
+
+
+class TrustedTimeSource:
+    """Explicit opt-in for hosts whose clock is known to be correct (development Mac)."""
+
+    def is_trusted(self) -> bool:
+        return True
