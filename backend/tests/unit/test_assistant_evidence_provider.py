@@ -409,3 +409,140 @@ def test_stored_state_from_another_shape_starts_fresh() -> None:
     envelope = provider.decide(context("회의 잡아 줘", follow_up=True, state={"something": "else"}))
     assert envelope.control_state["turns"] == ["회의 잡아 줘"]
     assert model.seen == [["회의 잡아 줘"]]
+
+
+# ------------------------------------------- stage 3: model mistake guards
+
+
+@pytest.mark.parametrize("title", ["그거 하나", "일정 좀", "뭐 하나", "이것", "저번에 말한 그 건", "그 일정"])
+def test_unclear_create_title_asks_for_the_title(title: str) -> None:
+    turn = f"모레 오전 10시에 {title} 넣어 줘"
+    model = ScriptedModel(
+        output(op("create", change={"title": [span(title)], "date": [span("모레")], "time": [span("오전 10시")]}))
+    )
+    _, decision = decide(EvidenceDecisionProvider(model, FakeReader()), turn)
+    assert decision == {"kind": "ask", "text": texts.ASK_TITLE}
+
+
+def test_unclear_target_title_asks_which_schedule() -> None:
+    model = ScriptedModel(output(op("delete", target={"title": [span("그거")]})))
+    reader = FakeReader([schedule("그거 정리", REFERENCE + timedelta(days=1))])
+    _, decision = decide(EvidenceDecisionProvider(model, reader), "그거 지워 줘")
+    assert decision == {"kind": "ask", "text": texts.ASK_TARGET_TITLE}
+    assert reader.reads == []  # nothing is searched with an unclear title
+
+
+def test_unclear_new_title_asks_for_the_change() -> None:
+    model = ScriptedModel(output(op("update", target={"title": [span("회의")]}, change={"title": [span("그거")]})))
+    _, decision = decide(EvidenceDecisionProvider(model, FakeReader()), "회의 제목을 그거로 바꿔 줘")
+    assert decision == {"kind": "ask", "text": texts.ASK_CHANGE_VALUE}
+
+
+LK52_TURNS = ["반품 사유 분류 잡아 줘", "모레요", "오전 10시로 하고, 날짜는 모레 말고 글피로 바꿔 줘"]
+# The run 006 mistake: the correction "모레 말고 글피" is ignored and "모레" is adopted.
+LK52_MISSED = output(
+    op(
+        "create",
+        change={
+            "title": [span("반품 사유 분류")],
+            "date": [span("모레", turn=2)],
+            "time": [span("오전 10시", turn=3)],
+            "category": [span("반품")],
+        },
+    )
+)
+
+
+def _lk52_provider(*extra: dict) -> tuple[EvidenceDecisionProvider, object]:
+    model = ScriptedModel(
+        output(op("create", change={"title": [span("반품 사유 분류")], "category": [span("반품")]})),
+        output(op("create", change={"title": [span("반품 사유 분류")], "date": [span("모레", turn=2)]})),
+        LK52_MISSED,
+        *extra,
+    )
+    provider = EvidenceDecisionProvider(model, FakeReader())
+    previous, _ = decide(provider, LK52_TURNS[0])
+    previous, _ = decide(provider, LK52_TURNS[1], previous=previous)
+    return provider, previous
+
+
+def test_missed_correction_shows_values_before_creating() -> None:
+    provider, previous = _lk52_provider()
+    third, decision = decide(provider, LK52_TURNS[2], previous=previous)
+    assert decision["kind"] == "ask"
+    assert decision["text"] == texts.confirm_create_values(
+        "반품 사유 분류", datetime(2026, 10, 31, 10, 0, tzinfo=SEOUL)
+    )
+
+
+def test_missed_correction_answered_no_asks_for_date_and_time_again() -> None:
+    provider, previous = _lk52_provider()
+    third, _ = decide(provider, LK52_TURNS[2], previous=previous)
+    _, decision = decide(provider, "아니", previous=third)
+    assert decision == {"kind": "ask", "text": texts.ASK_DATETIME_AGAIN}
+
+
+def test_missed_correction_answered_yes_creates() -> None:
+    provider, previous = _lk52_provider(LK52_MISSED)
+    third, _ = decide(provider, LK52_TURNS[2], previous=previous)
+    _, decision = decide(provider, "응", previous=third)
+    assert decision["kind"] == "create_intent"
+
+
+def test_marked_correction_creates_without_extra_question() -> None:
+    turns = {1: "내일 오전 11시 아니 오후 1시에 출고 박스 테이핑 확인 등록해 줘"}
+    model = ScriptedModel(
+        output(
+            op(
+                "create",
+                change={
+                    "title": [span("출고 박스 테이핑 확인")],
+                    "date": [span("내일")],
+                    "time": [
+                        span("오전 11시", status="superseded"),
+                        span("아니", status="correction_marker"),
+                        span("오후 1시"),
+                    ],
+                },
+            )
+        )
+    )
+    _, decision = decide(EvidenceDecisionProvider(model, FakeReader()), turns[1])
+    assert decision["kind"] == "create_intent"
+    assert datetime.fromisoformat(decision["scheduledAt"]) == datetime(2026, 10, 30, 13, 0, tzinfo=SEOUL)
+
+
+LK28_TURN = "출고 적재 순서 확인 일정을 2027년 11월 9일 오후 3시 20분으로 옮겨 줘"
+# The run 004 mistake: a move request read as a new schedule.
+LK28_AS_CREATE = output(
+    op(
+        "create",
+        change={
+            "title": [span("출고 적재 순서 확인")],
+            "date": [span("2027년 11월 9일")],
+            "time": [span("오후 3시 20분")],
+        },
+    )
+)
+
+
+def test_change_words_read_as_create_ask_before_creating() -> None:
+    provider = EvidenceDecisionProvider(ScriptedModel(LK28_AS_CREATE), FakeReader())
+    _, decision = decide(provider, LK28_TURN)
+    assert decision == {"kind": "ask", "text": texts.confirm_new_create("출고 적재 순서 확인")}
+
+
+def test_change_words_answered_no_starts_over() -> None:
+    provider = EvidenceDecisionProvider(ScriptedModel(LK28_AS_CREATE), FakeReader())
+    first, _ = decide(provider, LK28_TURN)
+    envelope, decision = decide(provider, "아니", previous=first)
+    assert decision == {"kind": "ask", "text": texts.ASK_RESTATE}
+    assert envelope.control_state["turns"] == []
+
+
+def test_change_words_answered_yes_creates() -> None:
+    provider = EvidenceDecisionProvider(ScriptedModel(LK28_AS_CREATE, LK28_AS_CREATE), FakeReader())
+    first, _ = decide(provider, LK28_TURN)
+    _, decision = decide(provider, "응", previous=first)
+    assert decision["kind"] == "create_intent"
+    assert decision["timeInterpretation"] == "absolute"

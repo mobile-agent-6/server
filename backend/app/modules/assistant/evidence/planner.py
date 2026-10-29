@@ -26,6 +26,7 @@ from app.modules.assistant.evidence.normalize import (
     TimeStatus,
     combine,
     is_future_scope,
+    is_unclear_title,
     resolve_category,
     resolve_completed,
     resolve_date,
@@ -173,7 +174,7 @@ def _plan_create(
     overrides: Overrides,
 ) -> _Plan:
     title = _last(adopted_texts(operation.change.get("title", ())))
-    if title is None:
+    if title is None or is_unclear_title(title):
         return _Plan(ask=Ask(texts.ASK_TITLE))
     moment = _change_moment(
         operation, reference=reference, server_time_trusted=server_time_trusted, overrides=overrides
@@ -250,6 +251,8 @@ def _plan_list(
         decision["completed"] = completed
     title = _last(adopted_texts(operation.filter.get("title", ())))
     if title is not None:
+        if is_unclear_title(title):
+            return _Plan(ask=Ask(texts.ASK_TARGET_TITLE))
         decision["title"] = title
     return _Plan(decision=decision)
 
@@ -270,7 +273,7 @@ def _find_targets(
     reader: ScheduleReadPort,
 ) -> _Targets | Ask:
     title = _last(adopted_texts(operation.target.get("title", ())))
-    if title is None:
+    if title is None or is_unclear_title(title):
         return Ask(texts.ASK_TARGET_TITLE)
     date_texts = adopted_texts(operation.target.get("date", ()))
     absolute = False
@@ -346,6 +349,9 @@ def _plan_target_operation(
     moment = _Moment()
     if is_update:
         if not _has_change_value(operation):
+            return _Plan(ask=Ask(texts.ASK_CHANGE_VALUE))
+        new_title = _last(adopted_texts(operation.change.get("title", ())))
+        if new_title is not None and is_unclear_title(new_title):
             return _Plan(ask=Ask(texts.ASK_CHANGE_VALUE))
         resolved = _change_moment(
             operation, reference=reference, server_time_trusted=server_time_trusted, overrides=overrides

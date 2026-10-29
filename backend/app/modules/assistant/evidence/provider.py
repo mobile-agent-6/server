@@ -7,6 +7,7 @@ planner build the decision.  The model never sees or picks Schedule IDs.
 
 from __future__ import annotations
 
+import re
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime
@@ -14,7 +15,12 @@ from typing import Any, Protocol
 
 from app.modules.assistant.decisions import DecisionContext, DecisionEnvelope
 from app.modules.assistant.evidence import texts
-from app.modules.assistant.evidence.contract import EvidenceOutput, parse_evidence_output
+from app.modules.assistant.evidence.contract import (
+    EvidenceOperation,
+    EvidenceOutput,
+    SpanStatus,
+    parse_evidence_output,
+)
 from app.modules.assistant.evidence.gate import (
     Answer,
     analyze_text,
@@ -45,8 +51,8 @@ class _State:
     pending: dict[str, str] | None = None
     change_date: str | None = None
     midnight: bool = False
-    # Several requests at once: the first create runs only after a yes.
-    first_confirmed: bool = False
+    # The user said yes to a create check (several requests, a missed correction, or change words).
+    create_confirmed: bool = False
 
     def to_json(self) -> dict[str, Any]:
         return {
@@ -56,7 +62,7 @@ class _State:
             "pending": self.pending,
             "changeDate": self.change_date,
             "midnight": self.midnight,
-            "firstConfirmed": self.first_confirmed,
+            "createConfirmed": self.create_confirmed,
         }
 
     @property
@@ -81,7 +87,7 @@ def _load_state(value: object) -> _State | None:
         or len(turns) > MAX_TURNS
         or type(value.get("consentGranted")) is not bool
         or type(value.get("midnight")) is not bool
-        or type(value.get("firstConfirmed")) is not bool
+        or type(value.get("createConfirmed")) is not bool
         or not (pending is None or (isinstance(pending, dict) and all(isinstance(v, str) for v in pending.values())))
         or not (change_date is None or isinstance(change_date, str))
     ):
@@ -97,7 +103,7 @@ def _load_state(value: object) -> _State | None:
         pending=dict(pending) if pending is not None else None,
         change_date=change_date,
         midnight=value["midnight"],
-        first_confirmed=value["firstConfirmed"],
+        create_confirmed=value["createConfirmed"],
     )
 
 
@@ -159,14 +165,19 @@ class EvidenceDecisionProvider:
                 if answer is Answer.NO:
                     if slot == "first_operation":
                         return _envelope({"kind": "cancel", "text": texts.FIRST_DECLINED}, _cleared())
+                    if slot == "new_create":
+                        # Probably a change to an existing schedule: start over.
+                        return _envelope({"kind": "ask", "text": texts.ASK_RESTATE}, _cleared())
+                    if slot == "values":
+                        return self._ask(texts.ASK_DATETIME_AGAIN, state)
                     again = texts.ASK_TIME_AGAIN if slot == "midnight" else texts.ASK_DATE_AGAIN
                     return self._ask(again, state)
                 if slot == "change_date":
                     state.change_date = pending.get("value")
                 elif slot == "midnight":
                     state.midnight = True
-                elif slot == "first_operation":
-                    state.first_confirmed = True
+                elif slot in {"first_operation", "values", "new_create"}:
+                    state.create_confirmed = True
 
         if not state.consent_granted:
             analyses = [analyze_text(turn) for turn in state.turns]
@@ -210,17 +221,62 @@ class EvidenceDecisionProvider:
         if decision is None:
             raise ValueError("planner returned neither a decision nor a question")
         several = len(output.operations) > 1
-        if several and decision["kind"] == "create_intent" and not state.first_confirmed:
-            # A create runs at once, so with several requests ask before the first one.
-            question = texts.confirm_first_create(decision["title"])
-            state.pending = {"kind": "confirm", "slot": "first_operation", "value": "yes", "text": question}
-            return self._ask(question, state)
+        if decision["kind"] == "create_intent" and not state.create_confirmed:
+            # A create runs at once with no confirmation step, so these checks
+            # stop a model mistake before it becomes a wrong schedule.
+            check = _create_check(decision, operation, state.turns, several=several)
+            if check is not None:
+                slot, question = check
+                state.pending = {"kind": "confirm", "slot": slot, "value": "yes", "text": question}
+                return self._ask(question, state)
         if several and decision["kind"] in {"confirm", "select_candidate"}:
             decision["text"] = decision["text"] + texts.MORE_REQUESTS_NOTE
         if not context.server_time_trusted and _is_relative(decision):
             # The processor will ask for an absolute date; keep the turns for that answer.
             return _envelope(decision, state)
         return _envelope(decision, _cleared())
+
+
+# "말고", "대신", "아니" mark a correction; "아니요" and "아니오" are answers, not corrections.
+_CORRECTION_MARKER = re.compile(r"말고|대신|아니(?!요|오)")
+_DATE_OR_TIME_WORD = re.compile(
+    r"\d+\s*(?:시|분|월|일)|오늘|내일|모레|글피|요일|오전|오후|아침|저녁|밤|새벽|낮"
+)
+_CHANGE_VERB = re.compile(r"옮겨|바꿔|변경|수정|취소|삭제|지워")
+
+
+def _has_correction_evidence(operation: EvidenceOperation) -> bool:
+    return any(
+        span.status is not SpanStatus.ADOPTED
+        for evidence in (operation.target, operation.change, operation.filter)
+        for spans in evidence.values()
+        for span in spans
+    )
+
+
+def _create_check(
+    decision: dict[str, Any],
+    operation: EvidenceOperation,
+    turns: Sequence[str],
+    *,
+    several: bool,
+) -> tuple[str, str] | None:
+    """Return ``(slot, question)`` when a create needs a yes before it runs."""
+
+    title = str(decision["title"])
+    if several:
+        return "first_operation", texts.confirm_first_create(title)
+    if _has_correction_evidence(operation):
+        return None
+    latest = turns[-1] if turns else ""
+    if _CORRECTION_MARKER.search(latest) and _DATE_OR_TIME_WORD.search(latest):
+        # The user corrected a value but the model marked no correction (run 006 lk52).
+        scheduled_at = datetime.fromisoformat(str(decision["scheduledAt"]))
+        return "values", texts.confirm_create_values(title, scheduled_at)
+    if any(_CHANGE_VERB.search(turn) for turn in turns):
+        # Change or delete wording read as a new schedule (run 004 lk28).
+        return "new_create", texts.confirm_new_create(title)
+    return None
 
 
 def _is_relative(decision: dict[str, Any]) -> bool:

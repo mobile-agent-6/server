@@ -251,3 +251,27 @@ def test_future_scope() -> None:
     assert is_future_scope(["오늘 이후"]) is True
     assert is_future_scope(["지난"]) is False
     assert is_future_scope([]) is False
+
+
+@pytest.mark.parametrize(
+    ("title", "unclear"),
+    [
+        ("그거 하나", True),
+        ("일정 좀", True),
+        ("뭐 하나", True),
+        ("이것", True),
+        ("저번에 말한 그 건", True),
+        ("그 일정", True),
+        ("할 일", True),
+        ("", True),
+        ("입고 검수", False),
+        ("반품 창고 정리", False),
+        ("일정 조율 회의", False),
+        ("하나로 마트 납품", False),
+        ("이 회의", False),
+    ],
+)
+def test_unclear_title(title: str, unclear: bool) -> None:
+    from app.modules.assistant.evidence.normalize import is_unclear_title
+
+    assert is_unclear_title(title) is unclear
