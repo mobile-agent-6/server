@@ -1,0 +1,70 @@
+{
+  "version": "candidate-c-create-mlx-trial-preregistration-v0.6",
+  "status": "BE-PROPOSED",
+  "recordedOn": "2026-10-28",
+  "purpose": "Issue #32 본 학습. 학습 후보(batch 1~3 create 370건 + batch 4 비create 부정 50건 + batch 5 비create 보강 36건)에서 Validation 약 50 대화를 family 단위로 떼고, schema 순서 target으로 학습한 최종 adapter를 locked56과 Test 50으로 평가한다. 합격 확정이나 배포 판단이 아니다.",
+  "trainingData": {
+    "source": "batch1/ ~ batch5/ training-row-preview-v0.1.jsonl",
+    "reviewState": "CLAUDE_INDEPENDENT_REVIEW / DATA 담당 확인 전 (batch1 2차 100, batch2 1차 100, batch3 1차 170, batch4 2차 50, batch5 검수 후 기록)",
+    "validationSplit": "bucket을 순서대로 돌며 각 bucket에서 sha256(familyId)가 가장 작은 family부터, 그 family의 모든 skill이 남은 학습 family에 있을 때만 validation으로 분리. 분리된 대화 수가 50 이상이 될 때까지 반복. familyId는 batch를 넘어 같은 family",
+    "batches": {
+      "batch1": "5b411a3242d6a14f2d9b7faf38da8de75f47e6fa8ed5c45a2df8ed262bb589ae",
+      "batch2": "cb5fc8f5c581dda78bbcfbba30d5da1c940800d413cca13f51280c2b0eb8ab95",
+      "batch3": "ddfe18137076aa20602cd64c6d87efa77b14bcf0c5839cb9b6d7e487c232e8b4",
+      "batch4": "a099b5d9f3dfd30fea1fa1134971a37a215fd671518026a6d34f57898e4d471a",
+      "batch5": "13dc57f919008d50aecfeb2b6bcd021e142dddfc153889c56d14b62cb94f62d8"
+    },
+    "validationConversations": 50
+  },
+  "evaluation": {
+    "cases": "Issue #30 locked 56 (학습 금지)",
+    "lockedSha256": "17c7d4ef10aff8171d422c248431d3c34faaf03bf7282fab5dc3abcfa2389b57",
+    "primarySubset": "operation에 create가 있는 20건",
+    "regressionSubset": "나머지 36건(조회·수정·삭제·미지원 단독)",
+    "judgement": "Issue #30 ollama_eval_v0_3.evaluate_case 후보 C 경로 그대로",
+    "comparison": "같은 MLX runtime·모델 revision·non-thinking template·temperature 0에서 base vs final adapter",
+    "notComparableTo": "Issue #30 Ollama qwen3:4b 결과(runtime·양자화·출력 형식 강제가 다름)",
+    "constrainedDecoding": "없음. MLX는 JSON schema 강제를 쓰지 않으므로 형식 실패를 별도 집계",
+    "test50": "test50/lock-manifest-v0.1.json의 경로와 해시로 선택, 최종 adapter 1회, base 결과(~/qwen-c-test50-base, correct 0/50, unsafe 0)와 paired 비교, locked56과 따로 보고. 점수 상한 48"
+  },
+  "training": {
+    "method": "QLoRA (4bit base + LoRA)",
+    "numLayers": 16,
+    "loraRank": 8,
+    "learningRate": 0.0001,
+    "batchSize": 1,
+    "iterations": "round(epochs × train 행 수)",
+    "seed": 42,
+    "checkpointSelection": "최종 adapter만 평가. 중간 체크포인트를 평가 결과로 고르지 않는다",
+    "evalAndSaveEvery": 100,
+    "targetKeyOrder": "schema",
+    "targetKeyOrderNote": "Issue #30 candidate_c_schema 속성 순서 그대로 직렬화(근거 먼저, missingInformation 마지막). 파싱 결과는 canonical과 같다.",
+    "epochs": 2
+  },
+  "decisionRules": {
+    "stop": "base 또는 adapter 평가에서 unsafe_accept가 1건이라도 나오면 즉시 중단하고 같은 run을 수정·재개하지 않는다",
+    "effective": "primary 20건 correct가 base보다 5건 이상 증가하고, regression 36건에서 unsafe_accept 0, correct 감소 2건 이하",
+    "noEffect": "primary 20건 correct 증가가 1건 이하",
+    "inconclusive": "그 사이. 데이터 추가 후 재시험"
+  },
+  "supersedes": "v0.5 (run ~/qwen-c-trial-005, STOP on lk23 unsafe_accept: 완료 조건 \"아직 안 끝난\" 누락. create 14건 correct 10, unsafe 0, list lk19~21 correct). batch 4 검수 지적 빈칸(완료 조건, futureScope, cue 제목, 대상과 바꿀 날짜, category와 완료 수정, change_value)을 batch 5로 보강",
+  "run": "~/qwen-c-trial-006",
+  "operationalStop": "AC 전원이 빠지면 즉시 알림. 배터리 전원이면서 20% 이하이면 운영 중단(판정 아님)",
+  "probes": {
+    "note": "locked56과 Test 50을 쓰지 않은 학습 데이터 재현 확인. 판정 근거가 아니라 설정 선택 근거",
+    "run003": {
+      "titleUnclearAsked": "8/38",
+      "stratified71ExactMatch": "12/71"
+    },
+    "probeA": {
+      "titleUnclearAsked": "0/38",
+      "valLoss": 0.091
+    },
+    "probeB": {
+      "titleUnclearAsked": "33/38",
+      "stratified71ExactMatch": "16/71",
+      "valLoss": 0.035,
+      "iters": 300
+    }
+  }
+}

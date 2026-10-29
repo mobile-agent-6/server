@@ -1,0 +1,9 @@
+{
+  "status": "REMOTE_UNVERIFIED",
+  "reason": "git fetch origin develop failed because github.com DNS resolution was unavailable",
+  "recordedOn": "2026-10-26",
+  "branch": "test/candidate-c-create-400",
+  "head": "e1bfaf7b3deb0fc61e86ed469bbdbcdf1594b1a3",
+  "cachedOriginDevelop": "e1bfaf7b3deb0fc61e86ed469bbdbcdf1594b1a3",
+  "requiresRemoteRecheckBeforeCommit": true
+}

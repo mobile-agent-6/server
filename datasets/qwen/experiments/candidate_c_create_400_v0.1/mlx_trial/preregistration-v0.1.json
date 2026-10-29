@@ -1,0 +1,38 @@
+{
+  "version": "candidate-c-create-mlx-trial-preregistration-v0.1",
+  "status": "BE-PROPOSED",
+  "recordedOn": "2026-10-27",
+  "purpose": "batch 1 학습으로 Candidate C 정답이 늘어나는 방향인지 확인하는 탐색 시험. 합격 확정·배포 판단이 아니다.",
+  "trainingData": {
+    "source": "batch1/training-row-preview-v0.1.jsonl",
+    "conversationsSha256": "5b411a3242d6a14f2d9b7faf38da8de75f47e6fa8ed5c45a2df8ed262bb589ae",
+    "reviewState": "CLAUDE_INDEPENDENT_REVIEW / DATA 담당 확인 전",
+    "validationSplit": "bucket마다 sha256(familyId)가 가장 작은 family 하나를 validation으로 분리"
+  },
+  "evaluation": {
+    "cases": "Issue #30 locked 56 (학습 금지)",
+    "lockedSha256": "17c7d4ef10aff8171d422c248431d3c34faaf03bf7282fab5dc3abcfa2389b57",
+    "primarySubset": "operation에 create가 있는 20건",
+    "regressionSubset": "나머지 36건(조회·수정·삭제·미지원 단독)",
+    "judgement": "Issue #30 ollama_eval_v0_3.evaluate_case 후보 C 경로 그대로",
+    "comparison": "같은 MLX runtime·모델 revision·non-thinking template·temperature 0에서 base vs final adapter",
+    "notComparableTo": "Issue #30 Ollama qwen3:4b 결과(runtime·양자화·출력 형식 강제가 다름)",
+    "constrainedDecoding": "없음. MLX는 JSON schema 강제를 쓰지 않으므로 형식 실패를 별도 집계"
+  },
+  "training": {
+    "method": "QLoRA (4bit base + LoRA)",
+    "numLayers": 4,
+    "loraRank": 8,
+    "learningRate": 1e-5,
+    "batchSize": 1,
+    "iterations": "train 행 수 × 2 (2 epoch)",
+    "seed": 42,
+    "checkpointSelection": "최종 adapter만 평가. 중간 체크포인트를 평가 결과로 고르지 않는다"
+  },
+  "decisionRules": {
+    "stop": "base 또는 adapter 평가에서 unsafe_accept가 1건이라도 나오면 즉시 중단하고 같은 run을 수정·재개하지 않는다",
+    "effective": "primary 20건 correct가 base보다 5건 이상 증가하고, regression 36건에서 unsafe_accept 0, correct 감소 2건 이하",
+    "noEffect": "primary 20건 correct 증가가 1건 이하",
+    "inconclusive": "그 사이. 데이터 추가 후 재시험"
+  }
+}

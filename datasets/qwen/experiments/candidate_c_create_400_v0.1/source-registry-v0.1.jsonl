@@ -1,0 +1,3 @@
+{"path":"datasets/qwen/experiments/multiturn_400_v0.1/scenarios_all_400_UNREVIEWED.jsonl","policy":"train_validation_reuse_candidate_only","sha256":"c08f776b87589cfe21f791443be50678e83e38f1f2fb95f839570dcc02b36f29","sourceId":"existing_400"}
+{"path":"datasets/qwen/experiments/structured_output_contract_v0.1/development-cases-v0.1.jsonl","policy":"forbidden_for_training","sha256":"18d3b4a595132cad0b1bb6092a4a26c180496aedfccb90bb4baac0301eb7e024","sourceId":"issue30_development_12"}
+{"path":"datasets/qwen/experiments/structured_output_contract_v0.1/locked-cases-v0.1.jsonl","policy":"forbidden_for_training","sha256":"17c7d4ef10aff8171d422c248431d3c34faaf03bf7282fab5dc3abcfa2389b57","sourceId":"issue30_locked_56"}

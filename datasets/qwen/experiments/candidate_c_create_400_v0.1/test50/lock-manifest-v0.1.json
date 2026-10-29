@@ -1,0 +1,37 @@
+{
+  "version": "candidate-c-create-test50-lock-v0.1",
+  "status": "LOCKED_FOR_EVALUATION / BE-PROPOSED",
+  "lockedAt": "2026-10-28T12:42:44+09:00",
+  "reviewState": "CLAUDE_INDEPENDENT_REVIEW / DATA 담당 확인 전 (claude-data-review-t50 2차 50 ACCEPT)",
+  "files": {
+    "conversations": {
+      "path": "test50/conversations-v0.1.jsonl",
+      "sha256": "9591f72f70ffa8ed6608d902c0969196cb66408efe82f6bb2cee5adbb2ca41e3"
+    },
+    "targets": {
+      "path": "test50/candidate-c-targets-v0.1.jsonl",
+      "sha256": "b3d67320696bba7f57264ca222dede5d9a32ce3830e2eb0624952945723ce8a6"
+    },
+    "buildTest50": {
+      "path": "test50/build_test50.py",
+      "sha256": "cccdb901ce470137aa77b7215912fce0aa4535c3df491a7f285093c35e635284"
+    },
+    "validator": {
+      "path": "validator.py",
+      "sha256": "7f33b2b54b133adeb43161b1c56f82b69d8e6bada15bd0d3ec9c6044eec25580"
+    }
+  },
+  "reviewEvents": {
+    "path": "test50/review-events-v0.1.jsonl",
+    "sha256": "49b64d8d5eec0447dbdae5b92aac146a2ff5a5a4511037992fdca266e930f9b4"
+  },
+  "rules": [
+    "학습, prompt, schema, 학습 설정 조정에 사용하지 않는다",
+    "평가 대상은 datasetRole이 아니라 이 파일의 경로와 sha256으로 선택한다(locked56과 role 값이 같음)",
+    "결과는 locked56과 따로 보고한다",
+    "base와 최종 adapter를 같은 runtime, revision, template, temperature 0으로 한 번씩 paired 평가한다",
+    "평가 결과를 본 뒤 설정을 바꾸면 새 Test 세트 또는 새 run으로 전체를 다시 평가한다",
+    "Test 실패 사례는 다음 버전 validation으로만 쓰고 train으로 옮기지 않는다",
+    "잠금 이후 이 파일들을 수정하지 않는다. 수정이 필요하면 v0.2로 새로 잠근다"
+  ]
+}

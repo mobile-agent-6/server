@@ -1,0 +1,61 @@
+{
+  "bundleVersion": "candidate-c-create-contract-bundle-v0.1",
+  "status": "BE-PROPOSED",
+  "baseProvenance": {
+    "status": "REMOTE_UNVERIFIED",
+    "reason": "git fetch origin develop failed because github.com DNS resolution was unavailable",
+    "recordedOn": "2026-10-26",
+    "branch": "test/candidate-c-create-400",
+    "head": "e1bfaf7b3deb0fc61e86ed469bbdbcdf1594b1a3",
+    "cachedOriginDevelop": "e1bfaf7b3deb0fc61e86ed469bbdbcdf1594b1a3",
+    "requiresRemoteRecheckBeforeCommit": true
+  },
+  "baseProvenanceSha256": "cf79e1a5b048500cb1c5721727ed3c75d18a8566cc6c904e753c1ce7631c550a",
+  "semanticSchemaExpectedSha256": "cfe0ed947f6bd709e0e3ba60a8daf63fb1f201614cb11d90b823931b060a3b1d",
+  "artifacts": {
+    "candidateCValidator": {
+      "path": "datasets/qwen/experiments/structured_output_contract_v0.1/contracts.py",
+      "fileSha256": "d68469a7e5a71ebdeb3ea693d895d1faecc8aa959125cfc94e15766dc82b5f62",
+      "symbol": "validate_candidate_c",
+      "symbolSha256": "28f0f66386a055c513f71abc6db38d3f16125b3d84cd121ca0dc3a48e9117c6c"
+    },
+    "commonGateV04": {
+      "path": "datasets/qwen/experiments/structured_output_contract_v0.1/common_gate_v0_4.py",
+      "fileSha256": "7185baf7f7bde15359d17d76b3aa659587c0127f1e792549d2c11d873291963b",
+      "symbol": "common_backend_gate_v0_4",
+      "symbolSha256": "8176c19cdaa1ae72bd6dcad5fe55fbaf7b0ae7a4be312d123c7217274df09caf"
+    },
+    "createNormalizer": {
+      "path": "datasets/qwen/experiments/structured_output_contract_v0.1/dry_mapping.py",
+      "fileSha256": "ecf7f23d8248c2562973ab8b4c98cf7506bbf287cd454f6d814cd128d9322bb0",
+      "symbol": "_view_from_c_operation",
+      "symbolSha256": "77d876fcb66b1cd9fa46efbdbf741d6cbbcf0538fc671a14e55278ba841e2ddc"
+    },
+    "contextRenderer": {
+      "path": "datasets/qwen/experiments/structured_output_contract_v0.1/ollama_eval.py",
+      "fileSha256": "aeb43250fdcfd0e5ec38687b39b78b902c52489bba4b16f5888e8e8f69e98b70",
+      "symbol": "render_extraction_context",
+      "symbolSha256": "c158f3e231d046a34a0d061bdfac3e64041516ddeddd9441b7df0bfd330d8337"
+    },
+    "executableEffect": {
+      "path": "datasets/qwen/experiments/structured_output_contract_v0.1/ollama_eval_v0_3.py",
+      "fileSha256": "9c43d4c09f32547132e6e811ce5cd5213f3d0c545f7528500e7fe5bcf08d12a0",
+      "symbol": "executable_effect",
+      "symbolSha256": "9a49363b117e7efde380155ba5608c3f34d9b47cdb185acca32ba2e02b8cc047"
+    },
+    "createProfileValidator": {
+      "path": "datasets/qwen/experiments/candidate_c_create_400_v0.1/validator.py",
+      "fileSha256": "7f33b2b54b133adeb43161b1c56f82b69d8e6bada15bd0d3ec9c6044eec25580",
+      "symbol": "validate_create_profile",
+      "symbolSha256": "2db5e8fe1b9b7f14754b63b32f389362c542f8fe98e94b3f2ef651874bc165b5"
+    },
+    "semanticOracleSchema": {
+      "path": "datasets/qwen/experiments/structured_output_contract_v0.1/semantic-oracle-schema-v0.1.json",
+      "fileSha256": "cfe0ed947f6bd709e0e3ba60a8daf63fb1f201614cb11d90b823931b060a3b1d"
+    },
+    "candidateCPrompt": {
+      "path": "datasets/qwen/experiments/structured_output_contract_v0.1/candidate-c-prompt-v0.1.txt",
+      "fileSha256": "6352d687dd9093f783ff1c23e95d6f84433af30c3776a524aaa980a83db5f24b"
+    }
+  }
+}
