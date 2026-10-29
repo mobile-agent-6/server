@@ -546,3 +546,29 @@ def test_change_words_answered_yes_creates() -> None:
     _, decision = decide(provider, "응", previous=first)
     assert decision["kind"] == "create_intent"
     assert decision["timeInterpretation"] == "absolute"
+
+
+def test_category_word_from_the_target_title_is_not_a_category_change() -> None:
+    # Real run 006 output for "입고 검수 일정을 오후 5시로 옮겨 줘".
+    target = schedule("입고 검수", datetime(2026, 10, 30, 15, 30, tzinfo=SEOUL))
+    model = ScriptedModel(
+        output(
+            op(
+                "update",
+                target={"title": [span("입고 검수")]},
+                change={"time": [span("오후 5시")], "category": [span("입고")]},
+            )
+        )
+    )
+    _, decision = decide(EvidenceDecisionProvider(model, FakeReader([target])), "입고 검수 일정을 오후 5시로 옮겨 줘")
+    assert decision["kind"] == "confirm"
+    assert set(decision["changes"]) == {"scheduledAt"}
+
+
+def test_category_change_outside_the_title_is_kept() -> None:
+    target = schedule("입고 검수", REFERENCE + timedelta(days=1))
+    model = ScriptedModel(
+        output(op("update", target={"title": [span("입고 검수")]}, change={"category": [span("출고")]}))
+    )
+    _, decision = decide(EvidenceDecisionProvider(model, FakeReader([target])), "입고 검수 분류를 출고로 바꿔 줘")
+    assert decision["changes"] == {"category": "OUTBOUND"}

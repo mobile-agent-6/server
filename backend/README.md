@@ -136,11 +136,45 @@ worker/sweeper unhealthy 또는 startup recovery 실패로 Assistant가 비활�
 process를 재시작해 lock 획득과 근거 기반 recovery를 다시 수행한다. 재시작은 모델이나
 Schedule write를 다시 실행하지 않는다.
 
-현재 production `DecisionProvider`는 연결되지 않았다. 따라서 새 text와 자연어 후속
-입력은 request를 insert하지 않고 `503 ASSISTANT_UNAVAILABLE`을 반환한다. 저장된
-질문의 target·changes가 완전한 selection/confirmation은 provider 없이 접수되어
-backend safe writer까지 처리할 수 있다. 테스트 전용 scripted provider·시각·UUID
-주입은 demo 환경에서 사용할 수 없다.
+기본값에서는 모델이 연결되지 않는다. 이때 새 text와 자연어 후속 입력은 request를
+insert하지 않고 `503 ASSISTANT_UNAVAILABLE`을 반환한다. 저장된 질문의 target과
+changes가 완전한 selection/confirmation은 모델 없이 접수되어 backend safe writer까지
+처리할 수 있다. 테스트 전용 scripted provider, 시각, UUID 주입은 demo 환경에서
+사용할 수 없다.
+
+### 모델 연결
+
+모델은 사용자 원문의 근거 단어만 출력하고, 값 계산과 판단은 backend
+(`app/modules/assistant/evidence/`)가 한다. 모델 서버는 OpenAI 호환
+`/v1/chat/completions` endpoint면 된다. 시스템 prompt는 학습 때와 같은
+`app/modules/assistant/evidence/prompt.txt`를 사용한다.
+
+| 환경변수 | 기본값 | 설명 |
+|---|---|---|
+| `SCHEDULE_ASSISTANT_MODEL_ENABLED` | `false` | `true`면 시작할 때 모델 서버를 연결한다. 연결되지 않으면 Assistant만 `503`이고 나머지 API는 정상이다 |
+| `SCHEDULE_ASSISTANT_MODEL_BASE_URL` | `http://127.0.0.1:8088` | 모델 서버 주소 |
+| `SCHEDULE_ASSISTANT_MODEL_NAME` | 비움 | 요청의 `model` 값. 비우면 보내지 않는다 |
+| `SCHEDULE_ASSISTANT_MODEL_TIMEOUT_SECONDS` | `60` | 모델 호출 한 번의 제한 시간(최대 240) |
+| `SCHEDULE_ASSISTANT_TRUST_SERVER_TIME` | `false` | `true`면 서버 시각을 신뢰해 "내일" 같은 상대 날짜를 바로 계산한다. 시계가 정확한 개발 Mac에서만 켠다. 끄면 상대 날짜마다 절대 날짜를 다시 묻는다 |
+
+개발 Mac에서 학습한 어댑터로 실행하는 예:
+
+```bash
+mlx_lm.server --model <기본 모델> --adapter-path <어댑터> --host 127.0.0.1 --port 8088 \
+  --temp 0.0 --chat-template-args '{"enable_thinking": false}'
+SCHEDULE_ASSISTANT_MODEL_ENABLED=true SCHEDULE_ASSISTANT_TRUST_SERVER_TIME=true \
+  python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+실제 모델 smoke test는 CI에서 건너뛰고, 모델 서버가 있을 때만 실행한다.
+
+```bash
+ASSISTANT_SMOKE_MODEL_URL=http://127.0.0.1:8088 python -m pytest tests/integration/test_assistant_model_smoke.py -s
+```
+
+모델 출력이 형식에 맞지 않으면 다시 묻지 않고 `MODEL_OUTPUT_INVALID`로 끝낸다.
+decoding이 고정(temperature 0)이라 같은 입력을 다시 보내도 같은 출력이 나오기 때문이다.
+Orange Pi용 모델 변환, 실행과 성능 측정은 별도 작업이다.
 
 `20261017_0004` downgrade 전에는 위 runtime을 포함한 서버를 먼저 중지하고 정확한
 대상 DB·revision·검증 backup을 확인해야 한다. 기존 downgrade 제한과 backup 복구

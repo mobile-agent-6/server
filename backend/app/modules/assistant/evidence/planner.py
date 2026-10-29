@@ -318,9 +318,16 @@ def _changes_for(
     title = _last(adopted_texts(operation.change.get("title", ())))
     if title is not None:
         changes["title"] = title
-    category = resolve_category(adopted_texts(operation.change.get("category", ())))
-    if category is not None:
-        changes["category"] = category
+    category_texts = adopted_texts(operation.change.get("category", ()))
+    target_titles = adopted_texts(operation.target.get("title", ()))
+    # A category word taken from inside the target title ("입고" in "입고 검수 일정을
+    # 옮겨 줘") is part of the name, not a request to change the category.
+    if category_texts and not any(
+        title_contains(text, title) for text in category_texts for title in target_titles
+    ):
+        category = resolve_category(category_texts)
+        if category is not None:
+            changes["category"] = category
     completed = resolve_completed(adopted_texts(operation.change.get("completed", ())))
     if completed is not None:
         changes["completed"] = completed
