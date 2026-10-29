@@ -23,10 +23,12 @@ from app.modules.assistant.decisions import (
     DecisionAsk,
     DecisionConfirm,
     DecisionContext,
+    DecisionCancel,
     DecisionCreateIntent,
     DecisionEnvelope,
     DecisionFail,
     DecisionListIntent,
+    DecisionNoMatch,
     DecisionProvider,
     DecisionProviderTimeout,
     DecisionSelectCandidate,
@@ -73,10 +75,13 @@ from app.modules.assistant.serialization import (
     serialize_snapshot,
 )
 from app.modules.assistant.runtime_failures import timeout_snapshot
+from app.modules.assistant.evidence.normalize import title_contains
 from app.modules.assistant.runtime_guard import ProcessDeadlineGuard
 from app.modules.schedules.schemas import ScheduleCreate, ScheduleUpdate
 
 QUESTION_TTL = timedelta(minutes=10)
+# A title-filtered list reads the bounded range first; beyond this it asks to narrow.
+LIST_TITLE_SCAN_LIMIT = 100  # the read port allows at most 101 rows per read
 RELATIVE_TIME_QUESTION = (
     "서버 시각을 신뢰할 수 없습니다. 절대 날짜와 시각을 알려 주세요."
 )
@@ -617,13 +622,35 @@ def _provider_decision_plan(
         return _FinalizePlan(pending_write=pending, **control)
 
     if isinstance(decision, DecisionListIntent):
-        schedules = schedule_reader.list(
-            from_utc=decision.from_at,
-            to_utc=decision.to_at,
-            category=decision.category,
-            completed=decision.completed,
-            limit=101,
-        )
+        if decision.title is None:
+            schedules = schedule_reader.list(
+                from_utc=decision.from_at,
+                to_utc=decision.to_at,
+                category=decision.category,
+                completed=decision.completed,
+                limit=101,
+            )
+        else:
+            # Title filtering happens after the read, so read the whole bounded range.
+            scanned = schedule_reader.list(
+                from_utc=decision.from_at,
+                to_utc=decision.to_at,
+                category=decision.category,
+                completed=decision.completed,
+                limit=LIST_TITLE_SCAN_LIMIT + 1,
+            )
+            if len(scanned) > LIST_TITLE_SCAN_LIMIT:
+                return _ask_plan(
+                    LIST_NARROWING_QUESTION,
+                    issue_time=issue_time_factory(),
+                    uuid_factory=uuid_factory,
+                    **control,
+                )
+            schedules = [
+                schedule
+                for schedule in scanned
+                if title_contains(decision.title, schedule.title)
+            ]
         if len(schedules) > 100:
             return _ask_plan(
                 LIST_NARROWING_QUESTION,
@@ -758,6 +785,27 @@ def _provider_decision_plan(
             candidates=candidate_snapshots,
             issue_time=issue_time,
             expires_at=expires_at,
+            **control,
+        )
+
+    if isinstance(decision, DecisionNoMatch):
+        return _FinalizePlan(
+            result=_no_match(operation=AssistantOutcomeOperation(decision.operation)).result,
+            **control,
+        )
+
+    if isinstance(decision, DecisionCancel):
+        fields: dict[str, object] = {}
+        if decision.operation is not None:
+            fields["operation"] = AssistantOutcomeOperation(decision.operation)
+        return _FinalizePlan(
+            result=AssistantResultOutcome(
+                kind=AssistantResultKind.OUTCOME,
+                text=decision.text,
+                outcome=AssistantOutcome.CANCELLED,
+                schedules_changed=False,
+                **fields,
+            ),
             **control,
         )
 

@@ -324,5 +324,16 @@ def is_future_scope(texts: Sequence[str]) -> bool:
     return bool(texts) and all(_FUTURE_SCOPE.search(normalize_text(text)) for text in texts)
 
 
+def _title_key(value: str) -> str:
+    return "".join(unicodedata.normalize("NFKC", value).split()).casefold()
+
+
+def title_contains(query: str, title: str) -> bool:
+    """True when ``query`` appears in ``title``, ignoring spaces and case."""
+
+    key = _title_key(query)
+    return bool(key) and key in _title_key(title)
+
+
 def combine(day: date, clock: time) -> datetime:
     return datetime.combine(day, clock, tzinfo=SEOUL)

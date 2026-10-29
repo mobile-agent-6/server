@@ -24,6 +24,7 @@ from app.modules.assistant.schemas import (
     AssistantDateTime,
     AssistantFailureCodeValue,
     AssistantFailureNextActionValue,
+    AssistantOutcomeOperationValue,
     AssistantText,
     AssistantUuid,
 )
@@ -130,6 +131,8 @@ class DecisionListIntent(_InternalModel):
     to_at: AssistantDateTime = Field(alias="to")
     category: CategoryValue | None = None
     completed: bool | None = None
+    # Keep only schedules whose title contains this text, ignoring spaces and case.
+    title: Title | None = None
     time_interpretation: TimeInterpretationValue
 
     @model_validator(mode="after")
@@ -166,12 +169,29 @@ class DecisionFail(_InternalModel):
         return self
 
 
+class DecisionNoMatch(_InternalModel):
+    """The backend searched for a target schedule and found none."""
+
+    kind: Literal["no_match"]
+    operation: AssistantOutcomeOperationValue
+
+
+class DecisionCancel(_InternalModel):
+    """The user declined to continue; nothing is written."""
+
+    kind: Literal["cancel"]
+    text: AssistantText
+    operation: AssistantOutcomeOperationValue | None = None
+
+
 Decision = Annotated[
     DecisionAsk
     | DecisionSelectCandidate
     | DecisionConfirm
     | DecisionCreateIntent
     | DecisionListIntent
+    | DecisionNoMatch
+    | DecisionCancel
     | DecisionFail,
     Field(discriminator="kind"),
 ]

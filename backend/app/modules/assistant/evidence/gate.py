@@ -296,3 +296,50 @@ def analyze_text(text: str) -> TextAnalysis:
     for start, end in sorted(covered, reverse=True):
         residual = residual[:start] + " " * (end - start) + residual[end:]
     return TextAnalysis(findings=tuple(findings), supported_operation=bool(_SUPPORTED_OP.search(residual)))
+
+
+# ------------------------------------------------------ yes or no answers
+
+_AFFIRM = re.compile(
+    r"^(?:응|어|네|넵|예|그래|그래요|좋아|좋아요|오케이|ok|알겠어|알겠습니다|맞아|맞아요|그렇게\s*해)(?![가-힣])",
+    re.IGNORECASE,
+)
+_DECLINE = re.compile(r"(?:^|[\s,.!?])(?:아니|아뇨|아니요|아니오|싫어|됐어|됐어요|취소|그만)(?![가-힣])")
+_DECLINE_VERB = re.compile(r"(?:등록|넣|진행|추가|하|잡)지\s*(?:마|말)|안\s*할래|하지\s*않|그만\s*둬|취소해")
+# Issue #35: polite and everyday forms ("해 주세요", "부탁", "필요 없어요") also proceed.
+_PROCEED = re.compile(r"(?:등록해|등록\s*해|넣어|진행해|잡아|그렇게\s*해|해\s*줘|해\s*주세요|부탁|필요\s*없)")
+_DATE_OR_TIME = re.compile(r"\d+\s*(?:시|분|월|일|년)|오늘|내일|모레|글피|요일")
+
+
+class Answer(StrEnum):
+    YES = "yes"
+    NO = "no"
+    UNKNOWN = "unknown"
+
+
+def classify_answer(text: str) -> Answer:
+    """Read a reply to a backend yes/no question.
+
+    Anything unclear, any new unsupported request, and any reply that carries a
+    date or time is UNKNOWN, so the backend asks again instead of guessing.
+    """
+
+    value = normalize_text(text)
+    analysis = analyze_text(value)
+    kinds = {finding.kind for finding in analysis.findings}
+    if CueKind.REQUEST in kinds or CueKind.UNKNOWN in kinds:
+        return Answer.UNKNOWN
+    if _DATE_OR_TIME.search(value):
+        return Answer.UNKNOWN
+    affirm = bool(_AFFIRM.match(value))
+    decline = bool(_DECLINE.search(value)) or bool(_DECLINE_VERB.search(value))
+    proceed = bool(_PROCEED.search(value))
+    if CueKind.EXCLUSION in kinds and proceed and not _DECLINE_VERB.search(value):
+        return Answer.YES
+    if affirm and not decline:
+        return Answer.YES
+    if decline and not affirm:
+        return Answer.NO
+    if proceed and not decline:
+        return Answer.YES
+    return Answer.UNKNOWN
