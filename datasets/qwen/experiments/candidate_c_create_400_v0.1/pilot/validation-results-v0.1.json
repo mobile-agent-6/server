@@ -1,0 +1,1184 @@
+{
+  "version": "candidate-c-create-pilot-validation-v0.1",
+  "status": "PASS",
+  "reviewState": "PROPOSED_UNREVIEWED",
+  "caseCount": 30,
+  "bucketCounts": {
+    "correction": 6,
+    "direct_create": 6,
+    "missing_and_followup": 6,
+    "mixed_unsupported_consent": 6,
+    "time_safety": 6
+  },
+  "contractGapCount": 0,
+  "contractGaps": [],
+  "localAccepts": 42,
+  "gateAccepts": 41,
+  "gateExpectedRejects": 1,
+  "unsafeAccepts": 0,
+  "wrongWriteValueAccepts": 0,
+  "supersededExecutedAccepts": 0,
+  "mappingExceptionCount": 0,
+  "mutationFixtureCount": 20,
+  "mutationUnsafeAccepts": 2,
+  "mutationFinalAccepts": 0,
+  "mutationDetectionFailures": 0,
+  "mutationSafetyPathCount": 8,
+  "metricDefinitions": {
+    "mutationUnsafeAccepts": "intentional mutation outputs that reached an unsafe write and were detected as unsafe",
+    "mutationFinalAccepts": "mutation outputs classified as a normal correct accept; unsafe detections remain false here",
+    "mutationDetectionFailures": "mutation outputs whose observed safety class differed from the preregistered expectedSafetyClass"
+  },
+  "trainingPreviewRows": 37,
+  "trainingInputTargetConflicts": 0,
+  "contamination": {
+    "sourceCount": 468,
+    "exactMatches": 0,
+    "jaccardAtLeast0_7": 0,
+    "maxCharTrigramJaccard": 0.407407,
+    "cases": [
+      {
+        "caseId": "c3-create-pilot-01",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.257143,
+        "nearestSource": "locked56:lk12-create-past-time-rejected",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-02",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.4,
+        "nearestSource": "existing400:test-other-create-direct_test-05",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-03",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.142857,
+        "nearestSource": "locked56:lk01-create-absolute-24h-untrusted",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-04",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.21875,
+        "nearestSource": "existing400:ret-create-correct",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-05",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.184211,
+        "nearestSource": "locked56:lk03-create-relative-weekday",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-06",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.269231,
+        "nearestSource": "existing400:train-inventory-020",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-07",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.407407,
+        "nearestSource": "existing400:train-inbound-020",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-08",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.183673,
+        "nearestSource": "locked56:lk04-create-today-untrusted-ask-absolute",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-09",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.333333,
+        "nearestSource": "existing400:train-outbound-007",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-10",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.125,
+        "nearestSource": "existing400:train-outbound-008",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-11",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.230769,
+        "nearestSource": "locked56:lk04-create-today-untrusted-ask-absolute",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-12",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.1875,
+        "nearestSource": "locked56:lk10-create-other-category-year-omitted",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-13",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.219512,
+        "nearestSource": "locked56:lk12-create-past-time-rejected",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-14",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.172414,
+        "nearestSource": "locked56:lk14-create-year-boundary",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-15",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.148936,
+        "nearestSource": "existing400:out-create-task",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-16",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.111111,
+        "nearestSource": "locked56:lk12-create-past-time-rejected",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-17",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.135135,
+        "nearestSource": "existing400:out-create-ampm",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-18",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.145833,
+        "nearestSource": "locked56:lk09-create-task-unclear",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-19",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.37037,
+        "nearestSource": "existing400:train-inventory-001",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-20",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.242424,
+        "nearestSource": "existing400:train-inbound-create-direct_train-01",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-21",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.205882,
+        "nearestSource": "existing400:in-create-past",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-22",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.16,
+        "nearestSource": "locked56:lk14-create-year-boundary",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-23",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.184211,
+        "nearestSource": "existing400:train-inventory-create-direct_train-03",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-24",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.185185,
+        "nearestSource": "locked56:lk19-list-seoul-day-boundary-untrusted",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-25",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.146341,
+        "nearestSource": "locked56:lk14-create-year-boundary",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-26",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.185185,
+        "nearestSource": "locked56:lk48-unsupported-mixed-decline",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-27",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.173913,
+        "nearestSource": "locked56:lk47-unsupported-mixed-consent",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-28",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.132075,
+        "nearestSource": "locked56:lk48-unsupported-mixed-decline",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-29",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.3,
+        "nearestSource": "existing400:inv-create-date",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-30",
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.132075,
+        "nearestSource": "locked56:lk28-update-exact-date-time-approve",
+        "requiresManualReview": false
+      }
+    ],
+    "utteranceSourceCount": 1071,
+    "utteranceExactMatches": 0,
+    "utteranceJaccardAtLeast0_7": 0,
+    "utteranceMaxCharTrigramJaccard": 0.6,
+    "utterances": [
+      {
+        "caseId": "c3-create-pilot-01",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.257143,
+        "nearestSource": "locked56:lk12-create-past-time-rejected:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-02",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.4,
+        "nearestSource": "existing400:test-other-create-direct_test-05:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-03",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.148148,
+        "nearestSource": "locked56:lk38-update-relative-untrusted-ask:t2",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-04",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.25,
+        "nearestSource": "existing400:train-inventory-013:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-05",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.184211,
+        "nearestSource": "locked56:lk03-create-relative-weekday:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-06",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.368421,
+        "nearestSource": "existing400:train-inventory-020:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-07",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.4,
+        "nearestSource": "existing400:train-inbound-020:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-07",
+        "turn": 2,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.428571,
+        "nearestSource": "existing400:in-create-time:t2",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-08",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.210526,
+        "nearestSource": "existing400:test-return-create-date_ampm-04:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-08",
+        "turn": 2,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.25,
+        "nearestSource": "locked56:lk38-update-relative-untrusted-ask:t2",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-09",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.352941,
+        "nearestSource": "existing400:train-outbound-007:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-09",
+        "turn": 2,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.285714,
+        "nearestSource": "existing400:out-create-ampm:t2",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-10",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.238095,
+        "nearestSource": "existing400:train-outbound-008:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-10",
+        "turn": 2,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.055556,
+        "nearestSource": "existing400:train-other-007:t2",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-11",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.444444,
+        "nearestSource": "existing400:train-inbound-020:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-11",
+        "turn": 2,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.263158,
+        "nearestSource": "locked56:lk04-create-today-untrusted-ask-absolute:t2",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-12",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.3125,
+        "nearestSource": "existing400:validation-inbound-create-task_date-01:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-12",
+        "turn": 2,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.142857,
+        "nearestSource": "existing400:train-other-008:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-13",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.219512,
+        "nearestSource": "locked56:lk12-create-past-time-rejected:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-14",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.172414,
+        "nearestSource": "locked56:lk14-create-year-boundary:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-15",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.184211,
+        "nearestSource": "existing400:out-create-task:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-16",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.114286,
+        "nearestSource": "locked56:lk38-update-relative-untrusted-ask:t2",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-17",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.151515,
+        "nearestSource": "existing400:train-inbound-018:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-18",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.227273,
+        "nearestSource": "locked56:lk09-create-task-unclear:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-18",
+        "turn": 2,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.166667,
+        "nearestSource": "existing400:out-create-ampm:t2",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-19",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.5,
+        "nearestSource": "existing400:train-inventory-001:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-20",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.242424,
+        "nearestSource": "existing400:train-inbound-create-direct_train-01:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-21",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.291667,
+        "nearestSource": "existing400:in-create-past:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-22",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.208333,
+        "nearestSource": "existing400:in-create-past:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-23",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.184211,
+        "nearestSource": "existing400:train-inventory-create-direct_train-03:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-24",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.192308,
+        "nearestSource": "existing400:out-create-ampm:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-25",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.166667,
+        "nearestSource": "locked56:lk48-unsupported-mixed-decline:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-25",
+        "turn": 2,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.272727,
+        "nearestSource": "dev12:dev10-unsupported-only-then-mixed-consent:t3",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-26",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.16129,
+        "nearestSource": "existing400:validation-other-create-direct_validation-05:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-26",
+        "turn": 2,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.4,
+        "nearestSource": "locked56:lk48-unsupported-mixed-decline:t2",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-27",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.181818,
+        "nearestSource": "locked56:lk38-update-relative-untrusted-ask:t2",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-27",
+        "turn": 2,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.6,
+        "nearestSource": "locked56:lk47-unsupported-mixed-consent:t2",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-28",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.162162,
+        "nearestSource": "locked56:lk11-create-inline-correction:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-28",
+        "turn": 2,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.2,
+        "nearestSource": "existing400:in-update-reject:t2",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-29",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.4,
+        "nearestSource": "existing400:inv-create-date:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-29",
+        "turn": 2,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.222222,
+        "nearestSource": "existing400:test-inbound-create-task_date_time-01:t1",
+        "requiresManualReview": false
+      },
+      {
+        "caseId": "c3-create-pilot-30",
+        "turn": 1,
+        "exactMatch": false,
+        "maxCharTrigramJaccard": 0.133333,
+        "nearestSource": "locked56:lk48-unsupported-mixed-decline:t1",
+        "requiresManualReview": false
+      }
+    ]
+  },
+  "semanticSchema": {
+    "path": "datasets/qwen/experiments/structured_output_contract_v0.1/semantic-oracle-schema-v0.1.json",
+    "sha256": "cfe0ed947f6bd709e0e3ba60a8daf63fb1f201614cb11d90b823931b060a3b1d",
+    "validation": "full schema auxiliary validation for all keywords used; third-party jsonschema unavailable in fixed environment",
+    "errorCount": 0
+  },
+  "profileSha256": "3b1f07614e59c734309e1d29acebf1d38ba0258516824fb689b56dd856fc2806",
+  "pilotSha256": "bf7db4230a6870cf743ef212e1d5ac171b480202723f80c572161eb336f7351a",
+  "targetsSha256": "d08a246f84b34b630fff94e07024f6c5329b9f173bd4c9fa29b13483eec660a3",
+  "contractBundle": {
+    "bundleVersion": "candidate-c-create-contract-bundle-v0.1",
+    "status": "BE-PROPOSED",
+    "baseProvenance": {
+      "status": "REMOTE_UNVERIFIED",
+      "reason": "git fetch origin develop failed because github.com DNS resolution was unavailable",
+      "recordedOn": "2026-10-26",
+      "branch": "test/candidate-c-create-400",
+      "head": "e1bfaf7b3deb0fc61e86ed469bbdbcdf1594b1a3",
+      "cachedOriginDevelop": "e1bfaf7b3deb0fc61e86ed469bbdbcdf1594b1a3",
+      "requiresRemoteRecheckBeforeCommit": true
+    },
+    "baseProvenanceSha256": "cf79e1a5b048500cb1c5721727ed3c75d18a8566cc6c904e753c1ce7631c550a",
+    "semanticSchemaExpectedSha256": "cfe0ed947f6bd709e0e3ba60a8daf63fb1f201614cb11d90b823931b060a3b1d",
+    "artifacts": {
+      "candidateCValidator": {
+        "path": "datasets/qwen/experiments/structured_output_contract_v0.1/contracts.py",
+        "fileSha256": "d68469a7e5a71ebdeb3ea693d895d1faecc8aa959125cfc94e15766dc82b5f62",
+        "symbol": "validate_candidate_c",
+        "symbolSha256": "28f0f66386a055c513f71abc6db38d3f16125b3d84cd121ca0dc3a48e9117c6c"
+      },
+      "commonGateV04": {
+        "path": "datasets/qwen/experiments/structured_output_contract_v0.1/common_gate_v0_4.py",
+        "fileSha256": "7185baf7f7bde15359d17d76b3aa659587c0127f1e792549d2c11d873291963b",
+        "symbol": "common_backend_gate_v0_4",
+        "symbolSha256": "8176c19cdaa1ae72bd6dcad5fe55fbaf7b0ae7a4be312d123c7217274df09caf"
+      },
+      "createNormalizer": {
+        "path": "datasets/qwen/experiments/structured_output_contract_v0.1/dry_mapping.py",
+        "fileSha256": "ecf7f23d8248c2562973ab8b4c98cf7506bbf287cd454f6d814cd128d9322bb0",
+        "symbol": "_view_from_c_operation",
+        "symbolSha256": "77d876fcb66b1cd9fa46efbdbf741d6cbbcf0538fc671a14e55278ba841e2ddc"
+      },
+      "contextRenderer": {
+        "path": "datasets/qwen/experiments/structured_output_contract_v0.1/ollama_eval.py",
+        "fileSha256": "aeb43250fdcfd0e5ec38687b39b78b902c52489bba4b16f5888e8e8f69e98b70",
+        "symbol": "render_extraction_context",
+        "symbolSha256": "c158f3e231d046a34a0d061bdfac3e64041516ddeddd9441b7df0bfd330d8337"
+      },
+      "executableEffect": {
+        "path": "datasets/qwen/experiments/structured_output_contract_v0.1/ollama_eval_v0_3.py",
+        "fileSha256": "9c43d4c09f32547132e6e811ce5cd5213f3d0c545f7528500e7fe5bcf08d12a0",
+        "symbol": "executable_effect",
+        "symbolSha256": "9a49363b117e7efde380155ba5608c3f34d9b47cdb185acca32ba2e02b8cc047"
+      },
+      "createProfileValidator": {
+        "path": "datasets/qwen/experiments/candidate_c_create_400_v0.1/validator.py",
+        "fileSha256": "7f33b2b54b133adeb43161b1c56f82b69d8e6bada15bd0d3ec9c6044eec25580",
+        "symbol": "validate_create_profile",
+        "symbolSha256": "2db5e8fe1b9b7f14754b63b32f389362c542f8fe98e94b3f2ef651874bc165b5"
+      },
+      "semanticOracleSchema": {
+        "path": "datasets/qwen/experiments/structured_output_contract_v0.1/semantic-oracle-schema-v0.1.json",
+        "fileSha256": "cfe0ed947f6bd709e0e3ba60a8daf63fb1f201614cb11d90b823931b060a3b1d"
+      },
+      "candidateCPrompt": {
+        "path": "datasets/qwen/experiments/structured_output_contract_v0.1/candidate-c-prompt-v0.1.txt",
+        "fileSha256": "6352d687dd9093f783ff1c23e95d6f84433af30c3776a524aaa980a83db5f24b"
+      }
+    }
+  },
+  "turnResults": [
+    {
+      "caseId": "c3-create-pilot-01",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-02",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-03",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-04",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-05",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-06",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-07",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "question",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 0
+    },
+    {
+      "caseId": "c3-create-pilot-07",
+      "turn": 2,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-08",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "question",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 0
+    },
+    {
+      "caseId": "c3-create-pilot-08",
+      "turn": 2,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-09",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "question",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 0
+    },
+    {
+      "caseId": "c3-create-pilot-09",
+      "turn": 2,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-10",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "question",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 0
+    },
+    {
+      "caseId": "c3-create-pilot-10",
+      "turn": 2,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-11",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "question",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 0
+    },
+    {
+      "caseId": "c3-create-pilot-11",
+      "turn": 2,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-12",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "question",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 0
+    },
+    {
+      "caseId": "c3-create-pilot-12",
+      "turn": 2,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-13",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-14",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-15",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-16",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-17",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-18",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "question",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 0
+    },
+    {
+      "caseId": "c3-create-pilot-18",
+      "turn": 2,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-19",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "question",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 0
+    },
+    {
+      "caseId": "c3-create-pilot-20",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-21",
+      "turn": 1,
+      "local": "accept",
+      "gate": "reject:PAST_CREATE",
+      "consentState": "not_required",
+      "decision": "gate_reject",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 0
+    },
+    {
+      "caseId": "c3-create-pilot-22",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-23",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "pending_write",
+      "writePossible": true,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-24",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "not_required",
+      "decision": "question",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 0
+    },
+    {
+      "caseId": "c3-create-pilot-25",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "pending",
+      "decision": "question",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 0
+    },
+    {
+      "caseId": "c3-create-pilot-25",
+      "turn": 2,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "granted",
+      "decision": "not_run",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-26",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "pending",
+      "decision": "question",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 0
+    },
+    {
+      "caseId": "c3-create-pilot-26",
+      "turn": 2,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "declined",
+      "decision": "not_run",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 0
+    },
+    {
+      "caseId": "c3-create-pilot-27",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "pending",
+      "decision": "question",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 0
+    },
+    {
+      "caseId": "c3-create-pilot-27",
+      "turn": 2,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "granted",
+      "decision": "not_run",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-28",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "pending",
+      "decision": "question",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 0
+    },
+    {
+      "caseId": "c3-create-pilot-28",
+      "turn": 2,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "declined",
+      "decision": "not_run",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 0
+    },
+    {
+      "caseId": "c3-create-pilot-29",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "pending",
+      "decision": "question",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 0
+    },
+    {
+      "caseId": "c3-create-pilot-29",
+      "turn": 2,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "granted",
+      "decision": "not_run",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 1
+    },
+    {
+      "caseId": "c3-create-pilot-30",
+      "turn": 1,
+      "local": "accept",
+      "gate": "accept",
+      "consentState": "pending",
+      "decision": "question",
+      "writePossible": false,
+      "writeValueMismatches": [],
+      "unsafeReason": null,
+      "oracleExpectedWrite": 0
+    }
+  ],
+  "errors": [],
+  "annotationDecisions": [
+    {
+      "caseId": "c3-create-pilot-17",
+      "policy": "excluded_out_of_order_marker_after_adopted",
+      "correctionProvenanceScored": false
+    },
+    {
+      "caseId": "c3-create-pilot-18",
+      "policy": "excluded_cross_turn_without_marker",
+      "correctionProvenanceScored": false
+    }
+  ],
+  "expansionDecision": "READY_FOR_INDEPENDENT_REVIEW"
+}

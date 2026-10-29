@@ -1,0 +1,33 @@
+{
+  "profileVersion": "candidate-c-create-profile-v0.1",
+  "status": "BE-PROPOSED",
+  "baseContract": "issue30-candidate-c-v0.1",
+  "addsFields": false,
+  "allowedKinds": ["create"],
+  "roles": {
+    "targetEvidence": [],
+    "changeEvidence": ["title", "date", "time", "category"],
+    "filterEvidence": []
+  },
+  "unsupportedPlacement": {
+    "mixedWithCreate": "operation.unsupportedEvidence",
+    "unsupportedOnly": "topLevel.unsupportedEvidence",
+    "duplicatePlacementAllowed": false
+  },
+  "categoryAbsent": "backend_infers_supported_category_or_OTHER",
+  "conflictingAdoptedValues": {
+    "scope": "changeEvidence.title,date,time,category",
+    "rule": "with_two_or_more_adopted_spans_distinct_normalized_values_or_any_unresolved_or_ambiguous_value_fail_closed",
+    "failureCode": "C_PROFILE_CONFLICTING_ADOPTED_VALUES"
+  },
+  "correctionProvenancePolicy": {
+    "orderedOldMarkerNew": "label_adopted_superseded_and_marker",
+    "markerAfterAdopted": "label_adopted_only_and_exclude_provenance_metric",
+    "crossTurnWithoutMarkerWhilePending": "label_adopted_only_and_exclude_provenance_metric",
+    "afterCreateCompleted": "new_update_task_not_create_correction"
+  },
+  "knownContractGaps": [],
+  "knownBaseNormalizerLimitations": [
+    "issue30_v0.1_uses_adopted_array_order_without_profile_conflict_check"
+  ]
+}
