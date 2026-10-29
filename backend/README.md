@@ -155,7 +155,7 @@ changes가 완전한 selection/confirmation은 모델 없이 접수되어 backen
 | `SCHEDULE_ASSISTANT_MODEL_BASE_URL` | `http://127.0.0.1:8088` | 모델 서버 주소 |
 | `SCHEDULE_ASSISTANT_MODEL_NAME` | 비움 | 요청의 `model` 값. 비우면 보내지 않는다 |
 | `SCHEDULE_ASSISTANT_MODEL_TIMEOUT_SECONDS` | `60` | 모델 호출 한 번의 제한 시간(최대 240) |
-| `SCHEDULE_ASSISTANT_TRUST_SERVER_TIME` | `false` | `true`면 서버 시각을 신뢰해 "내일" 같은 상대 날짜를 바로 계산한다. 시계가 정확한 개발 Mac에서만 켠다. 끄면 상대 날짜마다 절대 날짜를 다시 묻는다 |
+| `SCHEDULE_ASSISTANT_TRUST_SERVER_TIME` | `false` | `true`면 시각 동기화 없이도 서버 시각을 신뢰해 "내일" 같은 상대 날짜를 바로 계산한다. 시계가 정확한 개발 Mac에서만 켠다. 끄면 앱의 `POST /api/v1/system/time-sync`가 성공한 뒤부터 신뢰하고, 그전에는 상대 날짜마다 절대 날짜를 다시 묻는다 |
 
 개발 Mac에서 학습한 어댑터로 실행하는 예:
 

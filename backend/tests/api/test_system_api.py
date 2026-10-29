@@ -372,3 +372,37 @@ def test_system_routes_have_exact_405_allow(client: TestClient) -> None:
     assert set(sync.headers["Allow"].split(", ")) == {"POST"}
     assert_request_id(health)
     assert_request_id(sync)
+
+
+def test_time_sync_controls_assistant_time_trust(client: TestClient) -> None:
+    trust = client.app.state.assistant_time_trust_source
+    assert trust.is_trusted() is False
+
+    client.app.state.time_sync_adapter = FakeTimeSyncAdapter(FIXED_NOW)
+    synced = client.post(
+        "/api/v1/system/time-sync",
+        json={"currentTime": "2026-09-13T04:30:00Z"},
+    )
+    assert synced.status_code == 200
+    assert trust.is_trusted() is True
+
+    # The Pi clock is off by 5 minutes and cannot be fixed.
+    client.app.state.time_sync_adapter = FakeTimeSyncAdapter(
+        FIXED_NOW - timedelta(minutes=5)
+    )
+    failed = client.post(
+        "/api/v1/system/time-sync",
+        json={"currentTime": "2026-09-13T04:30:00Z"},
+    )
+    assert failed.status_code == 503
+    assert trust.is_trusted() is False
+
+    # Bad phone input says nothing about the Pi clock.
+    client.app.state.time_sync_adapter = FakeTimeSyncAdapter(FIXED_NOW)
+    client.post("/api/v1/system/time-sync", json={"currentTime": "2026-09-13T04:30:00Z"})
+    out_of_range = client.post(
+        "/api/v1/system/time-sync",
+        json={"currentTime": "2040-01-01T00:00:00Z"},
+    )
+    assert out_of_range.status_code == 422
+    assert trust.is_trusted() is True

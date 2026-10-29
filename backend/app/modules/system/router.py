@@ -6,7 +6,7 @@ import logging
 
 from fastapi import APIRouter, Depends, Request
 
-from app.core.exceptions import ValidationFailure
+from app.core.exceptions import ClockAutoSyncActive, TimeSyncUnavailable, ValidationFailure
 from app.core.problem_details import Problem
 from app.modules.system import service
 from app.modules.system.schemas import HealthResponse, TimeSyncRequest, TimeSyncResponse
@@ -78,14 +78,21 @@ def health_check(request: Request) -> HealthResponse:
 )
 def sync_system_time(data: TimeSyncRequest, request: Request) -> TimeSyncResponse:
     started = request.state.request_started_monotonic
-    result = service.sync_system_time(
-        data=data,
-        settings=request.app.state.settings,
-        adapter=request.app.state.time_sync_adapter,
-        process_lock=request.app.state.time_sync_lock,
-        monotonic_clock=request.app.state.monotonic_clock,
-        request_started_monotonic=started,
-    )
+    trust = request.app.state.time_sync_trust
+    try:
+        result = service.sync_system_time(
+            data=data,
+            settings=request.app.state.settings,
+            adapter=request.app.state.time_sync_adapter,
+            process_lock=request.app.state.time_sync_lock,
+            monotonic_clock=request.app.state.monotonic_clock,
+            request_started_monotonic=started,
+        )
+    except (TimeSyncUnavailable, ClockAutoSyncActive):
+        # The Pi clock differs from the phone and could not be fixed.
+        trust.revoke()
+        raise
+    trust.mark_synced()
     logger.warning(
         "system time synchronization processed",
         extra={
