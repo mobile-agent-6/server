@@ -10,6 +10,7 @@ OpenAI-compatible server with the trained adapter, for example:
 
 from __future__ import annotations
 
+import json
 import os
 import time
 from datetime import datetime
@@ -87,10 +88,14 @@ def _snapshot(application) -> list[tuple[str, str, str]]:
 
 
 def test_real_model_flows(database_path: Path) -> None:
+    # tests/conftest.py drops SCHEDULE_* values; the DB and the log stay in a temp folder.
+    log_file = database_path.parent / "smoke.log"
     application = create_app(
         Settings(
             _env_file=None,
             database_url=f"sqlite:///{database_path}",
+            log_format="json",
+            log_file=log_file,
             assistant_model_enabled=True,
             assistant_model_base_url=SMOKE_URL or "",
             assistant_trust_server_time=True,
@@ -188,6 +193,12 @@ def test_real_model_flows(database_path: Path) -> None:
                     assert after == before, (turns, result)
             with application.state.engine.connect() as connection:
                 assert connection.exec_driver_sql("PRAGMA integrity_check").scalar() == "ok"
+            calls = [
+                json.loads(line)
+                for line in log_file.read_text(encoding="utf-8").splitlines()
+                if '"assistant.model_call"' in line
+            ]
+            assert calls and all(call["promptSha256"] and "userTurns" in call for call in calls)
             print("\nweak flows:", report)
             print("\nsmoke timings:", [(label, round(seconds, 1)) for label, seconds in session.timings])
     finally:

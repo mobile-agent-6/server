@@ -235,6 +235,8 @@ class DecisionContext(_InternalModel):
     pending_context: object | None = None
     control_state_version: int | None = Field(default=None, ge=1)
     control_state: object | None = None
+    # Seconds the provider may spend before the request deadline (minus a safety margin).
+    time_budget_seconds: float | None = Field(default=None, gt=0)
 
     @model_validator(mode="after")
     def validate_json_context(self) -> "DecisionContext":

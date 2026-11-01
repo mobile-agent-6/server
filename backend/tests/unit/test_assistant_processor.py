@@ -268,19 +268,49 @@ def test_claim_deadline_guard_uses_exact_300_second_boundary(
     assert stored.pending_write_json is None
     if expected_timeout:
         assert stored.result_json["code"] == "PROCESSING_TIMEOUT"
-        assert provider.call_count == 0
     else:
-        assert stored.result_json["kind"] == "need_more_info"
-        assert provider.call_count == 1
+        # Claimed before the deadline, but too late to call the model safely.
+        assert stored.result_json["code"] == "MODEL_TIMEOUT"
+    assert provider.call_count == 0
     assert reader.get_calls == []
     assert reader.list_limits == []
+
+
+def test_provider_gets_the_time_left_before_the_deadline(processor_store) -> None:
+    admit(processor_store, request_data())
+    provider = ScriptedDecisionProvider([envelope({"kind": "ask", "text": "몇 시인가요?"})])
+
+    run(processor_store, provider, MemoryScheduleReader([schedule()]), monotonic_clock=FixedMonotonicClock(100.0))
+
+    # 300 s deadline - 100 s waited - 10 s safety margin.
+    assert provider.contexts[0].time_budget_seconds == 190.0
+    assert stored_request(processor_store).result_json["kind"] == "need_more_info"
+
+
+@pytest.mark.parametrize("monotonic_now", [290.0, 295.0])
+def test_request_without_enough_time_left_fails_without_calling_the_model(
+    processor_store, monotonic_now: float
+) -> None:
+    admit(processor_store, request_data())
+    provider = ScriptedDecisionProvider([])
+
+    result = run(
+        processor_store, provider, MemoryScheduleReader([schedule()]), monotonic_clock=FixedMonotonicClock(monotonic_now)
+    )
+
+    assert result is ProcessOneResult.COMPLETED
+    stored = stored_request(processor_store)
+    assert (stored.result_json["code"], stored.result_json["nextAction"]) == ("MODEL_TIMEOUT", "retry_later")
+    assert stored.pending_write_json is None
+    assert provider.call_count == 0
 
 
 def test_finalize_guard_makes_timeout_win_after_late_provider_result(
     processor_store,
 ) -> None:
     admit(processor_store, request_data())
-    monotonic = FixedMonotonicClock(299.999)
+    # Just inside the safety margin, then the provider answers past the deadline.
+    monotonic = FixedMonotonicClock(289.999)
 
     class DeadlineCrossingProvider:
         def __init__(self) -> None:
@@ -288,7 +318,7 @@ def test_finalize_guard_makes_timeout_win_after_late_provider_result(
 
         def decide(self, _context):
             self.call_count += 1
-            monotonic.advance(0.001)
+            monotonic.advance(10.001)
             return envelope({"kind": "ask", "text": "늦은 질문"})
 
     provider = DeadlineCrossingProvider()

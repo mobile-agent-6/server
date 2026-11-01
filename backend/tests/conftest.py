@@ -1,8 +1,15 @@
 from __future__ import annotations
 
+import os
 from collections.abc import Iterator
 from datetime import datetime, timezone
 from pathlib import Path
+
+# Tests never read the developer's SCHEDULE_* settings.  This runs before
+# app.main is imported, whose module-level app would otherwise open the
+# configured log file or database.
+for _name in [key for key in os.environ if key.startswith("SCHEDULE_")]:
+    del os.environ[_name]
 
 import pytest
 from alembic import command

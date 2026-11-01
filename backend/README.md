@@ -175,6 +175,10 @@ ASSISTANT_SMOKE_MODEL_URL=http://127.0.0.1:8088 python -m pytest tests/integrati
 모델 출력이 형식에 맞지 않으면 다시 묻지 않고 `MODEL_OUTPUT_INVALID`로 끝낸다.
 decoding이 고정(temperature 0)이라 같은 입력을 다시 보내도 같은 출력이 나오기 때문이다.
 
+모델 호출 제한 시간은 `SCHEDULE_ASSISTANT_MODEL_TIMEOUT_SECONDS`와 요청 처리 마감(300초)까지 남은 시간에서
+안전여유 10초를 뺀 값 중 짧은 쪽이다. 대기열에서 기다리느라 남은 시간이 10초 이하이면 모델을 부르지 않고
+`MODEL_TIMEOUT`으로 끝낸다. 마감을 넘겨 모델 호출이 남아 있으면 runtime이 unhealthy가 되기 때문이다.
+
 모델을 부를 때마다 `assistant.model_call` 로그 한 줄을 남긴다. 요청 ID, 모델명, prompt 해시,
 사용자 turn, 모델 원출력, 검사 결과(`ok` 또는 오류 코드), 처리 시간이 들어간다. 이 필드는
 `SCHEDULE_LOG_FORMAT=json`일 때만 기록되고(console 형식은 결과와 시간 요약 한 줄),

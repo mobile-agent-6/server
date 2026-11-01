@@ -71,7 +71,7 @@ class _GoldModel:
         self.current_turn: int | None = None
         self.calls = 0
 
-    def extract(self, *, turns, reference_time, server_time_trusted) -> str:
+    def extract(self, *, turns, reference_time, server_time_trusted, timeout_seconds=None) -> str:
         self.calls += 1
         assert self.current_turn is not None
         seen = [number for number in self.text_turns if number <= self.current_turn]
