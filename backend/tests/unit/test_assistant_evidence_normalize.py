@@ -8,6 +8,7 @@ from app.modules.assistant.evidence.normalize import (
     SEOUL,
     DatePurpose,
     DateStatus,
+    TimeResult,
     TimeStatus,
     is_future_scope,
     resolve_category,
@@ -15,6 +16,7 @@ from app.modules.assistant.evidence.normalize import (
     resolve_date,
     resolve_month_range,
     resolve_time,
+    resolve_week_range,
 )
 
 # Thursday 2026-10-29 10:00 in Seoul.
@@ -95,9 +97,77 @@ def test_weekday_that_is_today_asks() -> None:
     assert schedule_date("목요일").status is DateStatus.WEEKDAY_IS_TODAY
 
 
-@pytest.mark.parametrize("text", ["다음 주 금요일", "지난주 월요일", "매주 금요일", "다음 달", "3일 뒤", "주말", "3/5"])
+@pytest.mark.parametrize("text", ["매주 금요일", "다음 달", "주말", "이번 주말", "3/5", "15일간", "월말"])
 def test_unsupported_date_expressions_ask_instead_of_guessing(text: str) -> None:
     assert schedule_date(text).status is DateStatus.UNSUPPORTED
+
+
+# Weeks run Monday to Sunday; 2026-10-29 is a Thursday.
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("다음 주 금요일", date(2026, 11, 6)),
+        ("다음주 월요일", date(2026, 11, 2)),
+        ("다다음 주 화요일", date(2026, 11, 10)),
+        ("지난주 월요일", date(2026, 10, 19)),
+        ("저번 주 수요일", date(2026, 10, 21)),
+        ("이번 달 30일", date(2026, 10, 30)),
+        ("다음 달 3일", date(2026, 11, 3)),
+        ("지난달 3일", date(2026, 9, 3)),
+        ("3일 뒤", date(2026, 11, 1)),
+        ("10일 후", date(2026, 11, 8)),
+    ],
+)
+def test_week_month_and_day_count_expressions(text: str, expected: date) -> None:
+    result = schedule_date(text)
+    assert (result.status, result.dates, result.absolute) == (DateStatus.RESOLVED, (expected,), False)
+
+
+def test_day_of_next_month_that_does_not_exist() -> None:
+    assert schedule_date("다음 달 31일").status is DateStatus.INVALID_DATE
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [("15일", date(2026, 11, 15)), ("29일", date(2026, 10, 29)), ("31일", date(2026, 10, 31)), ("1일", date(2026, 11, 1))],
+)
+def test_day_only_means_the_coming_day(text: str, expected: date) -> None:
+    result = schedule_date(text)
+    assert (result.status, result.dates) == (DateStatus.RESOLVED, (expected,))
+
+
+def test_day_only_search_looks_back_this_month_and_ahead() -> None:
+    assert search_date("15일").dates == (date(2026, 10, 15), date(2026, 11, 15))
+    assert search_date("30일").dates == (date(2026, 10, 30),)
+
+
+@pytest.mark.parametrize(
+    ("text", "start"),
+    [("이번 주", date(2026, 10, 26)), ("다음 주", date(2026, 11, 2)), ("지난주", date(2026, 10, 19))],
+)
+def test_week_range_runs_monday_to_sunday(text: str, start: date) -> None:
+    begin, end = resolve_week_range([text], REFERENCE)
+    assert begin.date() == start and (end - begin).days == 7
+
+
+@pytest.mark.parametrize("text", ["다음 주 화요일", "이번 주말", "주말"])
+def test_week_range_ignores_a_weekday_or_weekend(text: str) -> None:
+    assert resolve_week_range([text], REFERENCE) is None
+
+
+@pytest.mark.parametrize(
+    ("text", "start", "end"),
+    [("이번 달", date(2026, 10, 1), date(2026, 11, 1)), ("다음 달", date(2026, 11, 1), date(2026, 12, 1))],
+)
+def test_month_words_cover_the_whole_month(text: str, start: date, end: date) -> None:
+    begin, finish, absolute = resolve_month_range([text], REFERENCE)
+    assert (begin.date(), finish.date(), absolute) == (start, end, False)
+
+
+def test_next_month_in_december_rolls_into_january() -> None:
+    december = datetime(2026, 12, 10, 9, 0, tzinfo=SEOUL)
+    begin, finish, _ = resolve_month_range(["다음 달"], december)
+    assert (begin.date(), finish.date()) == (date(2027, 1, 1), date(2027, 2, 1))
 
 
 @pytest.mark.parametrize("text", ["2월 30일", "13월 1일", "2026년 2월 29일"])
@@ -176,9 +246,46 @@ def test_period_without_hour_asks_for_time() -> None:
     assert resolve_time(["오후"]).status is TimeStatus.NEEDS_CLOCK
 
 
-@pytest.mark.parametrize("text", ["15:30", "정오", "자정", "점심", "세 시"])
+@pytest.mark.parametrize("text", ["2시간 뒤", "한 시간 후"])
 def test_unsupported_time_expressions(text: str) -> None:
     assert resolve_time([text]).status is TimeStatus.UNSUPPORTED
+
+
+@pytest.mark.parametrize(
+    ("text", "hour", "minute"),
+    [
+        ("15:30", 15, 30),
+        ("오후 3:30", 15, 30),
+        ("정오", 12, 0),
+        ("점심 12시", 12, 0),
+        ("점심 1시", 13, 0),
+        ("점심 11시 반", 11, 30),
+        ("오후 세 시 반", 15, 30),
+        ("오전 열한 시 20분", 11, 20),
+        ("저녁 일곱 시", 19, 0),
+    ],
+)
+def test_more_time_expressions(text: str, hour: int, minute: int) -> None:
+    assert resolve_time([text]) == TimeResult(TimeStatus.RESOLVED, hour, minute)
+
+
+@pytest.mark.parametrize("text", ["3:30", "세 시", "열두 시"])
+def test_colon_and_korean_hours_without_period_ask_am_or_pm(text: str) -> None:
+    assert resolve_time([text]).status is TimeStatus.NEEDS_AMPM
+
+
+def test_midnight_word_asks_like_night_twelve() -> None:
+    assert resolve_time(["자정"]).status is TimeStatus.MIDNIGHT_UNCLEAR
+
+
+@pytest.mark.parametrize(("text", "status"), [("점심", TimeStatus.NEEDS_CLOCK), ("점심 5시", TimeStatus.PERIOD_UNCLEAR)])
+def test_lunch_needs_a_lunch_hour(text: str, status: TimeStatus) -> None:
+    assert resolve_time([text]).status is status
+
+
+@pytest.mark.parametrize("text", ["부두 시설", "한 시간"])
+def test_korean_hour_words_inside_other_words_are_not_times(text: str) -> None:
+    assert resolve_time([text]).status is TimeStatus.NOT_A_TIME
 
 
 @pytest.mark.parametrize("text", ["25시", "3시 70분"])

@@ -31,6 +31,7 @@ from app.modules.assistant.evidence.normalize import (
     resolve_completed,
     resolve_date,
     resolve_month_range,
+    resolve_week_range,
     resolve_time,
     title_contains,
     title_similar,
@@ -217,8 +218,11 @@ def _plan_list(
     absolute = False
     if date_texts:
         month = resolve_month_range(date_texts, reference)
+        week = resolve_week_range(date_texts, reference)
         if month is not None:
             start, end, absolute = month
+        elif week is not None:
+            start, end = week
         else:
             result = resolve_date(date_texts, reference, purpose=DatePurpose.SEARCH)
             if result.status is DateStatus.RESOLVED:

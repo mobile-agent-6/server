@@ -75,7 +75,12 @@ class DateResult:
 _FULL_DATE = re.compile(r"(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일")
 _MONTH_DAY = re.compile(r"(\d{1,2})월\s*(\d{1,2})일")
 _THIS_WEEK_DAY = re.compile(r"이번\s*주\s*([월화수목금토일])요일")
-_OTHER_WEEK_DAY = re.compile(r"(?:다음|다다음|지난|저번)\s*주\s*[월화수목금토일]요일")
+_OTHER_WEEK_DAY = re.compile(r"(다다음|다음|지난|저번)\s*주\s*([월화수목금토일])요일")
+_WEEK_SHIFT = {"다음": 1, "다다음": 2, "지난": -1, "저번": -1, "이번": 0}
+_MONTH_SHIFT_DAY = re.compile(r"(이번|다다음|다음|지난|저번)\s*달\s*(\d{1,2})\s*일")
+_DAYS_LATER = re.compile(r"(?<!\d)(\d{1,3})\s*일\s*(?:뒤|후)")
+# A day of the month alone ("15일에").  Not part of "N일 뒤", "N일간" or "M월 N일".
+_DAY_ONLY = re.compile(r"(?<![\d월])(?<!월\s)(\d{1,2})\s*일(?!\s*(?:뒤|후|간|동안))")
 # Recurring wording is not a single date.
 _RECURRING = re.compile(r"매주|매일|매달|매월|격주|주마다|날마다")
 _BARE_WEEKDAY = re.compile(r"(?<![가-힣])([월화수목금토일])요일")
@@ -93,6 +98,15 @@ def _safe_date(year: int, month: int, day: int) -> date | None:
         return date(year, month, day)
     except ValueError:
         return None
+
+
+def _shift_month(day: date, months: int) -> tuple[int, int]:
+    index = day.year * 12 + day.month - 1 + months
+    return index // 12, index % 12 + 1
+
+
+def _monday(day: date) -> date:
+    return day - timedelta(days=day.weekday())
 
 
 def resolve_date(
@@ -127,8 +141,27 @@ def resolve_date(
         # 2월 29일).  Never move it silently: ask about next year.
         return DateResult(DateStatus.PAST_WITHOUT_YEAR, proposal=next_year)
 
-    if _OTHER_WEEK_DAY.search(combined) or _RECURRING.search(combined):
+    if _RECURRING.search(combined):
         return DateResult(DateStatus.UNSUPPORTED)
+
+    # Weeks run Monday to Sunday: "다음 주 화요일" is the Tuesday of next week.
+    other_week = _OTHER_WEEK_DAY.search(combined)
+    if other_week:
+        shift = _WEEK_SHIFT[other_week.group(1)]
+        index = _WEEKDAYS.index(other_week.group(2))
+        return DateResult(DateStatus.RESOLVED, (_monday(today) + timedelta(days=7 * shift + index),))
+
+    month_shift = _MONTH_SHIFT_DAY.search(combined)
+    if month_shift:
+        year, month = _shift_month(today, _WEEK_SHIFT[month_shift.group(1)])
+        value = _safe_date(year, month, int(month_shift.group(2)))
+        if value is None:
+            return DateResult(DateStatus.INVALID_DATE)
+        return DateResult(DateStatus.RESOLVED, (value,))
+
+    later = _DAYS_LATER.search(combined)
+    if later:
+        return DateResult(DateStatus.RESOLVED, (today + timedelta(days=int(later.group(1))),))
 
     for word, offset in _RELATIVE_DAYS:
         if word in combined:
@@ -148,21 +181,72 @@ def resolve_date(
             return DateResult(DateStatus.WEEKDAY_IS_TODAY)
         return DateResult(DateStatus.RESOLVED, (today + timedelta(days=ahead),))
 
+    day_only = _DAY_ONLY.search(combined)
+    if day_only:
+        return _day_of_month(int(day_only.group(1)), today, purpose)
+
     if _DATE_LIKE.search(combined):
         return DateResult(DateStatus.UNSUPPORTED)
     return DateResult(DateStatus.NOT_A_DATE)
 
 
+def _day_of_month(day_value: int, today: date, purpose: DatePurpose) -> DateResult:
+    """ "15일" means the coming 15th (user decision, 2026-11-01).
+
+    A search also looks at the 15th of next month, the way a date without a
+    year looks at this year and next year.
+    """
+
+    if not 1 <= day_value <= 31:
+        return DateResult(DateStatus.INVALID_DATE)
+    found: list[date] = []
+    for months in range(0, 3):
+        year, month = _shift_month(today, months)
+        value = _safe_date(year, month, day_value)
+        if value is not None and value >= today:
+            found.append(value)
+    if not found:
+        return DateResult(DateStatus.INVALID_DATE)
+    if purpose is DatePurpose.SEARCH:
+        this_month = _safe_date(today.year, today.month, day_value)
+        searched = [this_month] if this_month is not None and this_month < today else []
+        return DateResult(DateStatus.RESOLVED, tuple(searched + found[:1]))
+    return DateResult(DateStatus.RESOLVED, (found[0],))
+
+
 _MONTH_ONLY = re.compile(r"(?:(\d{4})년\s*)?(\d{1,2})월(?!\s*\d{1,2}일)")
+
+
+_MONTH_WORD = re.compile(r"(이번|다다음|다음|지난|저번)\s*달(?!\s*\d)")
+_WEEK_WORD = re.compile(r"(이번|다다음|다음|지난|저번)\s*주(?!\s*[월화수목금토일]요일)(?!말)")
+
+
+def resolve_week_range(texts: Sequence[str], reference: datetime) -> tuple[datetime, datetime] | None:
+    """Monday to Sunday for "이번 주", "다음 주" or "지난주" (a list period)."""
+
+    match = _WEEK_WORD.search(_joined(texts))
+    if not match:
+        return None
+    monday = _monday(_local_today(reference)) + timedelta(days=7 * _WEEK_SHIFT[match.group(1)])
+    start = datetime.combine(monday, time(0, 0), tzinfo=SEOUL)
+    return start, start + timedelta(days=7)
 
 
 def resolve_month_range(
     texts: Sequence[str],
     reference: datetime,
 ) -> tuple[datetime, datetime, bool] | None:
-    """Return ``(start, end, absolute)`` for a month-only query such as "10월"."""
+    """Return ``(start, end, absolute)`` for a month-only query such as "10월"
+    or "다음 달"."""
 
-    match = _MONTH_ONLY.search(_joined(texts))
+    joined = _joined(texts)
+    word = _MONTH_WORD.search(joined)
+    if word:
+        year, month = _shift_month(_local_today(reference), _WEEK_SHIFT[word.group(1)])
+        start = datetime(year, month, 1, tzinfo=SEOUL)
+        end_year, end_month = _shift_month(start.date(), 1)
+        return start, datetime(end_year, end_month, 1, tzinfo=SEOUL), False
+    match = _MONTH_ONLY.search(joined)
     if not match:
         return None
     month = int(match.group(2))
@@ -210,12 +294,17 @@ class TimeResult:
         return time(self.hour, self.minute)
 
 
-_PERIOD = re.compile(r"오전|오후|아침|저녁|새벽|낮|밤")
-_CLOCK = re.compile(r"(\d{1,2})\s*시(?:\s*(\d{1,2})\s*분|\s*(반))?")
-_TIME_LIKE = re.compile(
-    r"\d{1,2}\s*:\s*\d{2}|정오|자정|점심|한\s*시|두\s*시|세\s*시|네\s*시|다섯\s*시|"
-    r"여섯\s*시|일곱\s*시|여덟\s*시|아홉\s*시|열\s*시|열한\s*시|열두\s*시|\d+\s*시간\s*(?:뒤|후)"
-)
+_PERIOD = re.compile(r"오전|오후|아침|저녁|새벽|점심|낮|밤")
+_CLOCK = re.compile(r"(\d{1,2})\s*시(?!간)(?:\s*(\d{1,2})\s*분|\s*(반))?")
+_COLON_CLOCK = re.compile(r"(?<!\d)(\d{1,2})\s*:\s*(\d{2})(?!\d)")
+# "세 시 반" is "3시 반".  Not inside a word ("부두 시설") and not "한 시간".
+_KOREAN_HOUR = re.compile(r"(?<![가-힣])(열한|열두|한|두|세|네|다섯|여섯|일곱|여덟|아홉|열)\s*시(?!간)")
+_KOREAN_HOURS = {
+    "한": 1, "두": 2, "세": 3, "네": 4, "다섯": 5, "여섯": 6, "일곱": 7, "여덟": 8,
+    "아홉": 9, "열": 10, "열한": 11, "열두": 12,
+}
+# Relative hours need the clock; this version asks instead.
+_TIME_LIKE = re.compile(r"(?:\d+|한|두|세|네|다섯|여섯|일곱|여덟|아홉|열)\s*시간\s*(?:뒤|후)")
 
 
 def _apply_period(period: str, hour: int) -> int | TimeStatus:
@@ -233,6 +322,13 @@ def _apply_period(period: str, hour: int) -> int | TimeStatus:
         if 6 <= hour <= 11:
             return hour + 12
         return TimeStatus.PERIOD_UNCLEAR  # "밤 2시" may mean 02:00
+    if period == "점심":
+        # "점심 12시" is noon and "점심 1시" is 13:00; other hours are not lunch.
+        if hour in {11, 12}:
+            return hour
+        if hour in {1, 2}:
+            return hour + 12
+        return TimeStatus.PERIOD_UNCLEAR
     if period == "낮":
         if hour == 12:
             return 12
@@ -249,7 +345,13 @@ def _apply_period(period: str, hour: int) -> int | TimeStatus:
 
 
 def resolve_time(texts: Sequence[str]) -> TimeResult:
-    combined = _joined(texts)
+    combined = _KOREAN_HOUR.sub(lambda m: f"{_KOREAN_HOURS[m.group(1)]}시", _joined(texts))
+    combined = _COLON_CLOCK.sub(lambda m: f"{int(m.group(1))}시 {int(m.group(2))}분", combined)
+    if "정오" in combined and not _CLOCK.search(combined):
+        return TimeResult(TimeStatus.RESOLVED, 12, 0)
+    if "자정" in combined and not _CLOCK.search(combined):
+        # Same question as "밤 12시": people read midnight differently.
+        return TimeResult(TimeStatus.MIDNIGHT_UNCLEAR)
     match = _CLOCK.search(combined)
     if not match:
         if _TIME_LIKE.search(combined):
