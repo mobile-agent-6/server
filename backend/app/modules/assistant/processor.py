@@ -80,6 +80,8 @@ from app.modules.assistant.runtime_guard import ProcessDeadlineGuard
 from app.modules.schedules.schemas import ScheduleCreate, ScheduleUpdate
 
 QUESTION_TTL = timedelta(minutes=10)
+# Kept back from the request deadline for SQLite waits and finalize (Issue #29).
+PROVIDER_SAFETY_MARGIN_SECONDS = 10.0
 # A title-filtered list reads the bounded range first; beyond this it asks to narrow.
 LIST_TITLE_SCAN_LIMIT = 100  # the read port allows at most 101 rows per read
 RELATIVE_TIME_QUESTION = (
@@ -268,7 +270,10 @@ def _load_stored_input(
 
 
 def _decision_context(
-    stored: _StoredInput, *, server_time_trusted: bool
+    stored: _StoredInput,
+    *,
+    server_time_trusted: bool,
+    time_budget_seconds: float | None = None,
 ) -> DecisionContext:
     return DecisionContext(
         request_id=stored.request_id,
@@ -283,7 +288,22 @@ def _decision_context(
         pending_context=stored.pending_context,
         control_state_version=stored.control_state_version,
         control_state=stored.control_state,
+        time_budget_seconds=time_budget_seconds,
     )
+
+
+def _provider_time_budget(runtime_guard: ProcessDeadlineGuard) -> float:
+    """Time left for the model before the request deadline, keeping a margin.
+
+    The margin leaves room for SQLite waits and finalize.  A model call still
+    running at the deadline would mark the runtime unhealthy, so a request that
+    waited too long in the queue fails as a timeout without calling the model.
+    """
+
+    budget = runtime_guard.deadline - runtime_guard.monotonic_clock.now() - PROVIDER_SAFETY_MARGIN_SECONDS
+    if budget <= 0:
+        raise DecisionProviderTimeout("no time left before the request deadline")
+    return budget
 
 
 def _call_provider(
@@ -1029,7 +1049,9 @@ def process_one(
             )
         else:
             context = _decision_context(
-                stored, server_time_trusted=server_time_trusted
+                stored,
+                server_time_trusted=server_time_trusted,
+                time_budget_seconds=_provider_time_budget(runtime_guard),
             )
             envelope = _call_provider(provider, context)
             plan = _provider_decision_plan(

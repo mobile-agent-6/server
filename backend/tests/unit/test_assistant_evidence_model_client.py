@@ -175,3 +175,27 @@ def test_client_exposes_model_name_and_prompt_hash_for_logs() -> None:
     client = ChatCompletionsModel(base_url="http://127.0.0.1:9", timeout_seconds=1, prompt="P")
     assert client.name == "default"
     assert client.prompt_sha256 == hashlib.sha256(b"P").hexdigest()
+
+
+def test_deadline_budget_shortens_the_configured_timeout() -> None:
+    server = FakeServer()
+    server.body = {"choices": [{"message": {"content": "{}"}}]}
+    seen: list[float] = []
+    import urllib.request
+
+    original = urllib.request.urlopen
+
+    def spy(request, timeout):
+        seen.append(timeout)
+        return original(request, timeout=timeout)
+
+    urllib.request.urlopen = spy
+    try:
+        client = ChatCompletionsModel(base_url=server.url, timeout_seconds=60, prompt="P")
+        client.extract(turns=["회의"], reference_time=REFERENCE, server_time_trusted=True, timeout_seconds=12.5)
+        client.extract(turns=["회의"], reference_time=REFERENCE, server_time_trusted=True, timeout_seconds=90)
+        client.extract(turns=["회의"], reference_time=REFERENCE, server_time_trusted=True)
+    finally:
+        urllib.request.urlopen = original
+        server.close()
+    assert seen == [12.5, 60, 60]

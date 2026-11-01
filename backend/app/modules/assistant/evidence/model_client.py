@@ -84,7 +84,16 @@ class ChatCompletionsModel:
         except (OSError, ValueError):
             return False
 
-    def extract(self, *, turns: Sequence[str], reference_time: datetime, server_time_trusted: bool) -> str:
+    def extract(
+        self,
+        *,
+        turns: Sequence[str],
+        reference_time: datetime,
+        server_time_trusted: bool,
+        timeout_seconds: float | None = None,
+    ) -> str:
+        # The request deadline may leave less time than the configured limit.
+        timeout = self._timeout if timeout_seconds is None else min(self._timeout, timeout_seconds)
         body: dict[str, Any] = {
             "messages": [
                 {"role": "system", "content": self._prompt},
@@ -108,7 +117,7 @@ class ChatCompletionsModel:
             method="POST",
         )
         try:
-            with urllib.request.urlopen(request, timeout=self._timeout) as response:
+            with urllib.request.urlopen(request, timeout=timeout) as response:
                 raw = response.read(MAX_RESPONSE_BYTES + 1)
         except urllib.error.HTTPError as exc:
             if exc.code in {400, 413}:

@@ -42,7 +42,7 @@ class ScriptedModel:
         self.outputs = list(outputs)
         self.seen: list[list[str]] = []
 
-    def extract(self, *, turns, reference_time, server_time_trusted) -> str:
+    def extract(self, *, turns, reference_time, server_time_trusted, timeout_seconds=None) -> str:
         self.seen.append(list(turns))
         return json.dumps(self.outputs.pop(0), ensure_ascii=False)
 

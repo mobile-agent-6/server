@@ -44,7 +44,14 @@ MAX_TURN_CHARS = 500
 class EvidenceModel(Protocol):
     """Returns the raw evidence JSON text for the user turns so far."""
 
-    def extract(self, *, turns: Sequence[str], reference_time: datetime, server_time_trusted: bool) -> str: ...
+    def extract(
+        self,
+        *,
+        turns: Sequence[str],
+        reference_time: datetime,
+        server_time_trusted: bool,
+        timeout_seconds: float | None = None,
+    ) -> str: ...
 
 
 @dataclass
@@ -206,7 +213,10 @@ class EvidenceDecisionProvider:
         validation = "ok"
         try:
             raw = self._model.extract(
-                turns=list(state.turns), reference_time=reference, server_time_trusted=context.server_time_trusted
+                turns=list(state.turns),
+                reference_time=reference,
+                server_time_trusted=context.server_time_trusted,
+                timeout_seconds=context.time_budget_seconds,
             )
             output = parse_evidence_output(raw, user_turns=turns)
             check_roles(output, reference=reference)
