@@ -170,7 +170,34 @@ TEST50_CONFIG = DatasetConfig(
         ("batch3", BATCH3_CONFIG.conversations),
     ),
 )
-CONFIGS = {config.name: config for config in (PILOT_CONFIG, BATCH1_CONFIG, BATCH2_CONFIG, BATCH3_CONFIG, TEST50_CONFIG)}
+BATCH6_DIR = HERE / "batch6"
+BATCH6_CONFIG = DatasetConfig(
+    name="batch6",
+    conversations=BATCH6_DIR / "conversations-v0.1.jsonl",
+    targets=BATCH6_DIR / "candidate-c-targets-v0.1.jsonl",
+    preview=BATCH6_DIR / "training-row-preview-v0.1.jsonl",
+    results=BATCH6_DIR / "validation-results-v0.1.json",
+    bucket_counts={
+        "direct_create": 0,
+        "missing_and_followup": 0,
+        "correction": 65,
+        "time_safety": 0,
+        "mixed_unsupported_consent": 0,
+    },
+    dataset_role="training_candidate",
+    run_mutations=False,
+    extra_sources=(
+        ("pilot30", PILOT),
+        ("batch1", BATCH1_CONFIG.conversations),
+        ("batch2", BATCH2_CONFIG.conversations),
+        ("batch3", BATCH3_CONFIG.conversations),
+        ("test50", TEST50_CONFIG.conversations),
+    ),
+)
+CONFIGS = {
+    config.name: config
+    for config in (PILOT_CONFIG, BATCH1_CONFIG, BATCH2_CONFIG, BATCH3_CONFIG, TEST50_CONFIG, BATCH6_CONFIG)
+}
 
 
 class CreateProfileError(ValueError):
