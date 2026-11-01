@@ -33,6 +33,7 @@ from app.modules.assistant.evidence.normalize import (
     resolve_month_range,
     resolve_time,
     title_contains,
+    title_similar,
 )
 from app.modules.assistant.schedule_read import ScheduleRead, ScheduleReadPort
 
@@ -288,14 +289,16 @@ def _find_targets(
             return Ask(texts.ASK_DATE_AGAIN)
         ranges = [(_day_start(day), _day_start(day) + timedelta(days=1)) for day in days]
     else:
-        # No date: search the coming 92 days by title (user decision, 2026-10-29).
+        # No date: search 92 days back and 92 days ahead by title (#37 stage 5).
+        # The read port allows at most 92 days per read, so read each side.
         start = _day_start(_today(reference))
-        ranges = [(start, start + SEARCH_WINDOW)]
+        ranges = [(start - SEARCH_WINDOW, start), (start, start + SEARCH_WINDOW)]
     completed = None
     state_texts = adopted_texts(operation.target.get("completedState", ()))
     if state_texts:
         completed = resolve_completed(state_texts)
     found: dict[str, ScheduleRead] = {}
+    similar: dict[str, ScheduleRead] = {}
     for start, end in ranges:
         rows = reader.list(
             from_utc=start, to_utc=end, category=None, completed=completed, limit=TARGET_SCAN_LIMIT + 1
@@ -305,6 +308,12 @@ def _find_targets(
         for row in rows:
             if title_contains(title, row.title):
                 found[str(row.id)] = row
+            elif title_similar(title, row.title):
+                similar[str(row.id)] = row
+    if not found:
+        # Only when nothing matches: a one-letter slip ("상하자"), shown with its
+        # stored title in the confirmation or the candidate list.
+        found = similar
     ordered = sorted(found.values(), key=lambda row: (row.scheduled_at, str(row.id)))
     return _Targets(schedules=ordered, absolute=absolute)
 
