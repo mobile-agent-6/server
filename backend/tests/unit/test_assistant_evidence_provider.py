@@ -195,6 +195,8 @@ def test_unsupported_request_asks_consent_then_creates() -> None:
     assert model.seen == []  # no model call before consent
     _, decision = decide(provider, "문자 없이 등록만 해 주세요", previous=first)
     assert decision["kind"] == "create_intent"
+    # The yes is not sent to the model; only the request is.
+    assert model.seen == [["내일 오후 4시에 회의 등록하고 알림도 켜 줘"]]
 
 
 def test_declined_consent_cancels() -> None:
@@ -546,6 +548,47 @@ def test_change_words_answered_yes_creates() -> None:
     _, decision = decide(provider, "응", previous=first)
     assert decision["kind"] == "create_intent"
     assert decision["timeInterpretation"] == "absolute"
+    assert model_turns(provider) == [[LK28_TURN], [LK28_TURN]]
+
+
+def model_turns(provider: EvidenceDecisionProvider) -> list[list[str]]:
+    return provider._model.seen
+
+
+MOVE_PENDING_FIRST = output(
+    op("create", change={"title": [span("재고 회의")], "date": [span("모레")]})
+)
+
+
+def _pending_create(answer: str, answer_output: dict) -> dict:
+    provider = EvidenceDecisionProvider(ScriptedModel(MOVE_PENDING_FIRST, answer_output), FakeReader())
+    first, decision = decide(provider, "모레 재고 회의 넣어 줘")
+    assert decision == {"kind": "ask", "text": texts.ASK_TIME}
+    _, decision = decide(provider, answer, previous=first)
+    return decision
+
+
+def test_slot_change_in_an_answer_creates_without_new_create_question() -> None:
+    answer = "오후 4시로 하고 날짜는 글피로 바꿔 줘"
+    decision = _pending_create(
+        answer,
+        output(op("create", change={
+            "title": [span("재고 회의")], "date": [span("글피", turn=2)], "time": [span("오후 4시", turn=2)],
+        })),
+    )
+    assert decision["kind"] == "create_intent"
+    assert decision["scheduledAt"] == "2026-11-01T07:00:00Z"  # 11월 1일 오후 4시 (Seoul)
+
+
+@pytest.mark.parametrize("answer", ["오후 4시, 그리고 기존 회의는 옮겨 줘", "오후 4시, 근데 그건 취소해 줘"])
+def test_other_change_words_in_an_answer_still_ask(answer: str) -> None:
+    decision = _pending_create(
+        answer,
+        output(op("create", change={
+            "title": [span("재고 회의")], "date": [span("모레")], "time": [span("오후 4시", turn=2)],
+        })),
+    )
+    assert decision == {"kind": "ask", "text": texts.confirm_new_create("재고 회의")}
 
 
 def test_category_word_from_the_target_title_is_not_a_category_change() -> None:
