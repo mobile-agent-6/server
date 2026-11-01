@@ -355,5 +355,32 @@ def title_contains(query: str, title: str) -> bool:
     return bool(key) and key in _title_key(title)
 
 
+_CATEGORY_WORDS = re.compile(r"입고|재고|출고|피킹|포장|반품")
+
+
+def _category_words(key: str) -> set[str]:
+    return set(_CATEGORY_WORDS.findall(key))
+
+
+# Shorter titles differ by one letter too easily ("회의" and "회식").
+SIMILAR_TITLE_MIN_CHARS = 5
+
+
+def title_similar(query: str, title: str) -> bool:
+    """True when the titles differ by at most one letter (a speech recognition slip
+    such as "상하차" heard as "상하자"), ignoring spaces and case."""
+
+    a, b = _title_key(query), _title_key(title)
+    if min(len(a), len(b)) < SIMILAR_TITLE_MIN_CHARS or abs(len(a) - len(b)) > 1:
+        return False
+    # "입고 검품" and "출고 검품" differ by one letter but are different work.
+    if _category_words(a) != _category_words(b):
+        return False
+    if len(a) == len(b):
+        return sum(x != y for x, y in zip(a, b)) <= 1
+    short, long = (a, b) if len(a) < len(b) else (b, a)
+    return any(long[:index] + long[index + 1 :] == short for index in range(len(long)))
+
+
 def combine(day: date, clock: time) -> datetime:
     return datetime.combine(day, clock, tzinfo=SEOUL)

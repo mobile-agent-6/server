@@ -35,7 +35,7 @@ FIXTURE = json.loads(
     (Path(__file__).resolve().parents[1] / "fixtures" / "evidence_locked56.json").read_text(encoding="utf-8")
 )
 CASES = FIXTURE["cases"]
-MIN_CORRECT = 26
+MIN_CORRECT = 49  # 2026-11-01 (#37 stage 5); Issue #30 dry mapping reached 26
 
 
 class _Trust:
@@ -74,9 +74,14 @@ class _GoldModel:
     def extract(self, *, turns, reference_time, server_time_trusted, timeout_seconds=None) -> str:
         self.calls += 1
         assert self.current_turn is not None
+        # Match by text: the provider drops yes/no answers, so its turns are not
+        # always the last few case turns.
+        texts = {t["turn"]: t["text"] for t in self.case["turns"] if t["inputType"] == "text"}
         seen = [number for number in self.text_turns if number <= self.current_turn]
-        window = seen[-len(turns):]
-        mapping = {case_turn: index for index, case_turn in enumerate(window, 1)}
+        mapping: dict[int, int] = {}
+        for index, text in enumerate(turns, 1):
+            number = next(n for n in reversed(seen) if texts[n] == text and n not in mapping)
+            mapping[number] = index
         gold = copy.deepcopy(self.case["goldByTurn"][str(self.current_turn)])
 
         def renumber(value):

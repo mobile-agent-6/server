@@ -283,12 +283,57 @@ def test_more_than_ten_targets_asks_to_narrow() -> None:
     assert decision == {"kind": "ask", "text": texts.ASK_NARROW}
 
 
-def test_target_without_date_searches_the_coming_92_days() -> None:
+def test_target_without_date_searches_92_days_back_and_ahead() -> None:
     reader = FakeReader()
     model = ScriptedModel(output(op("delete", target={"title": [span("점검")]})))
     decide(EvidenceDecisionProvider(model, reader), "점검 일정 지워 줘")
-    assert len(reader.reads) == 1
-    assert reader.reads[0]["to"] - reader.reads[0]["from"] == timedelta(days=92)
+    today = datetime(2026, 10, 29, tzinfo=SEOUL)
+    assert [(read["from"], read["to"]) for read in reader.reads] == [
+        (today - timedelta(days=92), today),
+        (today, today + timedelta(days=92)),
+    ]
+
+
+def test_target_without_date_finds_a_past_schedule() -> None:
+    past = schedule("냉장 창고 온도 기록", datetime(2026, 10, 20, 8, 0, tzinfo=SEOUL), completed=True)
+    model = ScriptedModel(output(op("delete", target={"title": [span("냉장 창고 온도 기록")]})))
+    _, decision = decide(EvidenceDecisionProvider(model, FakeReader([past])), "냉장 창고 온도 기록 지워 줘")
+    assert decision["kind"] == "confirm"
+    assert decision["scheduleId"] == str(past.id)
+
+
+def _delete_target(title: str, schedules: list[ScheduleRead]) -> dict:
+    model = ScriptedModel(output(op("delete", target={"title": [span(title)]})))
+    _, decision = decide(EvidenceDecisionProvider(model, FakeReader(schedules)), f"{title} 지워 줘")
+    return decision
+
+
+def test_one_letter_slip_is_found_when_nothing_matches() -> None:
+    stored = schedule("출고 상하자 대기 확인", datetime(2026, 10, 30, 10, 0, tzinfo=SEOUL))
+    decision = _delete_target("출고 상하차 대기 확인", [stored])
+    # The confirmation shows the stored title, so the user sees the slip.
+    assert decision["kind"] == "confirm"
+    assert decision["scheduleId"] == str(stored.id)
+
+
+def test_one_letter_slip_is_not_mixed_in_when_the_title_matches() -> None:
+    exact = schedule("출고 상하차 대기 확인", datetime(2026, 10, 30, 10, 0, tzinfo=SEOUL))
+    slip = schedule("출고 상하자 대기 확인", datetime(2026, 10, 31, 10, 0, tzinfo=SEOUL))
+    decision = _delete_target("출고 상하차 대기 확인", [exact, slip])
+    assert (decision["kind"], decision["scheduleId"]) == ("confirm", str(exact.id))
+
+
+@pytest.mark.parametrize(
+    ("said", "stored"),
+    [
+        ("입고 검품 라인 정리", "출고 검품 라인 정리"),  # different category word
+        ("주간 회의", "주간 회식"),  # too short to guess
+        ("출고 상하차 대기 확인", "출고 대기 차량 확인"),  # more than one letter
+    ],
+)
+def test_titles_that_only_look_alike_are_not_targets(said: str, stored: str) -> None:
+    decision = _delete_target(said, [schedule(stored, datetime(2026, 10, 30, 10, 0, tzinfo=SEOUL))])
+    assert decision["kind"] == "no_match"
 
 
 def test_target_date_without_year_searches_this_and_next_year() -> None:
