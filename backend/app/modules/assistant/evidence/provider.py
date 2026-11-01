@@ -7,7 +7,9 @@ planner build the decision.  The model never sees or picks Schedule IDs.
 
 from __future__ import annotations
 
+import logging
 import re
+import time
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime
@@ -30,6 +32,8 @@ from app.modules.assistant.evidence.gate import (
 )
 from app.modules.assistant.evidence.planner import Ask, Overrides, plan_operation
 from app.modules.assistant.schedule_read import ScheduleReadPort
+
+logger = logging.getLogger(__name__)
 
 STATE_KEY = "evidence"
 STATE_VERSION = 1
@@ -190,14 +194,44 @@ class EvidenceDecisionProvider:
                     return self._ask(texts.CONSENT_QUESTION, state)
                 return _envelope({"kind": "ask", "text": texts.GUIDANCE}, _cleared())
 
-        turns = {index: turn for index, turn in enumerate(state.turns, 1)}
-        raw = self._model.extract(
-            turns=list(state.turns), reference_time=reference, server_time_trusted=context.server_time_trusted
-        )
-        output = parse_evidence_output(raw, user_turns=turns)
-        check_roles(output, reference=reference)
-        check_turn_prefix(list(turns), len(turns))
+        output = self._extract(state, context, reference)
         return self._plan(output, state, context, reference)
+
+    def _extract(self, state: _State, context: DecisionContext, reference: datetime) -> EvidenceOutput:
+        """Call the model once, check the output, and log the call (Issue #29)."""
+
+        turns = {index: turn for index, turn in enumerate(state.turns, 1)}
+        started = time.monotonic()
+        raw: str | None = None
+        validation = "ok"
+        try:
+            raw = self._model.extract(
+                turns=list(state.turns), reference_time=reference, server_time_trusted=context.server_time_trusted
+            )
+            output = parse_evidence_output(raw, user_turns=turns)
+            check_roles(output, reference=reference)
+            check_turn_prefix(list(turns), len(turns))
+            return output
+        except Exception as exc:
+            validation = str(getattr(exc, "code", None) or type(exc).__name__)
+            raise
+        finally:
+            duration_ms = round((time.monotonic() - started) * 1000)
+            logger.info(
+                "Assistant model call %s in %d ms",
+                validation,
+                duration_ms,
+                extra={
+                    "event": "assistant.model_call",
+                    "requestId": str(context.request_id),
+                    "durationMs": duration_ms,
+                    "model": getattr(self._model, "name", None),
+                    "promptSha256": getattr(self._model, "prompt_sha256", None),
+                    "userTurns": list(state.turns),
+                    "modelOutput": raw,
+                    "validation": validation,
+                },
+            )
 
     def _plan(
         self, output: EvidenceOutput, state: _State, context: DecisionContext, reference: datetime

@@ -104,7 +104,7 @@ def test_real_model_flows(database_path: Path) -> None:
             assert application.state.assistant_provider_available is True
             session = Session(client)
 
-            # Flows the run 006 adapter handles (2026-10-29).
+            # Flows the run 006 adapter handles (2026-11-01).
             created = session.text("내일 오후 3시 반에 입고 검수 잡아 줘")
             assert (created["kind"], created.get("outcome")) == ("outcome", "success"), created
             second = session.text("모레 오후 2시에 운영 회의 잡아 줘")
@@ -146,6 +146,28 @@ def test_real_model_flows(database_path: Path) -> None:
             expected += [("재고 실사", "INVENTORY", "10-31 09:00"), ("재고 회의", "INVENTORY", "10-31 14:00")]
             assert _snapshot(application) == sorted(expected)
 
+            # Two schedules share a title: the user picks one, approves, and only that one goes.
+            for text in ("내일 오전 10시에 주간 회의 잡아 줘", "모레 오전 10시에 주간 회의 잡아 줘"):
+                session.conversation_id = None
+                session.last = {}
+                made = session.text(text)
+                assert (made["kind"], made.get("outcome")) == ("outcome", "success"), made
+            session.conversation_id = None
+            session.last = {}
+            choose = session.text("주간 회의 일정 삭제해 줘")
+            assert choose["kind"] == "candidate_selection", choose
+            assert len(choose["candidates"]) == 2
+            later = max(choose["candidates"], key=lambda item: item["scheduledAt"])
+            confirm = session.send(
+                {"type": "selection", "questionId": choose["questionId"], "candidateId": later["candidateId"]},
+                label="select",
+            )
+            assert confirm["kind"] == "confirmation", confirm
+            removed = session.approve()
+            assert (removed["kind"], removed.get("outcome")) == ("outcome", "success"), removed
+            expected.append(("주간 회의", "OTHER", "10-30 10:00"))
+            assert _snapshot(application) == sorted(expected)
+
             # Flows the current adapter is weak at: they may fail, but must never write.
             report = []
             for turns in (["입고 검수 완료로 표시해 줘"],):
@@ -164,6 +186,8 @@ def test_real_model_flows(database_path: Path) -> None:
                 report.append((turns[-1], result["kind"], result.get("outcome"), succeeded))
                 if not succeeded:
                     assert after == before, (turns, result)
+            with application.state.engine.connect() as connection:
+                assert connection.exec_driver_sql("PRAGMA integrity_check").scalar() == "ok"
             print("\nweak flows:", report)
             print("\nsmoke timings:", [(label, round(seconds, 1)) for label, seconds in session.timings])
     finally:

@@ -174,6 +174,13 @@ ASSISTANT_SMOKE_MODEL_URL=http://127.0.0.1:8088 python -m pytest tests/integrati
 
 모델 출력이 형식에 맞지 않으면 다시 묻지 않고 `MODEL_OUTPUT_INVALID`로 끝낸다.
 decoding이 고정(temperature 0)이라 같은 입력을 다시 보내도 같은 출력이 나오기 때문이다.
+
+모델을 부를 때마다 `assistant.model_call` 로그 한 줄을 남긴다. 요청 ID, 모델명, prompt 해시,
+사용자 turn, 모델 원출력, 검사 결과(`ok` 또는 오류 코드), 처리 시간이 들어간다. 이 필드는
+`SCHEDULE_LOG_FORMAT=json`일 때만 기록되고(console 형식은 결과와 시간 요약 한 줄),
+SQLite나 오류 응답에는 들어가지 않는다.
+사용자 원문이 들어가므로 로그 파일을 Git이나 팀 공유 위치에 올리지 않는다.
+
 Orange Pi용 모델 변환, 실행과 성능 측정은 별도 작업이다.
 
 `20261017_0004` downgrade 전에는 위 runtime을 포함한 서버를 먼저 중지하고 정확한
