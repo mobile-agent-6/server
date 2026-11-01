@@ -127,13 +127,28 @@ def test_real_model_flows(database_path: Path) -> None:
             expected = [("입고 검수", "INBOUND", "10-30 17:00")]
             assert _snapshot(application) == expected
 
+            # A missing time is asked, then the answer creates.
+            session.conversation_id = None
+            session.last = {}
+            asked = session.text("모레 재고 회의 잡아 줘")
+            assert asked["kind"] == "need_more_info", asked
+            answered = session.text("오후 2시", answer=True)
+            assert (answered["kind"], answered.get("outcome")) == ("outcome", "success"), answered
+
+            # An unsupported reminder asks for consent; the yes is not sent to the model.
+            session.conversation_id = None
+            session.last = {}
+            consent = session.text("모레 오전 9시에 재고 실사 등록하고 알림도 켜 줘")
+            assert consent["kind"] == "need_more_info", consent
+            granted = session.text("응, 알림 없이 등록해", answer=True)
+            assert (granted["kind"], granted.get("outcome")) == ("outcome", "success"), granted
+
+            expected += [("재고 실사", "INVENTORY", "10-31 09:00"), ("재고 회의", "INVENTORY", "10-31 14:00")]
+            assert _snapshot(application) == sorted(expected)
+
             # Flows the current adapter is weak at: they may fail, but must never write.
             report = []
-            for turns in (
-                ["모레 재고 회의 잡아 줘"],
-                ["입고 검수 완료로 표시해 줘"],
-                ["모레 오전 9시에 재고 실사 등록하고 알림도 켜 줘", "응, 알림 없이 등록해"],
-            ):
+            for turns in (["입고 검수 완료로 표시해 줘"],):
                 before = _snapshot(application)
                 session.conversation_id = None
                 session.last = {}

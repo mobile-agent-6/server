@@ -150,6 +150,9 @@ class EvidenceDecisionProvider:
         if pending is not None:
             state.pending = None
             answer = classify_answer(text)
+            # A yes or no ("응, 알림 없이 등록해") is not part of the request.  The
+            # model was never trained on it and misreads the request when it is there.
+            state.turns.pop()
             if pending.get("kind") == "consent":
                 if answer is Answer.NO:
                     return _envelope({"kind": "cancel", "text": texts.CONSENT_DECLINED}, _cleared())
@@ -243,6 +246,15 @@ _DATE_OR_TIME_WORD = re.compile(
     r"\d+\s*(?:시|분|월|일)|오늘|내일|모레|글피|요일|오전|오후|아침|저녁|밤|새벽|낮"
 )
 _CHANGE_VERB = re.compile(r"옮겨|바꿔|변경|수정|취소|삭제|지워")
+_REMOVE_VERB = re.compile(r"취소|삭제|지워")
+# "날짜는 글피로 바꿔 줘" in an answer changes the create being asked about.
+_SLOT_WORD = re.compile(r"(?:날짜|시간|시각|제목)\s*(?:은|는|을|를)")
+
+
+def _is_change_request(turn: str, *, first: bool) -> bool:
+    if first or _REMOVE_VERB.search(turn):
+        return bool(_CHANGE_VERB.search(turn))
+    return bool(_CHANGE_VERB.search(turn)) and not _SLOT_WORD.search(turn)
 
 
 def _has_correction_evidence(operation: EvidenceOperation) -> bool:
@@ -273,7 +285,7 @@ def _create_check(
         # The user corrected a value but the model marked no correction (run 006 lk52).
         scheduled_at = datetime.fromisoformat(str(decision["scheduledAt"]))
         return "values", texts.confirm_create_values(title, scheduled_at)
-    if any(_CHANGE_VERB.search(turn) for turn in turns):
+    if any(_is_change_request(turn, first=index == 0) for index, turn in enumerate(turns)):
         # Change or delete wording read as a new schedule (run 004 lk28).
         return "new_create", texts.confirm_new_create(title)
     return None
