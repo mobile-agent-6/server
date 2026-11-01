@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from uuid import UUID, uuid4
 
 import pytest
@@ -708,3 +708,47 @@ def test_model_timeout_is_logged_without_output(caplog) -> None:
         decide(EvidenceDecisionProvider(SlowModel(), FakeReader()), "내일 회의 잡아 줘")
     (record,) = _model_call_records(caplog)
     assert (record.validation, record.modelOutput) == ("DecisionProviderTimeout", None)
+
+
+# ------------------------------------------------------- more expressions (#37 stage 8)
+
+
+@pytest.mark.parametrize(
+    ("date_text", "time_text", "expected"),
+    [
+        ("다음 주 화요일", "오후 3시", "2026-11-03T06:00:00Z"),
+        ("다음 달 3일", "15:30", "2026-11-03T06:30:00Z"),
+        ("15일", "점심 1시", "2026-11-15T04:00:00Z"),
+        ("3일 뒤", "정오", "2026-11-01T03:00:00Z"),
+        ("모레", "오후 세 시 반", "2026-10-31T06:30:00Z"),
+    ],
+)
+def test_create_with_new_expressions(date_text: str, time_text: str, expected: str) -> None:
+    text = f"{date_text} {time_text}에 회의 잡아 줘"
+    model = ScriptedModel(output(op("create", change={
+        "title": [span("회의")], "date": [span(date_text)], "time": [span(time_text)],
+    })))
+    _, decision = decide(EvidenceDecisionProvider(model, FakeReader()), text)
+    assert (decision["kind"], decision["scheduledAt"]) == ("create_intent", expected)
+    assert decision["timeInterpretation"] == "relative"
+
+
+def test_create_at_midnight_word_asks_first() -> None:
+    model = ScriptedModel(output(op("create", change={
+        "title": [span("서버 점검")], "date": [span("모레")], "time": [span("자정")],
+    })))
+    _, decision = decide(EvidenceDecisionProvider(model, FakeReader()), "모레 자정에 서버 점검 잡아 줘")
+    assert decision == {"kind": "ask", "text": texts.confirm_midnight(date(2026, 11, 1))}
+
+
+@pytest.mark.parametrize(
+    ("period", "start", "end"),
+    [
+        ("다음 주", "2026-11-01T15:00:00Z", "2026-11-08T15:00:00Z"),
+        ("이번 달", "2026-09-30T15:00:00Z", "2026-10-31T15:00:00Z"),
+    ],
+)
+def test_list_by_week_or_month_word(period: str, start: str, end: str) -> None:
+    model = ScriptedModel(output(op("list", filter={"date": [span(period)]})))
+    _, decision = decide(EvidenceDecisionProvider(model, FakeReader()), f"{period} 일정 보여 줘")
+    assert (decision["kind"], decision["from"], decision["to"]) == ("list_intent", start, end)
