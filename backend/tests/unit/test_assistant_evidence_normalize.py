@@ -382,3 +382,78 @@ def test_unclear_title(title: str, unclear: bool) -> None:
     from app.modules.assistant.evidence.normalize import is_unclear_title
 
     assert is_unclear_title(title) is unclear
+
+
+@pytest.mark.parametrize(("text", "hour"), [("오후 열 한 시", 23), ("오전 열 두 시", 0), ("오후 열 두 시", 12)])
+def test_spaced_korean_eleven_and_twelve(text: str, hour: int) -> None:
+    assert resolve_time([text]) == TimeResult(TimeStatus.RESOLVED, hour, 0)
+
+
+@pytest.mark.parametrize("text", ["오후 두 시 삼십 분", "3시 30", "3시 십오 분", "오후 3시 5"])
+def test_minutes_that_cannot_be_read_are_asked_not_dropped(text: str) -> None:
+    assert resolve_time([text]).status is TimeStatus.UNSUPPORTED
+
+
+@pytest.mark.parametrize(
+    ("adopted", "replaced", "status", "day", "absolute"),
+    [
+        ("5일", "12월 3일", "inherited", date(2026, 12, 5), False),
+        ("5일", "2026년 12월 3일", "inherited", date(2026, 12, 5), True),
+        ("5일", "다음 달 3일", "inherited", date(2026, 11, 5), False),
+        ("수요일", "다음 주 화요일", "inherited", date(2026, 11, 4), False),
+        # A past date without a year: the caller asks about next year.
+        ("5일", "2월 3일", "inherited_next_year", date(2027, 2, 5), False),
+        # No month or week to keep: read the new value on its own.
+        ("5일", "내일", "not_partial", None, False),
+        ("수요일", "오늘", "not_partial", None, False),
+        ("모레", "내일", "not_partial", None, False),
+        ("31일", "11월 3일", "unknown", None, False),
+        ("5일", "그날", "unknown", None, False),
+        # A month alone does not say which week.
+        ("금요일", "12월 3일", "unknown", None, False),
+    ],
+)
+def test_partial_correction_inherits_month_or_week(adopted, replaced, status, day, absolute) -> None:
+    from app.modules.assistant.evidence.normalize import inherit_partial_date
+
+    result = inherit_partial_date(adopted, [replaced], REFERENCE)
+    assert (result.status.value, result.day, result.absolute) == (status, day, absolute)
+
+
+def test_korean_24_hour_words_are_asked_again() -> None:
+    assert resolve_time(["열다섯 시"]).status is TimeStatus.UNSUPPORTED
+    assert resolve_time(["스무 시"]).status is TimeStatus.UNSUPPORTED
+
+
+def test_second_correction_without_a_month_asks_again() -> None:
+    from app.modules.assistant.evidence.normalize import Inherit, inherit_partial_date
+
+    # "12월 3일 말고 5일, 아니 6일": the month is two values back.
+    assert inherit_partial_date("6일", ["12월 3일", "5일"], REFERENCE).status is Inherit.UNKNOWN
+
+
+@pytest.mark.parametrize(
+    ("adopted", "replaced", "status", "day"),
+    [
+        ("25일", "11월 3일", "inherited", date(2026, 11, 25)),  # still ahead this year
+        ("1일", "11월 3일", "inherited_next_year", date(2027, 11, 1)),  # already passed
+    ],
+)
+def test_inherited_day_uses_this_year_when_still_ahead(adopted, replaced, status, day) -> None:
+    from app.modules.assistant.evidence.normalize import inherit_partial_date
+
+    november_20 = datetime(2026, 11, 20, 10, 0, tzinfo=SEOUL)
+    result = inherit_partial_date(adopted, [replaced], november_20)
+    assert (result.status.value, result.day) == (status, day)
+
+
+@pytest.mark.parametrize("text", ["열 세 시", "오후 열 세 시", "스물 한 시", "열 다섯 시"])
+def test_spaced_korean_24_hour_words_are_asked_not_misread(text: str) -> None:
+    assert resolve_time([text]).status is TimeStatus.UNSUPPORTED
+
+
+def test_second_weekday_correction_without_a_week_asks_again() -> None:
+    from app.modules.assistant.evidence.normalize import Inherit, inherit_partial_date
+
+    result = inherit_partial_date("목요일", ["다음 주 화요일", "수요일"], REFERENCE)
+    assert result.status is Inherit.UNKNOWN

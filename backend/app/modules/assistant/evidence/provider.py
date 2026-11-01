@@ -7,6 +7,7 @@ planner build the decision.  The model never sees or picks Schedule IDs.
 
 from __future__ import annotations
 
+import json
 import logging
 import re
 import time
@@ -30,12 +31,15 @@ from app.modules.assistant.evidence.gate import (
     check_turn_prefix,
     classify_answer,
 )
+from app.modules.assistant.evidence.normalize import mentions_date_or_time
 from app.modules.assistant.evidence.planner import Ask, Overrides, plan_operation
 from app.modules.assistant.schedule_read import ScheduleReadPort
 
 logger = logging.getLogger(__name__)
 
 STATE_KEY = "evidence"
+# Shape of the provider's own JSON; an older shape starts the task fresh.
+STATE_SHAPE = 2
 STATE_VERSION = 1
 MAX_TURNS = 8
 MAX_TURN_CHARS = 500
@@ -60,19 +64,22 @@ class _State:
     consent_granted: bool = False
     # {"kind": "consent"} or {"kind": "confirm", "slot": ..., "value": ..., "text": ...}
     pending: dict[str, str] | None = None
+    # Confirmed values keep the evidence they were asked about (see Overrides).
     change_date: str | None = None
-    midnight: bool = False
-    # The user said yes to a create check (several requests, a missed correction, or change words).
-    create_confirmed: bool = False
+    change_date_source: str | None = None
+    midnight_source: str | None = None
+    # The create the user said yes to (title, time, category), so a changed create is checked again.
+    create_confirmed: str | None = None
 
     def to_json(self) -> dict[str, Any]:
         return {
-            STATE_KEY: 1,
+            STATE_KEY: STATE_SHAPE,
             "turns": list(self.turns),
             "consentGranted": self.consent_granted,
             "pending": self.pending,
             "changeDate": self.change_date,
-            "midnight": self.midnight,
+            "changeDateSource": self.change_date_source,
+            "midnightSource": self.midnight_source,
             "createConfirmed": self.create_confirmed,
         }
 
@@ -80,27 +87,27 @@ class _State:
     def overrides(self) -> Overrides:
         return Overrides(
             change_date=date.fromisoformat(self.change_date) if self.change_date else None,
-            midnight=self.midnight,
+            change_date_source=self.change_date_source,
+            midnight_source=self.midnight_source,
         )
 
 
 def _load_state(value: object) -> _State | None:
     """Accept only the exact shape this provider writes; anything else starts fresh."""
 
-    if not isinstance(value, dict) or value.get(STATE_KEY) != 1:
+    if not isinstance(value, dict) or value.get(STATE_KEY) != STATE_SHAPE:
         return None
     turns = value.get("turns")
     pending = value.get("pending")
     change_date = value.get("changeDate")
+    optional_text = ("changeDate", "changeDateSource", "midnightSource", "createConfirmed")
     if (
         not isinstance(turns, list)
         or not all(isinstance(turn, str) for turn in turns)
         or len(turns) > MAX_TURNS
         or type(value.get("consentGranted")) is not bool
-        or type(value.get("midnight")) is not bool
-        or type(value.get("createConfirmed")) is not bool
+        or not all(value.get(key) is None or isinstance(value.get(key), str) for key in optional_text)
         or not (pending is None or (isinstance(pending, dict) and all(isinstance(v, str) for v in pending.values())))
-        or not (change_date is None or isinstance(change_date, str))
     ):
         return None
     try:
@@ -113,8 +120,9 @@ def _load_state(value: object) -> _State | None:
         consent_granted=value["consentGranted"],
         pending=dict(pending) if pending is not None else None,
         change_date=change_date,
-        midnight=value["midnight"],
-        create_confirmed=value["createConfirmed"],
+        change_date_source=value.get("changeDateSource"),
+        midnight_source=value.get("midnightSource"),
+        create_confirmed=value.get("createConfirmed"),
     )
 
 
@@ -188,10 +196,11 @@ class EvidenceDecisionProvider:
                     return self._ask(again, state)
                 if slot == "change_date":
                     state.change_date = pending.get("value")
+                    state.change_date_source = pending.get("source")
                 elif slot == "midnight":
-                    state.midnight = True
+                    state.midnight_source = pending.get("source")
                 elif slot in {"first_operation", "values", "new_create"}:
-                    state.create_confirmed = True
+                    state.create_confirmed = pending.get("value")
 
         if not state.consent_granted:
             analyses = [analyze_text(turn) for turn in state.turns]
@@ -268,13 +277,18 @@ class EvidenceDecisionProvider:
         if decision is None:
             raise ValueError("planner returned neither a decision nor a question")
         several = len(output.operations) > 1
-        if decision["kind"] == "create_intent" and not state.create_confirmed:
+        if decision["kind"] == "create_intent" and state.create_confirmed != _create_signature(decision):
             # A create runs at once with no confirmation step, so these checks
             # stop a model mistake before it becomes a wrong schedule.
             check = _create_check(decision, operation, state.turns, several=several)
             if check is not None:
                 slot, question = check
-                state.pending = {"kind": "confirm", "slot": slot, "value": "yes", "text": question}
+                state.pending = {
+                    "kind": "confirm",
+                    "slot": slot,
+                    "value": _create_signature(decision),
+                    "text": question,
+                }
                 return self._ask(question, state)
         if several and decision["kind"] in {"confirm", "select_candidate"}:
             decision["text"] = decision["text"] + texts.MORE_REQUESTS_NOTE
@@ -286,9 +300,6 @@ class EvidenceDecisionProvider:
 
 # "말고", "대신", "아니" mark a correction; "아니요" and "아니오" are answers, not corrections.
 _CORRECTION_MARKER = re.compile(r"말고|대신|아니(?!요|오)")
-_DATE_OR_TIME_WORD = re.compile(
-    r"\d+\s*(?:시|분|월|일)|오늘|내일|모레|글피|요일|오전|오후|아침|저녁|밤|새벽|낮"
-)
 _CHANGE_VERB = re.compile(r"옮겨|바꿔|변경|수정|취소|삭제|지워")
 _REMOVE_VERB = re.compile(r"취소|삭제|지워")
 # "날짜는 글피로 바꿔 줘" in an answer changes the create being asked about.
@@ -325,7 +336,7 @@ def _create_check(
     if _has_correction_evidence(operation):
         return None
     latest = turns[-1] if turns else ""
-    if _CORRECTION_MARKER.search(latest) and _DATE_OR_TIME_WORD.search(latest):
+    if _CORRECTION_MARKER.search(latest) and mentions_date_or_time(latest):
         # The user corrected a value but the model marked no correction (run 006 lk52).
         scheduled_at = datetime.fromisoformat(str(decision["scheduledAt"]))
         return "values", texts.confirm_create_values(title, scheduled_at)
@@ -333,6 +344,12 @@ def _create_check(
         # Change or delete wording read as a new schedule (run 004 lk28).
         return "new_create", texts.confirm_new_create(title)
     return None
+
+
+def _create_signature(decision: dict[str, Any]) -> str:
+    return json.dumps(
+        [decision.get("title"), decision.get("scheduledAt"), decision.get("category")], ensure_ascii=False
+    )
 
 
 def _is_relative(decision: dict[str, Any]) -> bool:

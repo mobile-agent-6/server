@@ -214,6 +214,88 @@ def _day_of_month(day_value: int, today: date, purpose: DatePurpose) -> DateResu
     return DateResult(DateStatus.RESOLVED, (found[0],))
 
 
+_PARTIAL_DAY = re.compile(r"(\d{1,2})\s*일")
+_PARTIAL_WEEKDAY = re.compile(r"([월화수목금토일])요일")
+
+
+_HAS_MONTH = re.compile(r"\d{1,2}\s*월|(?:이번|다다음|다음|지난|저번)\s*달")
+_HAS_WEEK = re.compile(r"(?:이번|다다음|다음|지난|저번)\s*주")
+
+
+class Inherit(StrEnum):
+    NOT_PARTIAL = "not_partial"
+    INHERITED = "inherited"
+    # Inherited from a past date without a year: ask about next year first.
+    INHERITED_NEXT_YEAR = "inherited_next_year"
+    UNKNOWN = "unknown"
+
+
+@dataclass(frozen=True)
+class InheritResult:
+    status: Inherit
+    day: date | None = None
+    absolute: bool = False
+
+
+_YEARLESS_MONTH = re.compile(r"(?<!년\s)(?<!년)\d{1,2}\s*월")
+
+
+def inherit_partial_date(adopted: str, replaced: Sequence[str], reference: datetime) -> InheritResult:
+    """A correction that leaves out the month or week keeps the replaced one.
+
+    "12월 3일 말고 5일" is 12월 5일, and "다음 주 화요일 말고 수요일" is next
+    week's Wednesday.  Only a replaced value that names a month or week is
+    inherited ("내일 말고 5일" is still the coming 5th).  When the replaced
+    value is not a readable date, the result is UNKNOWN so the caller asks
+    again instead of guessing (review 2026-11-01).
+    """
+
+    text = normalize_text(adopted)
+    day_match = _PARTIAL_DAY.fullmatch(text)
+    weekday_match = _PARTIAL_WEEKDAY.fullmatch(text)
+    if not day_match and not weekday_match or not replaced:
+        return InheritResult(Inherit.NOT_PARTIAL)
+    last = normalize_text(replaced[-1])
+    previous = resolve_date([last], reference, purpose=DatePurpose.SCHEDULE)
+    if previous.status in {DateStatus.NOT_A_DATE, DateStatus.UNSUPPORTED, DateStatus.INVALID_DATE}:
+        return InheritResult(Inherit.UNKNOWN)
+    marker = _HAS_MONTH if day_match else _HAS_WEEK
+    if not marker.search(last):
+        # "12월 3일 말고 5일, 아니 6일" or "다음 주 화요일 말고 수요일, 아니 목요일":
+        # the month or week is two values back; ask.
+        if any(marker.search(normalize_text(value)) for value in replaced[:-1]):
+            return InheritResult(Inherit.UNKNOWN)
+        # "12월 3일 말고 금요일": a month alone does not say which week.
+        if weekday_match and _HAS_MONTH.search(last):
+            return InheritResult(Inherit.UNKNOWN)
+        return InheritResult(Inherit.NOT_PARTIAL)
+    status = Inherit.INHERITED
+    if previous.status is DateStatus.RESOLVED:
+        base = previous.dates[0]
+    elif previous.status is DateStatus.PAST_WITHOUT_YEAR and previous.proposal is not None:
+        base = previous.proposal
+    else:
+        return InheritResult(Inherit.UNKNOWN)
+    if day_match:
+        day_value = int(day_match.group(1))
+        today = _local_today(reference)
+        if not previous.absolute and _YEARLESS_MONTH.search(last):
+            # Same rule as a date without a year: this year if still ahead, else ask about next year.
+            this_year = _safe_date(today.year, base.month, day_value)
+            if this_year is not None and this_year >= today:
+                return InheritResult(Inherit.INHERITED, this_year, False)
+            next_year = _safe_date(today.year + 1, base.month, day_value)
+            if next_year is None:
+                return InheritResult(Inherit.UNKNOWN)
+            return InheritResult(Inherit.INHERITED_NEXT_YEAR, next_year, False)
+        value = _safe_date(base.year, base.month, day_value)
+        if value is None:
+            return InheritResult(Inherit.UNKNOWN)
+        return InheritResult(status, value, previous.absolute)
+    index = _WEEKDAYS.index(weekday_match.group(1))
+    return InheritResult(status, _monday(base) + timedelta(days=index), previous.absolute)
+
+
 _MONTH_ONLY = re.compile(r"(?:(\d{4})년\s*)?(\d{1,2})월(?!\s*\d{1,2}일)")
 
 
@@ -298,13 +380,20 @@ _PERIOD = re.compile(r"오전|오후|아침|저녁|새벽|점심|낮|밤")
 _CLOCK = re.compile(r"(\d{1,2})\s*시(?!간)(?:\s*(\d{1,2})\s*분|\s*(반))?")
 _COLON_CLOCK = re.compile(r"(?<!\d)(\d{1,2})\s*:\s*(\d{2})(?!\d)")
 # "세 시 반" is "3시 반".  Not inside a word ("부두 시설") and not "한 시간".
-_KOREAN_HOUR = re.compile(r"(?<![가-힣])(열한|열두|한|두|세|네|다섯|여섯|일곱|여덟|아홉|열)\s*시(?!간)")
+_KOREAN_HOUR = re.compile(r"(?<![가-힣])(열\s*한|열\s*두|한|두|세|네|다섯|여섯|일곱|여덟|아홉|열)\s*시(?!간)")
+# Minutes left after the clock that this version cannot read ("삼십 분", "3시 30").
+_UNREAD_MINUTES = re.compile(r"\s*(?:\d|[일이삼사오육칠팔구십]+\s*분)")
 _KOREAN_HOURS = {
     "한": 1, "두": 2, "세": 3, "네": 4, "다섯": 5, "여섯": 6, "일곱": 7, "여덟": 8,
     "아홉": 9, "열": 10, "열한": 11, "열두": 12,
 }
 # Relative hours need the clock; this version asks instead.
 _TIME_LIKE = re.compile(r"(?:\d+|한|두|세|네|다섯|여섯|일곱|여덟|아홉|열)\s*시간\s*(?:뒤|후)")
+# 24-hour Korean words ("열다섯 시", "열 세 시", "스물 한 시") are not read yet.
+# Checked before the hour words become digits, so "열 세 시" is never read as 3시.
+_KOREAN_24_HOUR = re.compile(
+    r"(?<![가-힣])(?:열\s*(?:셋|세|넷|네|다섯|여섯|일곱|여덟|아홉)|스무|스물\s*(?:한|두|세|네)?)\s*시(?!간)"
+)
 
 
 def _apply_period(period: str, hour: int) -> int | TimeStatus:
@@ -344,8 +433,16 @@ def _apply_period(period: str, hour: int) -> int | TimeStatus:
     raise ValueError(f"unknown period: {period}")
 
 
+def _korean_hour_digits(match: re.Match[str]) -> str:
+    word = "".join(match.group(1).split())  # "열 한" is "열한"
+    return f"{_KOREAN_HOURS[word]}시"
+
+
 def resolve_time(texts: Sequence[str]) -> TimeResult:
-    combined = _KOREAN_HOUR.sub(lambda m: f"{_KOREAN_HOURS[m.group(1)]}시", _joined(texts))
+    joined = _joined(texts)
+    if _KOREAN_24_HOUR.search(joined):
+        return TimeResult(TimeStatus.UNSUPPORTED)
+    combined = _KOREAN_HOUR.sub(_korean_hour_digits, joined)
     combined = _COLON_CLOCK.sub(lambda m: f"{int(m.group(1))}시 {int(m.group(2))}분", combined)
     if "정오" in combined and not _CLOCK.search(combined):
         return TimeResult(TimeStatus.RESOLVED, 12, 0)
@@ -359,6 +456,9 @@ def resolve_time(texts: Sequence[str]) -> TimeResult:
         if _PERIOD.search(combined):
             return TimeResult(TimeStatus.NEEDS_CLOCK)
         return TimeResult(TimeStatus.NOT_A_TIME)
+    if _UNREAD_MINUTES.match(combined, match.end()):
+        # Never drop minutes: "두 시 삼십 분" is not 2:00.
+        return TimeResult(TimeStatus.UNSUPPORTED)
     hour = int(match.group(1))
     minute = 30 if match.group(3) else int(match.group(2) or 0)
     if not 0 <= hour <= 23 or not 0 <= minute <= 59:
@@ -377,6 +477,39 @@ def resolve_time(texts: Sequence[str]) -> TimeResult:
     if isinstance(applied, TimeStatus):
         return TimeResult(applied)
     return TimeResult(TimeStatus.RESOLVED, applied, minute)
+
+
+# ------------------------------------------------- shared date/time checks
+
+# Pieces of date and time wording, used to tell "only a date or time" apart
+# from a title that mentions one ("다음 주 회의 준비").
+_DATE_TIME_PARTS = re.compile(
+    r"\d{4}\s*년|\d{1,2}\s*월|\d{1,2}\s*일|오늘|내일|모레|글피|"
+    r"(?:이번|다다음|다음|지난|저번)\s*(?:주|달)|[월화수목금토일]요일|"
+    r"오전|오후|아침|저녁|새벽|점심|낮|밤|정오|자정|\d{1,2}\s*:\s*\d{2}|\d{1,2}\s*시|\d{1,2}\s*분|"
+    r"(?:열\s*한|열\s*두|한|두|세|네|다섯|여섯|일곱|여덟|아홉|열)\s*시|반|뒤|후|에|으로|로|쯤|요"
+)
+
+
+def mentions_date_or_time(text: str) -> bool:
+    """True when the text holds any date or time wording this module knows.
+
+    gate.py and provider.py call this instead of keeping their own word lists,
+    so a new expression here is known everywhere (review 2026-11-01).
+    """
+
+    return (
+        resolve_date([text], datetime(2000, 1, 3, tzinfo=SEOUL), purpose=DatePurpose.SEARCH).status
+        is not DateStatus.NOT_A_DATE
+        or resolve_time([text]).status is not TimeStatus.NOT_A_TIME
+    )
+
+
+def is_date_or_time_only(text: str) -> bool:
+    """True for "정오" or "다음 주 화요일", false for "다음 주 회의 준비"."""
+
+    value = normalize_text(text)
+    return mentions_date_or_time(value) and not _DATE_TIME_PARTS.sub("", value).strip(" ,.")
 
 
 # --------------------------------------------------------- category, state

@@ -17,16 +17,21 @@ from app.modules.assistant.evidence import texts
 from app.modules.assistant.evidence.contract import (
     EvidenceOperation,
     OperationKind,
+    SpanStatus,
     adopted_texts,
+    evidence_key,
 )
 from app.modules.assistant.evidence.normalize import (
     SEOUL,
     DatePurpose,
     DateStatus,
+    Inherit,
+    InheritResult,
     TimeStatus,
     combine,
     is_future_scope,
     is_unclear_title,
+    inherit_partial_date,
     resolve_category,
     resolve_completed,
     resolve_date,
@@ -53,10 +58,15 @@ class Ask:
 
 @dataclass(frozen=True)
 class Overrides:
-    """Values the user already confirmed with a yes/no answer."""
+    """Values the user already confirmed with a yes/no answer.
+
+    Each one is tied to the evidence it was asked about.  When a later turn
+    changes that evidence ("아니 다음 주 금요일로"), the old yes no longer applies.
+    """
 
     change_date: date | None = None
-    midnight: bool = False
+    change_date_source: str | None = None
+    midnight_source: str | None = None
 
 
 @dataclass
@@ -110,10 +120,33 @@ def _change_moment(
     moment = _Moment()
     date_texts = adopted_texts(operation.change.get("date", ()))
     time_texts = adopted_texts(operation.change.get("time", ()))
+    date_key = evidence_key(operation.change.get("date", ()))
+    midnight_key = date_key + "#" + evidence_key(operation.change.get("time", ()))
     today = _today(reference)
 
-    if overrides.change_date is not None:
+    replaced = [
+        span.text for span in operation.change.get("date", ()) if span.status is SpanStatus.SUPERSEDED
+    ]
+    inherited = (
+        inherit_partial_date(date_texts[-1], replaced, reference)
+        if date_texts and replaced
+        else InheritResult(Inherit.NOT_PARTIAL)
+    )
+    if overrides.change_date is not None and overrides.change_date_source == date_key:
         moment.day = overrides.change_date
+    elif inherited.status is Inherit.INHERITED:
+        moment.day = inherited.day
+        moment.absolute = inherited.absolute
+    elif inherited.status is Inherit.INHERITED_NEXT_YEAR and inherited.day is not None:
+        # "2월 3일 말고 5일" in October: the same next-year question as "2월 5일".
+        if not server_time_trusted:
+            return Ask(texts.ASK_ABSOLUTE_DATE)
+        return Ask(
+            texts.confirm_next_year(inherited.day),
+            confirm={"slot": "change_date", "value": inherited.day.isoformat(), "source": date_key},
+        )
+    elif inherited.status is Inherit.UNKNOWN:
+        return Ask(texts.ASK_DATE_AGAIN)
     elif date_texts:
         result = resolve_date(date_texts, reference, purpose=DatePurpose.SCHEDULE)
         if result.status is DateStatus.RESOLVED:
@@ -126,12 +159,15 @@ def _change_moment(
                 return Ask(texts.ASK_DATE_AGAIN)
             return Ask(
                 texts.confirm_next_year(result.proposal),
-                confirm={"slot": "change_date", "value": result.proposal.isoformat()},
+                confirm={"slot": "change_date", "value": result.proposal.isoformat(), "source": date_key},
             )
         elif result.status is DateStatus.WEEKDAY_IS_TODAY:
             if not server_time_trusted:
                 return Ask(texts.ASK_ABSOLUTE_DATE)
-            return Ask(texts.confirm_today(today), confirm={"slot": "change_date", "value": today.isoformat()})
+            return Ask(
+                texts.confirm_today(today),
+                confirm={"slot": "change_date", "value": today.isoformat(), "source": date_key},
+            )
         else:
             return Ask(texts.ASK_DATE_AGAIN)
 
@@ -144,13 +180,13 @@ def _change_moment(
         elif result_time.status is TimeStatus.NEEDS_CLOCK:
             return Ask(texts.ASK_TIME)
         elif result_time.status is TimeStatus.MIDNIGHT_UNCLEAR:
-            if overrides.midnight:
+            if overrides.midnight_source == midnight_key:
                 moment.clock = time(0, 0)
                 moment.next_day_midnight = True
             elif moment.day is not None:
                 return Ask(
                     texts.confirm_midnight(moment.day + timedelta(days=1)),
-                    confirm={"slot": "midnight", "value": "yes"},
+                    confirm={"slot": "midnight", "value": "yes", "source": midnight_key},
                 )
             else:
                 # The date is still unknown; ask for it first.

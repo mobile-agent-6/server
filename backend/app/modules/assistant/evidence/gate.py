@@ -29,7 +29,9 @@ from app.modules.assistant.evidence.normalize import (
     DatePurpose,
     DateStatus,
     TimeStatus,
+    is_date_or_time_only,
     is_future_scope,
+    mentions_date_or_time,
     normalize_text,
     resolve_category,
     resolve_completed,
@@ -67,12 +69,6 @@ _OPERATION_ONLY = re.compile(
     r"보여\s*줘|알려\s*줘|뭐\s*있어|있어|바꿔\s*줘|옮겨\s*줘|"
     r"삭제해\s*줘|지워\s*줘|지우고|다\s*보여\s*줘|전부\s*보여\s*줘)$"
 )
-# A date or time token alone cannot be a title.
-_DATE_OR_TIME_ONLY = re.compile(
-    r"^(?:\d{4}년\s*)?\d{1,2}월(?:\s*\d{1,2}일)?$|^(?:오늘|내일|모레|글피)$|"
-    r"^(?:이번\s*주\s*)?[월화수목금토일]요일$|"
-    r"^(?:(?:오전|오후|아침|저녁|새벽|낮|밤)\s*)?\d{1,2}\s*시(?:\s*\d{1,2}\s*분|\s*반)?$"
-)
 
 # Statuses that are real expressions the user can clarify.  Only NOT_A_* means
 # the model put words in the wrong slot.
@@ -92,7 +88,8 @@ class EvidenceGateError(ValueError):
 def _is_title(texts: Sequence[str]) -> bool:
     for text in texts:
         value = normalize_text(text)
-        if _OPERATION_ONLY.fullmatch(value) or _DATE_OR_TIME_ONLY.fullmatch(value):
+        # A date or time alone ("정오", "다음 주 화요일") cannot be a title.
+        if _OPERATION_ONLY.fullmatch(value) or is_date_or_time_only(value):
             return False
         if not re.search(r"[0-9A-Za-z가-힣]", value):
             return False
@@ -299,16 +296,43 @@ def analyze_text(text: str) -> TextAnalysis:
 
 
 # ------------------------------------------------------ yes or no answers
+#
+# A reply to a yes/no question is split into words of four kinds.  Every word
+# must be one of them or a neutral word; anything left over ("응 정오로",
+# "응, 제목은 주간 회의로", "그건 좀") is new or unclear information, so the
+# backend asks again instead of guessing or dropping it (review 2026-11-01).
+# Keeping one table, not separate yes and no lists, stops a word from being
+# allowed without also being judged.
 
-_AFFIRM = re.compile(
-    r"^(?:응|어|네|넵|예|그래|그래요|좋아|좋아요|오케이|ok|알겠어|알겠습니다|맞아|맞아요|그렇게\s*해)(?![가-힣])",
+# "알림 빼고" or "문자는 필요 없어요" in a consent reply: the user drops the
+# unsupported part and goes on.
+_DROPPED_FEATURE = re.compile(
+    r"(?:알림|문자|리마인더|푸시|메시지|메세지|알람)\s*(?:은|는|도|이|가)?\s*"
+    r"(?:없이|빼고|빼\s*주세요|빼\s*줘|빼|말고|생략하고|필요\s*없으니|필요\s*없어요|필요\s*없어|필요\s*없습니다|"
+    r"안\s*해도\s*(?:돼요|돼|됩니다)|됐어요|됐어|괜찮아요|괜찮아)"
+)
+_ANSWER_WORD = re.compile(
+    # No: refusing or stopping.
+    r"(?P<no>(?:하|넣|잡|등록하|진행하|추가하)지\s*(?:마세요|마|말아\s*주세요|말아|않을게요|않을게|않아요|않아)|"
+    r"안\s*(?:할게요|할게|할래요|할래|해요|해)|"
+    r"취소할게요|취소할게|취소해\s*주세요|취소해\s*줘|취소해요|취소해|취소|"
+    r"그만둘게요|그만둘게|그만할게요|그만할게|그만\s*둬|그만|"
+    r"아니요|아니오|아뇨|아니야|아니|싫어요|싫어|됐어요|됐어|마세요)|"
+    # A part of the requests: "나머지만", "첫 번째는 빼 줘".
+    r"(?P<part>빼고|빼\s*주세요|빼\s*줘|빼|나머지)|"
+    # Yes.
+    r"(?P<yes>그렇게\s*해\s*주세요|그렇게\s*해\s*줘|그렇게\s*해요|그렇게\s*해|"
+    r"알겠습니다|알겠어요|알겠어|좋습니다|좋아요|좋아|맞습니다|맞아요|맞아|그래요|그래|그럼요|"
+    r"오케이|ok|넵|네|예|응|어)|"
+    # Go ahead: "등록해 줘", "진행해 주세요".
+    r"(?P<go>등록만|등록|넣어|잡아|진행|해\s*주세요|해\s*줘요|해\s*줘|해요|해|"
+    r"부탁해요|부탁해|부탁드립니다|부탁드려요|부탁합니다|할게요|할게|주세요|줘)|"
+    # Neutral: words that change nothing.  "좀" is left out ("그건 좀" is a soft no).
+    r"(?P<neutral>첫\s*번째(?:\s*(?:것|거))?|그건|그거|그것|일정|전부|모두|이대로|그대로|그냥|일단|그럼|"
+    r"괜찮아요|괜찮아|은|는|도|만|요)",
     re.IGNORECASE,
 )
-_DECLINE = re.compile(r"(?:^|[\s,.!?])(?:아니|아뇨|아니요|아니오|싫어|됐어|됐어요|취소|그만)(?![가-힣])")
-_DECLINE_VERB = re.compile(r"(?:등록|넣|진행|추가|하|잡)지\s*(?:마|말)|안\s*할래|하지\s*않|그만\s*둬|취소해")
-# Issue #35: polite and everyday forms ("해 주세요", "부탁", "필요 없어요") also proceed.
-_PROCEED = re.compile(r"(?:등록해|등록\s*해|넣어|진행해|잡아|그렇게\s*해|해\s*줘|해\s*주세요|부탁|필요\s*없)")
-_DATE_OR_TIME = re.compile(r"\d+\s*(?:시|분|월|일|년)|오늘|내일|모레|글피|요일")
+_ANSWER_FILLER = re.compile(r"[\s,.!?~…]+")
 
 
 class Answer(StrEnum):
@@ -317,29 +341,47 @@ class Answer(StrEnum):
     UNKNOWN = "unknown"
 
 
+def _answer_words(value: str) -> set[str] | None:
+    """The kinds of words in a reply, or None when something else is left."""
+
+    rest = _DROPPED_FEATURE.sub(" ", value)
+    # Dropping the unsupported part ("알림은 필요 없어요") means going on without it.
+    kinds: set[str] = {"go"} if rest != value else set()
+    pieces: list[str] = []
+    position = 0
+    for match in _ANSWER_WORD.finditer(rest):
+        pieces.append(rest[position:match.start()])
+        position = match.end()
+        kinds.add(match.lastgroup or "")
+    pieces.append(rest[position:])
+    if _ANSWER_FILLER.sub("", "".join(pieces)):
+        return None
+    return kinds
+
+
 def classify_answer(text: str) -> Answer:
     """Read a reply to a backend yes/no question.
 
-    Anything unclear, any new unsupported request, and any reply that carries a
-    date or time is UNKNOWN, so the backend asks again instead of guessing.
+    1. A yes word with a no word ("네, 취소할게요") is unclear: ask again.
+    2. Any no word is a no ("아니요, 등록하지 마세요").
+    3. Picking a part ("나머지만 해 줘", "응 첫 번째는 빼 줘") is unclear: ask again.
+    4. A yes or go-ahead word, or dropping the unsupported part ("알림은 필요
+       없어요"), is a yes.
+    5. Anything else, a new request, or a date or time is unclear: ask again.
     """
 
     value = normalize_text(text)
     analysis = analyze_text(value)
-    kinds = {finding.kind for finding in analysis.findings}
-    if CueKind.REQUEST in kinds or CueKind.UNKNOWN in kinds:
+    cue_kinds = {finding.kind for finding in analysis.findings}
+    if CueKind.REQUEST in cue_kinds or CueKind.UNKNOWN in cue_kinds or mentions_date_or_time(value):
         return Answer.UNKNOWN
-    if _DATE_OR_TIME.search(value):
+    kinds = _answer_words(value)
+    if kinds is None:
         return Answer.UNKNOWN
-    affirm = bool(_AFFIRM.match(value))
-    decline = bool(_DECLINE.search(value)) or bool(_DECLINE_VERB.search(value))
-    proceed = bool(_PROCEED.search(value))
-    if CueKind.EXCLUSION in kinds and proceed and not _DECLINE_VERB.search(value):
-        return Answer.YES
-    if affirm and not decline:
-        return Answer.YES
-    if decline and not affirm:
-        return Answer.NO
-    if proceed and not decline:
+    if "no" in kinds:
+        return Answer.UNKNOWN if "yes" in kinds else Answer.NO
+    if "part" in kinds:
+        return Answer.UNKNOWN
+    if "yes" in kinds or "go" in kinds:
         return Answer.YES
     return Answer.UNKNOWN
