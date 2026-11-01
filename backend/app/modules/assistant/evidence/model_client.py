@@ -9,6 +9,7 @@ The model has no Schedule access; it only returns text.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import socket
 import urllib.error
@@ -70,6 +71,9 @@ class ChatCompletionsModel:
         self._timeout = timeout_seconds
         self._model = model
         self._prompt = prompt if prompt is not None else PROMPT_PATH.read_text(encoding="utf-8")
+        # Shown in the model call log so a run can be tied to its model and prompt.
+        self.name = model or "default"
+        self.prompt_sha256 = hashlib.sha256(self._prompt.encode("utf-8")).hexdigest()
 
     def is_ready(self) -> bool:
         """Quick start-up check; any failure means the Assistant stays unavailable."""

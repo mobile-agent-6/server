@@ -34,6 +34,11 @@ _JSON_FIELDS = (
     "resultServerTime",
     "adjusted",
     "clientIp",
+    "model",
+    "promptSha256",
+    "userTurns",
+    "modelOutput",
+    "validation",
 )
 
 

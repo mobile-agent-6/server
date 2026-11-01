@@ -107,3 +107,19 @@ def test_demo_disables_uvicorn_access_log(tmp_path: Path) -> None:
     configure_logging(settings)
 
     assert logging.getLogger("uvicorn.access").disabled is True
+
+
+def test_json_formatter_emits_model_call_fields() -> None:
+    record = logging.LogRecord("app.test", logging.INFO, __file__, 1, "model call", (), None)
+    record.event = "assistant.model_call"
+    record.model = "default"
+    record.promptSha256 = "abc"
+    record.userTurns = ["내일 회의 잡아 줘", "오후 3시"]
+    record.modelOutput = '{"operations":[]}'
+    record.validation = "ok"
+
+    payload = json.loads(JsonFormatter().format(record))
+
+    assert payload["userTurns"] == ["내일 회의 잡아 줘", "오후 3시"]
+    assert (payload["model"], payload["promptSha256"], payload["validation"]) == ("default", "abc", "ok")
+    assert payload["modelOutput"] == '{"operations":[]}'

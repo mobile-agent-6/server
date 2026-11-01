@@ -615,3 +615,51 @@ def test_category_change_outside_the_title_is_kept() -> None:
     )
     _, decision = decide(EvidenceDecisionProvider(model, FakeReader([target])), "입고 검수 분류를 출고로 바꿔 줘")
     assert decision["changes"] == {"category": "OUTBOUND"}
+
+
+# ------------------------------------------------------------- model call log
+
+
+def _model_call_records(caplog) -> list:
+    return [r for r in caplog.records if getattr(r, "event", None) == "assistant.model_call"]
+
+
+def test_model_call_is_logged_with_input_output_and_result(caplog) -> None:
+    caplog.set_level("INFO", logger="app.modules.assistant.evidence.provider")
+    created = output(op("create", change={
+        "title": [span("입고 검수")], "date": [span("내일")], "time": [span("오후 3시")],
+    }))
+    model = ScriptedModel(created)
+    model.name = "run-006"
+    model.prompt_sha256 = "abc"
+    decide(EvidenceDecisionProvider(model, FakeReader()), "내일 오후 3시에 입고 검수 잡아 줘")
+    (record,) = _model_call_records(caplog)
+    assert record.validation == "ok"
+    assert record.userTurns == ["내일 오후 3시에 입고 검수 잡아 줘"]
+    assert json.loads(record.modelOutput) == created
+    assert (record.model, record.promptSha256) == ("run-006", "abc")
+    assert record.durationMs >= 0
+
+
+def test_invalid_model_output_is_logged_with_the_error_code(caplog) -> None:
+    caplog.set_level("INFO", logger="app.modules.assistant.evidence.provider")
+    model = ScriptedModel(output(op("create", change={"title": [span("없는 제목")]})))
+    with pytest.raises(EvidenceContractError):
+        decide(EvidenceDecisionProvider(model, FakeReader()), "내일 회의 잡아 줘")
+    (record,) = _model_call_records(caplog)
+    assert record.validation == "SPAN_NOT_IN_TURN"
+    assert record.modelOutput is not None
+
+
+def test_model_timeout_is_logged_without_output(caplog) -> None:
+    from app.modules.assistant.decisions import DecisionProviderTimeout
+
+    class SlowModel:
+        def extract(self, **_: object) -> str:
+            raise DecisionProviderTimeout("model server timed out")
+
+    caplog.set_level("INFO", logger="app.modules.assistant.evidence.provider")
+    with pytest.raises(DecisionProviderTimeout):
+        decide(EvidenceDecisionProvider(SlowModel(), FakeReader()), "내일 회의 잡아 줘")
+    (record,) = _model_call_records(caplog)
+    assert (record.validation, record.modelOutput) == ("DecisionProviderTimeout", None)

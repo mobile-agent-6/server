@@ -167,3 +167,11 @@ def test_unreachable_server_is_unavailable() -> None:
 def test_base_url_must_be_http(url: str) -> None:
     with pytest.raises(ValueError):
         ChatCompletionsModel(base_url=url, timeout_seconds=5, prompt="p")
+
+
+def test_client_exposes_model_name_and_prompt_hash_for_logs() -> None:
+    import hashlib
+
+    client = ChatCompletionsModel(base_url="http://127.0.0.1:9", timeout_seconds=1, prompt="P")
+    assert client.name == "default"
+    assert client.prompt_sha256 == hashlib.sha256(b"P").hexdigest()
