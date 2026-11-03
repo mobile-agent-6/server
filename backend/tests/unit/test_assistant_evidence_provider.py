@@ -124,6 +124,59 @@ def test_complete_create() -> None:
     assert envelope.control_state["turns"] == []  # cleared once the task ends
 
 
+@pytest.mark.parametrize("title", ["출하 예정 점검", "협력사 납품 회의"])
+def test_create_uses_other_for_ambiguous_logistics_terms(title: str) -> None:
+    model = ScriptedModel(
+        output(
+            op(
+                "create",
+                change={
+                    "title": [span(title)],
+                    "date": [span("내일")],
+                    "time": [span("오전 9시")],
+                },
+            )
+        )
+    )
+    _, decision = decide(
+        EvidenceDecisionProvider(model, FakeReader()),
+        f"내일 오전 9시에 {title} 등록해 줘",
+    )
+    assert decision["kind"] == "create_intent"
+    assert decision["category"] == "OTHER"
+
+
+@pytest.mark.parametrize(
+    ("title", "category_text", "expected"),
+    [
+        ("납품분 입고 확인", "입고", "INBOUND"),
+        ("출하 출고 점검", "출고", "OUTBOUND"),
+    ],
+)
+def test_explicit_category_cue_wins_over_ambiguous_logistics_terms(
+    title: str, category_text: str, expected: str
+) -> None:
+    model = ScriptedModel(
+        output(
+            op(
+                "create",
+                change={
+                    "title": [span(title)],
+                    "date": [span("내일")],
+                    "time": [span("오전 9시")],
+                    "category": [span(category_text)],
+                },
+            )
+        )
+    )
+    _, decision = decide(
+        EvidenceDecisionProvider(model, FakeReader()),
+        f"내일 오전 9시에 {title} 등록해 줘",
+    )
+    assert decision["kind"] == "create_intent"
+    assert decision["category"] == expected
+
+
 def test_past_create_asks_for_a_new_date_and_time_before_write() -> None:
     model = ScriptedModel(
         output(
@@ -618,6 +671,30 @@ def test_unclear_target_title_asks_which_schedule() -> None:
     _, decision = decide(EvidenceDecisionProvider(model, reader), "그거 지워 줘")
     assert decision == {"kind": "ask", "text": texts.ASK_TARGET_TITLE}
     assert reader.reads == []  # nothing is searched with an unclear title
+
+
+def test_unclear_list_title_asks_which_schedule() -> None:
+    model = ScriptedModel(output(op("list", filter={"title": [span("그 일정")]})))
+    reader = FakeReader([schedule("그 일정 정리", REFERENCE + timedelta(days=1))])
+    _, decision = decide(EvidenceDecisionProvider(model, reader), "그 일정 보여 줘")
+    assert decision == {"kind": "ask", "text": texts.ASK_TARGET_TITLE}
+    assert reader.reads == []
+
+
+def test_unclear_update_target_asks_which_schedule() -> None:
+    model = ScriptedModel(
+        output(
+            op(
+                "update",
+                target={"title": [span("그거")]},
+                change={"completed": [span("완료")]},
+            )
+        )
+    )
+    reader = FakeReader([schedule("그거 정리", REFERENCE + timedelta(days=1))])
+    _, decision = decide(EvidenceDecisionProvider(model, reader), "그거 완료로 바꿔 줘")
+    assert decision == {"kind": "ask", "text": texts.ASK_TARGET_TITLE}
+    assert reader.reads == []
 
 
 def test_unclear_new_title_asks_for_the_change() -> None:
