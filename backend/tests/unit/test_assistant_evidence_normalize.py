@@ -376,6 +376,14 @@ def test_future_scope() -> None:
     assert is_future_scope([]) is False
 
 
+def test_day_only_does_not_roll_from_an_invalid_current_month_date() -> None:
+    reference = datetime(2026, 11, 3, 10, 0, tzinfo=SEOUL)
+
+    result = resolve_date(["31일"], reference, purpose=DatePurpose.SCHEDULE)
+
+    assert result.status is DateStatus.INVALID_DATE
+
+
 @pytest.mark.parametrize(
     ("title", "unclear"),
     [

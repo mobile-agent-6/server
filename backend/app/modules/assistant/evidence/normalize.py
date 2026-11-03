@@ -200,6 +200,10 @@ def _day_of_month(day_value: int, today: date, purpose: DatePurpose) -> DateResu
 
     if not 1 <= day_value <= 31:
         return DateResult(DateStatus.INVALID_DATE)
+    # A day-only expression refers to the current month first. If the date does
+    # not exist, do not silently move it to a later month where it does.
+    if _safe_date(today.year, today.month, day_value) is None:
+        return DateResult(DateStatus.INVALID_DATE)
     found: list[date] = []
     for months in range(0, 3):
         year, month = _shift_month(today, months)

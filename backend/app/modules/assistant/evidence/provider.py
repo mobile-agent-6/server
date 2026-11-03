@@ -39,6 +39,13 @@ from app.modules.assistant.evidence.gate import (
 )
 from app.modules.assistant.evidence.normalize import mentions_date_or_time, normalize_text
 from app.modules.assistant.evidence.planner import Ask, Overrides, plan_operation
+from app.modules.assistant.evidence.safety import (
+    EvidenceQuestion,
+    check_role_span_overlaps,
+    clarification_answer_matches,
+    evidence_question,
+    pre_write_question,
+)
 from app.modules.assistant.schedule_read import ScheduleReadPort
 
 logger = logging.getLogger(__name__)
@@ -153,6 +160,16 @@ class EvidenceDecisionProvider:
     def _ask(self, text: str, state: _State) -> DecisionEnvelope:
         return _envelope({"kind": "ask", "text": text}, state)
 
+    def _ask_for_evidence(
+        self, question: EvidenceQuestion, state: _State
+    ) -> DecisionEnvelope:
+        state.pending = {
+            "kind": "clarify",
+            "slot": question.value,
+            "text": question.text,
+        }
+        return self._ask(question.text, state)
+
     def _starting_state(self, context: DecisionContext, text: str) -> _State:
         previous = None
         if context.is_question_follow_up and context.answered_question_kind == "need_more_info":
@@ -174,39 +191,53 @@ class EvidenceDecisionProvider:
         pending = state.pending
         if pending is not None:
             state.pending = None
-            answer = classify_answer(text)
-            # A yes or no ("응, 알림 없이 등록해") is not part of the request.  The
-            # model was never trained on it and misreads the request when it is there.
-            state.turns.pop()
-            if pending.get("kind") == "consent":
-                if answer is Answer.NO:
-                    return _envelope({"kind": "cancel", "text": texts.CONSENT_DECLINED}, _cleared())
-                if answer is Answer.UNKNOWN:
+            if pending.get("kind") == "clarify":
+                try:
+                    question = EvidenceQuestion(
+                        pending.get("slot", EvidenceQuestion.VALUE)
+                    )
+                except (TypeError, ValueError):
+                    return _envelope(
+                        {"kind": "ask", "text": texts.ASK_RESTATE}, _cleared()
+                    )
+                if not clarification_answer_matches(question, text):
+                    state.turns.pop()
                     state.pending = pending
-                    return self._ask(texts.CONSENT_QUESTION, state)
-                state.consent_granted = True
-            elif pending.get("kind") == "confirm":
-                if answer is Answer.UNKNOWN:
-                    state.pending = pending
-                    return self._ask(pending.get("text", texts.ASK_DATE_AGAIN), state)
-                slot = pending.get("slot")
-                if answer is Answer.NO:
-                    if slot == "first_operation":
-                        return _envelope({"kind": "cancel", "text": texts.FIRST_DECLINED}, _cleared())
-                    if slot == "new_create":
-                        # Probably a change to an existing schedule: start over.
-                        return _envelope({"kind": "ask", "text": texts.ASK_RESTATE}, _cleared())
-                    if slot == "values":
-                        return self._ask(texts.ASK_DATETIME_AGAIN, state)
-                    again = texts.ASK_TIME_AGAIN if slot == "midnight" else texts.ASK_DATE_AGAIN
-                    return self._ask(again, state)
-                if slot == "change_date":
-                    state.change_date = pending.get("value")
-                    state.change_date_source = pending.get("source")
-                elif slot == "midnight":
-                    state.midnight_source = pending.get("source")
-                elif slot in {"first_operation", "values", "new_create"}:
-                    state.create_confirmed = pending.get("value")
+                    return self._ask(pending.get("text", question.text), state)
+            else:
+                answer = classify_answer(text)
+                # A yes or no ("응, 알림 없이 등록해") is not part of the request.
+                # The model was never trained on it and misreads the request when it is there.
+                state.turns.pop()
+                if pending.get("kind") == "consent":
+                    if answer is Answer.NO:
+                        return _envelope({"kind": "cancel", "text": texts.CONSENT_DECLINED}, _cleared())
+                    if answer is Answer.UNKNOWN:
+                        state.pending = pending
+                        return self._ask(texts.CONSENT_QUESTION, state)
+                    state.consent_granted = True
+                elif pending.get("kind") == "confirm":
+                    if answer is Answer.UNKNOWN:
+                        state.pending = pending
+                        return self._ask(pending.get("text", texts.ASK_DATE_AGAIN), state)
+                    slot = pending.get("slot")
+                    if answer is Answer.NO:
+                        if slot == "first_operation":
+                            return _envelope({"kind": "cancel", "text": texts.FIRST_DECLINED}, _cleared())
+                        if slot == "new_create":
+                            # Probably a change to an existing schedule: start over.
+                            return _envelope({"kind": "ask", "text": texts.ASK_RESTATE}, _cleared())
+                        if slot == "values":
+                            return self._ask(texts.ASK_DATETIME_AGAIN, state)
+                        again = texts.ASK_TIME_AGAIN if slot == "midnight" else texts.ASK_DATE_AGAIN
+                        return self._ask(again, state)
+                    if slot == "change_date":
+                        state.change_date = pending.get("value")
+                        state.change_date_source = pending.get("source")
+                    elif slot == "midnight":
+                        state.midnight_source = pending.get("source")
+                    elif slot in {"first_operation", "values", "new_create"}:
+                        state.create_confirmed = pending.get("value")
 
         if not state.consent_granted:
             analyses = [analyze_text(turn) for turn in state.turns]
@@ -238,6 +269,7 @@ class EvidenceDecisionProvider:
             )
             output = parse_evidence_output(raw, user_turns=turns)
             check_roles(output, reference=reference)
+            check_role_span_overlaps(output, user_turns=turns)
             check_turn_prefix(list(turns), len(turns))
             return output
         except (EvidenceContractError, EvidenceGateError) as exc:
@@ -282,6 +314,16 @@ class EvidenceDecisionProvider:
             state.pending = {"kind": "consent"}
             return self._ask(texts.CONSENT_QUESTION, state)
 
+        question = evidence_question(
+            operation,
+            turns=state.turns,
+            reference=reference,
+            coverage_operations=output.operations,
+            coverage_spans=output.unsupported,
+        )
+        if question is not None:
+            return self._ask_for_evidence(question, state)
+
         decision, ask = plan_operation(
             operation,
             reference=reference,
@@ -296,6 +338,17 @@ class EvidenceDecisionProvider:
             return self._ask(question, state)
         if decision is None:
             raise ValueError("planner returned neither a decision nor a question")
+        question = pre_write_question(
+            decision,
+            operation,
+            turns=state.turns,
+            reference=reference,
+            server_time_trusted=context.server_time_trusted,
+            coverage_operations=output.operations,
+            coverage_spans=output.unsupported,
+        )
+        if question is not None:
+            return self._ask_for_evidence(question, state)
         if decision["kind"] == "create_intent" and state.create_confirmed != _create_signature(decision):
             # A create runs at once with no confirmation step, so these checks
             # stop a model mistake before it becomes a wrong schedule.

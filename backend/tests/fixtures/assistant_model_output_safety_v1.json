@@ -159,6 +159,101 @@
       },
       "expectedModelCalls": 1,
       "expectedSchedules": []
+    },
+    {
+      "caseId": "create-omits-next-year-modifier",
+      "class": "incomplete_date_evidence",
+      "input": "내년 12월 5일 오후 3시에 회의 등록해 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "회의", "status": "adopted"}],
+              "date": [{"turn": 1, "text": "12월 5일", "status": "adopted"}],
+              "time": [{"turn": 1, "text": "오후 3시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "need_more_info",
+        "text": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "create-conflicting-adopted-dates",
+      "class": "conflicting_adopted_values",
+      "input": "모레, 아니 내일 오후 3시에 회의 등록해 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "회의", "status": "adopted"}],
+              "date": [
+                {"turn": 1, "text": "모레", "status": "adopted"},
+                {"turn": 1, "text": "아니", "status": "correction_marker"},
+                {"turn": 1, "text": "내일", "status": "adopted"}
+              ],
+              "time": [{"turn": 1, "text": "오후 3시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "need_more_info",
+        "text": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "create-title-overlaps-date-and-time",
+      "class": "semantic_role_overlap",
+      "input": "내일 오후 3시 회의 등록해 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "내일 오후 3시 회의", "status": "adopted"}],
+              "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+              "time": [{"turn": 1, "text": "오후 3시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "failure",
+        "code": "MODEL_OUTPUT_INVALID",
+        "nextAction": "revise_input"
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
     }
   ]
 }

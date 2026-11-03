@@ -929,27 +929,57 @@ def _lk52_provider(*extra: dict) -> tuple[EvidenceDecisionProvider, object]:
     return provider, previous
 
 
-def test_missed_correction_shows_values_before_creating() -> None:
+def test_missed_correction_asks_for_the_omitted_date() -> None:
     provider, previous = _lk52_provider()
-    third, decision = decide(provider, LK52_TURNS[2], previous=previous)
-    assert decision["kind"] == "ask"
-    assert decision["text"] == texts.confirm_create_values(
-        "반품 사유 분류", datetime(2026, 10, 31, 10, 0, tzinfo=SEOUL)
-    )
+    _, decision = decide(provider, LK52_TURNS[2], previous=previous)
+    assert decision == {"kind": "ask", "text": texts.ASK_DATE_AGAIN}
 
 
-def test_missed_correction_answered_no_asks_for_date_and_time_again() -> None:
+def test_missed_correction_clarification_rejects_a_yes_no_answer() -> None:
     provider, previous = _lk52_provider()
     third, _ = decide(provider, LK52_TURNS[2], previous=previous)
     _, decision = decide(provider, "아니", previous=third)
-    assert decision == {"kind": "ask", "text": texts.ASK_DATETIME_AGAIN}
+    assert decision == {"kind": "ask", "text": texts.ASK_DATE_AGAIN}
 
 
-def test_missed_correction_answered_yes_creates() -> None:
+def test_missed_correction_cannot_be_authorized_with_yes() -> None:
     provider, previous = _lk52_provider(LK52_MISSED)
     third, _ = decide(provider, LK52_TURNS[2], previous=previous)
     _, decision = decide(provider, "응", previous=third)
+    assert decision == {"kind": "ask", "text": texts.ASK_DATE_AGAIN}
+
+
+def test_date_clarification_is_rechecked_before_create() -> None:
+    wrong = output(
+        op(
+            "create",
+            change={
+                "title": [span("회의")],
+                "date": [span("12월 5일")],
+                "time": [span("오후 3시")],
+            },
+        )
+    )
+    corrected = output(
+        op(
+            "create",
+            change={
+                "title": [span("회의")],
+                "date": [span("2027년 12월 5일", turn=2)],
+                "time": [span("오후 3시")],
+            },
+        )
+    )
+    model = ScriptedModel(wrong, corrected)
+    provider = EvidenceDecisionProvider(model, FakeReader())
+
+    first, decision = decide(provider, "내년 12월 5일 오후 3시에 회의 등록해 줘")
+    assert decision == {"kind": "ask", "text": texts.ASK_DATE_AGAIN}
+
+    _, decision = decide(provider, "2027년 12월 5일", previous=first)
     assert decision["kind"] == "create_intent"
+    assert decision["scheduledAt"] == "2027-12-05T06:00:00Z"
+    assert len(model.seen) == 2
 
 
 def test_marked_correction_creates_without_extra_question() -> None:
@@ -1344,8 +1374,18 @@ def test_correction_without_month_asks_when_the_replaced_date_is_unreadable() ->
     assert decision == {"kind": "ask", "text": texts.ASK_DATE_AGAIN}
 
 
-@pytest.mark.parametrize("latest", ["아니 정오로", "아니 15:30으로", "아니 다음 달 3일로", "아니 열한 시 반으로"])
-def test_missed_correction_with_new_expressions_still_asks_before_creating(latest: str) -> None:
+@pytest.mark.parametrize(
+    ("latest", "question"),
+    [
+        ("아니 정오로", texts.ASK_TIME_AGAIN),
+        ("아니 15:30으로", texts.ASK_TIME_AGAIN),
+        ("아니 다음 달 3일로", texts.ASK_DATE_AGAIN),
+        ("아니 열한 시 반으로", texts.ASK_TIME_AGAIN),
+    ],
+)
+def test_missed_correction_with_new_expressions_asks_for_that_value(
+    latest: str, question: str
+) -> None:
     # The model kept the old values and marked no correction.
     missed = output(op("create", change={
         "title": [span("회의")], "date": [span("내일")], "time": [span("오후 3시")],
@@ -1357,8 +1397,7 @@ def test_missed_correction_with_new_expressions_still_asks_before_creating(lates
              "changeDate": None, "changeDateSource": None, "midnightSource": None, "createConfirmed": None}
     envelope = provider.decide(context(latest, follow_up=True, state=state))
     decision = envelope.decision.model_dump(mode="json", by_alias=True, exclude_none=True)
-    assert decision["kind"] == "ask"
-    assert decision["text"] == texts.confirm_create_values("회의", datetime(2026, 10, 30, 15, 0, tzinfo=SEOUL))
+    assert decision == {"kind": "ask", "text": question}
 
 
 @pytest.mark.parametrize("title", ["정오", "다음 주 화요일", "15:30"])
