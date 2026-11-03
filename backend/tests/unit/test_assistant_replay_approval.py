@@ -38,3 +38,7 @@ def test_replay_difference_approval_list_is_explicit_and_case_scoped() -> None:
         identity = (item["case"], item["turn"])
         assert identity not in seen
         seen.add(identity)
+    assert seen == {
+        ("c3-create-b3-002", 1),
+        ("c3-create-b3-053", 2),
+    }

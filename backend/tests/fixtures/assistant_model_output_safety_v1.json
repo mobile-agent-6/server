@@ -32,7 +32,7 @@
       },
       "expectedResult": {
         "kind": "need_more_info",
-        "text": "'회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+        "text": "2026년 10월 30일 오후 4시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
       },
       "expectedModelCalls": 1,
       "expectedSchedules": []
@@ -62,7 +62,7 @@
       },
       "expectedResult": {
         "kind": "need_more_info",
-        "text": "'회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+        "text": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
       },
       "expectedModelCalls": 1,
       "expectedSchedules": []

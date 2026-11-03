@@ -35,6 +35,12 @@ FIXTURE_PATH = (
 )
 FIXTURE = json.loads(FIXTURE_PATH.read_text(encoding="utf-8"))
 CASES = FIXTURE["cases"]
+CREATE_GUARD_FIXTURE = json.loads(
+    (FIXTURE_PATH.parent / "assistant_create_guard_v1.json").read_text(
+        encoding="utf-8"
+    )
+)
+CREATE_GUARD_CASES = CREATE_GUARD_FIXTURE["cases"]
 SEOUL = timezone(timedelta(hours=9))
 NOW = datetime(2026, 10, 29, 10, 0, tzinfo=SEOUL)
 
@@ -158,6 +164,71 @@ def test_model_output_safety_matrix_matches_api_and_database(
                 ]
             assert _schedule_rows(application) == case["expectedSchedules"]
         assert model.calls == case["expectedModelCalls"]
+    finally:
+        application.state.engine.dispose()
+
+
+@pytest.mark.parametrize(
+    "case", CREATE_GUARD_CASES, ids=[case["caseId"] for case in CREATE_GUARD_CASES]
+)
+def test_create_guard_cases_ask_before_api_write(case: dict, tmp_path: Path) -> None:
+    model_output = {
+        "operations": [
+            {
+                "index": 1,
+                "kind": "create",
+                "targetEvidence": {},
+                "changeEvidence": {
+                    "title": [
+                        {"turn": 1, "text": case["title"], "status": "adopted"}
+                    ],
+                    "date": [
+                        {"turn": 1, "text": case["date"], "status": "adopted"}
+                    ],
+                    "time": [
+                        {"turn": 1, "text": case["time"], "status": "adopted"}
+                    ],
+                },
+                "filterEvidence": {},
+                "unsupportedEvidence": [],
+                "missingInformation": [],
+            }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": [],
+    }
+    model = _FixedModel(model_output)
+    reader = _LazyReader()
+    provider = EvidenceDecisionProvider(model, reader)
+    database = tmp_path / (case["caseId"] + ".db")
+    migrate(database)
+    application = create_app(
+        Settings(_env_file=None, database_url=f"sqlite:///{database}"),
+        _assistant_runtime_ready_for_tests=True,
+        _assistant_decision_provider_for_tests=provider,
+        _assistant_time_trust_source_for_tests=_Trust(),
+        _assistant_uuid_factory_for_tests=uuid4,
+    )
+    application.state.clock = FixedClock(NOW)
+    try:
+        with TestClient(application) as client:
+            reader.inner = SqlAlchemyScheduleReader(
+                application.state.session_factory
+            )
+            request_id = str(uuid4())
+            response = client.post(
+                "/api/v1/assistant/requests",
+                json={
+                    "requestId": request_id,
+                    "input": {"type": "text", "text": case["input"]},
+                },
+            )
+            assert response.status_code == 202
+            result = _wait(client, request_id)["result"]
+            assert result["kind"] == "need_more_info"
+            assert result["text"] == case["expectedText"]
+            assert _schedule_rows(application) == []
+        assert model.calls == 1
     finally:
         application.state.engine.dispose()
 

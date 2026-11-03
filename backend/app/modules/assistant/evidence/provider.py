@@ -384,8 +384,12 @@ class EvidenceDecisionProvider:
         self, output: EvidenceOutput, state: _State, context: DecisionContext, reference: datetime
     ) -> DecisionEnvelope:
         if not output.operations:
+            if state.consent_granted:
+                raise EvidenceGateError("SUPPORTED_OPERATION_MISSING")
             if output.unsupported:
-                return _envelope({"kind": "ask", "text": texts.GUIDANCE}, _cleared())
+                return _envelope(
+                    {"kind": "ask", "text": texts.GUIDANCE}, _cleared()
+                )
             if any(_has_clear_supported_request(turn) for turn in state.turns):
                 raise EvidenceGateError("SUPPORTED_OPERATION_MISSING")
             return _envelope({"kind": "ask", "text": texts.GUIDANCE}, _cleared())
@@ -469,18 +473,30 @@ class EvidenceDecisionProvider:
 
 # "말고", "대신", "아니" mark a correction; "아니요" and "아니오" are answers, not corrections.
 _CORRECTION_MARKER = re.compile(r"말고|대신|아니(?!요|오)")
-_CHANGE_VERB = re.compile(r"옮겨|바꿔|변경|수정|취소|삭제|지워")
+_CHANGE_VERB = re.compile(r"옮겨|바꿔|변경|수정|미뤄|당겨|취소|삭제|지워")
 _REMOVE_VERB = re.compile(r"취소|삭제|지워")
 # A question about schedules must not become a create just because the model
 # returned create evidence.  Capability-style create requests are exempt.
 _QUERY_REQUEST = re.compile(
-    r"(?:보여\s*줘|알려\s*줘|조회(?:해\s*줘)?|뭐\s*있(?:어|나요|습니까)|"
-    r"일정\s*있(?:어|나요|습니까)|있(?:어|나요|습니까))\s*[?？]?\s*$"
+    r"(?:보여\s*줘|알려\s*줘|조회(?:해\s*줘)?|확인(?:해)?\s*줘|"
+    r"뭐\s*있(?:어|나요|습니까|니|나)|일정\s*있(?:어|나요|습니까|니|나)|"
+    r"있는지\s*(?:확인(?:해)?\s*줘)?|있(?:어|나요|습니까|니|나))\s*[?？]?\s*$"
 )
 _CREATE_CAPABILITY = re.compile(
     r"(?:등록(?:해)?|넣어|잡아|추가해|만들어)\s*"
     r"(?:줘|줄\s*수\s*있(?:어|나요|습니까))\s*[?？]?\s*$"
 )
+_CREATE_ACTION = re.compile(r"등록|넣어|잡아|추가|만들어|생성")
+_CREATE_PASSIVE = re.compile(
+    r"(?:등록|추가|생성)\s*(?:돼|되어|되었|되는|된|됐|됨)|"
+    r"(?:넣어|만들어)\s*(?:져|진|졌)|잡힌"
+)
+_CREATE_NEGATED = re.compile(
+    r"(?:등록|추가|생성)\s*(?:하지|안\s*해|지\s*(?:마|말|않))|"
+    r"(?:넣|잡|만들)\s*지\s*(?:마|말|않)|"
+    r"안\s*(?:등록|추가|생성|넣어|잡아|만들어)"
+)
+_COMPLETION_REQUEST = re.compile(r"완료(?:로|\s*(?:처리|표시))")
 _CLEAR_SUPPORTED_ACTION = re.compile(
     r"등록|넣어|잡아|추가해|만들어|옮겨|바꿔|변경|수정|지워|삭제|"
     r"완료로|완료\s*처리|조회"
@@ -547,12 +563,26 @@ def _has_query_request(operation: EvidenceOperation, turns: Sequence[str]) -> bo
     request after the unsupported part has already been handled by consent.
     """
 
+    for value in _residual_turns(operation, turns):
+        if _CREATE_CAPABILITY.search(value):
+            continue
+        if _QUERY_REQUEST.search(value):
+            return True
+    return False
+
+
+def _residual_turns(
+    operation: EvidenceOperation, turns: Sequence[str]
+) -> tuple[str, ...]:
+    """Return normalized request text after removing every claimed cue."""
+
     spans = [
         span
         for evidence in (operation.target, operation.change, operation.filter)
         for slot_spans in evidence.values()
         for span in slot_spans
     ] + list(operation.unsupported)
+    residuals: list[str] = []
     for turn_number, turn in enumerate(turns, 1):
         residual = normalize_text(turn)
         for span in spans:
@@ -560,9 +590,21 @@ def _has_query_request(operation: EvidenceOperation, turns: Sequence[str]) -> bo
                 residual = _mask_text(residual, span.text, span.occurrence)
         for finding in analyze_text(turn).findings:
             residual = _mask_text(residual, finding.text)
+        residuals.append(residual)
+    return tuple(residuals)
+
+
+def _has_explicit_create_action(
+    operation: EvidenceOperation, turns: Sequence[str]
+) -> bool:
+    for residual in _residual_turns(operation, turns):
         if _CREATE_CAPABILITY.search(residual):
-            continue
-        if _QUERY_REQUEST.search(residual):
+            return True
+        if (
+            _CREATE_ACTION.search(residual)
+            and not _CREATE_PASSIVE.search(residual)
+            and not _CREATE_NEGATED.search(residual)
+        ):
             return True
     return False
 
@@ -583,20 +625,24 @@ def _create_check(
     """Return ``(slot, question)`` when a create needs a yes before it runs."""
 
     title = str(decision["title"])
+    scheduled_at = datetime.fromisoformat(str(decision["scheduledAt"]))
     if several:
-        return "first_operation", texts.confirm_first_create(title)
+        return "first_operation", texts.confirm_first_create(title, scheduled_at)
     latest = turns[-1] if turns else ""
     if any(_is_change_request(turn, first=index == 0) for index, turn in enumerate(turns)):
         # Change or delete wording read as a new schedule (run 004 lk28).
-        return "new_create", texts.confirm_new_create(title)
+        return "new_create", texts.confirm_new_create(title, scheduled_at)
+    if any(_COMPLETION_REQUEST.search(normalize_text(turn)) for turn in turns):
+        return "new_create", texts.confirm_new_create(title, scheduled_at)
     if _has_query_request(operation, turns):
         # A list question read as a new schedule must never write immediately.
-        return "new_create", texts.confirm_new_create(title)
+        return "new_create", texts.confirm_new_create(title, scheduled_at)
+    if not _has_explicit_create_action(operation, turns):
+        return "new_create", texts.confirm_new_create(title, scheduled_at)
     if _has_replaced_evidence(operation):
         return None
     if _CORRECTION_MARKER.search(latest) and mentions_date_or_time(latest):
         # The user corrected a value but the model marked no replaced value (run 006 lk52).
-        scheduled_at = datetime.fromisoformat(str(decision["scheduledAt"]))
         return "values", texts.confirm_create_values(title, scheduled_at)
     return None
 

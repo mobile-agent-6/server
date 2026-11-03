@@ -46,8 +46,11 @@ def confirm_midnight(next_day: date) -> str:
     return f"{next_day.month}월 {next_day.day}일 0시(자정) 말씀이세요?"
 
 
-def confirm_first_create(title: str) -> str:
-    return f"여러 일정을 말씀하셨어요. '{title}' 일정부터 등록할까요? 나머지 요청은 이어서 말씀해 주세요."
+def confirm_first_create(title: str, scheduled_at: datetime) -> str:
+    return (
+        f"여러 일정을 말씀하셨어요. {_spoken_datetime(scheduled_at)}에 "
+        f"'{title}' 일정부터 등록할까요? 나머지 요청은 이어서 말씀해 주세요."
+    )
 
 
 def _spoken_time(value: datetime) -> str:
@@ -58,12 +61,23 @@ def _spoken_time(value: datetime) -> str:
     return f"{local.month}월 {local.day}일 {period} {hour}시{minute}"
 
 
+def _spoken_datetime(value: datetime) -> str:
+    local = value.astimezone(timezone(timedelta(hours=9)))
+    period = "오전" if local.hour < 12 else "오후"
+    hour = local.hour % 12 or 12
+    minute = f" {local.minute}분" if local.minute else ""
+    return f"{local.year}년 {local.month}월 {local.day}일 {period} {hour}시{minute}"
+
+
 def confirm_create_values(title: str, scheduled_at: datetime) -> str:
     return f"{_spoken_time(scheduled_at)}에 '{title}' 일정을 등록할까요?"
 
 
-def confirm_new_create(title: str) -> str:
-    return f"'{title}' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+def confirm_new_create(title: str, scheduled_at: datetime) -> str:
+    return (
+        f"{_spoken_datetime(scheduled_at)}에 '{title}' 일정을 새로 등록할까요? "
+        "기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    )
 
 
 def confirm_update(title: str) -> str:

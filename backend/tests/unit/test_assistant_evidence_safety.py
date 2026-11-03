@@ -61,6 +61,35 @@ def test_missing_date_modifier_is_not_silently_dropped() -> None:
     ) is EvidenceQuestion.DATE
 
 
+@pytest.mark.parametrize(
+    ("turn", "evidence"),
+    [
+        ("내후년 12월 5일 오후 3시에 회의 등록해 줘", "12월 5일"),
+        ("2주 뒤 금요일 오후 3시에 회의 등록해 줘", "금요일"),
+        ("일주일 뒤 금요일 오후 3시에 회의 등록해 줘", "금요일"),
+        ("한 달 뒤 5일 오후 3시에 회의 등록해 줘", "5일"),
+        ("2개월 후 5일 오후 3시에 회의 등록해 줘", "5일"),
+        ("3일 전 오후 3시에 회의 등록해 줘", "3일"),
+    ],
+)
+def test_missing_date_modifiers_require_clarification(
+    turn: str, evidence: str
+) -> None:
+    operation = _operation(
+        change={
+            "title": (_span("회의"),),
+            "date": (_span(evidence),),
+            "time": (_span("오후 3시"),),
+        }
+    )
+
+    assert evidence_question(
+        operation,
+        turns=[turn],
+        reference=REFERENCE,
+    ) is EvidenceQuestion.DATE
+
+
 def test_rejected_clock_phrase_does_not_require_model_evidence() -> None:
     operation = _operation(
         change={
