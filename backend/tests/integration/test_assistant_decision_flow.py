@@ -494,6 +494,52 @@ def test_sqlalchemy_schedule_reader_limits_101_and_preserves_schedule_api_semant
     engine.dispose()
 
 
+def test_sqlalchemy_schedule_reader_filters_title_before_limit(
+    database_path: Path,
+) -> None:
+    settings = Settings(_env_file=None, database_url=f"sqlite:///{database_path}")
+    engine = create_api_engine(settings)
+    factory = create_session_factory(engine)
+    unrelated = [
+        Schedule(
+            id=UUID(f"71000000-0000-4000-8000-{index:012x}"),
+            title=f"다른 일정 {index}",
+            scheduled_at=FIXED_NOW + timedelta(minutes=index + 1),
+            category=Category.OTHER,
+            completed=False,
+            created_at=FIXED_NOW + timedelta(seconds=index),
+            updated_at=FIXED_NOW,
+            deleted_at=None,
+        )
+        for index in range(101)
+    ]
+    matching = Schedule(
+        id=TARGET_ID,
+        title="출고 검량 확인",
+        scheduled_at=FIXED_NOW + timedelta(hours=4),
+        category=Category.OUTBOUND,
+        completed=False,
+        created_at=FIXED_NOW,
+        updated_at=FIXED_NOW,
+        deleted_at=None,
+    )
+    with factory.begin() as session:
+        session.add_all([*unrelated, matching])
+
+    reader = SqlAlchemyScheduleReader(factory)
+    rows = reader.list(
+        from_utc=FIXED_NOW,
+        to_utc=FIXED_NOW + timedelta(days=1),
+        category=None,
+        completed=None,
+        limit=101,
+        title="출고검량 확인",
+    )
+
+    assert [row.id for row in rows] == [TARGET_ID]
+    engine.dispose()
+
+
 @pytest.mark.parametrize(
     "overrides",
     [

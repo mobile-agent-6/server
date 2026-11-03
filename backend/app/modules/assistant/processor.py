@@ -87,7 +87,7 @@ QUESTION_TTL = timedelta(minutes=10)
 # Kept back from the request deadline for SQLite waits and finalize (Issue #29).
 PROVIDER_SAFETY_MARGIN_SECONDS = 10.0
 # A title-filtered list reads the bounded range first; beyond this it asks to narrow.
-LIST_TITLE_SCAN_LIMIT = 100  # the read port allows at most 101 rows per read
+LIST_TITLE_SCAN_LIMIT = 100  # post-filtered reads allow at most 100 results
 RELATIVE_TIME_QUESTION = (
     "서버 시각을 신뢰할 수 없습니다. 절대 날짜와 시각을 알려 주세요."
 )
@@ -663,13 +663,15 @@ def _provider_decision_plan(
                 limit=101,
             )
         else:
-            # Title filtering happens after the read, so read the whole bounded range.
+            # The read boundary prefilters a title when present. Exact title and
+            # time semantics are still checked here before exposing the result.
             scanned = schedule_reader.list(
                 from_utc=decision.from_at,
                 to_utc=decision.to_at,
                 category=decision.category,
                 completed=decision.completed,
                 limit=LIST_TITLE_SCAN_LIMIT + 1,
+                title=decision.title,
             )
             if len(scanned) > LIST_TITLE_SCAN_LIMIT:
                 return _ask_plan(

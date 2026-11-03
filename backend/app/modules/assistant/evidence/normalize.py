@@ -402,13 +402,17 @@ _KOREAN_24_HOUR = re.compile(
 
 
 def _apply_period(period: str, hour: int) -> int | TimeStatus:
-    if period in {"오전", "아침"}:
+    if period == "오전":
         return 0 if hour == 12 else hour
+    if period == "아침":
+        return TimeStatus.MIDNIGHT_UNCLEAR if hour == 12 else hour
     if period == "오후":
         return hour if hour == 12 else hour + 12
     if period == "저녁":
         if hour == 12:
             return TimeStatus.MIDNIGHT_UNCLEAR
+        if 1 <= hour <= 5:
+            return TimeStatus.PERIOD_UNCLEAR
         return hour + 12
     if period == "밤":
         if hour == 12:
@@ -526,7 +530,17 @@ _CATEGORY_CUES = (
     ("INVENTORY", re.compile(r"재고")),
     ("OUTBOUND", re.compile(r"출고|피킹|포장")),
     ("RETURN", re.compile(r"반품")),
+    ("OTHER", re.compile(r"기타")),
 )
+
+
+def category_candidates(texts: Sequence[str]) -> frozenset[str]:
+    """Return every explicit category meaning found in the evidence."""
+
+    combined = _joined(texts)
+    return frozenset(
+        category for category, pattern in _CATEGORY_CUES if pattern.search(combined)
+    )
 
 
 def resolve_category(texts: Sequence[str]) -> str | None:
@@ -536,16 +550,15 @@ def resolve_category(texts: Sequence[str]) -> str | None:
     matches the labelled training and evaluation data.
     """
 
-    combined = _joined(texts)
-    for category, pattern in _CATEGORY_CUES:
-        if pattern.search(combined):
-            return category
-    return None
+    candidates = category_candidates(texts)
+    return next(iter(candidates)) if len(candidates) == 1 else None
 
 
 _NOT_COMPLETED = re.compile(
-    r"미완료|완료\s*(?:안|못)\s*(?:된|한|했)|완료(?:되|하)지\s*(?:않|못)|"
-    r"안\s*끝|끝나지\s*않|못\s*끝|완료.*(?:취소|해제)"
+    r"미완료|"
+    r"완료(?:\s*(?:처리|표시))?\s*(?:가|는|를|로)?\s*(?:안|못)\s*(?:된|한|했|함)|"
+    r"완료(?:\s*(?:처리|표시))?\s*(?:가|는|를|로)?\s*(?:되|하)지\s*(?:않|못)|"
+    r"완료\s*전|안\s*끝|끝나지\s*않|못\s*끝|완료.*(?:취소|해제)"
 )
 _COMPLETED = re.compile(r"완료|끝났|끝난")
 

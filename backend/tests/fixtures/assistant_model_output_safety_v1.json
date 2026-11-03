@@ -254,6 +254,96 @@
       },
       "expectedModelCalls": 1,
       "expectedSchedules": []
+    },
+    {
+      "caseId": "create-ambiguous-morning-twelve",
+      "class": "ambiguous_time_period",
+      "input": "내일 아침 12시에 운영 회의 등록해 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "운영 회의", "status": "adopted"}],
+              "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+              "time": [{"turn": 1, "text": "아침 12시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "need_more_info",
+        "text": "10월 31일 0시(자정) 말씀이세요?"
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "create-ambiguous-early-evening",
+      "class": "ambiguous_time_period",
+      "input": "내일 저녁 3시에 운영 회의 등록해 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "운영 회의", "status": "adopted"}],
+              "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+              "time": [{"turn": 1, "text": "저녁 3시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "need_more_info",
+        "text": "시간을 '오후 3시'처럼 다시 말씀해 주세요."
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "create-multiple-title-categories",
+      "class": "conflicting_category_cues",
+      "input": "내일 오후 3시에 반품 입고 회의 등록해 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "반품 입고 회의", "status": "adopted"}],
+              "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+              "time": [{"turn": 1, "text": "오후 3시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "need_more_info",
+        "text": "어떤 분류인가요? 입고, 재고, 출고, 반품 또는 기타로 말씀해 주세요."
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
     }
   ]
 }

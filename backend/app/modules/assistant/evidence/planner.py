@@ -28,6 +28,7 @@ from app.modules.assistant.evidence.normalize import (
     Inherit,
     InheritResult,
     TimeStatus,
+    category_candidates,
     combine,
     is_future_scope,
     is_unclear_title,
@@ -287,11 +288,14 @@ def _plan_create(
         return _Plan(ask=Ask(texts.ASK_DATE))
     if moment.clock is None:
         return _Plan(ask=Ask(texts.ASK_TIME))
-    category = (
-        resolve_category(adopted_texts(operation.change.get("category", ())))
-        or resolve_category([title])
-        or "OTHER"
-    )
+    category_texts = adopted_texts(operation.change.get("category", ()))
+    if category_texts:
+        categories = category_candidates(category_texts)
+    else:
+        categories = category_candidates([title])
+    if len(categories) > 1:
+        return _Plan(ask=Ask(texts.ASK_CATEGORY))
+    category = next(iter(categories)) if len(categories) == 1 else "OTHER"
     return _Plan(
         decision={
             "kind": "create_intent",
@@ -424,7 +428,6 @@ def _find_targets(
     if time_ask is not None:
         return time_ask
     found: dict[str, ScheduleRead] = {}
-    similar: dict[str, ScheduleRead] = {}
     for start, end in ranges:
         rows = reader.list(
             from_utc=start,
@@ -432,6 +435,7 @@ def _find_targets(
             category=category,
             completed=completed,
             limit=TARGET_SCAN_LIMIT + 1,
+            title=title,
         )
         if len(rows) > TARGET_SCAN_LIMIT:
             return Ask(texts.ASK_NARROW)
@@ -442,11 +446,29 @@ def _find_targets(
                     continue
             if title_contains(title, row.title):
                 found[str(row.id)] = row
-            elif title_similar(title, row.title):
-                similar[str(row.id)] = row
     if not found:
         # Only when nothing matches: a one-letter slip ("상하자"), shown with its
-        # stored title in the confirmation or the candidate list.
+        # stored title in the confirmation or the candidate list. This fallback
+        # still uses the bounded scan because SQL substring filtering cannot
+        # express the one-letter similarity rule safely.
+        similar: dict[str, ScheduleRead] = {}
+        for start, end in ranges:
+            rows = reader.list(
+                from_utc=start,
+                to_utc=end,
+                category=category,
+                completed=completed,
+                limit=TARGET_SCAN_LIMIT + 1,
+            )
+            if len(rows) > TARGET_SCAN_LIMIT:
+                return Ask(texts.ASK_NARROW)
+            for row in rows:
+                if target_minutes is not None:
+                    local = row.scheduled_at.astimezone(SEOUL)
+                    if local.hour * 60 + local.minute not in target_minutes:
+                        continue
+                if title_similar(title, row.title):
+                    similar[str(row.id)] = row
         found = similar
     ordered = sorted(found.values(), key=lambda row: (row.scheduled_at, str(row.id)))
     return _Targets(schedules=ordered, absolute=absolute)
@@ -461,13 +483,10 @@ def _changes_for(
     title = _last(adopted_texts(operation.change.get("title", ())))
     if title is not None:
         changes["title"] = title
-    category_texts = adopted_texts(operation.change.get("category", ()))
-    target_titles = adopted_texts(operation.target.get("title", ()))
+    category_texts = _separate_category_texts(operation)
     # A category word taken from inside the target title ("입고" in "입고 검수 일정을
     # 옮겨 줘") is part of the name, not a request to change the category.
-    if category_texts and not any(
-        title_contains(text, title) for text in category_texts for title in target_titles
-    ):
+    if category_texts:
         category = resolve_category(category_texts)
         if category is not None:
             changes["category"] = category
@@ -481,6 +500,38 @@ def _changes_for(
         clock = moment.clock if moment.clock is not None else current.time().replace(second=0, microsecond=0)
         changes["scheduledAt"] = _iso(_scheduled_at(day, clock, moment.next_day_midnight))
     return changes
+
+
+def _separate_category_texts(operation: EvidenceOperation) -> list[str]:
+    """Keep category evidence that is not merely a word inside the target title."""
+
+    titles = [
+        span
+        for span in operation.target.get("title", ())
+        if span.status is SpanStatus.ADOPTED
+    ]
+    result: list[str] = []
+    for category in operation.change.get("category", ()):
+        if category.status is not SpanStatus.ADOPTED:
+            continue
+        nested = any(
+            category.turn == title.turn
+            and title_contains(category.text, title.text)
+            and not (
+                category.occurrence is not None
+                and (
+                    category.occurrence > 1
+                    or (
+                        title.occurrence is not None
+                        and category.occurrence != title.occurrence
+                    )
+                )
+            )
+            for title in titles
+        )
+        if not nested:
+            result.append(category.text)
+    return result
 
 
 def _has_change_value(operation: EvidenceOperation) -> bool:
@@ -529,15 +580,18 @@ def _plan_target_operation(
             item["changes"] = _changes_for(operation, schedule, moment)
         return item
 
+    candidates = [candidate(schedule) for schedule in targets.schedules]
+    if is_update and all(not item.get("changes") for item in candidates):
+        return _Plan(ask=Ask(texts.ASK_CHANGE_VALUE))
     if len(targets.schedules) == 1:
         schedule = targets.schedules[0]
         text = texts.confirm_update(schedule.title) if is_update else texts.confirm_delete(schedule.title)
-        return _Plan(decision={"kind": "confirm", "text": text, **candidate(schedule)})
+        return _Plan(decision={"kind": "confirm", "text": text, **candidates[0]})
     return _Plan(
         decision={
             "kind": "select_candidate",
             "text": texts.SELECT_TARGET,
-            "candidates": [candidate(schedule) for schedule in targets.schedules],
+            "candidates": candidates,
         }
     )
 

@@ -36,6 +36,7 @@ class ScheduleReadPort(Protocol):
         category: Category | None,
         completed: bool | None,
         limit: int,
+        title: str | None = None,
     ) -> list[ScheduleRead]: ...
 
 
@@ -82,6 +83,7 @@ class SqlAlchemyScheduleReader:
         category: Category | None,
         completed: bool | None,
         limit: int,
+        title: str | None = None,
     ) -> list[ScheduleRead]:
         normalized_from = _utc(from_utc)
         normalized_to = _utc(to_utc)
@@ -100,6 +102,7 @@ class SqlAlchemyScheduleReader:
                     category=category,
                     completed=completed,
                     limit=limit,
+                    title_contains=title,
                 )
                 return [_from_model(model) for model in models]
         except SQLAlchemyError as exc:

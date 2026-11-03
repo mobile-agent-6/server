@@ -26,6 +26,7 @@ from app.modules.assistant.model import (
     AssistantQuestionStatus,
     AssistantRequest,
 )
+from app.modules.assistant.evidence.normalize import title_contains
 from app.modules.assistant.processor import ProcessOneResult, process_one
 from app.modules.assistant.runtime_guard import ProcessDeadlineGuard
 from app.modules.assistant.schedule_read import (
@@ -90,6 +91,7 @@ class MemoryScheduleReader:
         self.schedules = {item.id: item for item in schedules or []}
         self.get_calls: list[UUID] = []
         self.list_limits: list[int] = []
+        self.list_titles: list[str | None] = []
 
     def get(self, schedule_id: UUID) -> ScheduleRead | None:
         self.get_calls.append(schedule_id)
@@ -103,14 +105,17 @@ class MemoryScheduleReader:
         category: Category | None,
         completed: bool | None,
         limit: int,
+        title: str | None = None,
     ) -> list[ScheduleRead]:
         self.list_limits.append(limit)
+        self.list_titles.append(title)
         values = [
             item
             for item in self.schedules.values()
             if from_utc <= item.scheduled_at < to_utc
             and (category is None or item.category is category)
             and (completed is None or item.completed is completed)
+            and (title is None or title_contains(title, item.title))
         ]
         return sorted(values, key=lambda item: (item.scheduled_at, item.id))[:limit]
 
@@ -1510,6 +1515,48 @@ def test_list_time_filter_is_applied_after_bounded_read(processor_store) -> None
 
     result = stored_request(processor_store).result_json
     assert reader.list_limits == [101]
+    assert result["kind"] == "outcome"
+    assert [item["id"] for item in result["items"]] == [str(matching.id)]
+
+
+def test_list_title_prefilter_is_applied_before_the_101_row_limit(
+    processor_store,
+) -> None:
+    unrelated = [
+        schedule(
+            UUID(f"71000000-0000-4000-8000-{index:012x}"),
+            title=f"다른 일정 {index}",
+            at=NOW + timedelta(minutes=index + 1),
+        )
+        for index in range(101)
+    ]
+    matching = schedule(
+        SCHEDULE_A,
+        title="출고 검량 확인",
+        at=NOW + timedelta(hours=4),
+    )
+    reader = MemoryScheduleReader([*unrelated, matching])
+    admit(processor_store, request_data())
+    provider = ScriptedDecisionProvider(
+        [
+            envelope(
+                {
+                    "kind": "list_intent",
+                    "text": "조회 결과입니다.",
+                    "from": NOW.isoformat(),
+                    "to": (NOW + timedelta(days=1)).isoformat(),
+                    "title": "출고 검량 확인",
+                    "timeInterpretation": "absolute",
+                }
+            )
+        ]
+    )
+
+    run(processor_store, provider, reader)
+
+    result = stored_request(processor_store).result_json
+    assert reader.list_limits == [101]
+    assert reader.list_titles == ["출고 검량 확인"]
     assert result["kind"] == "outcome"
     assert [item["id"] for item in result["items"]] == [str(matching.id)]
 

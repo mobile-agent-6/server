@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import unicodedata
 from datetime import datetime
 from uuid import UUID
 
@@ -20,6 +21,7 @@ def list_active(
     category: Category | None,
     completed: bool | None,
     limit: int | None = None,
+    title_contains: str | None = None,
 ) -> list[Schedule]:
     statement = sa.select(Schedule).where(
         Schedule.deleted_at.is_(None),
@@ -30,6 +32,13 @@ def list_active(
         statement = statement.where(Schedule.category == category)
     if completed is not None:
         statement = statement.where(Schedule.completed == completed)
+    if title_contains is not None:
+        compact = "".join(
+            unicodedata.normalize("NFKC", title_contains).split()
+        ).lower()
+        if compact:
+            stored = sa.func.replace(sa.func.lower(Schedule.title), " ", "")
+            statement = statement.where(stored.contains(compact, autoescape=True))
     statement = statement.order_by(
         Schedule.scheduled_at.asc(), Schedule.created_at.asc(), Schedule.id.asc()
     )

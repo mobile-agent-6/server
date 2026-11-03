@@ -11,6 +11,7 @@ from app.modules.assistant.evidence.normalize import (
     TimeResult,
     TimeStatus,
     is_future_scope,
+    category_candidates,
     resolve_category,
     resolve_completed,
     resolve_date,
@@ -240,10 +241,15 @@ def test_times_resolve(texts: list[str], hour: int, minute: int) -> None:
     assert (result.hour, result.minute) == (hour, minute)
 
 
-@pytest.mark.parametrize("text", ["저녁 12시", "밤 12시", "새벽 12시"])
+@pytest.mark.parametrize("text", ["아침 12시", "저녁 12시", "밤 12시", "새벽 12시"])
 def test_evening_and_night_twelve_ask(text: str) -> None:
     # Bug fix: "저녁 12시" used to become 12:00 noon.
     assert resolve_time([text]).status is TimeStatus.MIDNIGHT_UNCLEAR
+
+
+@pytest.mark.parametrize("text", ["저녁 1시", "저녁 2시", "저녁 3시", "저녁 4시", "저녁 5시"])
+def test_early_evening_hours_ask_instead_of_guessing(text: str) -> None:
+    assert resolve_time([text]).status is TimeStatus.PERIOD_UNCLEAR
 
 
 @pytest.mark.parametrize("text", ["밤 2시", "낮 9시", "새벽 9시"])
@@ -330,6 +336,7 @@ def test_non_time_words() -> None:
         ("피킹 점검", "OUTBOUND"),
         ("포장", "OUTBOUND"),
         ("반품 상자 검수", "RETURN"),
+        ("기타", "OTHER"),
         ("출고팀 회의", "OUTBOUND"),
         ("출하 예정 점검", None),
         ("협력사 납품 회의", None),
@@ -340,6 +347,11 @@ def test_non_time_words() -> None:
 )
 def test_category(text: str, expected: str | None) -> None:
     assert resolve_category([text]) == expected
+
+
+def test_multiple_category_cues_are_not_resolved_by_pattern_order() -> None:
+    assert category_candidates(["반품 입고 확인"]) == frozenset({"RETURN", "INBOUND"})
+    assert resolve_category(["반품 입고 확인"]) is None
 
 
 @pytest.mark.parametrize(
@@ -360,6 +372,12 @@ def test_category(text: str, expected: str | None) -> None:
         ("끝나지 않은", False),
         ("못 끝낸", False),
         ("완료 표시 취소", False),
+        ("완료가 안 된", False),
+        ("완료 처리 안 된", False),
+        ("완료 표시 안 한", False),
+        ("완료가 되지 않은", False),
+        ("완료를 못 한", False),
+        ("완료 전", False),
         ("회의", None),
     ],
 )

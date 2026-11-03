@@ -16,6 +16,7 @@ ASK_DATE_AGAIN = "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 �
 ASK_TIME_AGAIN = "시간을 '오후 3시'처럼 다시 말씀해 주세요."
 ASK_ABSOLUTE_DATE = "서버 시각을 확인할 수 없어요. 연도와 월, 일을 함께 알려 주세요."
 ASK_CHANGE_VALUE = "무엇으로 바꿀까요?"
+ASK_CATEGORY = "어떤 분류인가요? 입고, 재고, 출고, 반품 또는 기타로 말씀해 주세요."
 ASK_TARGET_TITLE = "어떤 일정인지 이름을 알려 주세요."
 ASK_NARROW = "해당하는 일정이 너무 많아요. 날짜를 함께 알려 주세요."
 ASK_LIST_SCOPE = "언제 일정을 볼까요?"
