@@ -180,10 +180,11 @@ decoding이 고정(temperature 0)이라 같은 입력을 다시 보내도 같은
 `MODEL_TIMEOUT`으로 끝낸다. 마감을 넘겨 모델 호출이 남아 있으면 runtime이 unhealthy가 되기 때문이다.
 
 모델을 부를 때마다 `assistant.model_call` 로그 한 줄을 남긴다. 요청 ID, 모델명, prompt 해시,
-사용자 turn, 모델 원출력, 검사 결과(`ok` 또는 오류 코드), 처리 시간이 들어간다. 이 필드는
-`SCHEDULE_LOG_FORMAT=json`일 때만 기록되고(console 형식은 결과와 시간 요약 한 줄),
-SQLite나 오류 응답에는 들어가지 않는다.
-사용자 원문이 들어가므로 로그 파일을 Git이나 팀 공유 위치에 올리지 않는다.
+turn 수와 입력 글자 수, 입력 SHA-256, 출력 byte 수와 출력 SHA-256, 검사 결과(`ok` 또는
+오류 코드), 처리 시간이 들어간다. 사용자 turn 원문과 모델 원출력은 기록하지 않는다. 이
+필드는 `SCHEDULE_LOG_FORMAT=json`일 때만 기록되고(console 형식은 결과와 시간 요약 한 줄),
+SQLite나 오류 응답에는 들어가지 않는다. hash와 길이도 운영 정보이므로 로그 파일은 Git이나
+팀 공유 위치에 올리지 않는다.
 
 Orange Pi용 모델 변환, 실행과 성능 측정은 별도 작업이다.
 
@@ -204,6 +205,27 @@ Orange Pi용 모델 변환, 실행과 성능 측정은 별도 작업이다.
 ```bash
 python -m pytest --cov=app --cov-branch --cov-report=term-missing
 ```
+
+Assistant evidence 경로는 다음 네 묶음을 서로 분리해 검사한다.
+
+| 묶음 | 고정 기준 |
+|---|---|
+| 모델 오답 안전 행렬 | API부터 임시 SQLite까지 13개 안전 사례에서 의도하지 않은 write 0 |
+| 정상 대조군 | 등록 2개와 완료 부정 조회 1개가 질문으로 바뀌지 않고 기대 DB 행 또는 조회 결과와 일치 |
+| locked56 | correct 49 이상, unsafe 0 |
+| 기존 정답 재생 | pilot, batch 1부터 6, Test 50의 정답 849행이 `3b0f937` 기준선과 일치하고 승인 목록 밖 차이 0 |
+
+```bash
+python -m pytest -q -p no:cacheprovider \
+  tests/integration/test_assistant_model_output_safety.py \
+  tests/integration/test_assistant_evidence_locked56.py \
+  tests/integration/test_assistant_evidence_gold_replay.py
+```
+
+Test 50 lock, locked56 원본, 기존 연구 manifest의 SHA-256도 재생 테스트에서 고정한다.
+run 006 평가 파일에는 원출력 SHA-256과 byte 길이만 있고 원출력 본문은 보존되지 않았으므로,
+같은 모델 출력을 이전 backend와 현재 backend에 다시 적용하는 비교는 수행할 수 없다. 기존 run의
+모델 점수와 현재 backend 재생 결과는 서로 다른 지표로 기록한다.
 
 ## 참고
 

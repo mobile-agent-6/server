@@ -1,4 +1,4 @@
-"""Non-circular API-to-database checks for intentionally wrong model output.
+"""Non-circular API-to-database checks for model-output safety and controls.
 
 The fixture contains human-authored expected API results and complete final
 Schedule rows.  This module deliberately does not import the evidence
@@ -13,7 +13,7 @@ import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from threading import Event
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 import sqlalchemy as sa
@@ -24,6 +24,7 @@ from app.core.config import Settings
 from app.main import create_app
 from app.modules.assistant.evidence.provider import EvidenceDecisionProvider
 from app.modules.assistant.schedule_read import ScheduleReadPort, SqlAlchemyScheduleReader
+from app.modules.schedules.category import Category
 from app.modules.schedules.model import Schedule
 from tests.conftest import migrate
 
@@ -94,8 +95,29 @@ def _schedule_rows(application) -> list[dict[str, object]]:
     ]
 
 
+def _seed_schedules(application, rows: list[dict[str, object]]) -> None:
+    if not rows:
+        return
+    with application.state.session_factory.begin() as session:
+        for row in rows:
+            session.add(
+                Schedule(
+                    id=UUID(str(row["id"])),
+                    title=row["title"],
+                    scheduled_at=datetime.fromisoformat(
+                        str(row["scheduledAt"]).replace("Z", "+00:00")
+                    ),
+                    category=Category(row["category"]),
+                    completed=row["completed"],
+                    created_at=NOW,
+                    updated_at=NOW,
+                    deleted_at=None,
+                )
+            )
+
+
 @pytest.mark.parametrize("case", CASES, ids=[case["caseId"] for case in CASES])
-def test_wrong_model_output_never_writes_unapproved_schedule(
+def test_model_output_safety_matrix_matches_api_and_database(
     case: dict, tmp_path: Path
 ) -> None:
     model = _FixedModel(case["modelOutput"])
@@ -117,6 +139,7 @@ def test_wrong_model_output_never_writes_unapproved_schedule(
     try:
         with TestClient(application) as client:
             reader.inner = SqlAlchemyScheduleReader(application.state.session_factory)
+            _seed_schedules(application, case.get("initialSchedules", []))
             request_id = str(uuid4())
             response = client.post(
                 "/api/v1/assistant/requests",
@@ -129,6 +152,10 @@ def test_wrong_model_output_never_writes_unapproved_schedule(
             result = _wait(client, request_id)["result"]
             for key, expected in case["expectedResult"].items():
                 assert result.get(key) == expected, (case["caseId"], key, result)
+            if "expectedItemTitles" in case:
+                assert [item["title"] for item in result.get("items", [])] == case[
+                    "expectedItemTitles"
+                ]
             assert _schedule_rows(application) == case["expectedSchedules"]
         assert model.calls == case["expectedModelCalls"]
     finally:
@@ -144,3 +171,30 @@ def test_safety_fixture_is_independent_of_production_value_interpreters() -> Non
     }
     assert "app.modules.assistant.evidence.normalize" not in imported
     assert "app.modules.assistant.evidence.planner" not in imported
+
+
+def test_safety_fixture_covers_required_failure_and_control_classes() -> None:
+    required = {
+        "ambiguous_time_period",
+        "completed_negation_filter",
+        "conflicting_adopted_values",
+        "conflicting_category_cues",
+        "create_operation_conflict",
+        "first_operation_only",
+        "incomplete_correction_provenance",
+        "incomplete_date_evidence",
+        "invalid_calendar_date",
+        "model_omitted_supported_operation",
+        "normal_capability_create",
+        "normal_create",
+        "semantic_role_overlap",
+        "unsupported_request_consent",
+    }
+    assert {case["class"] for case in CASES} == required
+    assert len(CASES) == 16
+    assert len({case["caseId"] for case in CASES}) == len(CASES)
+
+    normal = [case for case in CASES if case["class"].startswith("normal_")]
+    assert len(normal) == 2
+    assert all(case["expectedResult"]["kind"] == "outcome" for case in normal)
+    assert all(len(case["expectedSchedules"]) == 1 for case in normal)

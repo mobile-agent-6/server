@@ -20,10 +20,25 @@ from app.modules.assistant.evidence.provider import EvidenceDecisionProvider
 
 REPOSITORY = Path(__file__).resolve().parents[3]
 DATASET = REPOSITORY / "datasets/qwen/experiments/candidate_c_create_400_v0.1"
+CONTRACT = REPOSITORY / "datasets/qwen/experiments/structured_output_contract_v0.1"
 FIXTURES = Path(__file__).resolve().parents[1] / "fixtures"
 BASELINE_PATH = FIXTURES / "assistant_evidence_gold_replay_baseline_v1.json"
 APPROVAL_PATH = FIXTURES / "assistant_evidence_replay_approved_differences.json"
 GROUPS = ("pilot", "batch1", "batch2", "batch3", "batch4", "batch5", "batch6", "test50")
+LOCKED_ARTIFACTS = {
+    DATASET / "test50/lock-manifest-v0.1.json": (
+        "0d5702342f0f6a2fe136133e8a03433f691395647620aa78a54e6d2e7aed88a7"
+    ),
+    CONTRACT / "locked-cases-v0.1.jsonl": (
+        "17c7d4ef10aff8171d422c248431d3c34faaf03bf7282fab5dc3abcfa2389b57"
+    ),
+    CONTRACT / "shared-manifest-v0.1.json": (
+        "6d6c0bffbe71448887c5140777fd70aea08a664bc09ef895ac48365c37db2a2c"
+    ),
+    FIXTURES / "evidence_locked56.json": (
+        "80bf09c017f79d42ae9f913dcd47bd356deb8fa6ee1e7616280153747c5ee887"
+    ),
+}
 
 
 class _EmptyReader:
@@ -172,3 +187,11 @@ def test_baseline_manifest_shape_is_fixed() -> None:
     assert baseline["baselineCommit"] == "3b0f937"
     assert baseline["total"] == 849
     assert tuple(baseline["groups"]) == GROUPS
+
+
+def test_locked56_and_test50_artifacts_are_unchanged() -> None:
+    observed = {
+        path: hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in LOCKED_ARTIFACTS
+    }
+    assert observed == LOCKED_ARTIFACTS
