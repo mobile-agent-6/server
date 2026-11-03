@@ -467,7 +467,9 @@ def resolve_time(texts: Sequence[str]) -> TimeResult:
     period_match = _PERIOD.search(combined)
     if period_match is None:
         if 1 <= hour <= 12:
-            return TimeResult(TimeStatus.NEEDS_AMPM)
+            # Keep the parsed clock components so target matching can retain
+            # both possible schedules without choosing morning or afternoon.
+            return TimeResult(TimeStatus.NEEDS_AMPM, hour, minute)
         return TimeResult(TimeStatus.RESOLVED, hour, minute)
     if hour > 12:
         # "오후 15시" is a typo-like mix; keep the 24-hour value only if it agrees.

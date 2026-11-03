@@ -17,6 +17,7 @@ from app.modules.assistant.admission import admit_request, request_fingerprint
 from app.modules.assistant.decisions import (
     DecisionContext,
     DecisionEnvelope,
+    DecisionProviderInvalidOutput,
     DecisionProviderTimeout,
 )
 from app.modules.assistant.model import (
@@ -438,10 +439,16 @@ def test_ask_claims_and_atomically_persists_question_and_control_state(
     ("step", "code"),
     [
         (DecisionProviderTimeout("timeout"), "MODEL_TIMEOUT"),
+        (DecisionProviderInvalidOutput("bad evidence"), "MODEL_OUTPUT_INVALID"),
+        (ValueError("backend planner bug"), "INTERNAL_ERROR"),
+        (TypeError("backend planner type bug"), "INTERNAL_ERROR"),
         (RuntimeError("private provider detail"), "INTERNAL_ERROR"),
     ],
 )
-def test_provider_failures_are_sanitized(processor_store, step, code: str) -> None:
+def test_provider_failures_are_sanitized(
+    processor_store, step, code: str, caplog
+) -> None:
+    caplog.set_level("ERROR", logger="app.modules.assistant.processor")
     admit(processor_store, request_data())
     provider = ScriptedDecisionProvider([step])
 
@@ -450,6 +457,12 @@ def test_provider_failures_are_sanitized(processor_store, step, code: str) -> No
     request = stored_request(processor_store)
     assert request.result_json["code"] == code
     assert "private" not in request.result_json["text"]
+    internal_records = [
+        record
+        for record in caplog.records
+        if getattr(record, "event", None) == "assistant.processor_internal_error"
+    ]
+    assert bool(internal_records) is (code == "INTERNAL_ERROR")
 
 
 @pytest.mark.parametrize(
@@ -1463,6 +1476,42 @@ def test_list_reads_at_most_101_and_never_returns_partial_success(
         assert len(result["items"]) == count
     else:
         assert "items" not in result
+
+
+def test_list_time_filter_is_applied_after_bounded_read(processor_store) -> None:
+    matching = schedule(
+        SCHEDULE_A,
+        title="오후 점검",
+        at=datetime(2026, 10, 19, 6, 0, tzinfo=timezone.utc),
+    )
+    other = schedule(
+        SCHEDULE_B,
+        title="저녁 점검",
+        at=datetime(2026, 10, 19, 8, 0, tzinfo=timezone.utc),
+    )
+    reader = MemoryScheduleReader([other, matching])
+    admit(processor_store, request_data())
+    provider = ScriptedDecisionProvider(
+        [
+            envelope(
+                {
+                    "kind": "list_intent",
+                    "text": "조회 결과입니다.",
+                    "from": "2026-10-19T00:00:00+09:00",
+                    "to": "2026-10-20T00:00:00+09:00",
+                    "timeMinutes": 15 * 60,
+                    "timeInterpretation": "absolute",
+                }
+            )
+        ]
+    )
+
+    run(processor_store, provider, reader)
+
+    result = stored_request(processor_store).result_json
+    assert reader.list_limits == [101]
+    assert result["kind"] == "outcome"
+    assert [item["id"] for item in result["items"]] == [str(matching.id)]
 
 
 def test_worst_case_100_item_list_snapshot_stays_within_64_kib(

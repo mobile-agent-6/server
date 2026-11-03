@@ -6,6 +6,7 @@ write intent.  This module never calls a Schedule write function.
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from enum import StrEnum
@@ -30,6 +31,7 @@ from app.modules.assistant.decisions import (
     DecisionListIntent,
     DecisionNoMatch,
     DecisionProvider,
+    DecisionProviderInvalidOutput,
     DecisionProviderTimeout,
     DecisionSelectCandidate,
     PendingCreateIntent,
@@ -75,9 +77,11 @@ from app.modules.assistant.serialization import (
     serialize_snapshot,
 )
 from app.modules.assistant.runtime_failures import timeout_snapshot
-from app.modules.assistant.evidence.normalize import title_contains
+from app.modules.assistant.evidence.normalize import SEOUL, title_contains
 from app.modules.assistant.runtime_guard import ProcessDeadlineGuard
 from app.modules.schedules.schemas import ScheduleCreate, ScheduleUpdate
+
+logger = logging.getLogger(__name__)
 
 QUESTION_TTL = timedelta(minutes=10)
 # Kept back from the request deadline for SQLite waits and finalize (Issue #29).
@@ -313,15 +317,18 @@ def _call_provider(
         raise RuntimeError("DecisionProvider is unavailable after admission")
     try:
         raw = provider.decide(context)
+    except DecisionProviderTimeout:
+        raise
+    except DecisionProviderInvalidOutput as exc:
+        raise _InvalidDecision("DecisionProvider returned invalid model output") from exc
+    try:
         validated = DecisionEnvelope.model_validate(raw)
         payload = validated.model_dump(
             mode="json", by_alias=True, exclude_none=True
         )
         serialize_snapshot(payload)
         return DecisionEnvelope.model_validate(payload)
-    except DecisionProviderTimeout:
-        raise
-    except (ValidationError, SnapshotSerializationError, ValueError, TypeError) as exc:
+    except (ValidationError, SnapshotSerializationError, TypeError) as exc:
         raise _InvalidDecision("DecisionProvider returned invalid output") from exc
 
 
@@ -646,7 +653,8 @@ def _provider_decision_plan(
         return _FinalizePlan(pending_write=pending, **control)
 
     if isinstance(decision, DecisionListIntent):
-        if decision.title is None:
+        needs_post_filter = decision.title is not None or decision.time_minutes is not None
+        if not needs_post_filter:
             schedules = schedule_reader.list(
                 from_utc=decision.from_at,
                 to_utc=decision.to_at,
@@ -673,7 +681,18 @@ def _provider_decision_plan(
             schedules = [
                 schedule
                 for schedule in scanned
-                if title_contains(decision.title, schedule.title)
+                if (
+                    decision.title is None
+                    or title_contains(decision.title, schedule.title)
+                )
+                and (
+                    decision.time_minutes is None
+                    or (
+                        schedule.scheduled_at.astimezone(SEOUL).hour * 60
+                        + schedule.scheduled_at.astimezone(SEOUL).minute
+                    )
+                    == decision.time_minutes
+                )
             ]
         if len(schedules) > 100:
             return _ask_plan(
@@ -1094,6 +1113,10 @@ def process_one(
             )
         )
     except Exception:
+        logger.exception(
+            "Assistant processor internal error",
+            extra={"event": "assistant.processor_internal_error", "requestId": str(request_id)},
+        )
         prepared = _prepare(
             _failure(
                 AssistantFailureCode.INTERNAL_ERROR,

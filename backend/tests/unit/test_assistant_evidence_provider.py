@@ -6,10 +6,9 @@ from uuid import UUID, uuid4
 
 import pytest
 
-from app.modules.assistant.decisions import DecisionContext
+from app.modules.assistant.decisions import DecisionContext, DecisionProviderInvalidOutput
 from app.modules.assistant.evidence import texts
-from app.modules.assistant.evidence.contract import EvidenceContractError
-from app.modules.assistant.evidence.gate import Answer, EvidenceGateError, classify_answer
+from app.modules.assistant.evidence.gate import Answer, classify_answer
 from app.modules.assistant.evidence.normalize import SEOUL
 from app.modules.assistant.evidence.provider import EvidenceDecisionProvider
 from app.modules.assistant.schedule_read import ScheduleRead
@@ -28,11 +27,21 @@ class FakeReader:
         return next((s for s in self.schedules if s.id == schedule_id), None)
 
     def list(self, *, from_utc, to_utc, category, completed, limit):
-        self.reads.append({"from": from_utc, "to": to_utc, "completed": completed, "limit": limit})
+        self.reads.append(
+            {
+                "from": from_utc,
+                "to": to_utc,
+                "category": category,
+                "completed": completed,
+                "limit": limit,
+            }
+        )
         rows = [
             s
             for s in self.schedules
-            if from_utc <= s.scheduled_at < to_utc and (completed is None or s.completed is completed)
+            if from_utc <= s.scheduled_at < to_utc
+            and (category is None or s.category is category)
+            and (completed is None or s.completed is completed)
         ]
         return rows[:limit]
 
@@ -47,12 +56,18 @@ class ScriptedModel:
         return json.dumps(self.outputs.pop(0), ensure_ascii=False)
 
 
-def schedule(title: str, when: datetime, *, completed: bool = False) -> ScheduleRead:
+def schedule(
+    title: str,
+    when: datetime,
+    *,
+    category: Category = Category.OTHER,
+    completed: bool = False,
+) -> ScheduleRead:
     return ScheduleRead(
         id=uuid4(),
         title=title,
         scheduled_at=when.astimezone(timezone.utc),
-        category=Category.OTHER,
+        category=category,
         completed=completed,
         updated_at=REFERENCE.astimezone(timezone.utc),
     )
@@ -329,7 +344,7 @@ def test_generic_tell_me_request_is_not_treated_as_a_missing_schedule_operation(
 
 def test_supported_request_missing_from_model_output_is_rejected() -> None:
     provider = EvidenceDecisionProvider(ScriptedModel(output()), FakeReader())
-    with pytest.raises(EvidenceGateError, match="SUPPORTED_OPERATION_MISSING"):
+    with pytest.raises(DecisionProviderInvalidOutput, match="SUPPORTED_OPERATION_MISSING"):
         decide(provider, "내일 오후 3시에 회의 등록해 줘")
 
 
@@ -725,12 +740,105 @@ def test_several_requests_note_on_no_match() -> None:
     }
 
 
+def test_update_target_time_and_category_narrow_candidates() -> None:
+    inbound = schedule(
+        "정기 회의",
+        datetime(2026, 10, 30, 15, 0, tzinfo=SEOUL),
+        category=Category.INBOUND,
+    )
+    outbound = schedule(
+        "정기 회의",
+        datetime(2026, 10, 30, 15, 0, tzinfo=SEOUL),
+        category=Category.OUTBOUND,
+    )
+    wrong_time = schedule(
+        "정기 회의",
+        datetime(2026, 10, 30, 17, 0, tzinfo=SEOUL),
+        category=Category.INBOUND,
+    )
+    evidence = output(
+        op(
+            "update",
+            target={
+                "title": [span("정기 회의")],
+                "date": [span("내일")],
+                "time": [span("오후 3시")],
+                "category": [span("입고")],
+            },
+            change={"title": [span("주간 회의")]},
+        )
+    )
+    reader = FakeReader([outbound, wrong_time, inbound])
+
+    _, decision = decide(
+        EvidenceDecisionProvider(ScriptedModel(evidence), reader),
+        "내일 오후 3시 입고 정기 회의 제목을 주간 회의로 바꿔 줘",
+    )
+
+    assert decision["kind"] == "confirm"
+    assert decision["scheduleId"] == str(inbound.id)
+    assert reader.reads[0]["category"] is Category.INBOUND
+
+
+def test_ambiguous_target_time_keeps_morning_and_afternoon_candidates() -> None:
+    morning = schedule("정기 회의", datetime(2026, 10, 30, 3, 0, tzinfo=SEOUL))
+    afternoon = schedule("정기 회의", datetime(2026, 10, 30, 15, 0, tzinfo=SEOUL))
+    other = schedule("정기 회의", datetime(2026, 10, 30, 17, 0, tzinfo=SEOUL))
+    evidence = output(
+        op(
+            "delete",
+            target={
+                "title": [span("정기 회의")],
+                "date": [span("내일")],
+                "time": [span("3시")],
+            },
+        )
+    )
+
+    _, decision = decide(
+        EvidenceDecisionProvider(
+            ScriptedModel(evidence), FakeReader([other, afternoon, morning])
+        ),
+        "내일 3시 정기 회의 지워 줘",
+    )
+
+    assert decision["kind"] == "select_candidate"
+    assert {item["scheduleId"] for item in decision["candidates"]} == {
+        str(morning.id),
+        str(afternoon.id),
+    }
+
+
+def test_list_time_is_converted_to_backend_clock_filter() -> None:
+    evidence = output(
+        op(
+            "list",
+            filter={"date": [span("내일")], "time": [span("오후 3시")]},
+        )
+    )
+    _, decision = decide(
+        EvidenceDecisionProvider(ScriptedModel(evidence), FakeReader()),
+        "내일 오후 3시 일정 보여 줘",
+    )
+    assert decision["kind"] == "list_intent"
+    assert decision["timeMinutes"] == 15 * 60
+
+
+def test_ambiguous_list_time_asks_for_ampm() -> None:
+    evidence = output(op("list", filter={"time": [span("3시")]}))
+    _, decision = decide(
+        EvidenceDecisionProvider(ScriptedModel(evidence), FakeReader()),
+        "3시 일정 보여 줘",
+    )
+    assert decision == {"kind": "ask", "text": texts.ASK_AMPM}
+
+
 # ------------------------------------------------------------ bad output
 
 
 def test_invalid_model_output_is_rejected() -> None:
     model = ScriptedModel(output(op("create", change={"title": [span("출고 검수")]})))
-    with pytest.raises(EvidenceContractError):
+    with pytest.raises(DecisionProviderInvalidOutput):
         decide(EvidenceDecisionProvider(model, FakeReader()), "내일 입고 검수 잡아 줘")
 
 
@@ -1091,7 +1199,7 @@ def test_model_call_is_logged_with_input_output_and_result(caplog) -> None:
 def test_invalid_model_output_is_logged_with_the_error_code(caplog) -> None:
     caplog.set_level("INFO", logger="app.modules.assistant.evidence.provider")
     model = ScriptedModel(output(op("create", change={"title": [span("없는 제목")]})))
-    with pytest.raises(EvidenceContractError):
+    with pytest.raises(DecisionProviderInvalidOutput):
         decide(EvidenceDecisionProvider(model, FakeReader()), "내일 회의 잡아 줘")
     (record,) = _model_call_records(caplog)
     assert record.validation == "SPAN_NOT_IN_TURN"
@@ -1255,10 +1363,8 @@ def test_missed_correction_with_new_expressions_still_asks_before_creating(lates
 
 @pytest.mark.parametrize("title", ["정오", "다음 주 화요일", "15:30"])
 def test_date_or_time_alone_is_not_a_title(title: str) -> None:
-    from app.modules.assistant.evidence.gate import EvidenceGateError
-
     model = ScriptedModel(output(op("create", change={"title": [span(title)], "date": [span("내일")]})))
-    with pytest.raises(EvidenceGateError):
+    with pytest.raises(DecisionProviderInvalidOutput):
         decide(EvidenceDecisionProvider(model, FakeReader()), f"내일 {title} 잡아 줘")
 
 

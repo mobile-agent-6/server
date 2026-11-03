@@ -42,6 +42,7 @@ from app.modules.assistant.evidence.normalize import (
     title_similar,
 )
 from app.modules.assistant.schedule_read import ScheduleRead, ScheduleReadPort
+from app.modules.schedules.category import Category
 
 SEARCH_WINDOW = timedelta(days=92)
 TARGET_SCAN_LIMIT = 100  # the read port allows at most 101 rows per read
@@ -85,6 +86,29 @@ class _Plan:
     decision: dict[str, Any] | None = None
     ask: Ask | None = None
     notes: list[str] = field(default_factory=list)
+
+
+def _clock_minutes(value: time) -> int:
+    return value.hour * 60 + value.minute
+
+
+def _target_time_minutes(values: list[str]) -> tuple[frozenset[int] | None, Ask | None]:
+    """Return safe target clock candidates without guessing an AM or PM."""
+
+    if not values:
+        return None, None
+    result = resolve_time(values)
+    if result.resolved and result.clock is not None:
+        return frozenset({_clock_minutes(result.clock)}), None
+    if (
+        result.status is TimeStatus.NEEDS_AMPM
+        and result.hour is not None
+        and result.minute is not None
+    ):
+        morning = 0 if result.hour == 12 else result.hour
+        afternoon = 12 if result.hour == 12 else result.hour + 12
+        return frozenset({morning * 60 + result.minute, afternoon * 60 + result.minute}), None
+    return None, Ask(texts.ASK_TIME_AGAIN)
 
 
 def _today(reference: datetime) -> date:
@@ -337,6 +361,14 @@ def _plan_list(
     completed = resolve_completed(adopted_texts(operation.filter.get("completed", ())))
     if completed is not None:
         decision["completed"] = completed
+    time_texts = adopted_texts(operation.filter.get("time", ()))
+    if time_texts:
+        result_time = resolve_time(time_texts)
+        if result_time.status is TimeStatus.NEEDS_AMPM:
+            return _Plan(ask=Ask(texts.ASK_AMPM))
+        if not result_time.resolved or result_time.clock is None:
+            return _Plan(ask=Ask(texts.ASK_TIME_AGAIN))
+        decision["timeMinutes"] = _clock_minutes(result_time.clock)
     title = _last(adopted_texts(operation.filter.get("title", ())))
     if title is not None:
         if is_unclear_title(title):
@@ -384,15 +416,30 @@ def _find_targets(
     state_texts = adopted_texts(operation.target.get("completedState", ()))
     if state_texts:
         completed = resolve_completed(state_texts)
+    category_value = resolve_category(adopted_texts(operation.target.get("category", ())))
+    category = Category(category_value) if category_value is not None else None
+    target_minutes, time_ask = _target_time_minutes(
+        adopted_texts(operation.target.get("time", ()))
+    )
+    if time_ask is not None:
+        return time_ask
     found: dict[str, ScheduleRead] = {}
     similar: dict[str, ScheduleRead] = {}
     for start, end in ranges:
         rows = reader.list(
-            from_utc=start, to_utc=end, category=None, completed=completed, limit=TARGET_SCAN_LIMIT + 1
+            from_utc=start,
+            to_utc=end,
+            category=category,
+            completed=completed,
+            limit=TARGET_SCAN_LIMIT + 1,
         )
         if len(rows) > TARGET_SCAN_LIMIT:
             return Ask(texts.ASK_NARROW)
         for row in rows:
+            if target_minutes is not None:
+                local = row.scheduled_at.astimezone(SEOUL)
+                if local.hour * 60 + local.minute not in target_minutes:
+                    continue
             if title_contains(title, row.title):
                 found[str(row.id)] = row
             elif title_similar(title, row.title):

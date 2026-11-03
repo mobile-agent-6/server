@@ -16,9 +16,14 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Any, Protocol
 
-from app.modules.assistant.decisions import DecisionContext, DecisionEnvelope
+from app.modules.assistant.decisions import (
+    DecisionContext,
+    DecisionEnvelope,
+    DecisionProviderInvalidOutput,
+)
 from app.modules.assistant.evidence import texts
 from app.modules.assistant.evidence.contract import (
+    EvidenceContractError,
     EvidenceOperation,
     EvidenceOutput,
     SpanStatus,
@@ -212,7 +217,10 @@ class EvidenceDecisionProvider:
                 return _envelope({"kind": "ask", "text": texts.GUIDANCE}, _cleared())
 
         output = self._extract(state, context, reference)
-        return self._plan(output, state, context, reference)
+        try:
+            return self._plan(output, state, context, reference)
+        except EvidenceGateError as exc:
+            raise DecisionProviderInvalidOutput(exc.code) from exc
 
     def _extract(self, state: _State, context: DecisionContext, reference: datetime) -> EvidenceOutput:
         """Call the model once, check the output, and log the call (Issue #29)."""
@@ -232,6 +240,9 @@ class EvidenceDecisionProvider:
             check_roles(output, reference=reference)
             check_turn_prefix(list(turns), len(turns))
             return output
+        except (EvidenceContractError, EvidenceGateError) as exc:
+            validation = str(getattr(exc, "code", None) or type(exc).__name__)
+            raise DecisionProviderInvalidOutput(validation) from exc
         except Exception as exc:
             validation = str(getattr(exc, "code", None) or type(exc).__name__)
             raise
