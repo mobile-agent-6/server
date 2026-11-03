@@ -24,6 +24,7 @@ CONSENT_QUESTION = "알림과 문자 기능은 지원하지 않아요. 알림 �
 CONSENT_DECLINED = "요청을 취소했어요."
 GUIDANCE = "그 요청은 도와드릴 수 없어요. 일정 등록, 조회, 변경, 삭제를 말씀해 주세요."
 LIST_RESULT = "요청한 일정이에요."
+NO_MATCH = "조건에 맞는 일정을 찾지 못했습니다."
 MORE_REQUESTS_NOTE = " 나머지 요청은 이어서 말씀해 주세요."
 FIRST_DECLINED = "요청을 취소했어요. 필요한 일정은 하나씩 말씀해 주세요."
 ASK_DATETIME_AGAIN = "날짜와 시간을 다시 말씀해 주세요."

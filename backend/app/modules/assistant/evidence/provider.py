@@ -26,12 +26,13 @@ from app.modules.assistant.evidence.contract import (
 )
 from app.modules.assistant.evidence.gate import (
     Answer,
+    EvidenceGateError,
     analyze_text,
     check_roles,
     check_turn_prefix,
     classify_answer,
 )
-from app.modules.assistant.evidence.normalize import mentions_date_or_time
+from app.modules.assistant.evidence.normalize import mentions_date_or_time, normalize_text
 from app.modules.assistant.evidence.planner import Ask, Overrides, plan_operation
 from app.modules.assistant.schedule_read import ScheduleReadPort
 
@@ -256,9 +257,16 @@ class EvidenceDecisionProvider:
         self, output: EvidenceOutput, state: _State, context: DecisionContext, reference: datetime
     ) -> DecisionEnvelope:
         if not output.operations:
+            if output.unsupported:
+                return _envelope({"kind": "ask", "text": texts.GUIDANCE}, _cleared())
+            if any(_has_clear_supported_request(turn) for turn in state.turns):
+                raise EvidenceGateError("SUPPORTED_OPERATION_MISSING")
             return _envelope({"kind": "ask", "text": texts.GUIDANCE}, _cleared())
         operation = output.operations[0]
-        model_saw_unsupported = bool(output.unsupported) or bool(operation.unsupported)
+        several = len(output.operations) > 1
+        model_saw_unsupported = bool(output.unsupported) or any(
+            item.unsupported for item in output.operations
+        )
         if model_saw_unsupported and not state.consent_granted:
             state.pending = {"kind": "consent"}
             return self._ask(texts.CONSENT_QUESTION, state)
@@ -271,12 +279,12 @@ class EvidenceDecisionProvider:
             reader=self._reader,
         )
         if ask is not None:
+            question = _with_more_requests_note(ask.text, several=several)
             if ask.confirm is not None:
-                state.pending = {"kind": "confirm", **ask.confirm, "text": ask.text}
-            return self._ask(ask.text, state)
+                state.pending = {"kind": "confirm", **ask.confirm, "text": question}
+            return self._ask(question, state)
         if decision is None:
             raise ValueError("planner returned neither a decision nor a question")
-        several = len(output.operations) > 1
         if decision["kind"] == "create_intent" and state.create_confirmed != _create_signature(decision):
             # A create runs at once with no confirmation step, so these checks
             # stop a model mistake before it becomes a wrong schedule.
@@ -290,8 +298,13 @@ class EvidenceDecisionProvider:
                     "text": question,
                 }
                 return self._ask(question, state)
-        if several and decision["kind"] in {"confirm", "select_candidate"}:
-            decision["text"] = decision["text"] + texts.MORE_REQUESTS_NOTE
+        if several:
+            if decision["kind"] == "no_match":
+                decision["text"] = texts.NO_MATCH + texts.MORE_REQUESTS_NOTE
+            elif decision["kind"] in {"confirm", "select_candidate", "list_intent", "cancel"}:
+                decision["text"] = _with_more_requests_note(
+                    decision["text"], several=True
+                )
         if not context.server_time_trusted and _is_relative(decision):
             # The processor will ask for an absolute date; keep the turns for that answer.
             return _envelope(decision, state)
@@ -302,6 +315,24 @@ class EvidenceDecisionProvider:
 _CORRECTION_MARKER = re.compile(r"말고|대신|아니(?!요|오)")
 _CHANGE_VERB = re.compile(r"옮겨|바꿔|변경|수정|취소|삭제|지워")
 _REMOVE_VERB = re.compile(r"취소|삭제|지워")
+# A question about schedules must not become a create just because the model
+# returned create evidence.  Capability-style create requests are exempt.
+_QUERY_REQUEST = re.compile(
+    r"(?:보여\s*줘|알려\s*줘|조회(?:해\s*줘)?|뭐\s*있(?:어|나요|습니까)|"
+    r"일정\s*있(?:어|나요|습니까)|있(?:어|나요|습니까))\s*[?？]?\s*$"
+)
+_CREATE_CAPABILITY = re.compile(
+    r"(?:등록(?:해)?|넣어|잡아|추가해|만들어)\s*"
+    r"(?:줘|줄\s*수\s*있(?:어|나요|습니까))\s*[?？]?\s*$"
+)
+_CLEAR_SUPPORTED_ACTION = re.compile(
+    r"등록|넣어|잡아|추가해|만들어|옮겨|바꿔|변경|수정|지워|삭제|"
+    r"완료로|완료\s*처리|조회"
+)
+_SCHEDULE_LIST_REQUEST = re.compile(
+    r"(?:(?:일정|스케줄|할\s*일|회의|점검|검수|업무|작업).*"
+    r"(?:보여|알려|있(?:어|나요|습니까))|뭐\s*있(?:어|나요|습니까))"
+)
 # "날짜는 글피로 바꿔 줘" in an answer changes the create being asked about.
 _SLOT_WORD = re.compile(r"(?:날짜|시간|시각|제목)\s*(?:은|는|을|를)")
 
@@ -312,13 +343,65 @@ def _is_change_request(turn: str, *, first: bool) -> bool:
     return bool(_CHANGE_VERB.search(turn)) and not _SLOT_WORD.search(turn)
 
 
-def _has_correction_evidence(operation: EvidenceOperation) -> bool:
+def _has_clear_supported_request(turn: str) -> bool:
+    value = normalize_text(turn)
+    return bool(
+        _CLEAR_SUPPORTED_ACTION.search(value)
+        or _SCHEDULE_LIST_REQUEST.search(value)
+    )
+
+
+def _has_replaced_evidence(operation: EvidenceOperation) -> bool:
     return any(
-        span.status is not SpanStatus.ADOPTED
+        span.status is SpanStatus.SUPERSEDED
         for evidence in (operation.target, operation.change, operation.filter)
         for spans in evidence.values()
         for span in spans
     )
+
+
+def _mask_text(value: str, text: str, occurrence: int | None = None) -> str:
+    needle = normalize_text(text)
+    matches = list(re.finditer(re.escape(needle), value))
+    if occurrence is not None:
+        matches = matches[occurrence - 1:occurrence]
+    for match in reversed(matches):
+        value = value[:match.start()] + " " * (match.end() - match.start()) + value[match.end():]
+    return value
+
+
+def _has_query_request(operation: EvidenceOperation, turns: Sequence[str]) -> bool:
+    """Find a query cue only in text the model did not claim as evidence.
+
+    Unsupported-feature phrases are removed too.  This keeps requests such as
+    "register it and tell me an hour before" from being mistaken for a list
+    request after the unsupported part has already been handled by consent.
+    """
+
+    spans = [
+        span
+        for evidence in (operation.target, operation.change, operation.filter)
+        for slot_spans in evidence.values()
+        for span in slot_spans
+    ] + list(operation.unsupported)
+    for turn_number, turn in enumerate(turns, 1):
+        residual = normalize_text(turn)
+        for span in spans:
+            if span.turn == turn_number:
+                residual = _mask_text(residual, span.text, span.occurrence)
+        for finding in analyze_text(turn).findings:
+            residual = _mask_text(residual, finding.text)
+        if _CREATE_CAPABILITY.search(residual):
+            continue
+        if _QUERY_REQUEST.search(residual):
+            return True
+    return False
+
+
+def _with_more_requests_note(text: str, *, several: bool) -> str:
+    if not several or text.endswith(texts.MORE_REQUESTS_NOTE):
+        return text
+    return text + texts.MORE_REQUESTS_NOTE
 
 
 def _create_check(
@@ -333,16 +416,19 @@ def _create_check(
     title = str(decision["title"])
     if several:
         return "first_operation", texts.confirm_first_create(title)
-    if _has_correction_evidence(operation):
-        return None
     latest = turns[-1] if turns else ""
-    if _CORRECTION_MARKER.search(latest) and mentions_date_or_time(latest):
-        # The user corrected a value but the model marked no correction (run 006 lk52).
-        scheduled_at = datetime.fromisoformat(str(decision["scheduledAt"]))
-        return "values", texts.confirm_create_values(title, scheduled_at)
     if any(_is_change_request(turn, first=index == 0) for index, turn in enumerate(turns)):
         # Change or delete wording read as a new schedule (run 004 lk28).
         return "new_create", texts.confirm_new_create(title)
+    if _has_query_request(operation, turns):
+        # A list question read as a new schedule must never write immediately.
+        return "new_create", texts.confirm_new_create(title)
+    if _has_replaced_evidence(operation):
+        return None
+    if _CORRECTION_MARKER.search(latest) and mentions_date_or_time(latest):
+        # The user corrected a value but the model marked no replaced value (run 006 lk52).
+        scheduled_at = datetime.fromisoformat(str(decision["scheduledAt"]))
+        return "values", texts.confirm_create_values(title, scheduled_at)
     return None
 
 

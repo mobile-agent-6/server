@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "baselineCommit": "3b0f937",
+  "approver": "backend-owner",
+  "note": "Only intentional replay differences approved by the backend owner belong here. Entries are handwritten and must include case, turn, baseline, new behavior, reason, and decision basis.",
+  "baselineRecheck": {
+    "goldTargetRows": 849,
+    "batch6MarkerlessCases": [
+      "c3-create-b6-056",
+      "c3-create-b6-057",
+      "c3-create-b6-058",
+      "c3-create-b6-059",
+      "c3-create-b6-060"
+    ],
+    "approvedDifferencesAtBaseline": 0,
+    "note": "The earlier handoff mentioned four extra confirmations before the follow-up fixes. At baseline commit 3b0f937, all five markerless batch 6 families match this frozen replay, so no legacy difference is allowlisted."
+  },
+  "differences": []
+}

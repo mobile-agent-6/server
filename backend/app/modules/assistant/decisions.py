@@ -174,6 +174,7 @@ class DecisionNoMatch(_InternalModel):
 
     kind: Literal["no_match"]
     operation: AssistantOutcomeOperationValue
+    text: AssistantText | None = None
 
 
 class DecisionCancel(_InternalModel):

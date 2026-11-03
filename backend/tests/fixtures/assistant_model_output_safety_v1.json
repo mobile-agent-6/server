@@ -1,0 +1,164 @@
+{
+  "version": 1,
+  "baselineCommit": "3b0f937",
+  "note": "Human-authored model-error cases. Expected API results and final Schedule rows are fixed independently of evidence normalization and planning code.",
+  "cases": [
+    {
+      "caseId": "create-from-change-with-correction-evidence",
+      "class": "create_operation_conflict",
+      "input": "내일 오후 3시 말고 오후 4시로 회의 옮겨 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "회의", "status": "adopted"}],
+              "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+              "time": [
+                {"turn": 1, "text": "오후 3시", "status": "superseded"},
+                {"turn": 1, "text": "말고", "status": "correction_marker"},
+                {"turn": 1, "text": "오후 4시", "status": "adopted"}
+              ]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "need_more_info",
+        "text": "'회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "create-from-list-question",
+      "class": "create_operation_conflict",
+      "input": "내일 오후 3시 회의 있어?",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "회의", "status": "adopted"}],
+              "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+              "time": [{"turn": 1, "text": "오후 3시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "need_more_info",
+        "text": "'회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "marker-only-does-not-authorize-create",
+      "class": "incomplete_correction_provenance",
+      "input": "내일 말고 5일 오후 2시에 회의 잡아 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "회의", "status": "adopted"}],
+              "date": [
+                {"turn": 1, "text": "말고", "status": "correction_marker"},
+                {"turn": 1, "text": "5일", "status": "adopted"}
+              ],
+              "time": [{"turn": 1, "text": "오후 2시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "need_more_info",
+        "text": "11월 5일 오후 2시에 '회의' 일정을 등록할까요?"
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "supported-request-missing-operation",
+      "class": "model_omitted_supported_operation",
+      "input": "내일 오후 3시에 회의 등록해 줘",
+      "modelOutput": {
+        "operations": [],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "failure",
+        "code": "MODEL_OUTPUT_INVALID",
+        "nextAction": "revise_input"
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "multi-operation-no-match-keeps-remainder-notice",
+      "class": "first_operation_only",
+      "input": "없는 회의는 지우고 내일 오후 3시 재고 회의 등록해 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "delete",
+            "targetEvidence": {
+              "title": [{"turn": 1, "text": "없는 회의", "status": "adopted"}]
+            },
+            "changeEvidence": {},
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          },
+          {
+            "index": 2,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "재고 회의", "status": "adopted"}],
+              "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+              "time": [{"turn": 1, "text": "오후 3시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "outcome",
+        "outcome": "no_match",
+        "operation": "delete",
+        "text": "조건에 맞는 일정을 찾지 못했습니다. 나머지 요청은 이어서 말씀해 주세요."
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    }
+  ]
+}

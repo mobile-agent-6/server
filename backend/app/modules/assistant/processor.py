@@ -336,14 +336,18 @@ def _summary(schedule: ScheduleRead) -> AssistantScheduleSummary:
     )
 
 
-def _no_match(*, operation: AssistantOutcomeOperation | None = None) -> _FinalizePlan:
+def _no_match(
+    *,
+    operation: AssistantOutcomeOperation | None = None,
+    text: str = NO_MATCH_TEXT,
+) -> _FinalizePlan:
     fields: dict[str, object] = {}
     if operation is not None:
         fields["operation"] = operation
     return _FinalizePlan(
         result=AssistantResultOutcome(
             kind=AssistantResultKind.OUTCOME,
-            text=NO_MATCH_TEXT,
+            text=text,
             outcome=AssistantOutcome.NO_MATCH,
             schedules_changed=False,
             **fields,
@@ -810,7 +814,10 @@ def _provider_decision_plan(
 
     if isinstance(decision, DecisionNoMatch):
         return _FinalizePlan(
-            result=_no_match(operation=AssistantOutcomeOperation(decision.operation)).result,
+            result=_no_match(
+                operation=AssistantOutcomeOperation(decision.operation),
+                text=decision.text or NO_MATCH_TEXT,
+            ).result,
             **control,
         )
 
