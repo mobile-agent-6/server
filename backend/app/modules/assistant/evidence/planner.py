@@ -17,16 +17,21 @@ from app.modules.assistant.evidence import texts
 from app.modules.assistant.evidence.contract import (
     EvidenceOperation,
     OperationKind,
+    SpanStatus,
     adopted_texts,
+    evidence_key,
 )
 from app.modules.assistant.evidence.normalize import (
     SEOUL,
     DatePurpose,
     DateStatus,
+    Inherit,
+    InheritResult,
     TimeStatus,
     combine,
     is_future_scope,
     is_unclear_title,
+    inherit_partial_date,
     resolve_category,
     resolve_completed,
     resolve_date,
@@ -53,10 +58,15 @@ class Ask:
 
 @dataclass(frozen=True)
 class Overrides:
-    """Values the user already confirmed with a yes/no answer."""
+    """Values the user already confirmed with a yes/no answer.
+
+    Each one is tied to the evidence it was asked about.  When a later turn
+    changes that evidence ("아니 다음 주 금요일로"), the old yes no longer applies.
+    """
 
     change_date: date | None = None
-    midnight: bool = False
+    change_date_source: str | None = None
+    midnight_source: str | None = None
 
 
 @dataclass
@@ -97,6 +107,46 @@ def _interpretation(absolute: bool) -> str:
     return (TimeInterpretation.ABSOLUTE if absolute else TimeInterpretation.RELATIVE).value
 
 
+def _write_time(decision: Mapping[str, Any]) -> datetime | None:
+    """The one schedule time this decision would write, when already known."""
+
+    if decision.get("kind") == "create_intent":
+        value = decision.get("scheduledAt")
+    elif decision.get("kind") == "confirm" and decision.get("operation") == "update":
+        changes = decision.get("changes")
+        value = changes.get("scheduledAt") if isinstance(changes, Mapping) else None
+    else:
+        return None
+    if not isinstance(value, str):
+        return None
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def _pre_write_ask(
+    decision: Mapping[str, Any], *, reference: datetime, server_time_trusted: bool
+) -> Ask | None:
+    """Ask before persistence when one relative write time is already past.
+
+    The Schedule write boundary still performs its authoritative validation.
+    This earlier check only improves a trusted-clock conversation by asking for
+    a replacement while the evidence context is still available. An explicit
+    absolute past time keeps the established Schedule rejection result.
+    """
+
+    value = _write_time(decision)
+    if (
+        server_time_trusted
+        and decision.get("timeInterpretation") == TimeInterpretation.RELATIVE.value
+        and value is not None
+        and value <= reference
+    ):
+        return Ask(texts.ASK_DATETIME_AGAIN)
+    return None
+
+
 # ------------------------------------------------------------ date + time
 
 
@@ -110,10 +160,33 @@ def _change_moment(
     moment = _Moment()
     date_texts = adopted_texts(operation.change.get("date", ()))
     time_texts = adopted_texts(operation.change.get("time", ()))
+    date_key = evidence_key(operation.change.get("date", ()))
+    midnight_key = date_key + "#" + evidence_key(operation.change.get("time", ()))
     today = _today(reference)
 
-    if overrides.change_date is not None:
+    replaced = [
+        span.text for span in operation.change.get("date", ()) if span.status is SpanStatus.SUPERSEDED
+    ]
+    inherited = (
+        inherit_partial_date(date_texts[-1], replaced, reference)
+        if date_texts and replaced
+        else InheritResult(Inherit.NOT_PARTIAL)
+    )
+    if overrides.change_date is not None and overrides.change_date_source == date_key:
         moment.day = overrides.change_date
+    elif inherited.status is Inherit.INHERITED:
+        moment.day = inherited.day
+        moment.absolute = inherited.absolute
+    elif inherited.status is Inherit.INHERITED_NEXT_YEAR and inherited.day is not None:
+        # "2월 3일 말고 5일" in October: the same next-year question as "2월 5일".
+        if not server_time_trusted:
+            return Ask(texts.ASK_ABSOLUTE_DATE)
+        return Ask(
+            texts.confirm_next_year(inherited.day),
+            confirm={"slot": "change_date", "value": inherited.day.isoformat(), "source": date_key},
+        )
+    elif inherited.status is Inherit.UNKNOWN:
+        return Ask(texts.ASK_DATE_AGAIN)
     elif date_texts:
         result = resolve_date(date_texts, reference, purpose=DatePurpose.SCHEDULE)
         if result.status is DateStatus.RESOLVED:
@@ -126,12 +199,15 @@ def _change_moment(
                 return Ask(texts.ASK_DATE_AGAIN)
             return Ask(
                 texts.confirm_next_year(result.proposal),
-                confirm={"slot": "change_date", "value": result.proposal.isoformat()},
+                confirm={"slot": "change_date", "value": result.proposal.isoformat(), "source": date_key},
             )
         elif result.status is DateStatus.WEEKDAY_IS_TODAY:
             if not server_time_trusted:
                 return Ask(texts.ASK_ABSOLUTE_DATE)
-            return Ask(texts.confirm_today(today), confirm={"slot": "change_date", "value": today.isoformat()})
+            return Ask(
+                texts.confirm_today(today),
+                confirm={"slot": "change_date", "value": today.isoformat(), "source": date_key},
+            )
         else:
             return Ask(texts.ASK_DATE_AGAIN)
 
@@ -144,13 +220,13 @@ def _change_moment(
         elif result_time.status is TimeStatus.NEEDS_CLOCK:
             return Ask(texts.ASK_TIME)
         elif result_time.status is TimeStatus.MIDNIGHT_UNCLEAR:
-            if overrides.midnight:
+            if overrides.midnight_source == midnight_key:
                 moment.clock = time(0, 0)
                 moment.next_day_midnight = True
             elif moment.day is not None:
                 return Ask(
                     texts.confirm_midnight(moment.day + timedelta(days=1)),
-                    confirm={"slot": "midnight", "value": "yes"},
+                    confirm={"slot": "midnight", "value": "yes", "source": midnight_key},
                 )
             else:
                 # The date is still unknown; ask for it first.
@@ -226,8 +302,15 @@ def _plan_list(
         else:
             result = resolve_date(date_texts, reference, purpose=DatePurpose.SEARCH)
             if result.status is DateStatus.RESOLVED:
-                # A list needs one range: use the first match (this year when no year).
-                start = _day_start(result.dates[0])
+                # A list needs one range. A yearless date means the coming
+                # occurrence, while an explicit year keeps the exact date.
+                selected = result.dates[0]
+                if not result.absolute:
+                    selected = next(
+                        (day for day in result.dates if day >= _today(reference)),
+                        selected,
+                    )
+                start = _day_start(selected)
                 absolute = result.absolute
             elif result.status is DateStatus.WEEKDAY_IS_TODAY:
                 start = _day_start(_today(reference))
@@ -439,4 +522,10 @@ def plan_operation(
             overrides=overrides,
             reader=reader,
         )
+    if plan.decision is not None:
+        ask = _pre_write_ask(
+            plan.decision, reference=reference, server_time_trusted=server_time_trusted
+        )
+        if ask is not None:
+            return None, ask
     return plan.decision, plan.ask

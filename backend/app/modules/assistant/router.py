@@ -25,6 +25,7 @@ from app.modules.assistant.schemas import (
     AssistantRequestAcceptedResponse,
     AssistantRequestCreate,
     AssistantRequestStatusResponse,
+    AssistantInputText,
     AssistantUuid,
 )
 from app.modules.assistant.state_service import (
@@ -73,6 +74,18 @@ def _runtime_ready(request: Request) -> bool:
         and runtime is not None
         and runtime.snapshot().ready
     )
+
+
+def _provider_available(request: Request, data: AssistantRequestCreate) -> bool:
+    if request.app.state.assistant_provider_available:
+        return True
+    # Selection and confirmation use the persisted intent and never call the
+    # model.  A new text request may reconnect a model server that started
+    # after the backend, which is the usual Orange Pi boot order race.
+    reconnect = request.app.state.assistant_provider_reconnect
+    if isinstance(data.input, AssistantInputText) and reconnect is not None:
+        return bool(reconnect())
+    return False
 
 
 def _compensate_registration_failure(
@@ -128,7 +141,7 @@ def create_assistant_request(
         accepted_at=accepted_at,
         new_conversation_id=request.app.state.assistant_uuid_factory(),
         runtime_ready=_runtime_ready(request),
-        provider_available=request.app.state.assistant_provider_available,
+        provider_available=_provider_available(request, data),
     )
     if isinstance(response, AssistantRequestStatusResponse):
         return JSONResponse(

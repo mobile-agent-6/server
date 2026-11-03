@@ -104,6 +104,12 @@ def adopted_texts(spans: Iterable[Span]) -> list[str]:
     return [span.text for span in spans if span.status is SpanStatus.ADOPTED]
 
 
+def evidence_key(spans: Iterable[Span]) -> str:
+    """The adopted evidence as one string, so a confirmed value can be tied to it."""
+
+    return "|".join(f"{span.turn}:{span.text}" for span in spans if span.status is SpanStatus.ADOPTED)
+
+
 # ----------------------------------------------------------------- parsing
 
 

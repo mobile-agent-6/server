@@ -15,7 +15,7 @@
 - 일반 일정 화면은 이 문서의 Schedule REST API를 직접 호출한다.
 - 알림 기능은 제품 범위에서 제외했으며 Schedule 요청·응답에 알림 필드를 제공하지 않는다.
 - 일정 비서 화면은 이 문서의 Assistant API를 호출하고, 서버가 모델 해석·검증 뒤 Schedule API를 실행한다. 앱은 Assistant 결과를 근거로 같은 CRUD를 다시 실행하지 않는다.
-- Assistant endpoint, 영속 상태, runtime과 안전한 Schedule 실행 기반은 구현됐다. 모델 연결은 설정으로 켤 때만 동작한다(`backend/README.md`의 모델 연결). 모델이 연결되지 않으면 새 text와 자연어 후속 입력은 `503 ASSISTANT_UNAVAILABLE`이며, 저장 정보가 완전한 selection/confirmation과 기존 요청 조회, 취소는 처리할 수 있다.
+- Assistant endpoint, 영속 상태, runtime과 안전한 Schedule 실행 기반은 구현됐다. 모델 연결은 설정으로 켤 때만 동작한다(`backend/README.md`의 모델 연결). 백엔드보다 모델 서버가 늦게 시작되면 첫 text 입력에서 연결을 다시 확인한다. 그때도 연결되지 않으면 새 text와 자연어 후속 입력은 `503 ASSISTANT_UNAVAILABLE`이며, 저장 정보가 완전한 selection/confirmation과 기존 요청 조회, 취소는 처리할 수 있다.
 - 이번 Assistant 범위는 텍스트 입력이다. STT/TTS 전송 형식과 서버 내부 모델 연결 protocol은 아직 포함하지 않는다.
 - MVP에는 계정, 사용자별 일정 소유권과 API 인증을 포함하지 않는다.
 - 데이터베이스 구조는 [`erd.md`](erd.md)를 참고한다.
@@ -620,7 +620,7 @@ ValidationErrorItem
 
 > 상태: `BE-FE-AGREED`
 >
-> 구현: 계약 확정·부분 구현. DB별 runtime lock, 단일 worker, 300초 deadline, gate·marker 기반 Schedule 안전 write, idempotent create recovery, atomic update/delete, uncertain acknowledge와 bounded tombstone cleanup이 연결됐다. 모델(Qwen) 연결은 설정으로 켤 때만 동작하며, 연결되지 않으면 새 text와 자연어 후속 POST는 insert 없이 `503 ASSISTANT_UNAVAILABLE`이고, 저장 정보가 완전한 selection/confirmation과 기존 GET, cancel은 동작한다.
+> 구현: 계약 확정·부분 구현. DB별 runtime lock, 단일 worker, 300초 deadline, gate·marker 기반 Schedule 안전 write, idempotent create recovery, atomic update/delete, uncertain acknowledge와 bounded tombstone cleanup이 연결됐다. 모델(Qwen) 연결은 설정으로 켤 때만 동작하며, 시작 때 준비되지 않으면 첫 text 입력에서 한 번 더 연결을 확인한다. 그때도 연결되지 않으면 새 text와 자연어 후속 POST는 insert 없이 `503 ASSISTANT_UNAVAILABLE`이고, 저장 정보가 완전한 selection/confirmation과 기존 GET, cancel은 동작한다.
 
 ### 16.1 역할과 기본 흐름
 
