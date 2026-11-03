@@ -89,6 +89,7 @@ _BARE_WEEKDAY = re.compile(r"(?<![가-힣])([월화수목금토일])요일")
 _DATE_LIKE = re.compile(
     r"\d+\s*(?:월|일)|요일|주말|다음\s*(?:주|달)|이번\s*(?:주|달)|지난\s*(?:주|달)|"
     r"저번\s*(?:주|달)|월말|월초|연말|연초|\d+\s*/\s*\d+|(?:며칠|\d+\s*일)\s*(?:뒤|후)|"
+    r"이틀\s*(?:뒤|후)|일\s*주일\s*(?:뒤|후)|한\s*달\s*(?:뒤|후)|"
     r"오늘|내일|모레|글피|어제|그제|그저께"
 )
 
@@ -591,6 +592,7 @@ def title_contains(query: str, title: str) -> bool:
 
 
 _CATEGORY_WORDS = re.compile(r"입고|재고|출고|피킹|포장|반품")
+_DISTINCTIVE_TITLE_WORDS = re.compile(r"\d+|[a-z]+|오전|오후")
 
 
 def _category_words(key: str) -> set[str]:
@@ -607,6 +609,11 @@ def title_similar(query: str, title: str) -> bool:
 
     a, b = _title_key(query), _title_key(title)
     if min(len(a), len(b)) < SIMILAR_TITLE_MIN_CHARS or abs(len(a) - len(b)) > 1:
+        return False
+    # Numbers, Latin words and AM/PM words identify the schedule rather than a
+    # likely Korean speech-recognition typo. Never offer a different dock,
+    # version or time period as a one-letter fallback candidate.
+    if _DISTINCTIVE_TITLE_WORDS.findall(a) != _DISTINCTIVE_TITLE_WORDS.findall(b):
         return False
     # "입고 검품" and "출고 검품" differ by one letter but are different work.
     if _category_words(a) != _category_words(b):

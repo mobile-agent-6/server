@@ -9,11 +9,13 @@ from threading import Event
 from uuid import uuid4
 
 import sqlalchemy as sa
+import pytest
 from fastapi.testclient import TestClient
 
 from app.core.clock import FixedClock
 from app.core.config import Settings
 from app.main import create_app
+from app.modules.assistant.evidence.model_client import ChatCompletionsModel
 from app.modules.assistant.evidence.normalize import SEOUL
 from app.modules.schedules.model import Schedule
 from app.modules.system.time_sync import DisabledTimeSyncAdapter
@@ -128,6 +130,45 @@ def test_model_server_down_keeps_assistant_unavailable(database_path: Path) -> N
             )
             assert response.status_code == 503
             assert client.get("/health").status_code == 200
+    finally:
+        application.state.engine.dispose()
+
+
+def test_first_request_reconnects_a_model_server_that_started_late(
+    database_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    readiness = iter((False, True))
+    monkeypatch.setattr(ChatCompletionsModel, "is_ready", lambda self: next(readiness))
+    monkeypatch.setattr(
+        ChatCompletionsModel,
+        "extract",
+        lambda self, **kwargs: json.dumps(CREATE_OUTPUT, ensure_ascii=False),
+    )
+    application = _app(
+        database_path,
+        assistant_model_enabled=True,
+        assistant_model_base_url="http://127.0.0.1:9",
+        assistant_trust_server_time=True,
+    )
+    try:
+        with TestClient(application) as client:
+            assert application.state.assistant_provider_available is False
+            request_id = str(uuid4())
+            response = client.post(
+                "/api/v1/assistant/requests",
+                json={
+                    "requestId": request_id,
+                    "input": {"type": "text", "text": "내일 오후 3시 반에 입고 검수 잡아 줘"},
+                },
+            )
+            assert response.status_code == 202
+            assert application.state.assistant_provider_available is True
+            result = _wait(client, request_id)["result"]
+            assert (result["kind"], result["outcome"], result["operation"]) == (
+                "outcome",
+                "success",
+                "create",
+            )
     finally:
         application.state.engine.dispose()
 

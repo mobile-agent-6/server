@@ -382,6 +382,10 @@ def classify_answer(text: str) -> Answer:
         return Answer.UNKNOWN if "yes" in kinds else Answer.NO
     if "part" in kinds:
         return Answer.UNKNOWN
+    # A pointing word alone does not identify what the user accepted. In
+    # particular, "어 그건" must not turn a pending write into approval.
+    if "neutral" in kinds and "yes" in kinds and "go" not in kinds:
+        return Answer.UNKNOWN
     if "yes" in kinds or "go" in kinds:
         return Answer.YES
     return Answer.UNKNOWN

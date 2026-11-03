@@ -124,6 +124,49 @@ def test_complete_create() -> None:
     assert envelope.control_state["turns"] == []  # cleared once the task ends
 
 
+def test_past_create_asks_for_a_new_date_and_time_before_write() -> None:
+    model = ScriptedModel(
+        output(
+            op(
+                "create",
+                change={
+                    "title": [span("입고 검수")],
+                    "date": [span("오늘")],
+                    "time": [span("오전 9시")],
+                },
+            )
+        )
+    )
+    _, decision = decide(
+        EvidenceDecisionProvider(model, FakeReader()),
+        "오늘 오전 9시에 입고 검수 잡아 줘",
+    )
+    assert decision == {"kind": "ask", "text": texts.ASK_DATETIME_AGAIN}
+
+
+@pytest.mark.parametrize("date_text", ["이틀 뒤", "일주일 후", "한 달 뒤"])
+def test_unsupported_relative_date_asks_instead_of_rejecting_model_output(
+    date_text: str,
+) -> None:
+    model = ScriptedModel(
+        output(
+            op(
+                "create",
+                change={
+                    "title": [span("입고 검수")],
+                    "date": [span(date_text)],
+                    "time": [span("오후 3시")],
+                },
+            )
+        )
+    )
+    _, decision = decide(
+        EvidenceDecisionProvider(model, FakeReader()),
+        f"{date_text} 오후 3시에 입고 검수 잡아 줘",
+    )
+    assert decision == {"kind": "ask", "text": texts.ASK_DATE_AGAIN}
+
+
 def test_category_from_title_and_default_other() -> None:
     model = ScriptedModel(
         output(op("create", change={"title": [span("반품 상자 검수")], "date": [span("내일")], "time": [span("오후 2시")]})),
@@ -272,6 +315,7 @@ def test_unrelated_request_gets_guidance() -> None:
         ("네 다음 달로", Answer.UNKNOWN),
         ("좋아요 근데 오후로", Answer.UNKNOWN),
         ("응, 제목은 주간 회의로", Answer.UNKNOWN),
+        ("어 그건", Answer.UNKNOWN),
         # A yes that drops something is not a plain yes (re-review).
         ("응 첫 번째는 빼 줘", Answer.UNKNOWN),
         ("네 그건 빼 주세요", Answer.UNKNOWN),
@@ -322,6 +366,18 @@ def test_target_title_match_ignores_spaces_and_picks_among_several() -> None:
 def test_no_target_found() -> None:
     model = ScriptedModel(output(op("delete", target={"title": [span("출고 검량 기록")]})))
     _, decision = decide(EvidenceDecisionProvider(model, FakeReader()), "출고 검량 기록 지워 줘")
+    assert decision == {"kind": "no_match", "operation": "delete"}
+
+
+@pytest.mark.parametrize("query", ["2번 도크", "dock b", "오후 입고 점검"])
+def test_distinctive_title_change_is_not_a_typo_candidate(query: str) -> None:
+    rows = [
+        schedule("1번 도크", REFERENCE + timedelta(days=1)),
+        schedule("dock a", REFERENCE + timedelta(days=2)),
+        schedule("오전 입고 점검", REFERENCE + timedelta(days=3)),
+    ]
+    model = ScriptedModel(output(op("delete", target={"title": [span(query)]})))
+    _, decision = decide(EvidenceDecisionProvider(model, FakeReader(rows)), f"{query} 지워 줘")
     assert decision == {"kind": "no_match", "operation": "delete"}
 
 
@@ -408,6 +464,24 @@ def test_update_time_only_keeps_the_date() -> None:
     assert datetime.fromisoformat(decision["changes"]["scheduledAt"]) == datetime(2026, 11, 2, 17, 0, tzinfo=SEOUL)
 
 
+def test_update_to_a_past_time_asks_before_confirmation() -> None:
+    target = schedule("회의", datetime(2026, 10, 29, 11, 0, tzinfo=SEOUL))
+    model = ScriptedModel(
+        output(
+            op(
+                "update",
+                target={"title": [span("회의")]},
+                change={"time": [span("오전 9시")]},
+            )
+        )
+    )
+    _, decision = decide(
+        EvidenceDecisionProvider(model, FakeReader([target])),
+        "회의 오전 9시로 옮겨 줘",
+    )
+    assert decision == {"kind": "ask", "text": texts.ASK_DATETIME_AGAIN}
+
+
 def test_update_without_change_value_asks() -> None:
     model = ScriptedModel(output(op("update", target={"title": [span("회의")]})))
     _, decision = decide(EvidenceDecisionProvider(model, FakeReader()), "회의 좀 바꿔 줘")
@@ -447,6 +521,24 @@ def test_list_month_title_and_completed_filters() -> None:
     assert instant(decision["to"]) == datetime(2026, 12, 1, tzinfo=SEOUL)
     assert decision["completed"] is False
     assert decision["title"] == "회의"
+
+
+@pytest.mark.parametrize(
+    ("period", "start"),
+    [("3월 5일", "2027-03-04T15:00:00Z"), ("15일", "2026-11-14T15:00:00Z")],
+)
+def test_list_yearless_date_uses_the_coming_occurrence(period: str, start: str) -> None:
+    model = ScriptedModel(output(op("list", filter={"date": [span(period)]})))
+    _, decision = decide(EvidenceDecisionProvider(model, FakeReader()), f"{period} 일정 보여 줘")
+    assert decision["from"] == start
+    expected_end = datetime.fromisoformat(start.replace("Z", "+00:00")) + timedelta(days=1)
+    assert decision["to"] == expected_end.isoformat().replace("+00:00", "Z")
+
+
+def test_list_explicit_past_year_keeps_the_exact_date() -> None:
+    model = ScriptedModel(output(op("list", filter={"date": [span("2026년 3월 5일")]})))
+    _, decision = decide(EvidenceDecisionProvider(model, FakeReader()), "2026년 3월 5일 일정 보여 줘")
+    assert decision["from"] == "2026-03-04T15:00:00Z"
 
 
 # ------------------------------------------------------- several requests

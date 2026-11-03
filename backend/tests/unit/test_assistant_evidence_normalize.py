@@ -97,7 +97,21 @@ def test_weekday_that_is_today_asks() -> None:
     assert schedule_date("목요일").status is DateStatus.WEEKDAY_IS_TODAY
 
 
-@pytest.mark.parametrize("text", ["매주 금요일", "다음 달", "주말", "이번 주말", "3/5", "15일간", "월말"])
+@pytest.mark.parametrize(
+    "text",
+    [
+        "매주 금요일",
+        "다음 달",
+        "주말",
+        "이번 주말",
+        "3/5",
+        "15일간",
+        "월말",
+        "이틀 뒤",
+        "일주일 후",
+        "한 달 뒤",
+    ],
+)
 def test_unsupported_date_expressions_ask_instead_of_guessing(text: str) -> None:
     assert schedule_date(text).status is DateStatus.UNSUPPORTED
 

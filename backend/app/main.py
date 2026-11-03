@@ -110,6 +110,26 @@ def _model_provider(settings: Settings, application: FastAPI) -> DecisionProvide
     return EvidenceDecisionProvider(model, SqlAlchemyScheduleReader(application.state.session_factory))
 
 
+def _reconnect_model_provider(settings: Settings, application: FastAPI) -> bool:
+    """Install the provider when a model server that started late becomes ready."""
+
+    if application.state.assistant_provider_available:
+        return True
+    with application.state.assistant_provider_lock:
+        if application.state.assistant_provider_available:
+            return True
+        provider = _model_provider(settings, application)
+        if provider is None:
+            return False
+        application.state.assistant_decision_provider = provider
+        application.state.assistant_provider_available = True
+        logging.getLogger(__name__).info(
+            "Assistant model server is connected",
+            extra={"event": "assistant.model_connected"},
+        )
+        return True
+
+
 def create_app(
     settings: Settings | None = None,
     *,
@@ -190,10 +210,13 @@ def create_app(
                 assistant_engine
             )
             provider = _assistant_decision_provider_for_tests
-            if provider is None and resolved.assistant_model_enabled:
-                provider = _model_provider(resolved, application)
             application.state.assistant_decision_provider = provider
             application.state.assistant_provider_available = provider is not None
+            if provider is None and resolved.assistant_model_enabled:
+                application.state.assistant_provider_reconnect = lambda: (
+                    _reconnect_model_provider(resolved, application)
+                )
+                application.state.assistant_provider_reconnect()
             if ownership_lock is not None:
                 try:
                     timeout_engine = create_assistant_engine(
@@ -324,6 +347,7 @@ def create_app(
             application.state.assistant_runtime_ready = False
             application.state.assistant_provider_available = False
             application.state.assistant_decision_provider = None
+            application.state.assistant_provider_reconnect = None
             application.state.assistant_session_factory = None
             application.state.assistant_engine = None
             application.state.assistant_runtime_owner = False
@@ -356,6 +380,8 @@ def create_app(
     application.state.assistant_runtime_ready = False
     application.state.assistant_provider_available = False
     application.state.assistant_decision_provider = None
+    application.state.assistant_provider_lock = threading.Lock()
+    application.state.assistant_provider_reconnect = None
     application.state.assistant_runtime = None
     application.state.assistant_runtime_owner = False
     application.state.assistant_runtime_healthy = False

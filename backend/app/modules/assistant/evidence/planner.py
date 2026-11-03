@@ -107,6 +107,46 @@ def _interpretation(absolute: bool) -> str:
     return (TimeInterpretation.ABSOLUTE if absolute else TimeInterpretation.RELATIVE).value
 
 
+def _write_time(decision: Mapping[str, Any]) -> datetime | None:
+    """The one schedule time this decision would write, when already known."""
+
+    if decision.get("kind") == "create_intent":
+        value = decision.get("scheduledAt")
+    elif decision.get("kind") == "confirm" and decision.get("operation") == "update":
+        changes = decision.get("changes")
+        value = changes.get("scheduledAt") if isinstance(changes, Mapping) else None
+    else:
+        return None
+    if not isinstance(value, str):
+        return None
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def _pre_write_ask(
+    decision: Mapping[str, Any], *, reference: datetime, server_time_trusted: bool
+) -> Ask | None:
+    """Ask before persistence when one relative write time is already past.
+
+    The Schedule write boundary still performs its authoritative validation.
+    This earlier check only improves a trusted-clock conversation by asking for
+    a replacement while the evidence context is still available. An explicit
+    absolute past time keeps the established Schedule rejection result.
+    """
+
+    value = _write_time(decision)
+    if (
+        server_time_trusted
+        and decision.get("timeInterpretation") == TimeInterpretation.RELATIVE.value
+        and value is not None
+        and value <= reference
+    ):
+        return Ask(texts.ASK_DATETIME_AGAIN)
+    return None
+
+
 # ------------------------------------------------------------ date + time
 
 
@@ -262,8 +302,15 @@ def _plan_list(
         else:
             result = resolve_date(date_texts, reference, purpose=DatePurpose.SEARCH)
             if result.status is DateStatus.RESOLVED:
-                # A list needs one range: use the first match (this year when no year).
-                start = _day_start(result.dates[0])
+                # A list needs one range. A yearless date means the coming
+                # occurrence, while an explicit year keeps the exact date.
+                selected = result.dates[0]
+                if not result.absolute:
+                    selected = next(
+                        (day for day in result.dates if day >= _today(reference)),
+                        selected,
+                    )
+                start = _day_start(selected)
                 absolute = result.absolute
             elif result.status is DateStatus.WEEKDAY_IS_TODAY:
                 start = _day_start(_today(reference))
@@ -475,4 +522,10 @@ def plan_operation(
             overrides=overrides,
             reader=reader,
         )
+    if plan.decision is not None:
+        ask = _pre_write_ask(
+            plan.decision, reference=reference, server_time_trusted=server_time_trusted
+        )
+        if ask is not None:
+            return None, ask
     return plan.decision, plan.ask

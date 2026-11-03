@@ -151,7 +151,7 @@ changes가 완전한 selection/confirmation은 모델 없이 접수되어 backen
 
 | 환경변수 | 기본값 | 설명 |
 |---|---|---|
-| `SCHEDULE_ASSISTANT_MODEL_ENABLED` | `false` | `true`면 시작할 때 모델 서버를 연결한다. 연결되지 않으면 Assistant만 `503`이고 나머지 API는 정상이다 |
+| `SCHEDULE_ASSISTANT_MODEL_ENABLED` | `false` | `true`면 시작할 때 모델 서버를 연결한다. 아직 준비되지 않았다면 첫 텍스트 요청에서 다시 확인하며, 계속 연결되지 않으면 Assistant만 `503`이고 나머지 API는 정상이다 |
 | `SCHEDULE_ASSISTANT_MODEL_BASE_URL` | `http://127.0.0.1:8088` | 모델 서버 주소 |
 | `SCHEDULE_ASSISTANT_MODEL_NAME` | 비움 | 요청의 `model` 값. 비우면 보내지 않는다 |
 | `SCHEDULE_ASSISTANT_MODEL_TIMEOUT_SECONDS` | `60` | 모델 호출 한 번의 제한 시간(최대 240) |
