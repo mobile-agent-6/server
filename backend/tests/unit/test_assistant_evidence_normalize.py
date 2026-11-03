@@ -333,6 +333,8 @@ def test_non_time_words() -> None:
         ("출고팀 회의", "OUTBOUND"),
         ("출하 예정 점검", None),
         ("협력사 납품 회의", None),
+        ("납품분 입고 확인", "INBOUND"),
+        ("출하 출고 점검", "OUTBOUND"),
         ("운영 회의", None),
     ],
 )
