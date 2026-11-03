@@ -7,6 +7,7 @@ planner build the decision.  The model never sees or picks Schedule IDs.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import re
@@ -52,7 +53,7 @@ logger = logging.getLogger(__name__)
 
 STATE_KEY = "evidence"
 # Shape of the provider's own JSON; an older shape starts the task fresh.
-STATE_SHAPE = 2
+STATE_SHAPE = 3
 STATE_VERSION = 1
 MAX_TURNS = 8
 MAX_TURN_CHARS = 500
@@ -83,6 +84,9 @@ class _State:
     midnight_source: str | None = None
     # The create the user said yes to (title, time, category), so a changed create is checked again.
     create_confirmed: str | None = None
+    # Stored only after contract, role and overlap validation. A pure yes answer
+    # can resume at the planner without another model call.
+    validated_output: str | None = None
 
     def to_json(self) -> dict[str, Any]:
         return {
@@ -94,6 +98,7 @@ class _State:
             "changeDateSource": self.change_date_source,
             "midnightSource": self.midnight_source,
             "createConfirmed": self.create_confirmed,
+            "validatedOutput": self.validated_output,
         }
 
     @property
@@ -113,7 +118,13 @@ def _load_state(value: object) -> _State | None:
     turns = value.get("turns")
     pending = value.get("pending")
     change_date = value.get("changeDate")
-    optional_text = ("changeDate", "changeDateSource", "midnightSource", "createConfirmed")
+    optional_text = (
+        "changeDate",
+        "changeDateSource",
+        "midnightSource",
+        "createConfirmed",
+        "validatedOutput",
+    )
     if (
         not isinstance(turns, list)
         or not all(isinstance(turn, str) for turn in turns)
@@ -136,6 +147,7 @@ def _load_state(value: object) -> _State | None:
         change_date_source=value.get("changeDateSource"),
         midnight_source=value.get("midnightSource"),
         create_confirmed=value.get("createConfirmed"),
+        validated_output=value.get("validatedOutput"),
     )
 
 
@@ -148,6 +160,23 @@ def _envelope(decision: dict[str, Any], state: _State) -> DecisionEnvelope:
 def _cleared() -> _State:
     # Overwrite stored turns once a task ends, so user text is not kept longer than needed.
     return _State()
+
+
+def _digest(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def _validate_output(
+    raw: str,
+    *,
+    turns: dict[int, str],
+    reference: datetime,
+) -> EvidenceOutput:
+    output = parse_evidence_output(raw, user_turns=turns)
+    check_roles(output, reference=reference)
+    check_role_span_overlaps(output, user_turns=turns)
+    check_turn_prefix(list(turns), len(turns))
+    return output
 
 
 class EvidenceDecisionProvider:
@@ -163,6 +192,7 @@ class EvidenceDecisionProvider:
     def _ask_for_evidence(
         self, question: EvidenceQuestion, state: _State
     ) -> DecisionEnvelope:
+        state.validated_output = None
         state.pending = {
             "kind": "clarify",
             "slot": question.value,
@@ -177,6 +207,10 @@ class EvidenceDecisionProvider:
         if previous is None or len(previous.turns) >= MAX_TURNS:
             return _State(turns=[text])
         previous.turns.append(text)
+        if previous.pending is None:
+            # A processor-owned question supplied new evidence. Re-run model
+            # extraction with the original turns and this answer.
+            previous.validated_output = None
         return previous
 
     # ------------------------------------------------------------- decide
@@ -204,12 +238,13 @@ class EvidenceDecisionProvider:
                     state.turns.pop()
                     state.pending = pending
                     return self._ask(pending.get("text", question.text), state)
+                state.validated_output = None
             else:
                 answer = classify_answer(text)
-                # A yes or no ("응, 알림 없이 등록해") is not part of the request.
-                # The model was never trained on it and misreads the request when it is there.
-                state.turns.pop()
                 if pending.get("kind") == "consent":
+                    # A yes or no ("응, 알림 없이 등록해") is not part of the request.
+                    # The model was never trained on it and misreads the request when it is there.
+                    state.turns.pop()
                     if answer is Answer.NO:
                         return _envelope({"kind": "cancel", "text": texts.CONSENT_DECLINED}, _cleared())
                     if answer is Answer.UNKNOWN:
@@ -218,26 +253,49 @@ class EvidenceDecisionProvider:
                     state.consent_granted = True
                 elif pending.get("kind") == "confirm":
                     if answer is Answer.UNKNOWN:
-                        state.pending = pending
-                        return self._ask(pending.get("text", texts.ASK_DATE_AGAIN), state)
-                    slot = pending.get("slot")
-                    if answer is Answer.NO:
-                        if slot == "first_operation":
-                            return _envelope({"kind": "cancel", "text": texts.FIRST_DECLINED}, _cleared())
-                        if slot == "new_create":
-                            # Probably a change to an existing schedule: start over.
-                            return _envelope({"kind": "ask", "text": texts.ASK_RESTATE}, _cleared())
-                        if slot == "values":
-                            return self._ask(texts.ASK_DATETIME_AGAIN, state)
-                        again = texts.ASK_TIME_AGAIN if slot == "midnight" else texts.ASK_DATE_AGAIN
-                        return self._ask(again, state)
-                    if slot == "change_date":
-                        state.change_date = pending.get("value")
-                        state.change_date_source = pending.get("source")
-                    elif slot == "midnight":
-                        state.midnight_source = pending.get("source")
-                    elif slot in {"first_operation", "values", "new_create"}:
-                        state.create_confirmed = pending.get("value")
+                        if _is_confirmation_revision(text):
+                            state.validated_output = None
+                        else:
+                            state.turns.pop()
+                            state.pending = pending
+                            return self._ask(
+                                pending.get("text", texts.ASK_DATE_AGAIN), state
+                            )
+                    else:
+                        state.turns.pop()
+                        slot = pending.get("slot")
+                        if answer is Answer.NO:
+                            state.validated_output = None
+                            if slot == "first_operation":
+                                return _envelope(
+                                    {"kind": "cancel", "text": texts.FIRST_DECLINED},
+                                    _cleared(),
+                                )
+                            if slot == "new_create":
+                                # Probably a change to an existing schedule: start over.
+                                return _envelope(
+                                    {"kind": "ask", "text": texts.ASK_RESTATE},
+                                    _cleared(),
+                                )
+                            if slot == "values":
+                                return self._ask(texts.ASK_DATETIME_AGAIN, state)
+                            again = (
+                                texts.ASK_TIME_AGAIN
+                                if slot == "midnight"
+                                else texts.ASK_DATE_AGAIN
+                            )
+                            return self._ask(again, state)
+                        if slot == "change_date":
+                            state.change_date = pending.get("value")
+                            state.change_date_source = pending.get("source")
+                        elif slot == "midnight":
+                            state.midnight_source = pending.get("source")
+                        elif slot in {"first_operation", "values", "new_create"}:
+                            state.create_confirmed = pending.get("value")
+                else:
+                    return _envelope(
+                        {"kind": "ask", "text": texts.ASK_RESTATE}, _cleared()
+                    )
 
         if not state.consent_granted:
             analyses = [analyze_text(turn) for turn in state.turns]
@@ -247,7 +305,11 @@ class EvidenceDecisionProvider:
                     return self._ask(texts.CONSENT_QUESTION, state)
                 return _envelope({"kind": "ask", "text": texts.GUIDANCE}, _cleared())
 
-        output = self._extract(state, context, reference)
+        output = (
+            self._restore_output(state, reference)
+            if state.validated_output is not None
+            else self._extract(state, context, reference)
+        )
         try:
             return self._plan(output, state, context, reference)
         except EvidenceGateError as exc:
@@ -267,10 +329,8 @@ class EvidenceDecisionProvider:
                 server_time_trusted=context.server_time_trusted,
                 timeout_seconds=context.time_budget_seconds,
             )
-            output = parse_evidence_output(raw, user_turns=turns)
-            check_roles(output, reference=reference)
-            check_role_span_overlaps(output, user_turns=turns)
-            check_turn_prefix(list(turns), len(turns))
+            output = _validate_output(raw, turns=turns, reference=reference)
+            state.validated_output = raw
             return output
         except (EvidenceContractError, EvidenceGateError) as exc:
             validation = str(getattr(exc, "code", None) or type(exc).__name__)
@@ -290,11 +350,35 @@ class EvidenceDecisionProvider:
                     "durationMs": duration_ms,
                     "model": getattr(self._model, "name", None),
                     "promptSha256": getattr(self._model, "prompt_sha256", None),
-                    "userTurns": list(state.turns),
-                    "modelOutput": raw,
+                    "turnCount": len(state.turns),
+                    "inputChars": sum(len(turn) for turn in state.turns),
+                    "inputSha256": _digest(
+                        json.dumps(
+                            state.turns,
+                            ensure_ascii=False,
+                            separators=(",", ":"),
+                        )
+                    ),
+                    "outputBytes": len(raw.encode("utf-8")) if raw is not None else 0,
+                    "outputSha256": _digest(raw) if raw is not None else None,
                     "validation": validation,
                 },
             )
+
+    def _restore_output(
+        self, state: _State, reference: datetime
+    ) -> EvidenceOutput:
+        assert state.validated_output is not None
+        turns = {index: turn for index, turn in enumerate(state.turns, 1)}
+        try:
+            return _validate_output(
+                state.validated_output,
+                turns=turns,
+                reference=reference,
+            )
+        except (EvidenceContractError, EvidenceGateError) as exc:
+            code = str(getattr(exc, "code", None) or type(exc).__name__)
+            raise DecisionProviderInvalidOutput(code) from exc
 
     def _plan(
         self, output: EvidenceOutput, state: _State, context: DecisionContext, reference: datetime
@@ -335,6 +419,8 @@ class EvidenceDecisionProvider:
             question = _with_more_requests_note(ask.text, several=several)
             if ask.confirm is not None:
                 state.pending = {"kind": "confirm", **ask.confirm, "text": question}
+            else:
+                state.validated_output = None
             return self._ask(question, state)
         if decision is None:
             raise ValueError("planner returned neither a decision nor a question")
@@ -371,6 +457,12 @@ class EvidenceDecisionProvider:
                 )
         if not context.server_time_trusted and _is_relative(decision):
             # The processor will ask for an absolute date; keep the turns for that answer.
+            state.validated_output = None
+            return _envelope(decision, state)
+        if decision["kind"] in {"confirm", "select_candidate"}:
+            # A public selection or approval can later encounter a time-trust
+            # question. Keep the original turns, but not the model payload.
+            state.validated_output = None
             return _envelope(decision, state)
         return _envelope(decision, _cleared())
 
@@ -399,6 +491,19 @@ _SCHEDULE_LIST_REQUEST = re.compile(
 )
 # "날짜는 글피로 바꿔 줘" in an answer changes the create being asked about.
 _SLOT_WORD = re.compile(r"(?:날짜|시간|시각|제목)\s*(?:은|는|을|를)")
+_REVISION_WORD = re.compile(r"날짜|시간|시각|제목|분류|완료")
+
+
+def _is_confirmation_revision(text: str) -> bool:
+    value = normalize_text(text)
+    return bool(
+        mentions_date_or_time(value)
+        or _REVISION_WORD.search(value)
+        or (
+            _CORRECTION_MARKER.search(value)
+            and re.search(r"\S+(?:으)?로", value)
+        )
+    )
 
 
 def _is_change_request(turn: str, *, first: bool) -> bool:

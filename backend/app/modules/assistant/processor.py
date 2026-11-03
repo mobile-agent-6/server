@@ -7,7 +7,7 @@ write intent.  This module never calls a Schedule write function.
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timedelta, timezone
 from enum import StrEnum
 from typing import Callable, Protocol
@@ -164,6 +164,7 @@ class _FinalizePlan:
     pending_write: BaseModel | None = None
     control_state_version: int | None = None
     control_state: object | None = None
+    clear_control_state: bool = False
 
 
 @dataclass(frozen=True)
@@ -175,6 +176,7 @@ class _PreparedPlan:
     pending_write: dict[str, object] | None
     control_state_version: int | None
     control_state: object | None
+    clear_control_state: bool
 
 
 def _aware_utc(value: datetime) -> datetime:
@@ -538,10 +540,13 @@ def _from_saved_selection(
             RELATIVE_TIME_QUESTION,
             issue_time=issue_time_factory(),
             uuid_factory=uuid_factory,
+            control_state_version=stored.control_state_version,
+            control_state=stored.control_state,
         )
     schedule = schedule_reader.get(saved.target_schedule_id)
     if schedule is None:
-        return _no_match(operation=AssistantOutcomeOperation(saved.operation))
+        plan = _no_match(operation=AssistantOutcomeOperation(saved.operation))
+        return replace(plan, clear_control_state=True)
     intent = _target_intent_for_current_schedule(
         operation=AssistantConfirmationOperation(saved.operation),
         changes=(saved.changes if isinstance(saved, PendingUpdateIntent) else None),
@@ -549,13 +554,15 @@ def _from_saved_selection(
         schedule=schedule,
     )
     if intent is None:
-        return _already_applied()
+        return replace(_already_applied(), clear_control_state=True)
     return _confirmation_plan(
         text="이 일정에 요청한 변경을 적용할까요?",
         intent=intent,
         schedule=schedule,
         issue_time=issue_time_factory(),
         uuid_factory=uuid_factory,
+        control_state_version=stored.control_state_version,
+        control_state=stored.control_state,
     )
 
 
@@ -579,7 +586,8 @@ def _from_saved_confirmation(
                 outcome=AssistantOutcome.CANCELLED,
                 schedules_changed=False,
                 operation=AssistantOutcomeOperation(envelope.intent.operation),
-            )
+            ),
+            clear_control_state=True,
         )
     if approved is not True:
         raise RuntimeError("stored confirmation answer is invalid")
@@ -591,8 +599,13 @@ def _from_saved_confirmation(
             RELATIVE_TIME_QUESTION,
             issue_time=issue_time_factory(),
             uuid_factory=uuid_factory,
+            control_state_version=stored.control_state_version,
+            control_state=stored.control_state,
         )
-    return _FinalizePlan(pending_write=envelope.intent)
+    return _FinalizePlan(
+        pending_write=envelope.intent,
+        clear_control_state=True,
+    )
 
 
 def _provider_decision_plan(
@@ -871,6 +884,8 @@ def _provider_decision_plan(
 
 
 def _prepare(plan: _FinalizePlan) -> _PreparedPlan:
+    if plan.clear_control_state and plan.control_state is not None:
+        raise RuntimeError("cannot set and clear control state together")
     result: dict[str, object] | None = None
     result_kind: str | None = None
     if plan.result is not None:
@@ -909,6 +924,7 @@ def _prepare(plan: _FinalizePlan) -> _PreparedPlan:
         pending_write=pending_json,
         control_state_version=plan.control_state_version,
         control_state=plan.control_state,
+        clear_control_state=plan.clear_control_state,
     )
 
 
@@ -966,14 +982,18 @@ def _finalize(
                         ),
                     )
 
-                if plan.control_state is not None:
+                if plan.clear_control_state or plan.control_state is not None:
                     conversation = repository.get_conversation(
                         session, request.conversation_id
                     )
                     if conversation is None:
                         raise RuntimeError("Assistant conversation disappeared")
-                    conversation.control_state_version = plan.control_state_version
-                    conversation.control_state_json = plan.control_state
+                    if plan.clear_control_state:
+                        conversation.control_state_version = None
+                        conversation.control_state_json = None
+                    else:
+                        conversation.control_state_version = plan.control_state_version
+                        conversation.control_state_json = plan.control_state
 
                 if plan.pending_write is not None:
                     pending = session.execute(

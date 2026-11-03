@@ -36,8 +36,11 @@ _JSON_FIELDS = (
     "clientIp",
     "model",
     "promptSha256",
-    "userTurns",
-    "modelOutput",
+    "turnCount",
+    "inputChars",
+    "inputSha256",
+    "outputBytes",
+    "outputSha256",
     "validation",
 )
 

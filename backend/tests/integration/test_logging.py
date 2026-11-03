@@ -114,12 +114,21 @@ def test_json_formatter_emits_model_call_fields() -> None:
     record.event = "assistant.model_call"
     record.model = "default"
     record.promptSha256 = "abc"
+    record.turnCount = 2
+    record.inputChars = 21
+    record.inputSha256 = "a" * 64
+    record.outputBytes = 17
+    record.outputSha256 = "b" * 64
+    # Even if another caller attaches raw values, the formatter must not emit them.
     record.userTurns = ["내일 회의 잡아 줘", "오후 3시"]
     record.modelOutput = '{"operations":[]}'
     record.validation = "ok"
 
     payload = json.loads(JsonFormatter().format(record))
 
-    assert payload["userTurns"] == ["내일 회의 잡아 줘", "오후 3시"]
     assert (payload["model"], payload["promptSha256"], payload["validation"]) == ("default", "abc", "ok")
-    assert payload["modelOutput"] == '{"operations":[]}'
+    assert (payload["turnCount"], payload["inputChars"], payload["outputBytes"]) == (2, 21, 17)
+    assert payload["inputSha256"] == "a" * 64
+    assert payload["outputSha256"] == "b" * 64
+    assert "userTurns" not in payload
+    assert "modelOutput" not in payload

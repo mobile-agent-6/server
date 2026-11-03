@@ -1118,6 +1118,195 @@ def test_valid_selection_and_confirmation_are_provider_free(processor_store) -> 
     assert no_provider.call_count == 0
 
 
+def _evidence_state(turn: str) -> dict[str, object]:
+    return {
+        "evidence": 3,
+        "turns": [turn],
+        "consentGranted": False,
+        "pending": None,
+        "changeDate": None,
+        "changeDateSource": None,
+        "midnightSource": None,
+        "createConfirmed": None,
+        "validatedOutput": None,
+    }
+
+
+def test_saved_confirmation_keeps_original_state_for_time_trust_question(
+    processor_store,
+) -> None:
+    turn = "내일 재고 확인 일정을 오후 3시로 옮겨 줘"
+    state = _evidence_state(turn)
+    reader = MemoryScheduleReader([schedule()])
+    uuid_factory = UuidSequence()
+    admit(processor_store, request_data())
+    initial = ScriptedDecisionProvider(
+        [
+            envelope(
+                {
+                    "kind": "confirm",
+                    "text": "바꿀까요?",
+                    "scheduleId": str(SCHEDULE_A),
+                    "operation": "update",
+                    "changes": {"scheduledAt": "2026-10-19T06:00:00Z"},
+                    "timeInterpretation": "relative",
+                },
+                state=state,
+            )
+        ]
+    )
+    run(processor_store, initial, reader, uuid_factory=uuid_factory)
+    confirmation = active_question(processor_store)
+    approval_id = UUID("dddddddd-dddd-4ddd-8ddd-dddddddddddd")
+    admit(
+        processor_store,
+        request_data(
+            approval_id,
+            conversation_id=CONVERSATION_ID,
+            input_payload={
+                "type": "confirmation",
+                "questionId": str(confirmation.id),
+                "approved": True,
+            },
+        ),
+        provider_available=False,
+    )
+
+    no_provider = ScriptedDecisionProvider([])
+    assert run(
+        processor_store,
+        no_provider,
+        reader,
+        request_id=approval_id,
+        trusted=False,
+        uuid_factory=uuid_factory,
+    ) is ProcessOneResult.COMPLETED
+
+    assert no_provider.call_count == 0
+    assert stored_request(processor_store, approval_id).result_json["kind"] == "need_more_info"
+    with processor_store() as session:
+        conversation = session.get(AssistantConversation, CONVERSATION_ID)
+        assert conversation is not None
+        assert conversation.control_state_json == state
+
+
+def test_saved_selection_keeps_original_state_for_time_trust_question(
+    processor_store,
+) -> None:
+    state = _evidence_state("내일 재고 확인 일정 지워 줘")
+    first = schedule()
+    second = schedule(SCHEDULE_B, title="재고 확인 두 번째")
+    reader = MemoryScheduleReader([first, second])
+    uuid_factory = UuidSequence()
+    admit(processor_store, request_data())
+    initial = ScriptedDecisionProvider(
+        [
+            envelope(
+                {
+                    "kind": "select_candidate",
+                    "text": "선택하세요.",
+                    "candidates": [
+                        {
+                            "scheduleId": str(SCHEDULE_A),
+                            "operation": "delete",
+                            "timeInterpretation": "relative",
+                        },
+                        {
+                            "scheduleId": str(SCHEDULE_B),
+                            "operation": "delete",
+                            "timeInterpretation": "relative",
+                        },
+                    ],
+                },
+                state=state,
+            )
+        ]
+    )
+    run(processor_store, initial, reader, uuid_factory=uuid_factory)
+    selection_question = active_question(processor_store)
+    selection_id = UUID("dddddddd-dddd-4ddd-8ddd-dddddddddddd")
+    admit(
+        processor_store,
+        request_data(
+            selection_id,
+            conversation_id=CONVERSATION_ID,
+            input_payload={
+                "type": "selection",
+                "questionId": str(selection_question.id),
+                "candidateId": selection_question.candidates_json[0]["candidateId"],
+            },
+        ),
+        provider_available=False,
+    )
+
+    no_provider = ScriptedDecisionProvider([])
+    assert run(
+        processor_store,
+        no_provider,
+        reader,
+        request_id=selection_id,
+        trusted=False,
+        uuid_factory=uuid_factory,
+    ) is ProcessOneResult.COMPLETED
+
+    assert no_provider.call_count == 0
+    assert stored_request(processor_store, selection_id).result_json["kind"] == "need_more_info"
+    with processor_store() as session:
+        conversation = session.get(AssistantConversation, CONVERSATION_ID)
+        assert conversation is not None
+        assert conversation.control_state_json == state
+
+
+def test_saved_confirmation_clears_provider_state_before_write(
+    processor_store,
+) -> None:
+    state = _evidence_state("재고 확인 일정 지워 줘")
+    reader = MemoryScheduleReader([schedule()])
+    admit(processor_store, request_data())
+    initial = ScriptedDecisionProvider(
+        [
+            envelope(
+                {
+                    "kind": "confirm",
+                    "text": "삭제할까요?",
+                    "scheduleId": str(SCHEDULE_A),
+                    "operation": "delete",
+                    "timeInterpretation": "absolute",
+                },
+                state=state,
+            )
+        ]
+    )
+    run(processor_store, initial, reader)
+    confirmation = active_question(processor_store)
+    approval_id = UUID("dddddddd-dddd-4ddd-8ddd-dddddddddddd")
+    admit(
+        processor_store,
+        request_data(
+            approval_id,
+            conversation_id=CONVERSATION_ID,
+            input_payload={
+                "type": "confirmation",
+                "questionId": str(confirmation.id),
+                "approved": True,
+            },
+        ),
+        provider_available=False,
+    )
+
+    assert run(
+        processor_store,
+        ScriptedDecisionProvider([]),
+        reader,
+        request_id=approval_id,
+    ) is ProcessOneResult.PENDING_WRITE
+    with processor_store() as session:
+        conversation = session.get(AssistantConversation, CONVERSATION_ID)
+        assert conversation is not None
+        assert conversation.control_state_version is None
+        assert conversation.control_state_json is None
+
+
 def test_saved_selection_confirmation_uses_post_read_issue_time(
     processor_store,
 ) -> None:

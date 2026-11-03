@@ -347,6 +347,7 @@ def test_past_date_without_year_is_confirmed_before_using_next_year() -> None:
     assert decision["text"] == texts.confirm_next_year(datetime(2027, 3, 5).date())
     _, decision = decide(provider, "응", previous=first)
     assert datetime.fromisoformat(decision["scheduledAt"]) == datetime(2027, 3, 5, 14, 0, tzinfo=SEOUL)
+    assert model.seen == [["3월 5일 오후 2시 회의 잡아 줘"]]
 
 
 def test_declined_date_confirmation_asks_for_the_date_again() -> None:
@@ -359,11 +360,13 @@ def test_declined_date_confirmation_asks_for_the_date_again() -> None:
 
 def test_evening_twelve_asks_about_midnight() -> None:
     evidence = output(op("create", change={"title": [span("재고 실사")], "date": [span("내일")], "time": [span("밤 12시")]}))
-    provider = EvidenceDecisionProvider(ScriptedModel(evidence, evidence), FakeReader())
+    model = ScriptedModel(evidence)
+    provider = EvidenceDecisionProvider(model, FakeReader())
     first, decision = decide(provider, "내일 밤 12시에 재고 실사 잡아 줘")
     assert decision["text"] == texts.confirm_midnight(datetime(2026, 10, 31).date())
     _, decision = decide(provider, "응", previous=first)
     assert datetime.fromisoformat(decision["scheduledAt"]) == datetime(2026, 10, 31, 0, 0, tzinfo=SEOUL)
+    assert model.seen == [["내일 밤 12시에 재고 실사 잡아 줘"]]
 
 
 def test_untrusted_time_keeps_turns_for_the_absolute_date_answer() -> None:
@@ -1232,12 +1235,12 @@ def test_change_words_answered_no_starts_over() -> None:
 
 
 def test_change_words_answered_yes_creates() -> None:
-    provider = EvidenceDecisionProvider(ScriptedModel(LK28_AS_CREATE, LK28_AS_CREATE), FakeReader())
+    provider = EvidenceDecisionProvider(ScriptedModel(LK28_AS_CREATE), FakeReader())
     first, _ = decide(provider, LK28_TURN)
     _, decision = decide(provider, "응", previous=first)
     assert decision["kind"] == "create_intent"
     assert decision["timeInterpretation"] == "absolute"
-    assert model_turns(provider) == [[LK28_TURN], [LK28_TURN]]
+    assert model_turns(provider) == [[LK28_TURN]]
 
 
 def model_turns(provider: EvidenceDecisionProvider) -> list[list[str]]:
@@ -1354,7 +1357,7 @@ def _model_call_records(caplog) -> list:
     return [r for r in caplog.records if getattr(r, "event", None) == "assistant.model_call"]
 
 
-def test_model_call_is_logged_with_input_output_and_result(caplog) -> None:
+def test_model_call_log_keeps_metrics_without_user_or_model_text(caplog) -> None:
     caplog.set_level("INFO", logger="app.modules.assistant.evidence.provider")
     created = output(op("create", change={
         "title": [span("입고 검수")], "date": [span("내일")], "time": [span("오후 3시")],
@@ -1365,9 +1368,15 @@ def test_model_call_is_logged_with_input_output_and_result(caplog) -> None:
     decide(EvidenceDecisionProvider(model, FakeReader()), "내일 오후 3시에 입고 검수 잡아 줘")
     (record,) = _model_call_records(caplog)
     assert record.validation == "ok"
-    assert record.userTurns == ["내일 오후 3시에 입고 검수 잡아 줘"]
-    assert json.loads(record.modelOutput) == created
     assert (record.model, record.promptSha256) == ("run-006", "abc")
+    assert record.turnCount == 1
+    assert record.inputChars == len("내일 오후 3시에 입고 검수 잡아 줘")
+    assert len(record.inputSha256) == len(record.outputSha256) == 64
+    assert record.outputBytes == len(
+        json.dumps(created, ensure_ascii=False).encode("utf-8")
+    )
+    assert not hasattr(record, "userTurns")
+    assert not hasattr(record, "modelOutput")
     assert record.durationMs >= 0
 
 
@@ -1378,7 +1387,9 @@ def test_invalid_model_output_is_logged_with_the_error_code(caplog) -> None:
         decide(EvidenceDecisionProvider(model, FakeReader()), "내일 회의 잡아 줘")
     (record,) = _model_call_records(caplog)
     assert record.validation == "SPAN_NOT_IN_TURN"
-    assert record.modelOutput is not None
+    assert record.outputBytes > 0
+    assert len(record.outputSha256) == 64
+    assert not hasattr(record, "modelOutput")
 
 
 def test_model_timeout_is_logged_without_output(caplog) -> None:
@@ -1392,7 +1403,9 @@ def test_model_timeout_is_logged_without_output(caplog) -> None:
     with pytest.raises(DecisionProviderTimeout):
         decide(EvidenceDecisionProvider(SlowModel(), FakeReader()), "내일 회의 잡아 줘")
     (record,) = _model_call_records(caplog)
-    assert (record.validation, record.modelOutput) == ("DecisionProviderTimeout", None)
+    assert (record.validation, record.outputBytes) == ("DecisionProviderTimeout", 0)
+    assert getattr(record, "outputSha256", None) is None
+    assert not hasattr(record, "modelOutput")
 
 
 # ------------------------------------------------------- more expressions (#37 stage 8)
@@ -1439,16 +1452,29 @@ def test_list_by_week_or_month_word(period: str, start: str, end: str) -> None:
     assert (decision["kind"], decision["from"], decision["to"]) == ("list_intent", start, end)
 
 
-def test_yes_with_a_new_time_asks_again_instead_of_creating_the_old_time() -> None:
-    model = ScriptedModel(output(op("create", change={
+def test_confirmation_answer_with_a_new_time_is_reinterpreted() -> None:
+    original = output(op("create", change={
         "title": [span("회의")], "date": [span("내일")], "time": [span("오후 3시")],
-    }), op("create", index=2, change={"title": [span("점검")], "date": [span("내일")], "time": [span("오후 4시")]})))
+    }), op("create", index=2, change={"title": [span("점검")], "date": [span("내일")], "time": [span("오후 4시")]}))
+    corrected = output(op("create", change={
+        "title": [span("회의")],
+        "date": [span("내일")],
+        "time": [
+            span("오후 3시", status="superseded"),
+            span("아니", turn=2, status="correction_marker"),
+            span("정오", turn=2),
+        ],
+    }), op("create", index=2, change={"title": [span("점검")], "date": [span("내일")], "time": [span("오후 4시")]}))
+    model = ScriptedModel(original, corrected)
     provider = EvidenceDecisionProvider(model, FakeReader())
     first, decision = decide(provider, "내일 오후 3시 회의랑 오후 4시 점검 잡아 줘")
     assert decision["kind"] == "ask"
-    _, decision = decide(provider, "응 정오로", previous=first)
-    # The question is asked again; nothing is created at 15:00.
+    _, decision = decide(provider, "아니 정오로", previous=first)
     assert decision == {"kind": "ask", "text": first.decision.text}
+    assert model.seen == [
+        ["내일 오후 3시 회의랑 오후 4시 점검 잡아 줘"],
+        ["내일 오후 3시 회의랑 오후 4시 점검 잡아 줘", "아니 정오로"],
+    ]
 
 
 # ------------------------------------------- confirmed values follow their evidence (review)
@@ -1463,7 +1489,7 @@ def test_confirmed_next_year_date_does_not_override_a_later_correction() -> None
         "date": [span("2월 3일", 1, "superseded"), span("아니", 2, "correction_marker"), span("다음 주 금요일", 2)],
         "time": [span("3시", 1, "superseded"), span("아니", 2, "correction_marker"), span("오후 3시", 2)],
     }))
-    provider = EvidenceDecisionProvider(ScriptedModel(first_output, first_output, corrected), FakeReader())
+    provider = EvidenceDecisionProvider(ScriptedModel(first_output, corrected), FakeReader())
     first, decision = decide(provider, "2월 3일 3시 회의 잡아 줘")
     assert decision["text"] == texts.confirm_next_year(date(2027, 2, 3))
     second, decision = decide(provider, "응", previous=first)
@@ -1488,6 +1514,7 @@ def test_old_state_shape_starts_fresh() -> None:
     old = {"evidence": 1, "turns": ["회의"], "consentGranted": False, "pending": None,
            "changeDate": "2027-02-03", "midnight": True, "createConfirmed": True}
     assert _load_state(old) is None
+    assert _load_state({"evidence": 2, "turns": []}) is None
 
 
 @pytest.mark.parametrize(
@@ -1538,8 +1565,9 @@ def test_missed_correction_with_new_expressions_asks_for_that_value(
     turns = ["내일 오후 3시에 회의 잡아 줘", latest]
     model = ScriptedModel(missed)
     provider = EvidenceDecisionProvider(model, FakeReader())
-    state = {"evidence": 2, "turns": [turns[0]], "consentGranted": False, "pending": None,
-             "changeDate": None, "changeDateSource": None, "midnightSource": None, "createConfirmed": None}
+    state = {"evidence": 3, "turns": [turns[0]], "consentGranted": False, "pending": None,
+             "changeDate": None, "changeDateSource": None, "midnightSource": None,
+             "createConfirmed": None, "validatedOutput": None}
     envelope = provider.decide(context(latest, follow_up=True, state=state))
     decision = envelope.decision.model_dump(mode="json", by_alias=True, exclude_none=True)
     assert decision == {"kind": "ask", "text": question}

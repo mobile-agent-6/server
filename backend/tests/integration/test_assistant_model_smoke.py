@@ -198,7 +198,14 @@ def test_real_model_flows(database_path: Path) -> None:
                 for line in log_file.read_text(encoding="utf-8").splitlines()
                 if '"assistant.model_call"' in line
             ]
-            assert calls and all(call["promptSha256"] and "userTurns" in call for call in calls)
+            assert calls and all(
+                call["promptSha256"]
+                and call["turnCount"] >= 1
+                and call["inputChars"] >= 1
+                and "userTurns" not in call
+                and "modelOutput" not in call
+                for call in calls
+            )
             print("\nweak flows:", report)
             print("\nsmoke timings:", [(label, round(seconds, 1)) for label, seconds in session.timings])
     finally:
