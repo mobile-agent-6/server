@@ -17,6 +17,7 @@ from app.modules.assistant.admission import admit_request, request_fingerprint
 from app.modules.assistant.decisions import (
     DecisionContext,
     DecisionEnvelope,
+    DecisionProviderInvalidOutput,
     DecisionProviderTimeout,
 )
 from app.modules.assistant.model import (
@@ -25,6 +26,7 @@ from app.modules.assistant.model import (
     AssistantQuestionStatus,
     AssistantRequest,
 )
+from app.modules.assistant.evidence.normalize import title_contains
 from app.modules.assistant.processor import ProcessOneResult, process_one
 from app.modules.assistant.runtime_guard import ProcessDeadlineGuard
 from app.modules.assistant.schedule_read import (
@@ -89,6 +91,7 @@ class MemoryScheduleReader:
         self.schedules = {item.id: item for item in schedules or []}
         self.get_calls: list[UUID] = []
         self.list_limits: list[int] = []
+        self.list_titles: list[str | None] = []
 
     def get(self, schedule_id: UUID) -> ScheduleRead | None:
         self.get_calls.append(schedule_id)
@@ -102,14 +105,17 @@ class MemoryScheduleReader:
         category: Category | None,
         completed: bool | None,
         limit: int,
+        title: str | None = None,
     ) -> list[ScheduleRead]:
         self.list_limits.append(limit)
+        self.list_titles.append(title)
         values = [
             item
             for item in self.schedules.values()
             if from_utc <= item.scheduled_at < to_utc
             and (category is None or item.category is category)
             and (completed is None or item.completed is completed)
+            and (title is None or title_contains(title, item.title))
         ]
         return sorted(values, key=lambda item: (item.scheduled_at, item.id))[:limit]
 
@@ -438,10 +444,16 @@ def test_ask_claims_and_atomically_persists_question_and_control_state(
     ("step", "code"),
     [
         (DecisionProviderTimeout("timeout"), "MODEL_TIMEOUT"),
+        (DecisionProviderInvalidOutput("bad evidence"), "MODEL_OUTPUT_INVALID"),
+        (ValueError("backend planner bug"), "INTERNAL_ERROR"),
+        (TypeError("backend planner type bug"), "INTERNAL_ERROR"),
         (RuntimeError("private provider detail"), "INTERNAL_ERROR"),
     ],
 )
-def test_provider_failures_are_sanitized(processor_store, step, code: str) -> None:
+def test_provider_failures_are_sanitized(
+    processor_store, step, code: str, caplog
+) -> None:
+    caplog.set_level("ERROR", logger="app.modules.assistant.processor")
     admit(processor_store, request_data())
     provider = ScriptedDecisionProvider([step])
 
@@ -450,6 +462,17 @@ def test_provider_failures_are_sanitized(processor_store, step, code: str) -> No
     request = stored_request(processor_store)
     assert request.result_json["code"] == code
     assert "private" not in request.result_json["text"]
+    internal_records = [
+        record
+        for record in caplog.records
+        if getattr(record, "event", None) == "assistant.processor_internal_error"
+    ]
+    assert bool(internal_records) is (code == "INTERNAL_ERROR")
+    if internal_records:
+        (record,) = internal_records
+        assert record.exc_info is None
+        assert record.exceptionClass == type(step).__name__
+        assert "private" not in record.getMessage()
 
 
 @pytest.mark.parametrize(
@@ -1100,6 +1123,196 @@ def test_valid_selection_and_confirmation_are_provider_free(processor_store) -> 
     assert no_provider.call_count == 0
 
 
+def _evidence_state(turn: str) -> dict[str, object]:
+    return {
+        "evidence": 4,
+        "turns": [turn],
+        "consentGranted": False,
+        "pending": None,
+        "changeDate": None,
+        "changeDateSource": None,
+        "midnightValue": None,
+        "midnightSource": None,
+        "createConfirmed": None,
+        "validatedOutput": None,
+    }
+
+
+def test_saved_confirmation_keeps_original_state_for_time_trust_question(
+    processor_store,
+) -> None:
+    turn = "내일 재고 확인 일정을 오후 3시로 옮겨 줘"
+    state = _evidence_state(turn)
+    reader = MemoryScheduleReader([schedule()])
+    uuid_factory = UuidSequence()
+    admit(processor_store, request_data())
+    initial = ScriptedDecisionProvider(
+        [
+            envelope(
+                {
+                    "kind": "confirm",
+                    "text": "바꿀까요?",
+                    "scheduleId": str(SCHEDULE_A),
+                    "operation": "update",
+                    "changes": {"scheduledAt": "2026-10-19T06:00:00Z"},
+                    "timeInterpretation": "relative",
+                },
+                state=state,
+            )
+        ]
+    )
+    run(processor_store, initial, reader, uuid_factory=uuid_factory)
+    confirmation = active_question(processor_store)
+    approval_id = UUID("dddddddd-dddd-4ddd-8ddd-dddddddddddd")
+    admit(
+        processor_store,
+        request_data(
+            approval_id,
+            conversation_id=CONVERSATION_ID,
+            input_payload={
+                "type": "confirmation",
+                "questionId": str(confirmation.id),
+                "approved": True,
+            },
+        ),
+        provider_available=False,
+    )
+
+    no_provider = ScriptedDecisionProvider([])
+    assert run(
+        processor_store,
+        no_provider,
+        reader,
+        request_id=approval_id,
+        trusted=False,
+        uuid_factory=uuid_factory,
+    ) is ProcessOneResult.COMPLETED
+
+    assert no_provider.call_count == 0
+    assert stored_request(processor_store, approval_id).result_json["kind"] == "need_more_info"
+    with processor_store() as session:
+        conversation = session.get(AssistantConversation, CONVERSATION_ID)
+        assert conversation is not None
+        assert conversation.control_state_json == state
+
+
+def test_saved_selection_keeps_original_state_for_time_trust_question(
+    processor_store,
+) -> None:
+    state = _evidence_state("내일 재고 확인 일정 지워 줘")
+    first = schedule()
+    second = schedule(SCHEDULE_B, title="재고 확인 두 번째")
+    reader = MemoryScheduleReader([first, second])
+    uuid_factory = UuidSequence()
+    admit(processor_store, request_data())
+    initial = ScriptedDecisionProvider(
+        [
+            envelope(
+                {
+                    "kind": "select_candidate",
+                    "text": "선택하세요.",
+                    "candidates": [
+                        {
+                            "scheduleId": str(SCHEDULE_A),
+                            "operation": "delete",
+                            "timeInterpretation": "relative",
+                        },
+                        {
+                            "scheduleId": str(SCHEDULE_B),
+                            "operation": "delete",
+                            "timeInterpretation": "relative",
+                        },
+                    ],
+                },
+                state=state,
+            )
+        ]
+    )
+    run(processor_store, initial, reader, uuid_factory=uuid_factory)
+    selection_question = active_question(processor_store)
+    selection_id = UUID("dddddddd-dddd-4ddd-8ddd-dddddddddddd")
+    admit(
+        processor_store,
+        request_data(
+            selection_id,
+            conversation_id=CONVERSATION_ID,
+            input_payload={
+                "type": "selection",
+                "questionId": str(selection_question.id),
+                "candidateId": selection_question.candidates_json[0]["candidateId"],
+            },
+        ),
+        provider_available=False,
+    )
+
+    no_provider = ScriptedDecisionProvider([])
+    assert run(
+        processor_store,
+        no_provider,
+        reader,
+        request_id=selection_id,
+        trusted=False,
+        uuid_factory=uuid_factory,
+    ) is ProcessOneResult.COMPLETED
+
+    assert no_provider.call_count == 0
+    assert stored_request(processor_store, selection_id).result_json["kind"] == "need_more_info"
+    with processor_store() as session:
+        conversation = session.get(AssistantConversation, CONVERSATION_ID)
+        assert conversation is not None
+        assert conversation.control_state_json == state
+
+
+def test_saved_confirmation_clears_provider_state_before_write(
+    processor_store,
+) -> None:
+    state = _evidence_state("재고 확인 일정 지워 줘")
+    reader = MemoryScheduleReader([schedule()])
+    admit(processor_store, request_data())
+    initial = ScriptedDecisionProvider(
+        [
+            envelope(
+                {
+                    "kind": "confirm",
+                    "text": "삭제할까요?",
+                    "scheduleId": str(SCHEDULE_A),
+                    "operation": "delete",
+                    "timeInterpretation": "absolute",
+                },
+                state=state,
+            )
+        ]
+    )
+    run(processor_store, initial, reader)
+    confirmation = active_question(processor_store)
+    approval_id = UUID("dddddddd-dddd-4ddd-8ddd-dddddddddddd")
+    admit(
+        processor_store,
+        request_data(
+            approval_id,
+            conversation_id=CONVERSATION_ID,
+            input_payload={
+                "type": "confirmation",
+                "questionId": str(confirmation.id),
+                "approved": True,
+            },
+        ),
+        provider_available=False,
+    )
+
+    assert run(
+        processor_store,
+        ScriptedDecisionProvider([]),
+        reader,
+        request_id=approval_id,
+    ) is ProcessOneResult.PENDING_WRITE
+    with processor_store() as session:
+        conversation = session.get(AssistantConversation, CONVERSATION_ID)
+        assert conversation is not None
+        assert conversation.control_state_version is None
+        assert conversation.control_state_json is None
+
+
 def test_saved_selection_confirmation_uses_post_read_issue_time(
     processor_store,
 ) -> None:
@@ -1463,6 +1676,84 @@ def test_list_reads_at_most_101_and_never_returns_partial_success(
         assert len(result["items"]) == count
     else:
         assert "items" not in result
+
+
+def test_list_time_filter_is_applied_after_bounded_read(processor_store) -> None:
+    matching = schedule(
+        SCHEDULE_A,
+        title="오후 점검",
+        at=datetime(2026, 10, 19, 6, 0, tzinfo=timezone.utc),
+    )
+    other = schedule(
+        SCHEDULE_B,
+        title="저녁 점검",
+        at=datetime(2026, 10, 19, 8, 0, tzinfo=timezone.utc),
+    )
+    reader = MemoryScheduleReader([other, matching])
+    admit(processor_store, request_data())
+    provider = ScriptedDecisionProvider(
+        [
+            envelope(
+                {
+                    "kind": "list_intent",
+                    "text": "조회 결과입니다.",
+                    "from": "2026-10-19T00:00:00+09:00",
+                    "to": "2026-10-20T00:00:00+09:00",
+                    "timeMinutes": 15 * 60,
+                    "timeInterpretation": "absolute",
+                }
+            )
+        ]
+    )
+
+    run(processor_store, provider, reader)
+
+    result = stored_request(processor_store).result_json
+    assert reader.list_limits == [101]
+    assert result["kind"] == "outcome"
+    assert [item["id"] for item in result["items"]] == [str(matching.id)]
+
+
+def test_list_title_prefilter_is_applied_before_the_101_row_limit(
+    processor_store,
+) -> None:
+    unrelated = [
+        schedule(
+            UUID(f"71000000-0000-4000-8000-{index:012x}"),
+            title=f"다른 일정 {index}",
+            at=NOW + timedelta(minutes=index + 1),
+        )
+        for index in range(101)
+    ]
+    matching = schedule(
+        SCHEDULE_A,
+        title="출고 검량 확인",
+        at=NOW + timedelta(hours=4),
+    )
+    reader = MemoryScheduleReader([*unrelated, matching])
+    admit(processor_store, request_data())
+    provider = ScriptedDecisionProvider(
+        [
+            envelope(
+                {
+                    "kind": "list_intent",
+                    "text": "조회 결과입니다.",
+                    "from": NOW.isoformat(),
+                    "to": (NOW + timedelta(days=1)).isoformat(),
+                    "title": "출고 검량 확인",
+                    "timeInterpretation": "absolute",
+                }
+            )
+        ]
+    )
+
+    run(processor_store, provider, reader)
+
+    result = stored_request(processor_store).result_json
+    assert reader.list_limits == [101]
+    assert reader.list_titles == ["출고 검량 확인"]
+    assert result["kind"] == "outcome"
+    assert [item["id"] for item in result["items"]] == [str(matching.id)]
 
 
 def test_worst_case_100_item_list_snapshot_stays_within_64_kib(

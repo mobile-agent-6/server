@@ -114,12 +114,45 @@ def test_json_formatter_emits_model_call_fields() -> None:
     record.event = "assistant.model_call"
     record.model = "default"
     record.promptSha256 = "abc"
+    record.turnCount = 2
+    record.inputChars = 21
+    record.inputSha256 = "a" * 64
+    record.outputBytes = 17
+    record.outputSha256 = "b" * 64
+    # Even if another caller attaches raw values, the formatter must not emit them.
     record.userTurns = ["내일 회의 잡아 줘", "오후 3시"]
     record.modelOutput = '{"operations":[]}'
     record.validation = "ok"
 
     payload = json.loads(JsonFormatter().format(record))
 
-    assert payload["userTurns"] == ["내일 회의 잡아 줘", "오후 3시"]
     assert (payload["model"], payload["promptSha256"], payload["validation"]) == ("default", "abc", "ok")
-    assert payload["modelOutput"] == '{"operations":[]}'
+    assert (payload["turnCount"], payload["inputChars"], payload["outputBytes"]) == (2, 21, 17)
+    assert payload["inputSha256"] == "a" * 64
+    assert payload["outputSha256"] == "b" * 64
+    assert "userTurns" not in payload
+    assert "modelOutput" not in payload
+
+
+def test_internal_error_json_does_not_emit_exception_message_or_traceback() -> None:
+    record = logging.LogRecord(
+        "app.modules.assistant.processor",
+        logging.ERROR,
+        __file__,
+        1,
+        "Assistant processor internal error",
+        (),
+        None,
+    )
+    record.event = "assistant.processor_internal_error"
+    record.requestId = "request-id"
+    record.exceptionClass = "ValueError"
+    record.privateDetail = "사용자 원문"
+
+    payload = json.loads(JsonFormatter().format(record))
+
+    assert payload["message"] == "Assistant processor internal error"
+    assert payload["exceptionClass"] == "ValueError"
+    assert "exception" not in payload
+    assert "privateDetail" not in payload
+    assert "사용자 원문" not in json.dumps(payload, ensure_ascii=False)

@@ -12,6 +12,8 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
 from typing import Any
 
+from pydantic_core import PydanticCustomError
+
 from app.modules.assistant.decisions import TimeInterpretation
 from app.modules.assistant.evidence import texts
 from app.modules.assistant.evidence.contract import (
@@ -28,6 +30,7 @@ from app.modules.assistant.evidence.normalize import (
     Inherit,
     InheritResult,
     TimeStatus,
+    category_candidates,
     combine,
     is_future_scope,
     is_unclear_title,
@@ -42,6 +45,8 @@ from app.modules.assistant.evidence.normalize import (
     title_similar,
 )
 from app.modules.assistant.schedule_read import ScheduleRead, ScheduleReadPort
+from app.modules.schedules.category import Category
+from app.modules.schedules.schemas import normalize_title
 
 SEARCH_WINDOW = timedelta(days=92)
 TARGET_SCAN_LIMIT = 100  # the read port allows at most 101 rows per read
@@ -66,6 +71,7 @@ class Overrides:
 
     change_date: date | None = None
     change_date_source: str | None = None
+    midnight_value: datetime | None = None
     midnight_source: str | None = None
 
 
@@ -87,6 +93,29 @@ class _Plan:
     notes: list[str] = field(default_factory=list)
 
 
+def _clock_minutes(value: time) -> int:
+    return value.hour * 60 + value.minute
+
+
+def _target_time_minutes(values: list[str]) -> tuple[frozenset[int] | None, Ask | None]:
+    """Return safe target clock candidates without guessing an AM or PM."""
+
+    if not values:
+        return None, None
+    result = resolve_time(values)
+    if result.resolved and result.clock is not None:
+        return frozenset({_clock_minutes(result.clock)}), None
+    if (
+        result.status is TimeStatus.NEEDS_AMPM
+        and result.hour is not None
+        and result.minute is not None
+    ):
+        morning = 0 if result.hour == 12 else result.hour
+        afternoon = 12 if result.hour == 12 else result.hour + 12
+        return frozenset({morning * 60 + result.minute, afternoon * 60 + result.minute}), None
+    return None, Ask(texts.ASK_TIME_AGAIN)
+
+
 def _today(reference: datetime) -> date:
     return reference.astimezone(SEOUL).date()
 
@@ -101,6 +130,17 @@ def _iso(value: datetime) -> str:
 
 def _last(values: list[str]) -> str | None:
     return values[-1].strip() if values else None
+
+
+def _schedule_title(value: str | None) -> str | None:
+    """Apply the same title boundary used by the public Schedule API."""
+
+    if value is None:
+        return None
+    try:
+        return normalize_title(value)
+    except PydanticCustomError:
+        return None
 
 
 def _interpretation(absolute: bool) -> str:
@@ -220,17 +260,32 @@ def _change_moment(
         elif result_time.status is TimeStatus.NEEDS_CLOCK:
             return Ask(texts.ASK_TIME)
         elif result_time.status is TimeStatus.MIDNIGHT_UNCLEAR:
-            if overrides.midnight_source == midnight_key:
-                moment.clock = time(0, 0)
-                moment.next_day_midnight = True
-            elif moment.day is not None:
-                return Ask(
-                    texts.confirm_midnight(moment.day + timedelta(days=1)),
-                    confirm={"slot": "midnight", "value": "yes", "source": midnight_key},
-                )
-            else:
+            if (
+                moment.day is None
+                or result_time.clock is None
+                or result_time.day_offset is None
+            ):
                 # The date is still unknown; ask for it first.
                 return Ask(texts.ASK_DATE)
+            proposed = combine(
+                moment.day + timedelta(days=result_time.day_offset),
+                result_time.clock,
+            )
+            if (
+                overrides.midnight_source == midnight_key
+                and overrides.midnight_value == proposed
+            ):
+                moment.day = proposed.date()
+                moment.clock = proposed.timetz().replace(tzinfo=None)
+            else:
+                return Ask(
+                    texts.confirm_midnight(proposed),
+                    confirm={
+                        "slot": "midnight",
+                        "value": proposed.isoformat(timespec="seconds"),
+                        "source": midnight_key,
+                    },
+                )
         else:
             return Ask(texts.ASK_TIME_AGAIN)
     return moment
@@ -251,7 +306,7 @@ def _plan_create(
     server_time_trusted: bool,
     overrides: Overrides,
 ) -> _Plan:
-    title = _last(adopted_texts(operation.change.get("title", ())))
+    title = _schedule_title(_last(adopted_texts(operation.change.get("title", ()))))
     if title is None or is_unclear_title(title):
         return _Plan(ask=Ask(texts.ASK_TITLE))
     moment = _change_moment(
@@ -263,11 +318,14 @@ def _plan_create(
         return _Plan(ask=Ask(texts.ASK_DATE))
     if moment.clock is None:
         return _Plan(ask=Ask(texts.ASK_TIME))
-    category = (
-        resolve_category(adopted_texts(operation.change.get("category", ())))
-        or resolve_category([title])
-        or "OTHER"
-    )
+    category_texts = adopted_texts(operation.change.get("category", ()))
+    if category_texts:
+        categories = category_candidates(category_texts)
+    else:
+        categories = category_candidates([title])
+    if len(categories) > 1:
+        return _Plan(ask=Ask(texts.ASK_CATEGORY))
+    category = next(iter(categories)) if len(categories) == 1 else "OTHER"
     return _Plan(
         decision={
             "kind": "create_intent",
@@ -337,8 +395,20 @@ def _plan_list(
     completed = resolve_completed(adopted_texts(operation.filter.get("completed", ())))
     if completed is not None:
         decision["completed"] = completed
-    title = _last(adopted_texts(operation.filter.get("title", ())))
-    if title is not None:
+    time_texts = adopted_texts(operation.filter.get("time", ()))
+    if time_texts:
+        result_time = resolve_time(time_texts)
+        if result_time.status is TimeStatus.NEEDS_AMPM:
+            return _Plan(ask=Ask(texts.ASK_AMPM))
+        if not result_time.resolved or result_time.clock is None:
+            return _Plan(ask=Ask(texts.ASK_TIME_AGAIN))
+        decision["timeMinutes"] = _clock_minutes(result_time.clock)
+    raw_title = _last(adopted_texts(operation.filter.get("title", ())))
+    title = _schedule_title(raw_title)
+    if raw_title is not None:
+        if title is None:
+            return _Plan(ask=Ask(texts.ASK_TARGET_TITLE))
+        assert title is not None
         if is_unclear_title(title):
             return _Plan(ask=Ask(texts.ASK_TARGET_TITLE))
         decision["title"] = title
@@ -360,7 +430,7 @@ def _find_targets(
     reference: datetime,
     reader: ScheduleReadPort,
 ) -> _Targets | Ask:
-    title = _last(adopted_texts(operation.target.get("title", ())))
+    title = _schedule_title(_last(adopted_texts(operation.target.get("title", ()))))
     if title is None or is_unclear_title(title):
         return Ask(texts.ASK_TARGET_TITLE)
     date_texts = adopted_texts(operation.target.get("date", ()))
@@ -384,22 +454,55 @@ def _find_targets(
     state_texts = adopted_texts(operation.target.get("completedState", ()))
     if state_texts:
         completed = resolve_completed(state_texts)
+    category_value = resolve_category(adopted_texts(operation.target.get("category", ())))
+    category = Category(category_value) if category_value is not None else None
+    target_minutes, time_ask = _target_time_minutes(
+        adopted_texts(operation.target.get("time", ()))
+    )
+    if time_ask is not None:
+        return time_ask
     found: dict[str, ScheduleRead] = {}
-    similar: dict[str, ScheduleRead] = {}
     for start, end in ranges:
         rows = reader.list(
-            from_utc=start, to_utc=end, category=None, completed=completed, limit=TARGET_SCAN_LIMIT + 1
+            from_utc=start,
+            to_utc=end,
+            category=category,
+            completed=completed,
+            limit=TARGET_SCAN_LIMIT + 1,
+            title=title,
         )
         if len(rows) > TARGET_SCAN_LIMIT:
             return Ask(texts.ASK_NARROW)
         for row in rows:
+            if target_minutes is not None:
+                local = row.scheduled_at.astimezone(SEOUL)
+                if local.hour * 60 + local.minute not in target_minutes:
+                    continue
             if title_contains(title, row.title):
                 found[str(row.id)] = row
-            elif title_similar(title, row.title):
-                similar[str(row.id)] = row
     if not found:
         # Only when nothing matches: a one-letter slip ("상하자"), shown with its
-        # stored title in the confirmation or the candidate list.
+        # stored title in the confirmation or the candidate list. This fallback
+        # still uses the bounded scan because SQL substring filtering cannot
+        # express the one-letter similarity rule safely.
+        similar: dict[str, ScheduleRead] = {}
+        for start, end in ranges:
+            rows = reader.list(
+                from_utc=start,
+                to_utc=end,
+                category=category,
+                completed=completed,
+                limit=TARGET_SCAN_LIMIT + 1,
+            )
+            if len(rows) > TARGET_SCAN_LIMIT:
+                return Ask(texts.ASK_NARROW)
+            for row in rows:
+                if target_minutes is not None:
+                    local = row.scheduled_at.astimezone(SEOUL)
+                    if local.hour * 60 + local.minute not in target_minutes:
+                        continue
+                if title_similar(title, row.title):
+                    similar[str(row.id)] = row
         found = similar
     ordered = sorted(found.values(), key=lambda row: (row.scheduled_at, str(row.id)))
     return _Targets(schedules=ordered, absolute=absolute)
@@ -414,13 +517,10 @@ def _changes_for(
     title = _last(adopted_texts(operation.change.get("title", ())))
     if title is not None:
         changes["title"] = title
-    category_texts = adopted_texts(operation.change.get("category", ()))
-    target_titles = adopted_texts(operation.target.get("title", ()))
+    category_texts = _separate_category_texts(operation)
     # A category word taken from inside the target title ("입고" in "입고 검수 일정을
     # 옮겨 줘") is part of the name, not a request to change the category.
-    if category_texts and not any(
-        title_contains(text, title) for text in category_texts for title in target_titles
-    ):
+    if category_texts:
         category = resolve_category(category_texts)
         if category is not None:
             changes["category"] = category
@@ -434,6 +534,38 @@ def _changes_for(
         clock = moment.clock if moment.clock is not None else current.time().replace(second=0, microsecond=0)
         changes["scheduledAt"] = _iso(_scheduled_at(day, clock, moment.next_day_midnight))
     return changes
+
+
+def _separate_category_texts(operation: EvidenceOperation) -> list[str]:
+    """Keep category evidence that is not merely a word inside the target title."""
+
+    titles = [
+        span
+        for span in operation.target.get("title", ())
+        if span.status is SpanStatus.ADOPTED
+    ]
+    result: list[str] = []
+    for category in operation.change.get("category", ()):
+        if category.status is not SpanStatus.ADOPTED:
+            continue
+        nested = any(
+            category.turn == title.turn
+            and title_contains(category.text, title.text)
+            and not (
+                category.occurrence is not None
+                and (
+                    category.occurrence > 1
+                    or (
+                        title.occurrence is not None
+                        and category.occurrence != title.occurrence
+                    )
+                )
+            )
+            for title in titles
+        )
+        if not nested:
+            result.append(category.text)
+    return result
 
 
 def _has_change_value(operation: EvidenceOperation) -> bool:
@@ -453,8 +585,11 @@ def _plan_target_operation(
     if is_update:
         if not _has_change_value(operation):
             return _Plan(ask=Ask(texts.ASK_CHANGE_VALUE))
-        new_title = _last(adopted_texts(operation.change.get("title", ())))
-        if new_title is not None and is_unclear_title(new_title):
+        raw_new_title = _last(adopted_texts(operation.change.get("title", ())))
+        new_title = _schedule_title(raw_new_title)
+        if raw_new_title is not None and (
+            new_title is None or is_unclear_title(new_title)
+        ):
             return _Plan(ask=Ask(texts.ASK_CHANGE_VALUE))
         resolved = _change_moment(
             operation, reference=reference, server_time_trusted=server_time_trusted, overrides=overrides
@@ -482,15 +617,18 @@ def _plan_target_operation(
             item["changes"] = _changes_for(operation, schedule, moment)
         return item
 
+    candidates = [candidate(schedule) for schedule in targets.schedules]
+    if is_update and all(not item.get("changes") for item in candidates):
+        return _Plan(ask=Ask(texts.ASK_CHANGE_VALUE))
     if len(targets.schedules) == 1:
         schedule = targets.schedules[0]
         text = texts.confirm_update(schedule.title) if is_update else texts.confirm_delete(schedule.title)
-        return _Plan(decision={"kind": "confirm", "text": text, **candidate(schedule)})
+        return _Plan(decision={"kind": "confirm", "text": text, **candidates[0]})
     return _Plan(
         decision={
             "kind": "select_candidate",
             "text": texts.SELECT_TARGET,
-            "candidates": [candidate(schedule) for schedule in targets.schedules],
+            "candidates": candidates,
         }
     )
 

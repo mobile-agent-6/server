@@ -20,7 +20,6 @@ from enum import StrEnum
 from app.modules.assistant.evidence.contract import (
     EvidenceOperation,
     EvidenceOutput,
-    OperationKind,
     Span,
     SpanStatus,
     adopted_texts,
@@ -39,29 +38,7 @@ from app.modules.assistant.evidence.normalize import (
     resolve_month_range,
     resolve_time,
 )
-
-_ROLE_SLOTS: dict[OperationKind, dict[str, frozenset[str]]] = {
-    OperationKind.CREATE: {
-        "target": frozenset(),
-        "change": frozenset({"title", "date", "time", "category"}),
-        "filter": frozenset(),
-    },
-    OperationKind.LIST: {
-        "target": frozenset(),
-        "change": frozenset(),
-        "filter": frozenset({"title", "date", "category", "completed", "futureScope"}),
-    },
-    OperationKind.UPDATE: {
-        "target": frozenset({"title", "date", "completedState"}),
-        "change": frozenset({"title", "date", "time", "category", "completed"}),
-        "filter": frozenset(),
-    },
-    OperationKind.DELETE: {
-        "target": frozenset({"title", "date", "completedState"}),
-        "change": frozenset(),
-        "filter": frozenset(),
-    },
-}
+from app.modules.assistant.evidence.role_contract import ROLE_SLOTS
 
 # Words that only name the request, never the schedule itself.
 _OPERATION_ONLY = re.compile(
@@ -128,7 +105,7 @@ def _span_identity(span: Span) -> tuple[int, str, int | None]:
 
 
 def check_operation_roles(operation: EvidenceOperation, *, reference: datetime) -> None:
-    allowed = _ROLE_SLOTS[operation.kind]
+    allowed = ROLE_SLOTS[operation.kind]
     used: dict[tuple[int, str, int | None], tuple[str, str]] = {}
     for role, evidence in (("target", operation.target), ("change", operation.change), ("filter", operation.filter)):
         for slot, spans in evidence.items():

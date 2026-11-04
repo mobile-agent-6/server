@@ -6,7 +6,8 @@ write intent.  This module never calls a Schedule write function.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+import logging
+from dataclasses import dataclass, replace
 from datetime import datetime, timedelta, timezone
 from enum import StrEnum
 from typing import Callable, Protocol
@@ -30,6 +31,7 @@ from app.modules.assistant.decisions import (
     DecisionListIntent,
     DecisionNoMatch,
     DecisionProvider,
+    DecisionProviderInvalidOutput,
     DecisionProviderTimeout,
     DecisionSelectCandidate,
     PendingCreateIntent,
@@ -75,15 +77,17 @@ from app.modules.assistant.serialization import (
     serialize_snapshot,
 )
 from app.modules.assistant.runtime_failures import timeout_snapshot
-from app.modules.assistant.evidence.normalize import title_contains
+from app.modules.assistant.evidence.normalize import SEOUL, title_contains
 from app.modules.assistant.runtime_guard import ProcessDeadlineGuard
 from app.modules.schedules.schemas import ScheduleCreate, ScheduleUpdate
+
+logger = logging.getLogger(__name__)
 
 QUESTION_TTL = timedelta(minutes=10)
 # Kept back from the request deadline for SQLite waits and finalize (Issue #29).
 PROVIDER_SAFETY_MARGIN_SECONDS = 10.0
 # A title-filtered list reads the bounded range first; beyond this it asks to narrow.
-LIST_TITLE_SCAN_LIMIT = 100  # the read port allows at most 101 rows per read
+LIST_TITLE_SCAN_LIMIT = 100  # post-filtered reads allow at most 100 results
 RELATIVE_TIME_QUESTION = (
     "서버 시각을 신뢰할 수 없습니다. 절대 날짜와 시각을 알려 주세요."
 )
@@ -160,6 +164,7 @@ class _FinalizePlan:
     pending_write: BaseModel | None = None
     control_state_version: int | None = None
     control_state: object | None = None
+    clear_control_state: bool = False
 
 
 @dataclass(frozen=True)
@@ -171,6 +176,7 @@ class _PreparedPlan:
     pending_write: dict[str, object] | None
     control_state_version: int | None
     control_state: object | None
+    clear_control_state: bool
 
 
 def _aware_utc(value: datetime) -> datetime:
@@ -313,15 +319,18 @@ def _call_provider(
         raise RuntimeError("DecisionProvider is unavailable after admission")
     try:
         raw = provider.decide(context)
+    except DecisionProviderTimeout:
+        raise
+    except DecisionProviderInvalidOutput as exc:
+        raise _InvalidDecision("DecisionProvider returned invalid model output") from exc
+    try:
         validated = DecisionEnvelope.model_validate(raw)
         payload = validated.model_dump(
             mode="json", by_alias=True, exclude_none=True
         )
         serialize_snapshot(payload)
         return DecisionEnvelope.model_validate(payload)
-    except DecisionProviderTimeout:
-        raise
-    except (ValidationError, SnapshotSerializationError, ValueError, TypeError) as exc:
+    except (ValidationError, SnapshotSerializationError, TypeError) as exc:
         raise _InvalidDecision("DecisionProvider returned invalid output") from exc
 
 
@@ -336,14 +345,18 @@ def _summary(schedule: ScheduleRead) -> AssistantScheduleSummary:
     )
 
 
-def _no_match(*, operation: AssistantOutcomeOperation | None = None) -> _FinalizePlan:
+def _no_match(
+    *,
+    operation: AssistantOutcomeOperation | None = None,
+    text: str = NO_MATCH_TEXT,
+) -> _FinalizePlan:
     fields: dict[str, object] = {}
     if operation is not None:
         fields["operation"] = operation
     return _FinalizePlan(
         result=AssistantResultOutcome(
             kind=AssistantResultKind.OUTCOME,
-            text=NO_MATCH_TEXT,
+            text=text,
             outcome=AssistantOutcome.NO_MATCH,
             schedules_changed=False,
             **fields,
@@ -527,10 +540,13 @@ def _from_saved_selection(
             RELATIVE_TIME_QUESTION,
             issue_time=issue_time_factory(),
             uuid_factory=uuid_factory,
+            control_state_version=stored.control_state_version,
+            control_state=stored.control_state,
         )
     schedule = schedule_reader.get(saved.target_schedule_id)
     if schedule is None:
-        return _no_match(operation=AssistantOutcomeOperation(saved.operation))
+        plan = _no_match(operation=AssistantOutcomeOperation(saved.operation))
+        return replace(plan, clear_control_state=True)
     intent = _target_intent_for_current_schedule(
         operation=AssistantConfirmationOperation(saved.operation),
         changes=(saved.changes if isinstance(saved, PendingUpdateIntent) else None),
@@ -538,13 +554,15 @@ def _from_saved_selection(
         schedule=schedule,
     )
     if intent is None:
-        return _already_applied()
+        return replace(_already_applied(), clear_control_state=True)
     return _confirmation_plan(
         text="이 일정에 요청한 변경을 적용할까요?",
         intent=intent,
         schedule=schedule,
         issue_time=issue_time_factory(),
         uuid_factory=uuid_factory,
+        control_state_version=stored.control_state_version,
+        control_state=stored.control_state,
     )
 
 
@@ -568,7 +586,8 @@ def _from_saved_confirmation(
                 outcome=AssistantOutcome.CANCELLED,
                 schedules_changed=False,
                 operation=AssistantOutcomeOperation(envelope.intent.operation),
-            )
+            ),
+            clear_control_state=True,
         )
     if approved is not True:
         raise RuntimeError("stored confirmation answer is invalid")
@@ -580,8 +599,13 @@ def _from_saved_confirmation(
             RELATIVE_TIME_QUESTION,
             issue_time=issue_time_factory(),
             uuid_factory=uuid_factory,
+            control_state_version=stored.control_state_version,
+            control_state=stored.control_state,
         )
-    return _FinalizePlan(pending_write=envelope.intent)
+    return _FinalizePlan(
+        pending_write=envelope.intent,
+        clear_control_state=True,
+    )
 
 
 def _provider_decision_plan(
@@ -642,7 +666,8 @@ def _provider_decision_plan(
         return _FinalizePlan(pending_write=pending, **control)
 
     if isinstance(decision, DecisionListIntent):
-        if decision.title is None:
+        needs_post_filter = decision.title is not None or decision.time_minutes is not None
+        if not needs_post_filter:
             schedules = schedule_reader.list(
                 from_utc=decision.from_at,
                 to_utc=decision.to_at,
@@ -651,13 +676,15 @@ def _provider_decision_plan(
                 limit=101,
             )
         else:
-            # Title filtering happens after the read, so read the whole bounded range.
+            # The read boundary prefilters a title when present. Exact title and
+            # time semantics are still checked here before exposing the result.
             scanned = schedule_reader.list(
                 from_utc=decision.from_at,
                 to_utc=decision.to_at,
                 category=decision.category,
                 completed=decision.completed,
                 limit=LIST_TITLE_SCAN_LIMIT + 1,
+                title=decision.title,
             )
             if len(scanned) > LIST_TITLE_SCAN_LIMIT:
                 return _ask_plan(
@@ -669,7 +696,18 @@ def _provider_decision_plan(
             schedules = [
                 schedule
                 for schedule in scanned
-                if title_contains(decision.title, schedule.title)
+                if (
+                    decision.title is None
+                    or title_contains(decision.title, schedule.title)
+                )
+                and (
+                    decision.time_minutes is None
+                    or (
+                        schedule.scheduled_at.astimezone(SEOUL).hour * 60
+                        + schedule.scheduled_at.astimezone(SEOUL).minute
+                    )
+                    == decision.time_minutes
+                )
             ]
         if len(schedules) > 100:
             return _ask_plan(
@@ -810,7 +848,10 @@ def _provider_decision_plan(
 
     if isinstance(decision, DecisionNoMatch):
         return _FinalizePlan(
-            result=_no_match(operation=AssistantOutcomeOperation(decision.operation)).result,
+            result=_no_match(
+                operation=AssistantOutcomeOperation(decision.operation),
+                text=decision.text or NO_MATCH_TEXT,
+            ).result,
             **control,
         )
 
@@ -843,6 +884,8 @@ def _provider_decision_plan(
 
 
 def _prepare(plan: _FinalizePlan) -> _PreparedPlan:
+    if plan.clear_control_state and plan.control_state is not None:
+        raise RuntimeError("cannot set and clear control state together")
     result: dict[str, object] | None = None
     result_kind: str | None = None
     if plan.result is not None:
@@ -881,6 +924,7 @@ def _prepare(plan: _FinalizePlan) -> _PreparedPlan:
         pending_write=pending_json,
         control_state_version=plan.control_state_version,
         control_state=plan.control_state,
+        clear_control_state=plan.clear_control_state,
     )
 
 
@@ -938,14 +982,18 @@ def _finalize(
                         ),
                     )
 
-                if plan.control_state is not None:
+                if plan.clear_control_state or plan.control_state is not None:
                     conversation = repository.get_conversation(
                         session, request.conversation_id
                     )
                     if conversation is None:
                         raise RuntimeError("Assistant conversation disappeared")
-                    conversation.control_state_version = plan.control_state_version
-                    conversation.control_state_json = plan.control_state
+                    if plan.clear_control_state:
+                        conversation.control_state_version = None
+                        conversation.control_state_json = None
+                    else:
+                        conversation.control_state_version = plan.control_state_version
+                        conversation.control_state_json = plan.control_state
 
                 if plan.pending_write is not None:
                     pending = session.execute(
@@ -1086,7 +1134,15 @@ def process_one(
                 SCHEDULE_UNAVAILABLE_TEXT,
             )
         )
-    except Exception:
+    except Exception as exc:
+        logger.error(
+            "Assistant processor internal error",
+            extra={
+                "event": "assistant.processor_internal_error",
+                "requestId": str(request_id),
+                "exceptionClass": type(exc).__name__,
+            },
+        )
         prepared = _prepare(
             _failure(
                 AssistantFailureCode.INTERNAL_ERROR,

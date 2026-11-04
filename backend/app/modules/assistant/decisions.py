@@ -131,6 +131,8 @@ class DecisionListIntent(_InternalModel):
     to_at: AssistantDateTime = Field(alias="to")
     category: CategoryValue | None = None
     completed: bool | None = None
+    # Backend-computed local clock filter. The model never supplies this value.
+    time_minutes: int | None = Field(default=None, alias="timeMinutes", ge=0, le=1439)
     # Keep only schedules whose title contains this text, ignoring spaces and case.
     title: Title | None = None
     time_interpretation: TimeInterpretationValue
@@ -174,6 +176,7 @@ class DecisionNoMatch(_InternalModel):
 
     kind: Literal["no_match"]
     operation: AssistantOutcomeOperationValue
+    text: AssistantText | None = None
 
 
 class DecisionCancel(_InternalModel):
@@ -319,6 +322,10 @@ class DecisionProvider(Protocol):
 
 class DecisionProviderTimeout(TimeoutError):
     """The provider exceeded its configured internal timeout."""
+
+
+class DecisionProviderInvalidOutput(ValueError):
+    """The model response failed the evidence contract or semantic gate."""
 
 
 class TimeTrustSource(Protocol):

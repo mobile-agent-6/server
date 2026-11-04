@@ -16,7 +16,13 @@ from enum import StrEnum
 SEOUL = timezone(timedelta(hours=9), "Asia/Seoul")
 
 _WEEKDAYS = "월화수목금토일"
-_RELATIVE_DAYS = (("글피", 3), ("모레", 2), ("내일", 1), ("오늘", 0))
+_RELATIVE_DAYS = (
+    ("내일모레", 2),
+    ("글피", 3),
+    ("모레", 2),
+    ("내일", 1),
+    ("오늘", 0),
+)
 
 
 def normalize_text(value: str) -> str:
@@ -79,6 +85,14 @@ _OTHER_WEEK_DAY = re.compile(r"(다다음|다음|지난|저번)\s*주\s*([월화
 _WEEK_SHIFT = {"다음": 1, "다다음": 2, "지난": -1, "저번": -1, "이번": 0}
 _MONTH_SHIFT_DAY = re.compile(r"(이번|다다음|다음|지난|저번)\s*달\s*(\d{1,2})\s*일")
 _DAYS_LATER = re.compile(r"(?<!\d)(\d{1,3})\s*일\s*(?:뒤|후)")
+DATE_MODIFIER_PATTERN = (
+    r"(?:내\s*년|내\s*후년|후년|작년|다음\s*해|이듬해)|"
+    r"(?:\d{1,3}|한|두|세|네|다섯|여섯|일곱|여덟|아홉|열|몇)"
+    r"\s*(?:주(?:일)?|개월|달|년)\s*(?:뒤|후|전)|"
+    r"(?:일\s*주일|보름|이틀|사흘|나흘|닷새|열흘)\s*(?:뒤|후|전)|"
+    r"\d{1,3}\s*일\s*전"
+)
+_UNSUPPORTED_DATE_MODIFIER = re.compile(DATE_MODIFIER_PATTERN)
 # A day of the month alone ("15일에").  Not part of "N일 뒤", "N일간" or "M월 N일".
 _DAY_ONLY = re.compile(r"(?<![\d월])(?<!월\s)(\d{1,2})\s*일(?!\s*(?:뒤|후|간|동안))")
 # Recurring wording is not a single date.
@@ -92,6 +106,23 @@ _DATE_LIKE = re.compile(
     r"이틀\s*(?:뒤|후)|일\s*주일\s*(?:뒤|후)|한\s*달\s*(?:뒤|후)|"
     r"오늘|내일|모레|글피|어제|그제|그저께"
 )
+_DATE_REMAINDER_PUNCTUATION = re.compile(r"[\s,，.。!?！？'\"“”‘’()\[\]{}]+")
+_DATE_ALLOWED_REMAINDER = re.compile(
+    r"(?:에는|으로|부터|까지|에|은|는|이|가|을|를|로)?"
+)
+
+
+def _date_match_is_complete(value: str, match: re.Match[str]) -> bool:
+    """Return whether one supported date expression consumed its evidence.
+
+    Evidence may include a case particle such as ``에`` or ``부터``. Any
+    other remaining word means that a supported suffix matched only part of
+    an unknown expression, so the caller must ask instead of guessing.
+    """
+
+    remainder = value[: match.start()] + value[match.end() :]
+    remainder = _DATE_REMAINDER_PUNCTUATION.sub("", remainder)
+    return _DATE_ALLOWED_REMAINDER.fullmatch(remainder) is not None
 
 
 def _safe_date(year: int, month: int, day: int) -> date | None:
@@ -119,8 +150,16 @@ def resolve_date(
     combined = _joined(texts)
     today = _local_today(reference)
 
+    # Do not let a supported suffix win while an unsupported modifier is
+    # silently discarded (for example, reading "2주 뒤 금요일" as merely
+    # this week's Friday or "내년 12월 5일" as this year's date).
+    if _UNSUPPORTED_DATE_MODIFIER.search(combined):
+        return DateResult(DateStatus.UNSUPPORTED)
+
     full = _FULL_DATE.search(combined)
     if full:
+        if not _date_match_is_complete(combined, full):
+            return DateResult(DateStatus.UNSUPPORTED)
         value = _safe_date(*map(int, full.groups()))
         if value is None:
             return DateResult(DateStatus.INVALID_DATE)
@@ -128,6 +167,8 @@ def resolve_date(
 
     month_day = _MONTH_DAY.search(combined)
     if month_day:
+        if not _date_match_is_complete(combined, month_day):
+            return DateResult(DateStatus.UNSUPPORTED)
         month, day_value = map(int, month_day.groups())
         this_year = _safe_date(today.year, month, day_value)
         next_year = _safe_date(today.year + 1, month, day_value)
@@ -148,12 +189,16 @@ def resolve_date(
     # Weeks run Monday to Sunday: "다음 주 화요일" is the Tuesday of next week.
     other_week = _OTHER_WEEK_DAY.search(combined)
     if other_week:
+        if not _date_match_is_complete(combined, other_week):
+            return DateResult(DateStatus.UNSUPPORTED)
         shift = _WEEK_SHIFT[other_week.group(1)]
         index = _WEEKDAYS.index(other_week.group(2))
         return DateResult(DateStatus.RESOLVED, (_monday(today) + timedelta(days=7 * shift + index),))
 
     month_shift = _MONTH_SHIFT_DAY.search(combined)
     if month_shift:
+        if not _date_match_is_complete(combined, month_shift):
+            return DateResult(DateStatus.UNSUPPORTED)
         year, month = _shift_month(today, _WEEK_SHIFT[month_shift.group(1)])
         value = _safe_date(year, month, int(month_shift.group(2)))
         if value is None:
@@ -162,20 +207,29 @@ def resolve_date(
 
     later = _DAYS_LATER.search(combined)
     if later:
+        if not _date_match_is_complete(combined, later):
+            return DateResult(DateStatus.UNSUPPORTED)
         return DateResult(DateStatus.RESOLVED, (today + timedelta(days=int(later.group(1))),))
 
     for word, offset in _RELATIVE_DAYS:
-        if word in combined:
+        match = re.search(re.escape(word), combined)
+        if match:
+            if not _date_match_is_complete(combined, match):
+                return DateResult(DateStatus.UNSUPPORTED)
             return DateResult(DateStatus.RESOLVED, (today + timedelta(days=offset),))
 
     this_week = _THIS_WEEK_DAY.search(combined)
     if this_week:
+        if not _date_match_is_complete(combined, this_week):
+            return DateResult(DateStatus.UNSUPPORTED)
         index = _WEEKDAYS.index(this_week.group(1))
         monday = today - timedelta(days=today.weekday())
         return DateResult(DateStatus.RESOLVED, (monday + timedelta(days=index),))
 
     bare = _BARE_WEEKDAY.search(combined)
     if bare:
+        if not _date_match_is_complete(combined, bare):
+            return DateResult(DateStatus.UNSUPPORTED)
         index = _WEEKDAYS.index(bare.group(1))
         ahead = (index - today.weekday()) % 7
         if ahead == 0:
@@ -184,6 +238,8 @@ def resolve_date(
 
     day_only = _DAY_ONLY.search(combined)
     if day_only:
+        if not _date_match_is_complete(combined, day_only):
+            return DateResult(DateStatus.UNSUPPORTED)
         return _day_of_month(int(day_only.group(1)), today, purpose)
 
     if _DATE_LIKE.search(combined):
@@ -200,18 +256,25 @@ def _day_of_month(day_value: int, today: date, purpose: DatePurpose) -> DateResu
 
     if not 1 <= day_value <= 31:
         return DateResult(DateStatus.INVALID_DATE)
+    # A day-only expression refers to the current month first. If the date does
+    # not exist, do not silently move it to a later month where it does.
+    if _safe_date(today.year, today.month, day_value) is None:
+        return DateResult(DateStatus.INVALID_DATE)
     found: list[date] = []
-    for months in range(0, 3):
+    for months in range(0, 2):
         year, month = _shift_month(today, months)
         value = _safe_date(year, month, day_value)
         if value is not None and value >= today:
             found.append(value)
-    if not found:
-        return DateResult(DateStatus.INVALID_DATE)
     if purpose is DatePurpose.SEARCH:
         this_month = _safe_date(today.year, today.month, day_value)
         searched = [this_month] if this_month is not None and this_month < today else []
-        return DateResult(DateStatus.RESOLVED, tuple(searched + found[:1]))
+        candidates = searched + found[:1]
+        if candidates:
+            return DateResult(DateStatus.RESOLVED, tuple(candidates))
+        return DateResult(DateStatus.INVALID_DATE)
+    if not found:
+        return DateResult(DateStatus.INVALID_DATE)
     return DateResult(DateStatus.RESOLVED, (found[0],))
 
 
@@ -365,6 +428,9 @@ class TimeResult:
     status: TimeStatus
     hour: int | None = None
     minute: int | None = None
+    # For a midnight confirmation, whether the proposed 00:xx belongs to the
+    # requested date (0) or the following date (1).
+    day_offset: int | None = None
 
     @property
     def resolved(self) -> bool:
@@ -395,16 +461,21 @@ _TIME_LIKE = re.compile(r"(?:\d+|한|두|세|네|다섯|여섯|일곱|여덟|아
 _KOREAN_24_HOUR = re.compile(
     r"(?<![가-힣])(?:열\s*(?:셋|세|넷|네|다섯|여섯|일곱|여덟|아홉)|스무|스물\s*(?:한|두|세|네)?)\s*시(?!간)"
 )
+_MIDNIGHT_DAY_OFFSET = {"아침": 0, "새벽": 0, "저녁": 1, "밤": 1}
 
 
 def _apply_period(period: str, hour: int) -> int | TimeStatus:
-    if period in {"오전", "아침"}:
+    if period == "오전":
         return 0 if hour == 12 else hour
+    if period == "아침":
+        return TimeStatus.MIDNIGHT_UNCLEAR if hour == 12 else hour
     if period == "오후":
         return hour if hour == 12 else hour + 12
     if period == "저녁":
         if hour == 12:
             return TimeStatus.MIDNIGHT_UNCLEAR
+        if 1 <= hour <= 5:
+            return TimeStatus.PERIOD_UNCLEAR
         return hour + 12
     if period == "밤":
         if hour == 12:
@@ -449,7 +520,7 @@ def resolve_time(texts: Sequence[str]) -> TimeResult:
         return TimeResult(TimeStatus.RESOLVED, 12, 0)
     if "자정" in combined and not _CLOCK.search(combined):
         # Same question as "밤 12시": people read midnight differently.
-        return TimeResult(TimeStatus.MIDNIGHT_UNCLEAR)
+        return TimeResult(TimeStatus.MIDNIGHT_UNCLEAR, 0, 0, 1)
     match = _CLOCK.search(combined)
     if not match:
         if _TIME_LIKE.search(combined):
@@ -467,14 +538,24 @@ def resolve_time(texts: Sequence[str]) -> TimeResult:
     period_match = _PERIOD.search(combined)
     if period_match is None:
         if 1 <= hour <= 12:
-            return TimeResult(TimeStatus.NEEDS_AMPM)
+            # Keep the parsed clock components so target matching can retain
+            # both possible schedules without choosing morning or afternoon.
+            return TimeResult(TimeStatus.NEEDS_AMPM, hour, minute)
         return TimeResult(TimeStatus.RESOLVED, hour, minute)
     if hour > 12:
         # "오후 15시" is a typo-like mix; keep the 24-hour value only if it agrees.
         if period_match.group(0) in {"오후", "저녁", "밤", "낮"}:
             return TimeResult(TimeStatus.RESOLVED, hour, minute)
         return TimeResult(TimeStatus.PERIOD_UNCLEAR)
-    applied = _apply_period(period_match.group(0), hour)
+    period = period_match.group(0)
+    if hour == 12 and period in _MIDNIGHT_DAY_OFFSET:
+        return TimeResult(
+            TimeStatus.MIDNIGHT_UNCLEAR,
+            0,
+            minute,
+            _MIDNIGHT_DAY_OFFSET[period],
+        )
+    applied = _apply_period(period, hour)
     if isinstance(applied, TimeStatus):
         return TimeResult(applied)
     return TimeResult(TimeStatus.RESOLVED, applied, minute)
@@ -520,7 +601,17 @@ _CATEGORY_CUES = (
     ("INVENTORY", re.compile(r"재고")),
     ("OUTBOUND", re.compile(r"출고|피킹|포장")),
     ("RETURN", re.compile(r"반품")),
+    ("OTHER", re.compile(r"기타")),
 )
+
+
+def category_candidates(texts: Sequence[str]) -> frozenset[str]:
+    """Return every explicit category meaning found in the evidence."""
+
+    combined = _joined(texts)
+    return frozenset(
+        category for category, pattern in _CATEGORY_CUES if pattern.search(combined)
+    )
 
 
 def resolve_category(texts: Sequence[str]) -> str | None:
@@ -530,16 +621,17 @@ def resolve_category(texts: Sequence[str]) -> str | None:
     matches the labelled training and evaluation data.
     """
 
-    combined = _joined(texts)
-    for category, pattern in _CATEGORY_CUES:
-        if pattern.search(combined):
-            return category
-    return None
+    candidates = category_candidates(texts)
+    return next(iter(candidates)) if len(candidates) == 1 else None
 
 
 _NOT_COMPLETED = re.compile(
-    r"미완료|완료\s*(?:안|못)\s*(?:된|한|했)|완료(?:되|하)지\s*(?:않|못)|"
-    r"안\s*끝|끝나지\s*않|못\s*끝|완료.*(?:취소|해제)"
+    r"미완료|"
+    r"완료\s*(?:된|되|처리|표시)?\s*(?:게|거|건|것)?\s*"
+    r"(?:가|는|은|이|를|로)?\s*(?:아직\s*)?"
+    r"(?:(?:안|못)(?=\s|되|돼|됐|됨|된|한|했|함|$)|아니|아닌|아님)|"
+    r"완료(?:\s*(?:처리|표시))?\s*(?:가|는|를|로)?\s*(?:되|하)지\s*(?:않|못)|"
+    r"완료\s*전|안\s*끝|끝나지\s*않|못\s*끝|완료.*(?:취소|해제)"
 )
 _COMPLETED = re.compile(r"완료|끝났|끝난")
 

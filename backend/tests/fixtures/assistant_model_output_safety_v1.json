@@ -1,0 +1,723 @@
+{
+  "version": 1,
+  "baselineCommit": "3b0f937",
+  "note": "Human-authored model-error cases. Expected API results and final Schedule rows are fixed independently of evidence normalization and planning code.",
+  "cases": [
+    {
+      "caseId": "create-from-change-with-correction-evidence",
+      "class": "create_operation_conflict",
+      "input": "내일 오후 3시 말고 오후 4시로 회의 옮겨 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "회의", "status": "adopted"}],
+              "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+              "time": [
+                {"turn": 1, "text": "오후 3시", "status": "superseded"},
+                {"turn": 1, "text": "말고", "status": "correction_marker"},
+                {"turn": 1, "text": "오후 4시", "status": "adopted"}
+              ]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "need_more_info",
+        "text": "2026년 10월 30일 오후 4시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "create-from-list-question",
+      "class": "create_operation_conflict",
+      "input": "내일 오후 3시 회의 있어?",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "회의", "status": "adopted"}],
+              "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+              "time": [{"turn": 1, "text": "오후 3시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "need_more_info",
+        "text": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "marker-only-does-not-authorize-create",
+      "class": "incomplete_correction_provenance",
+      "input": "내일 말고 5일 오후 2시에 회의 잡아 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "회의", "status": "adopted"}],
+              "date": [
+                {"turn": 1, "text": "말고", "status": "correction_marker"},
+                {"turn": 1, "text": "5일", "status": "adopted"}
+              ],
+              "time": [{"turn": 1, "text": "오후 2시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "need_more_info",
+        "text": "11월 5일 오후 2시에 '회의' 일정을 등록할까요?"
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "supported-request-missing-operation",
+      "class": "model_omitted_supported_operation",
+      "input": "내일 오후 3시에 회의 등록해 줘",
+      "modelOutput": {
+        "operations": [],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "failure",
+        "code": "MODEL_OUTPUT_INVALID",
+        "nextAction": "revise_input"
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "multi-operation-no-match-keeps-remainder-notice",
+      "class": "first_operation_only",
+      "input": "없는 회의는 지우고 내일 오후 3시 재고 회의 등록해 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "delete",
+            "targetEvidence": {
+              "title": [{"turn": 1, "text": "없는 회의", "status": "adopted"}]
+            },
+            "changeEvidence": {},
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          },
+          {
+            "index": 2,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "재고 회의", "status": "adopted"}],
+              "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+              "time": [{"turn": 1, "text": "오후 3시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "outcome",
+        "outcome": "no_match",
+        "operation": "delete",
+        "text": "조건에 맞는 일정을 찾지 못했습니다. 나머지 요청은 이어서 말씀해 주세요."
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "create-omits-next-year-modifier",
+      "class": "incomplete_date_evidence",
+      "input": "내년 12월 5일 오후 3시에 회의 등록해 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "회의", "status": "adopted"}],
+              "date": [{"turn": 1, "text": "12월 5일", "status": "adopted"}],
+              "time": [{"turn": 1, "text": "오후 3시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "need_more_info",
+        "text": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "create-conflicting-adopted-dates",
+      "class": "conflicting_adopted_values",
+      "input": "모레, 아니 내일 오후 3시에 회의 등록해 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "회의", "status": "adopted"}],
+              "date": [
+                {"turn": 1, "text": "모레", "status": "adopted"},
+                {"turn": 1, "text": "아니", "status": "correction_marker"},
+                {"turn": 1, "text": "내일", "status": "adopted"}
+              ],
+              "time": [{"turn": 1, "text": "오후 3시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "need_more_info",
+        "text": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "create-title-overlaps-date-and-time",
+      "class": "semantic_role_overlap",
+      "input": "내일 오후 3시 회의 등록해 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "내일 오후 3시 회의", "status": "adopted"}],
+              "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+              "time": [{"turn": 1, "text": "오후 3시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "failure",
+        "code": "MODEL_OUTPUT_INVALID",
+        "nextAction": "revise_input"
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "create-ambiguous-morning-twelve",
+      "class": "ambiguous_time_period",
+      "input": "내일 아침 12시에 운영 회의 등록해 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "운영 회의", "status": "adopted"}],
+              "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+              "time": [{"turn": 1, "text": "아침 12시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "need_more_info",
+        "text": "10월 30일 0시(자정) 말씀이세요?"
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "create-ambiguous-early-evening",
+      "class": "ambiguous_time_period",
+      "input": "내일 저녁 3시에 운영 회의 등록해 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "운영 회의", "status": "adopted"}],
+              "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+              "time": [{"turn": 1, "text": "저녁 3시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "need_more_info",
+        "text": "시간을 '오후 3시'처럼 다시 말씀해 주세요."
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "create-multiple-title-categories",
+      "class": "conflicting_category_cues",
+      "input": "내일 오후 3시에 반품 입고 회의 등록해 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "반품 입고 회의", "status": "adopted"}],
+              "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+              "time": [{"turn": 1, "text": "오후 3시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "need_more_info",
+        "text": "어떤 분류인가요? 입고, 재고, 출고, 반품 또는 기타로 말씀해 주세요."
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "mixed-unsupported-request-requires-consent",
+      "class": "unsupported_request_consent",
+      "input": "내일 오후 3시에 회의 등록하고 알림도 켜 주고 모레 점검 지워 줘",
+      "modelOutput": {
+        "operations": [],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "need_more_info",
+        "text": "알림과 문자 기능은 지원하지 않아요. 알림 없이 일정만 진행할까요?"
+      },
+      "expectedModelCalls": 0,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "create-invalid-calendar-date",
+      "class": "invalid_calendar_date",
+      "input": "다음 달 31일 오후 3시에 운영 회의 등록해 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "운영 회의", "status": "adopted"}],
+              "date": [{"turn": 1, "text": "다음 달 31일", "status": "adopted"}],
+              "time": [{"turn": 1, "text": "오후 3시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "need_more_info",
+        "text": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": []
+    },
+    {
+      "caseId": "list-completed-negation-control",
+      "class": "completed_negation_filter",
+      "input": "완료가 안 된 일정 보여 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "list",
+            "targetEvidence": {},
+            "changeEvidence": {},
+            "filterEvidence": {
+              "completed": [
+                {"turn": 1, "text": "완료가 안 된", "status": "adopted"}
+              ]
+            },
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "initialSchedules": [
+        {
+          "id": "71000000-0000-4000-8000-000000000001",
+          "title": "미완료 운영 점검",
+          "scheduledAt": "2026-10-30T06:00:00Z",
+          "category": "OTHER",
+          "completed": false
+        },
+        {
+          "id": "71000000-0000-4000-8000-000000000002",
+          "title": "완료 운영 점검",
+          "scheduledAt": "2026-10-30T07:00:00Z",
+          "category": "OTHER",
+          "completed": true
+        }
+      ],
+      "expectedResult": {
+        "kind": "outcome",
+        "outcome": "success",
+        "operation": "list",
+        "schedulesChanged": false
+      },
+      "expectedItemTitles": ["미완료 운영 점검"],
+      "expectedModelCalls": 1,
+      "expectedSchedules": [
+        {
+          "title": "미완료 운영 점검",
+          "scheduledAt": "2026-10-30T06:00:00Z",
+          "category": "OTHER",
+          "completed": false
+        },
+        {
+          "title": "완료 운영 점검",
+          "scheduledAt": "2026-10-30T07:00:00Z",
+          "category": "OTHER",
+          "completed": true
+        }
+      ]
+    },
+    {
+      "caseId": "list-completed-not-yet-control",
+      "class": "completed_negation_filter",
+      "input": "완료 아직 안 됐어 일정 보여 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "list",
+            "targetEvidence": {},
+            "changeEvidence": {},
+            "filterEvidence": {
+              "completed": [
+                {"turn": 1, "text": "완료 아직 안 됐어", "status": "adopted"}
+              ]
+            },
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "initialSchedules": [
+        {
+          "id": "72000000-0000-4000-8000-000000000001",
+          "title": "미완료 운영 점검",
+          "scheduledAt": "2026-10-30T06:00:00Z",
+          "category": "OTHER",
+          "completed": false
+        },
+        {
+          "id": "72000000-0000-4000-8000-000000000002",
+          "title": "완료 운영 점검",
+          "scheduledAt": "2026-10-30T07:00:00Z",
+          "category": "OTHER",
+          "completed": true
+        }
+      ],
+      "expectedResult": {
+        "kind": "outcome",
+        "outcome": "success",
+        "operation": "list",
+        "schedulesChanged": false
+      },
+      "expectedItemTitles": ["미완료 운영 점검"],
+      "expectedModelCalls": 1,
+      "expectedSchedules": [
+        {
+          "title": "미완료 운영 점검",
+          "scheduledAt": "2026-10-30T06:00:00Z",
+          "category": "OTHER",
+          "completed": false
+        },
+        {
+          "title": "완료 운영 점검",
+          "scheduledAt": "2026-10-30T07:00:00Z",
+          "category": "OTHER",
+          "completed": true
+        }
+      ]
+    },
+    {
+      "caseId": "list-completed-is-not-control",
+      "class": "completed_negation_filter",
+      "input": "완료된 게 아니야 일정 보여 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "list",
+            "targetEvidence": {},
+            "changeEvidence": {},
+            "filterEvidence": {
+              "completed": [
+                {"turn": 1, "text": "완료된 게 아니야", "status": "adopted"}
+              ]
+            },
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "initialSchedules": [
+        {
+          "id": "73000000-0000-4000-8000-000000000001",
+          "title": "미완료 운영 점검",
+          "scheduledAt": "2026-10-30T06:00:00Z",
+          "category": "OTHER",
+          "completed": false
+        },
+        {
+          "id": "73000000-0000-4000-8000-000000000002",
+          "title": "완료 운영 점검",
+          "scheduledAt": "2026-10-30T07:00:00Z",
+          "category": "OTHER",
+          "completed": true
+        }
+      ],
+      "expectedResult": {
+        "kind": "outcome",
+        "outcome": "success",
+        "operation": "list",
+        "schedulesChanged": false
+      },
+      "expectedItemTitles": ["미완료 운영 점검"],
+      "expectedModelCalls": 1,
+      "expectedSchedules": [
+        {
+          "title": "미완료 운영 점검",
+          "scheduledAt": "2026-10-30T06:00:00Z",
+          "category": "OTHER",
+          "completed": false
+        },
+        {
+          "title": "완료 운영 점검",
+          "scheduledAt": "2026-10-30T07:00:00Z",
+          "category": "OTHER",
+          "completed": true
+        }
+      ]
+    },
+    {
+      "caseId": "list-completed-not-control",
+      "class": "completed_negation_filter",
+      "input": "완료된 거 아님 일정 보여 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "list",
+            "targetEvidence": {},
+            "changeEvidence": {},
+            "filterEvidence": {
+              "completed": [
+                {"turn": 1, "text": "완료된 거 아님", "status": "adopted"}
+              ]
+            },
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "initialSchedules": [
+        {
+          "id": "74000000-0000-4000-8000-000000000001",
+          "title": "미완료 운영 점검",
+          "scheduledAt": "2026-10-30T06:00:00Z",
+          "category": "OTHER",
+          "completed": false
+        },
+        {
+          "id": "74000000-0000-4000-8000-000000000002",
+          "title": "완료 운영 점검",
+          "scheduledAt": "2026-10-30T07:00:00Z",
+          "category": "OTHER",
+          "completed": true
+        }
+      ],
+      "expectedResult": {
+        "kind": "outcome",
+        "outcome": "success",
+        "operation": "list",
+        "schedulesChanged": false
+      },
+      "expectedItemTitles": ["미완료 운영 점검"],
+      "expectedModelCalls": 1,
+      "expectedSchedules": [
+        {
+          "title": "미완료 운영 점검",
+          "scheduledAt": "2026-10-30T06:00:00Z",
+          "category": "OTHER",
+          "completed": false
+        },
+        {
+          "title": "완료 운영 점검",
+          "scheduledAt": "2026-10-30T07:00:00Z",
+          "category": "OTHER",
+          "completed": true
+        }
+      ]
+    },
+    {
+      "caseId": "normal-create-control",
+      "class": "normal_create",
+      "input": "내일 오후 3시에 운영 회의 등록해 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "운영 회의", "status": "adopted"}],
+              "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+              "time": [{"turn": 1, "text": "오후 3시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "outcome",
+        "text": "일정을 등록했습니다.",
+        "outcome": "success",
+        "operation": "create",
+        "schedulesChanged": true
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": [
+        {
+          "title": "운영 회의",
+          "scheduledAt": "2026-10-30T06:00:00Z",
+          "category": "OTHER",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "caseId": "normal-capability-create-control",
+      "class": "normal_capability_create",
+      "input": "내일 오후 4시에 운영 점검 넣어 줄 수 있어?",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "create",
+            "targetEvidence": {},
+            "changeEvidence": {
+              "title": [{"turn": 1, "text": "운영 점검", "status": "adopted"}],
+              "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+              "time": [{"turn": 1, "text": "오후 4시", "status": "adopted"}]
+            },
+            "filterEvidence": {},
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "expectedResult": {
+        "kind": "outcome",
+        "text": "일정을 등록했습니다.",
+        "outcome": "success",
+        "operation": "create",
+        "schedulesChanged": true
+      },
+      "expectedModelCalls": 1,
+      "expectedSchedules": [
+        {
+          "title": "운영 점검",
+          "scheduledAt": "2026-10-30T07:00:00Z",
+          "category": "OTHER",
+          "completed": false
+        }
+      ]
+    }
+  ]
+}
