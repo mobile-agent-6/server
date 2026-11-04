@@ -94,6 +94,17 @@ _TIME_EXPRESSION = re.compile(
 )
 _REJECTED_PHRASE = re.compile(r"^\s*(?:은|는)?\s*(?:말고|아니고)")
 _SIGNAL_CHARACTER = re.compile(r"[0-9A-Za-z가-힣]")
+_DATE_ADJACENT_PREFIX = re.compile(
+    r"(?<![0-9A-Za-z가-힣])(?:"
+    r"내\s*(?:달|주)|다음|"
+    r"(?:\d{1,3}|한|두|세|네|다섯|여섯|일곱|여덟|아홉|열|몇)"
+    r"\s*(?:주|달|해|년)|"
+    r"있다가|지나서|(?:뒤|후|전)(?:에|에는)?"
+    r")\s*$"
+)
+_DATE_ADJACENT_SUFFIX = re.compile(
+    r"^\s*(?:있다가|지나서|(?:뒤|후|전)(?:에|에는)?)(?![가-힣])"
+)
 
 
 def clarification_answer_matches(question: EvidenceQuestion, text: str) -> bool:
@@ -290,6 +301,47 @@ def _uncaptured_expression(
     return False
 
 
+def _uncaptured_adjacent_date_word(
+    operation: EvidenceOperation,
+    operations: Sequence[EvidenceOperation],
+    extra_spans: Sequence[Span],
+    turn_number: int,
+    turn: str,
+) -> bool:
+    """Find a date word immediately beside a model-selected date span.
+
+    This is intentionally local. A word such as ``다음`` elsewhere in the
+    request is not evidence that the date span is incomplete.
+    """
+
+    value = normalize_text(turn)
+    covered = _covered_positions(operations, extra_spans, turn_number, value)
+    date_spans = [
+        span
+        for evidence in (operation.target, operation.change, operation.filter)
+        for span in evidence.get("date", ())
+        if span.turn == turn_number and span.status is SpanStatus.ADOPTED
+    ]
+    for span in date_spans:
+        for start, end in _occurrence_ranges(span, value):
+            candidates: list[tuple[re.Match[str], int]] = []
+            before = _DATE_ADJACENT_PREFIX.search(value[:start])
+            if before is not None:
+                candidates.append((before, 0))
+            after = _DATE_ADJACENT_SUFFIX.match(value[end:])
+            if after is not None:
+                candidates.append((after, end))
+            for match, offset in candidates:
+                required = {
+                    offset + index
+                    for index in range(match.start(), match.end())
+                    if _SIGNAL_CHARACTER.fullmatch(match.string[index])
+                }
+                if required and not required <= covered:
+                    return True
+    return False
+
+
 def evidence_question(
     operation: EvidenceOperation,
     *,
@@ -325,8 +377,21 @@ def evidence_question(
     operations = tuple(coverage_operations or (operation,))
     for turn_number, turn in enumerate(turns, 1):
         if turn_number == last_turn or turn_number in adopted_date_turns:
-            if _uncaptured_expression(
-                _DATE_EXPRESSION, operations, coverage_spans, turn_number, turn
+            if (
+                _uncaptured_expression(
+                    _DATE_EXPRESSION,
+                    operations,
+                    coverage_spans,
+                    turn_number,
+                    turn,
+                )
+                or _uncaptured_adjacent_date_word(
+                    operation,
+                    operations,
+                    coverage_spans,
+                    turn_number,
+                    turn,
+                )
             ):
                 return EvidenceQuestion.DATE
         if turn_number == last_turn or turn_number in adopted_time_turns:

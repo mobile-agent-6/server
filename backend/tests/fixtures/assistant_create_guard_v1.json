@@ -339,6 +339,78 @@
       "expectedText": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
     },
     {
+      "caseId": "full-repeated-next-week-date",
+      "input": "다음 다음 주 금요일 오후 3시 회의 등록해 줘",
+      "title": "회의",
+      "date": "다음 다음 주 금요일",
+      "time": "오후 3시",
+      "expectedText": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+    },
+    {
+      "caseId": "full-next-month-short-date",
+      "input": "내달 5일 오후 3시 회의 등록해 줘",
+      "title": "회의",
+      "date": "내달 5일",
+      "time": "오후 3시",
+      "expectedText": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+    },
+    {
+      "caseId": "full-next-week-short-date",
+      "input": "내주 금요일 오후 3시 회의 등록해 줘",
+      "title": "회의",
+      "date": "내주 금요일",
+      "time": "오후 3시",
+      "expectedText": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+    },
+    {
+      "caseId": "full-korean-count-weeks-later-date",
+      "input": "이 주 뒤 금요일 오후 3시 회의 등록해 줘",
+      "title": "회의",
+      "date": "이 주 뒤 금요일",
+      "time": "오후 3시",
+      "expectedText": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+    },
+    {
+      "caseId": "full-two-years-later-date",
+      "input": "두 해 뒤 12월 5일 오후 3시 회의 등록해 줘",
+      "title": "회의",
+      "date": "두 해 뒤 12월 5일",
+      "time": "오후 3시",
+      "expectedText": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+    },
+    {
+      "caseId": "full-three-days-later-colloquial-date",
+      "input": "3일 있다가 오후 3시 회의 등록해 줘",
+      "title": "회의",
+      "date": "3일 있다가",
+      "time": "오후 3시",
+      "expectedText": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+    },
+    {
+      "caseId": "full-two-months-later-colloquial-date",
+      "input": "두 달 있다가 5일 오후 3시 회의 등록해 줘",
+      "title": "회의",
+      "date": "두 달 있다가 5일",
+      "time": "오후 3시",
+      "expectedText": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+    },
+    {
+      "caseId": "full-one-week-passed-date",
+      "input": "일주일 지나서 금요일 오후 3시 회의 등록해 줘",
+      "title": "회의",
+      "date": "일주일 지나서 금요일",
+      "time": "오후 3시",
+      "expectedText": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+    },
+    {
+      "caseId": "missing-next-month-short-modifier",
+      "input": "내달 5일 오후 3시 회의 등록해 줘",
+      "title": "회의",
+      "date": "5일",
+      "time": "오후 3시",
+      "expectedText": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+    },
+    {
       "caseId": "day-only-does-not-skip-february",
       "referenceTime": "2027-01-31T10:00:00+09:00",
       "input": "30일 오후 3시 회의 등록해 줘",

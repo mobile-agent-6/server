@@ -128,6 +128,14 @@ def test_weekday_that_is_today_asks() -> None:
         "몇 주 뒤 금요일",
         "내 년 12월 5일",
         "2주 전 금요일",
+        "다음 다음 주 금요일",
+        "내달 5일",
+        "내주 금요일",
+        "이 주 뒤 금요일",
+        "두 해 뒤 12월 5일",
+        "3일 있다가",
+        "두 달 있다가 5일",
+        "일주일 지나서 금요일",
     ],
 )
 def test_unsupported_date_expressions_ask_instead_of_guessing(text: str) -> None:
@@ -153,6 +161,21 @@ def test_unsupported_date_expressions_ask_instead_of_guessing(text: str) -> None
 def test_week_month_and_day_count_expressions(text: str, expected: date) -> None:
     result = schedule_date(text)
     assert (result.status, result.dates, result.absolute) == (DateStatus.RESOLVED, (expected,), False)
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("내일에", date(2026, 10, 30)),
+        ("다음 주 금요일에는", date(2026, 11, 6)),
+        ("11월 3일부터", date(2026, 11, 3)),
+    ],
+)
+def test_date_case_particles_do_not_make_evidence_incomplete(
+    text: str, expected: date
+) -> None:
+    result = schedule_date(text)
+    assert (result.status, result.dates) == (DateStatus.RESOLVED, (expected,))
 
 
 def test_day_of_next_month_that_does_not_exist() -> None:

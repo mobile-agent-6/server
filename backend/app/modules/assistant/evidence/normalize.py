@@ -16,7 +16,13 @@ from enum import StrEnum
 SEOUL = timezone(timedelta(hours=9), "Asia/Seoul")
 
 _WEEKDAYS = "월화수목금토일"
-_RELATIVE_DAYS = (("글피", 3), ("모레", 2), ("내일", 1), ("오늘", 0))
+_RELATIVE_DAYS = (
+    ("내일모레", 2),
+    ("글피", 3),
+    ("모레", 2),
+    ("내일", 1),
+    ("오늘", 0),
+)
 
 
 def normalize_text(value: str) -> str:
@@ -100,6 +106,23 @@ _DATE_LIKE = re.compile(
     r"이틀\s*(?:뒤|후)|일\s*주일\s*(?:뒤|후)|한\s*달\s*(?:뒤|후)|"
     r"오늘|내일|모레|글피|어제|그제|그저께"
 )
+_DATE_REMAINDER_PUNCTUATION = re.compile(r"[\s,，.。!?！？'\"“”‘’()\[\]{}]+")
+_DATE_ALLOWED_REMAINDER = re.compile(
+    r"(?:에는|으로|부터|까지|에|은|는|이|가|을|를|로)?"
+)
+
+
+def _date_match_is_complete(value: str, match: re.Match[str]) -> bool:
+    """Return whether one supported date expression consumed its evidence.
+
+    Evidence may include a case particle such as ``에`` or ``부터``. Any
+    other remaining word means that a supported suffix matched only part of
+    an unknown expression, so the caller must ask instead of guessing.
+    """
+
+    remainder = value[: match.start()] + value[match.end() :]
+    remainder = _DATE_REMAINDER_PUNCTUATION.sub("", remainder)
+    return _DATE_ALLOWED_REMAINDER.fullmatch(remainder) is not None
 
 
 def _safe_date(year: int, month: int, day: int) -> date | None:
@@ -135,6 +158,8 @@ def resolve_date(
 
     full = _FULL_DATE.search(combined)
     if full:
+        if not _date_match_is_complete(combined, full):
+            return DateResult(DateStatus.UNSUPPORTED)
         value = _safe_date(*map(int, full.groups()))
         if value is None:
             return DateResult(DateStatus.INVALID_DATE)
@@ -142,6 +167,8 @@ def resolve_date(
 
     month_day = _MONTH_DAY.search(combined)
     if month_day:
+        if not _date_match_is_complete(combined, month_day):
+            return DateResult(DateStatus.UNSUPPORTED)
         month, day_value = map(int, month_day.groups())
         this_year = _safe_date(today.year, month, day_value)
         next_year = _safe_date(today.year + 1, month, day_value)
@@ -162,12 +189,16 @@ def resolve_date(
     # Weeks run Monday to Sunday: "다음 주 화요일" is the Tuesday of next week.
     other_week = _OTHER_WEEK_DAY.search(combined)
     if other_week:
+        if not _date_match_is_complete(combined, other_week):
+            return DateResult(DateStatus.UNSUPPORTED)
         shift = _WEEK_SHIFT[other_week.group(1)]
         index = _WEEKDAYS.index(other_week.group(2))
         return DateResult(DateStatus.RESOLVED, (_monday(today) + timedelta(days=7 * shift + index),))
 
     month_shift = _MONTH_SHIFT_DAY.search(combined)
     if month_shift:
+        if not _date_match_is_complete(combined, month_shift):
+            return DateResult(DateStatus.UNSUPPORTED)
         year, month = _shift_month(today, _WEEK_SHIFT[month_shift.group(1)])
         value = _safe_date(year, month, int(month_shift.group(2)))
         if value is None:
@@ -176,20 +207,29 @@ def resolve_date(
 
     later = _DAYS_LATER.search(combined)
     if later:
+        if not _date_match_is_complete(combined, later):
+            return DateResult(DateStatus.UNSUPPORTED)
         return DateResult(DateStatus.RESOLVED, (today + timedelta(days=int(later.group(1))),))
 
     for word, offset in _RELATIVE_DAYS:
-        if word in combined:
+        match = re.search(re.escape(word), combined)
+        if match:
+            if not _date_match_is_complete(combined, match):
+                return DateResult(DateStatus.UNSUPPORTED)
             return DateResult(DateStatus.RESOLVED, (today + timedelta(days=offset),))
 
     this_week = _THIS_WEEK_DAY.search(combined)
     if this_week:
+        if not _date_match_is_complete(combined, this_week):
+            return DateResult(DateStatus.UNSUPPORTED)
         index = _WEEKDAYS.index(this_week.group(1))
         monday = today - timedelta(days=today.weekday())
         return DateResult(DateStatus.RESOLVED, (monday + timedelta(days=index),))
 
     bare = _BARE_WEEKDAY.search(combined)
     if bare:
+        if not _date_match_is_complete(combined, bare):
+            return DateResult(DateStatus.UNSUPPORTED)
         index = _WEEKDAYS.index(bare.group(1))
         ahead = (index - today.weekday()) % 7
         if ahead == 0:
@@ -198,6 +238,8 @@ def resolve_date(
 
     day_only = _DAY_ONLY.search(combined)
     if day_only:
+        if not _date_match_is_complete(combined, day_only):
+            return DateResult(DateStatus.UNSUPPORTED)
         return _day_of_month(int(day_only.group(1)), today, purpose)
 
     if _DATE_LIKE.search(combined):
