@@ -453,6 +453,12 @@ def test_safety_fixture_covers_required_failure_and_control_classes() -> None:
     assert all(case["expectedResult"]["kind"] == "outcome" for case in normal)
     assert all(len(case["expectedSchedules"]) == 1 for case in normal)
 
+    assert CREATE_GUARD_FIXTURE["version"] == 1
+    assert len(CREATE_GUARD_CASES) == 25
+    assert len({case["caseId"] for case in CREATE_GUARD_CASES}) == len(
+        CREATE_GUARD_CASES
+    )
+
 
 def test_multiturn_fixture_covers_confirmation_resume_and_reset_boundaries() -> None:
     assert MULTITURN_FIXTURE["version"] == 1

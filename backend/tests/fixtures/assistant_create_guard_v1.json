@@ -91,6 +91,54 @@
       "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
     },
     {
+      "caseId": "past-registration-question",
+      "input": "내일 오후 3시 회의 등록했어?",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "past-registration-short-question",
+      "input": "내일 오후 3시 회의 등록했나?",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "past-scheduled-question",
+      "input": "내일 오후 3시 회의 잡아 뒀나?",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "past-inserted-question",
+      "input": "내일 오후 3시 회의 넣어 놨어?",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "past-added-question",
+      "input": "내일 오후 3시 회의 추가했었나?",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "registration-obligation-question",
+      "input": "내일 오후 3시 회의 등록해야 하나?",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
       "caseId": "missing-week-offset",
       "input": "2주 뒤 금요일 오후 3시 회의 등록해 줘",
       "title": "회의",

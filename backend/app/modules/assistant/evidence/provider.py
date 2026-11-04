@@ -511,6 +511,13 @@ _CREATE_NEGATED = re.compile(
     r"(?:넣|잡|만들)\s*지\s*(?:마|말|않)|"
     r"안\s*(?:등록|추가|생성|넣어|잡아|만들어)"
 )
+# A past status or a question about whether creation is necessary is not an
+# instruction to create. Keep this narrower than a generic question suffix so
+# direct commands such as "넣어" remain valid create actions.
+_CREATE_STATUS_OR_OBLIGATION = re.compile(
+    r"(?:등록|추가|생성)\s*(?:했(?:었)?|해\s*(?:뒀|두었|둔|놨|놓았|놓은)|해야\s*하)|"
+    r"(?:넣어|잡아|만들어)\s*(?:뒀|두었|둔|놨|놓았|놓은)"
+)
 _COMPLETION_REQUEST = re.compile(r"완료(?:로|\s*(?:처리|표시))")
 _CLEAR_SUPPORTED_ACTION = re.compile(
     r"등록|넣어|잡아|추가해|만들어|옮겨|바꿔|변경|수정|지워|삭제|"
@@ -581,7 +588,9 @@ def _has_query_request(operation: EvidenceOperation, turns: Sequence[str]) -> bo
     for value in _residual_turns(operation, turns):
         if _CREATE_CAPABILITY.search(value):
             continue
-        if _QUERY_REQUEST.search(value):
+        if _QUERY_REQUEST.search(value) or _CREATE_STATUS_OR_OBLIGATION.search(
+            value
+        ):
             return True
     return False
 
@@ -619,6 +628,7 @@ def _has_explicit_create_action(
             _CREATE_ACTION.search(residual)
             and not _CREATE_PASSIVE.search(residual)
             and not _CREATE_NEGATED.search(residual)
+            and not _CREATE_STATUS_OR_OBLIGATION.search(residual)
         ):
             return True
     return False

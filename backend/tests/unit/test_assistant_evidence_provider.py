@@ -1313,6 +1313,12 @@ def test_query_words_read_as_create_ask_before_creating(turn: str) -> None:
         "내일 오후 3시 회의 등록돼 있나?",
         "내일 오후 3시 회의 등록하지 마",
         "내일 오후 3시 회의 추가된 거 있나?",
+        "내일 오후 3시 회의 등록했어?",
+        "내일 오후 3시 회의 등록했나?",
+        "내일 오후 3시 회의 잡아 뒀나?",
+        "내일 오후 3시 회의 넣어 놨어?",
+        "내일 오후 3시 회의 추가했었나?",
+        "내일 오후 3시 회의 등록해야 하나?",
     ],
 )
 def test_non_create_wording_read_as_create_requires_confirmation(turn: str) -> None:
