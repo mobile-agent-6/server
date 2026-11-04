@@ -303,8 +303,6 @@ def _uncaptured_expression(
 
 def _uncaptured_adjacent_date_word(
     operation: EvidenceOperation,
-    operations: Sequence[EvidenceOperation],
-    extra_spans: Sequence[Span],
     turn_number: int,
     turn: str,
 ) -> bool:
@@ -315,14 +313,21 @@ def _uncaptured_adjacent_date_word(
     """
 
     value = normalize_text(turn)
-    covered = _covered_positions(operations, extra_spans, turn_number, value)
     date_spans = [
         span
         for evidence in (operation.target, operation.change, operation.filter)
         for span in evidence.get("date", ())
-        if span.turn == turn_number and span.status is SpanStatus.ADOPTED
+        if span.turn == turn_number
     ]
+    covered = {
+        index
+        for span in date_spans
+        for start, end in _occurrence_ranges(span, value)
+        for index in range(start, end)
+    }
     for span in date_spans:
+        if span.status is not SpanStatus.ADOPTED:
+            continue
         for start, end in _occurrence_ranges(span, value):
             candidates: list[tuple[re.Match[str], int]] = []
             before = _DATE_ADJACENT_PREFIX.search(value[:start])
@@ -387,8 +392,6 @@ def evidence_question(
                 )
                 or _uncaptured_adjacent_date_word(
                     operation,
-                    operations,
-                    coverage_spans,
                     turn_number,
                     turn,
                 )

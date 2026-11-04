@@ -107,6 +107,43 @@ def test_missing_date_modifiers_require_clarification(
     ) is EvidenceQuestion.DATE
 
 
+def test_non_date_roles_do_not_cover_an_adjacent_date_modifier() -> None:
+    unsupported = _operation(
+        change={
+            "title": (_span("재고 회의"),),
+            "date": (_span("5일"),),
+            "time": (_span("오후 2시"),),
+        },
+    )
+    unsupported = EvidenceOperation(
+        index=unsupported.index,
+        kind=unsupported.kind,
+        target=unsupported.target,
+        change=unsupported.change,
+        filter=unsupported.filter,
+        unsupported=(_span("두 달 뒤"),),
+        missing_information=unsupported.missing_information,
+    )
+    assert evidence_question(
+        unsupported,
+        turns=["두 달 뒤 5일 오후 2시 재고 회의 등록해 줘"],
+        reference=REFERENCE,
+    ) is EvidenceQuestion.DATE
+
+    title = _operation(
+        change={
+            "title": (_span("재고 회의 두 달 뒤"),),
+            "date": (_span("5일"),),
+            "time": (_span("오후 2시"),),
+        }
+    )
+    assert evidence_question(
+        title,
+        turns=["재고 회의 두 달 뒤 5일 오후 2시에 등록해 줘"],
+        reference=REFERENCE,
+    ) is EvidenceQuestion.DATE
+
+
 def test_rejected_clock_phrase_does_not_require_model_evidence() -> None:
     operation = _operation(
         change={

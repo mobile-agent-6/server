@@ -522,6 +522,15 @@ _CREATE_STATUS_OR_OBLIGATION = re.compile(
     r"(?:등록|추가|생성)\s*(?:했(?:었)?|해\s*(?:뒀|두었|둔|놨|놓았|놓은)|해야\s*하)|"
     r"(?:넣어|잡아|만들어)\s*(?:뒀|두었|둔|놨|놓았|놓은)"
 )
+_CREATE_STATUS_PREFIX = re.compile(
+    r"^\s*(?:(?:이|은|도|가|는)\s*|완료\s*)*"
+)
+_CREATE_ATTRIBUTIVE_STATUS = re.compile(
+    r"^(?:한|된|하는|하신)(?=\s*(?:거|것|건|회의|일정|상태|내용|항목)|\s|$)"
+)
+_CREATE_PASSIVE_OR_OBLIGATION_STATUS = re.compile(
+    r"^(?:(?:돼|되어|되었|되는|된|됐|됨)|해야\s*(?:하|돼|되|$))"
+)
 _COMPLETION_REQUEST = re.compile(r"완료(?:로|\s*(?:처리|표시))")
 _CLEAR_SUPPORTED_ACTION = re.compile(
     r"등록|넣어|잡아|추가해|만들어|옮겨|바꿔|변경|수정|지워|삭제|"
@@ -594,7 +603,7 @@ def _has_query_request(operation: EvidenceOperation, turns: Sequence[str]) -> bo
             continue
         if (
             _QUERY_REQUEST.search(value)
-            or _CREATE_STATUS_OR_OBLIGATION.search(value)
+            or _has_create_status_or_obligation(value)
             or (
                 _CREATE_ACTION.search(value)
                 and _QUESTION_ENDING.search(value)
@@ -627,6 +636,37 @@ def _residual_turns(
     return tuple(residuals)
 
 
+def _has_ss_batchim(value: str) -> bool:
+    """Return whether a Hangul syllable carries the past-tense ㅆ batchim."""
+
+    return any(
+        0xAC00 <= ord(character) <= 0xD7A3
+        and (ord(character) - 0xAC00) % 28 == 20
+        for character in value
+    )
+
+
+def _has_create_status_or_obligation(value: str) -> bool:
+    """Distinguish a creation status statement from an execution request."""
+
+    if _CREATE_STATUS_OR_OBLIGATION.search(value):
+        return True
+    for action in _CREATE_ACTION.finditer(value):
+        tail = value[action.end() :]
+        tail = _CREATE_STATUS_PREFIX.sub("", tail, count=1)
+        first_word = tail.split(maxsplit=1)[0] if tail else ""
+        if first_word.startswith(("하", "되", "돼", "됐")) and _has_ss_batchim(
+            first_word
+        ):
+            return True
+        if (
+            _CREATE_ATTRIBUTIVE_STATUS.search(tail)
+            or _CREATE_PASSIVE_OR_OBLIGATION_STATUS.search(tail)
+        ):
+            return True
+    return False
+
+
 def _has_explicit_create_action(
     operation: EvidenceOperation, turns: Sequence[str]
 ) -> bool:
@@ -639,7 +679,7 @@ def _has_explicit_create_action(
             _CREATE_ACTION.search(residual)
             and not _CREATE_PASSIVE.search(residual)
             and not _CREATE_NEGATED.search(residual)
-            and not _CREATE_STATUS_OR_OBLIGATION.search(residual)
+            and not _has_create_status_or_obligation(residual)
         ):
             return True
     return False

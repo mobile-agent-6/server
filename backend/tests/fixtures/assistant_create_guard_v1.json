@@ -411,6 +411,78 @@
       "expectedText": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
     },
     {
+      "caseId": "honorific-past-status-without-question-mark",
+      "input": "내일 오후 3시 회의 등록하셨어요",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "progressive-status-without-question-mark",
+      "input": "내일 오후 3시 회의 등록하는 거야",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "completed-status-without-question-mark",
+      "input": "내일 오후 3시 회의 등록 완료됐어",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "particle-completed-status-without-question-mark",
+      "input": "내일 오후 3시 회의 등록이 됐어",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "attributive-confirmation-without-question-mark",
+      "input": "내일 오후 3시 회의 등록한 거 맞지",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "honorific-attributive-status-without-question-mark",
+      "input": "내일 오후 3시 회의 등록하신 거 맞으세요",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "attributive-schedule-status-without-question-mark",
+      "input": "내일 오후 3시 이미 등록한 회의야",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "registration-obligation-without-question-mark",
+      "input": "내일 오후 3시 회의 등록해야 돼",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "title-does-not-cover-adjacent-date-modifier",
+      "input": "재고 회의 두 달 뒤 5일 오후 2시에 등록해 줘",
+      "title": "재고 회의 두 달 뒤",
+      "date": "5일",
+      "time": "오후 2시",
+      "expectedText": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+    },
+    {
       "caseId": "day-only-does-not-skip-february",
       "referenceTime": "2027-01-31T10:00:00+09:00",
       "input": "30일 오후 3시 회의 등록해 줘",

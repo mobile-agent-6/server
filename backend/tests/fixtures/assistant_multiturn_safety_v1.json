@@ -337,6 +337,60 @@
         ["내일 오후 3시 회의 있나요?"],
         ["내일 오후 5시 점검 등록해 줘"]
       ]
+    },
+    {
+      "caseId": "unsupported-span-does-not-cover-date-modifier",
+      "referenceTime": "2026-11-03T10:00:00+09:00",
+      "initialSchedules": [],
+      "modelOutputs": [
+        {
+          "operations": [
+            {
+              "index": 1,
+              "kind": "create",
+              "targetEvidence": {},
+              "changeEvidence": {
+                "title": [{"turn": 1, "text": "재고 회의", "status": "adopted"}],
+                "date": [{"turn": 1, "text": "5일", "status": "adopted"}],
+                "time": [{"turn": 1, "text": "오후 2시", "status": "adopted"}]
+              },
+              "filterEvidence": {},
+              "unsupportedEvidence": [
+                {"turn": 1, "text": "두 달 뒤", "status": "adopted"}
+              ],
+              "missingInformation": []
+            }
+          ],
+          "unsupportedEvidence": [],
+          "missingInformation": []
+        }
+      ],
+      "turns": [
+        {
+          "inputType": "text",
+          "text": "두 달 뒤 5일 오후 2시 재고 회의 등록해 줘",
+          "expectedResult": {
+            "kind": "need_more_info",
+            "text": "알림과 문자 기능은 지원하지 않아요. 알림 없이 일정만 진행할까요?"
+          },
+          "expectedModelCalls": 1,
+          "expectedSchedules": []
+        },
+        {
+          "inputType": "text",
+          "text": "응",
+          "answersPreviousQuestion": true,
+          "expectedResult": {
+            "kind": "need_more_info",
+            "text": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+          },
+          "expectedModelCalls": 1,
+          "expectedSchedules": []
+        }
+      ],
+      "expectedModelTurns": [
+        ["두 달 뒤 5일 오후 2시 재고 회의 등록해 줘"]
+      ]
     }
   ]
 }
