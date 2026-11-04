@@ -498,10 +498,14 @@ _QUERY_REQUEST = re.compile(
     r"있는지\s*(?:확인(?:해)?\s*줘)?|있(?:어|나요|습니까|니|나))\s*[?？]?\s*$"
 )
 _CREATE_CAPABILITY = re.compile(
-    r"(?:등록(?:해)?|넣어|잡아|추가해|만들어)\s*"
-    r"(?:줘|줄\s*수\s*있(?:어|나요|습니까))\s*[?？]?\s*$"
+    r"(?:등록(?:해)?|넣어|잡아|추가해|만들어|생성해)\s*"
+    r"(?:줘|주세요|줄\s*(?:수\s*있(?:어|나요|습니까)|래(?:요)?)|"
+    r"주(?:시겠(?:어요|습니까)|실래(?:요)?))\s*[?？]?\s*$"
 )
 _CREATE_ACTION = re.compile(r"등록|넣어|잡아|추가|만들어|생성")
+_QUESTION_ENDING = re.compile(
+    r"(?:[?？]|(?:나|니|냐|까|던가|나요|까요|죠)\s*[.。]?)\s*$"
+)
 _CREATE_PASSIVE = re.compile(
     r"(?:등록|추가|생성)\s*(?:돼|되어|되었|되는|된|됐|됨)|"
     r"(?:넣어|만들어)\s*(?:져|진|졌)|잡힌"
@@ -588,8 +592,13 @@ def _has_query_request(operation: EvidenceOperation, turns: Sequence[str]) -> bo
     for value in _residual_turns(operation, turns):
         if _CREATE_CAPABILITY.search(value):
             continue
-        if _QUERY_REQUEST.search(value) or _CREATE_STATUS_OR_OBLIGATION.search(
-            value
+        if (
+            _QUERY_REQUEST.search(value)
+            or _CREATE_STATUS_OR_OBLIGATION.search(value)
+            or (
+                _CREATE_ACTION.search(value)
+                and _QUESTION_ENDING.search(value)
+            )
         ):
             return True
     return False
@@ -624,6 +633,8 @@ def _has_explicit_create_action(
     for residual in _residual_turns(operation, turns):
         if _CREATE_CAPABILITY.search(residual):
             return True
+        if _CREATE_ACTION.search(residual) and _QUESTION_ENDING.search(residual):
+            continue
         if (
             _CREATE_ACTION.search(residual)
             and not _CREATE_PASSIVE.search(residual)

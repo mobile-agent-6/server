@@ -139,6 +139,102 @@
       "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
     },
     {
+      "caseId": "honorific-registered-question",
+      "input": "내일 오후 3시 회의 등록하셨어요?",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "honorific-registered-polite-question",
+      "input": "내일 오후 3시 회의 등록하셨나요?",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "honorific-added-question",
+      "input": "내일 오후 3시 회의 추가하셨어요?",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "formal-registered-question",
+      "input": "내일 오후 3시 회의 등록하였나?",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "progressive-registration-question",
+      "input": "내일 오후 3시 회의 등록하는 거야?",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "registration-completed-question",
+      "input": "내일 오후 3시 회의 등록 완료됐어?",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "registration-particle-completed-question",
+      "input": "내일 오후 3시 회의 등록이 됐나?",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "registration-topic-completed-question",
+      "input": "내일 오후 3시 회의 등록은 했나?",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "registration-negative-question",
+      "input": "내일 오후 3시 회의 등록 안 됐나?",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "registration-suggestion-question",
+      "input": "내일 오후 3시 회의 등록할까?",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "registration-preparation-suggestion-question",
+      "input": "내일 오후 3시 회의 등록해 놓을까?",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "registration-confirmation-question",
+      "input": "내일 오후 3시 회의 등록한 거 맞지?",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
       "caseId": "missing-week-offset",
       "input": "2주 뒤 금요일 오후 3시 회의 등록해 줘",
       "title": "회의",
