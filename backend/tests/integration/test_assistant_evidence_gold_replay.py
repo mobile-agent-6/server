@@ -67,12 +67,13 @@ def _read_jsonl(path: Path) -> list[dict]:
 
 def _state(previous_turns: list[str]) -> dict[str, object]:
     return {
-        "evidence": 3,
+        "evidence": 4,
         "turns": previous_turns,
         "consentGranted": False,
         "pending": None,
         "changeDate": None,
         "changeDateSource": None,
+        "midnightValue": None,
         "midnightSource": None,
         "createConfirmed": None,
         "validatedOutput": None,

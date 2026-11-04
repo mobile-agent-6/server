@@ -132,3 +132,27 @@ def test_json_formatter_emits_model_call_fields() -> None:
     assert payload["outputSha256"] == "b" * 64
     assert "userTurns" not in payload
     assert "modelOutput" not in payload
+
+
+def test_internal_error_json_does_not_emit_exception_message_or_traceback() -> None:
+    record = logging.LogRecord(
+        "app.modules.assistant.processor",
+        logging.ERROR,
+        __file__,
+        1,
+        "Assistant processor internal error",
+        (),
+        None,
+    )
+    record.event = "assistant.processor_internal_error"
+    record.requestId = "request-id"
+    record.exceptionClass = "ValueError"
+    record.privateDetail = "사용자 원문"
+
+    payload = json.loads(JsonFormatter().format(record))
+
+    assert payload["message"] == "Assistant processor internal error"
+    assert payload["exceptionClass"] == "ValueError"
+    assert "exception" not in payload
+    assert "privateDetail" not in payload
+    assert "사용자 원문" not in json.dumps(payload, ensure_ascii=False)

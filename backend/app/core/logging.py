@@ -42,6 +42,7 @@ _JSON_FIELDS = (
     "outputBytes",
     "outputSha256",
     "validation",
+    "exceptionClass",
 )
 
 

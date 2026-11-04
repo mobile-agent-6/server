@@ -53,7 +53,7 @@ logger = logging.getLogger(__name__)
 
 STATE_KEY = "evidence"
 # Shape of the provider's own JSON; an older shape starts the task fresh.
-STATE_SHAPE = 3
+STATE_SHAPE = 4
 STATE_VERSION = 1
 MAX_TURNS = 8
 MAX_TURN_CHARS = 500
@@ -81,6 +81,7 @@ class _State:
     # Confirmed values keep the evidence they were asked about (see Overrides).
     change_date: str | None = None
     change_date_source: str | None = None
+    midnight_value: str | None = None
     midnight_source: str | None = None
     # The create the user said yes to (title, time, category), so a changed create is checked again.
     create_confirmed: str | None = None
@@ -96,6 +97,7 @@ class _State:
             "pending": self.pending,
             "changeDate": self.change_date,
             "changeDateSource": self.change_date_source,
+            "midnightValue": self.midnight_value,
             "midnightSource": self.midnight_source,
             "createConfirmed": self.create_confirmed,
             "validatedOutput": self.validated_output,
@@ -106,6 +108,11 @@ class _State:
         return Overrides(
             change_date=date.fromisoformat(self.change_date) if self.change_date else None,
             change_date_source=self.change_date_source,
+            midnight_value=(
+                datetime.fromisoformat(self.midnight_value)
+                if self.midnight_value
+                else None
+            ),
             midnight_source=self.midnight_source,
         )
 
@@ -121,6 +128,7 @@ def _load_state(value: object) -> _State | None:
     optional_text = (
         "changeDate",
         "changeDateSource",
+        "midnightValue",
         "midnightSource",
         "createConfirmed",
         "validatedOutput",
@@ -137,6 +145,11 @@ def _load_state(value: object) -> _State | None:
     try:
         if change_date is not None:
             date.fromisoformat(change_date)
+        midnight_value = value.get("midnightValue")
+        if midnight_value is not None:
+            parsed_midnight = datetime.fromisoformat(midnight_value)
+            if parsed_midnight.tzinfo is None:
+                return None
     except ValueError:
         return None
     return _State(
@@ -145,6 +158,7 @@ def _load_state(value: object) -> _State | None:
         pending=dict(pending) if pending is not None else None,
         change_date=change_date,
         change_date_source=value.get("changeDateSource"),
+        midnight_value=value.get("midnightValue"),
         midnight_source=value.get("midnightSource"),
         create_confirmed=value.get("createConfirmed"),
         validated_output=value.get("validatedOutput"),
@@ -289,6 +303,7 @@ class EvidenceDecisionProvider:
                             state.change_date = pending.get("value")
                             state.change_date_source = pending.get("source")
                         elif slot == "midnight":
+                            state.midnight_value = pending.get("value")
                             state.midnight_source = pending.get("source")
                         elif slot in {"first_operation", "values", "new_create"}:
                             state.create_confirmed = pending.get("value")

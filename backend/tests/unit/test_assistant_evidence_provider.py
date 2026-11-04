@@ -216,7 +216,14 @@ def test_create_with_multiple_category_cues_asks_instead_of_using_pattern_order(
 @pytest.mark.parametrize(
     ("said_time", "expected_text"),
     [
-        ("아침 12시", texts.confirm_midnight(date(2026, 10, 31))),
+        (
+            "아침 12시",
+            texts.confirm_midnight(datetime(2026, 10, 30, 0, 0, tzinfo=SEOUL)),
+        ),
+        (
+            "새벽 12시 30분",
+            texts.confirm_midnight(datetime(2026, 10, 30, 0, 30, tzinfo=SEOUL)),
+        ),
         ("저녁 3시", texts.ASK_TIME_AGAIN),
     ],
 )
@@ -363,10 +370,46 @@ def test_evening_twelve_asks_about_midnight() -> None:
     model = ScriptedModel(evidence)
     provider = EvidenceDecisionProvider(model, FakeReader())
     first, decision = decide(provider, "내일 밤 12시에 재고 실사 잡아 줘")
-    assert decision["text"] == texts.confirm_midnight(datetime(2026, 10, 31).date())
+    assert decision["text"] == texts.confirm_midnight(
+        datetime(2026, 10, 31, 0, 0, tzinfo=SEOUL)
+    )
     _, decision = decide(provider, "응", previous=first)
     assert datetime.fromisoformat(decision["scheduledAt"]) == datetime(2026, 10, 31, 0, 0, tzinfo=SEOUL)
     assert model.seen == [["내일 밤 12시에 재고 실사 잡아 줘"]]
+
+
+@pytest.mark.parametrize(
+    ("said_time", "expected"),
+    [
+        ("아침 12시", datetime(2026, 10, 30, 0, 0, tzinfo=SEOUL)),
+        ("아침 12시 30분", datetime(2026, 10, 30, 0, 30, tzinfo=SEOUL)),
+        ("새벽 12시", datetime(2026, 10, 30, 0, 0, tzinfo=SEOUL)),
+        ("새벽 12시 반", datetime(2026, 10, 30, 0, 30, tzinfo=SEOUL)),
+        ("밤 12시 반", datetime(2026, 10, 31, 0, 30, tzinfo=SEOUL)),
+    ],
+)
+def test_confirmed_midnight_uses_the_exact_proposed_datetime(
+    said_time: str, expected: datetime
+) -> None:
+    evidence = output(
+        op(
+            "create",
+            change={
+                "title": [span("재고 실사")],
+                "date": [span("내일")],
+                "time": [span(said_time)],
+            },
+        )
+    )
+    model = ScriptedModel(evidence)
+    provider = EvidenceDecisionProvider(model, FakeReader())
+    first, decision = decide(
+        provider, f"내일 {said_time}에 재고 실사 잡아 줘"
+    )
+    assert decision["text"] == texts.confirm_midnight(expected)
+    _, decision = decide(provider, "응", previous=first)
+    assert datetime.fromisoformat(decision["scheduledAt"]) == expected
+    assert model.seen == [[f"내일 {said_time}에 재고 실사 잡아 줘"]]
 
 
 def test_untrusted_time_keeps_turns_for_the_absolute_date_answer() -> None:
@@ -1030,6 +1073,47 @@ def test_unclear_new_title_asks_for_the_change() -> None:
     assert decision == {"kind": "ask", "text": texts.ASK_CHANGE_VALUE}
 
 
+def test_create_title_over_schedule_limit_asks_for_the_title() -> None:
+    title = "가" * 101
+    model = ScriptedModel(
+        output(
+            op(
+                "create",
+                change={
+                    "title": [span(title)],
+                    "date": [span("내일")],
+                    "time": [span("오후 3시")],
+                },
+            )
+        )
+    )
+    _, decision = decide(
+        EvidenceDecisionProvider(model, FakeReader()),
+        f"내일 오후 3시에 {title} 등록해 줘",
+    )
+    assert decision == {"kind": "ask", "text": texts.ASK_TITLE}
+
+
+def test_update_title_over_schedule_limit_asks_for_a_change_value() -> None:
+    title = "가" * 101
+    model = ScriptedModel(
+        output(
+            op(
+                "update",
+                target={"title": [span("회의")]},
+                change={"title": [span(title)]},
+            )
+        )
+    )
+    reader = FakeReader([schedule("회의", REFERENCE + timedelta(days=1))])
+    _, decision = decide(
+        EvidenceDecisionProvider(model, reader),
+        f"회의 제목을 {title}로 바꿔 줘",
+    )
+    assert decision == {"kind": "ask", "text": texts.ASK_CHANGE_VALUE}
+    assert reader.reads == []
+
+
 LK52_TURNS = ["반품 사유 분류 잡아 줘", "모레요", "오전 10시로 하고, 날짜는 모레 말고 글피로 바꿔 줘"]
 # The run 006 mistake: the correction "모레 말고 글피" is ignored and "모레" is adopted.
 LK52_MISSED = output(
@@ -1519,7 +1603,12 @@ def test_create_at_midnight_word_asks_first() -> None:
         "title": [span("서버 점검")], "date": [span("모레")], "time": [span("자정")],
     })))
     _, decision = decide(EvidenceDecisionProvider(model, FakeReader()), "모레 자정에 서버 점검 잡아 줘")
-    assert decision == {"kind": "ask", "text": texts.confirm_midnight(date(2026, 11, 1))}
+    assert decision == {
+        "kind": "ask",
+        "text": texts.confirm_midnight(
+            datetime(2026, 11, 1, 0, 0, tzinfo=SEOUL)
+        ),
+    }
 
 
 @pytest.mark.parametrize(
@@ -1603,6 +1692,7 @@ def test_old_state_shape_starts_fresh() -> None:
            "changeDate": "2027-02-03", "midnight": True, "createConfirmed": True}
     assert _load_state(old) is None
     assert _load_state({"evidence": 2, "turns": []}) is None
+    assert _load_state({"evidence": 3, "turns": []}) is None
 
 
 @pytest.mark.parametrize(
@@ -1653,8 +1743,9 @@ def test_missed_correction_with_new_expressions_asks_for_that_value(
     turns = ["내일 오후 3시에 회의 잡아 줘", latest]
     model = ScriptedModel(missed)
     provider = EvidenceDecisionProvider(model, FakeReader())
-    state = {"evidence": 3, "turns": [turns[0]], "consentGranted": False, "pending": None,
-             "changeDate": None, "changeDateSource": None, "midnightSource": None,
+    state = {"evidence": 4, "turns": [turns[0]], "consentGranted": False, "pending": None,
+             "changeDate": None, "changeDateSource": None, "midnightValue": None,
+             "midnightSource": None,
              "createConfirmed": None, "validatedOutput": None}
     envelope = provider.decide(context(latest, follow_up=True, state=state))
     decision = envelope.decision.model_dump(mode="json", by_alias=True, exclude_none=True)

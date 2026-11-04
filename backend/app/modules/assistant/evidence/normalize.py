@@ -79,6 +79,12 @@ _OTHER_WEEK_DAY = re.compile(r"(다다음|다음|지난|저번)\s*주\s*([월화
 _WEEK_SHIFT = {"다음": 1, "다다음": 2, "지난": -1, "저번": -1, "이번": 0}
 _MONTH_SHIFT_DAY = re.compile(r"(이번|다다음|다음|지난|저번)\s*달\s*(\d{1,2})\s*일")
 _DAYS_LATER = re.compile(r"(?<!\d)(\d{1,3})\s*일\s*(?:뒤|후)")
+_UNSUPPORTED_DATE_MODIFIER = re.compile(
+    r"내년|내후년|후년|작년|"
+    r"(?:\d{1,3}|한)\s*(?:주|개월|달)\s*(?:뒤|후|전)|"
+    r"(?:일\s*주일|보름)\s*(?:뒤|후|전)|"
+    r"\d{1,3}\s*일\s*전"
+)
 # A day of the month alone ("15일에").  Not part of "N일 뒤", "N일간" or "M월 N일".
 _DAY_ONLY = re.compile(r"(?<![\d월])(?<!월\s)(\d{1,2})\s*일(?!\s*(?:뒤|후|간|동안))")
 # Recurring wording is not a single date.
@@ -118,6 +124,12 @@ def resolve_date(
 ) -> DateResult:
     combined = _joined(texts)
     today = _local_today(reference)
+
+    # Do not let a supported suffix win while an unsupported modifier is
+    # silently discarded (for example, reading "2주 뒤 금요일" as merely
+    # this week's Friday or "내년 12월 5일" as this year's date).
+    if _UNSUPPORTED_DATE_MODIFIER.search(combined):
+        return DateResult(DateStatus.UNSUPPORTED)
 
     full = _FULL_DATE.search(combined)
     if full:
@@ -205,17 +217,20 @@ def _day_of_month(day_value: int, today: date, purpose: DatePurpose) -> DateResu
     if _safe_date(today.year, today.month, day_value) is None:
         return DateResult(DateStatus.INVALID_DATE)
     found: list[date] = []
-    for months in range(0, 3):
+    for months in range(0, 2):
         year, month = _shift_month(today, months)
         value = _safe_date(year, month, day_value)
         if value is not None and value >= today:
             found.append(value)
-    if not found:
-        return DateResult(DateStatus.INVALID_DATE)
     if purpose is DatePurpose.SEARCH:
         this_month = _safe_date(today.year, today.month, day_value)
         searched = [this_month] if this_month is not None and this_month < today else []
-        return DateResult(DateStatus.RESOLVED, tuple(searched + found[:1]))
+        candidates = searched + found[:1]
+        if candidates:
+            return DateResult(DateStatus.RESOLVED, tuple(candidates))
+        return DateResult(DateStatus.INVALID_DATE)
+    if not found:
+        return DateResult(DateStatus.INVALID_DATE)
     return DateResult(DateStatus.RESOLVED, (found[0],))
 
 
@@ -369,6 +384,9 @@ class TimeResult:
     status: TimeStatus
     hour: int | None = None
     minute: int | None = None
+    # For a midnight confirmation, whether the proposed 00:xx belongs to the
+    # requested date (0) or the following date (1).
+    day_offset: int | None = None
 
     @property
     def resolved(self) -> bool:
@@ -399,6 +417,7 @@ _TIME_LIKE = re.compile(r"(?:\d+|한|두|세|네|다섯|여섯|일곱|여덟|아
 _KOREAN_24_HOUR = re.compile(
     r"(?<![가-힣])(?:열\s*(?:셋|세|넷|네|다섯|여섯|일곱|여덟|아홉)|스무|스물\s*(?:한|두|세|네)?)\s*시(?!간)"
 )
+_MIDNIGHT_DAY_OFFSET = {"아침": 0, "새벽": 0, "저녁": 1, "밤": 1}
 
 
 def _apply_period(period: str, hour: int) -> int | TimeStatus:
@@ -457,7 +476,7 @@ def resolve_time(texts: Sequence[str]) -> TimeResult:
         return TimeResult(TimeStatus.RESOLVED, 12, 0)
     if "자정" in combined and not _CLOCK.search(combined):
         # Same question as "밤 12시": people read midnight differently.
-        return TimeResult(TimeStatus.MIDNIGHT_UNCLEAR)
+        return TimeResult(TimeStatus.MIDNIGHT_UNCLEAR, 0, 0, 1)
     match = _CLOCK.search(combined)
     if not match:
         if _TIME_LIKE.search(combined):
@@ -484,7 +503,15 @@ def resolve_time(texts: Sequence[str]) -> TimeResult:
         if period_match.group(0) in {"오후", "저녁", "밤", "낮"}:
             return TimeResult(TimeStatus.RESOLVED, hour, minute)
         return TimeResult(TimeStatus.PERIOD_UNCLEAR)
-    applied = _apply_period(period_match.group(0), hour)
+    period = period_match.group(0)
+    if hour == 12 and period in _MIDNIGHT_DAY_OFFSET:
+        return TimeResult(
+            TimeStatus.MIDNIGHT_UNCLEAR,
+            0,
+            minute,
+            _MIDNIGHT_DAY_OFFSET[period],
+        )
+    applied = _apply_period(period, hour)
     if isinstance(applied, TimeStatus):
         return TimeResult(applied)
     return TimeResult(TimeStatus.RESOLVED, applied, minute)
@@ -556,7 +583,8 @@ def resolve_category(texts: Sequence[str]) -> str | None:
 
 _NOT_COMPLETED = re.compile(
     r"미완료|"
-    r"완료(?:\s*(?:처리|표시))?\s*(?:가|는|를|로)?\s*(?:안|못)\s*(?:된|한|했|함)|"
+    r"완료(?:\s*(?:처리|표시))?\s*(?:가|는|를|로)?\s*"
+    r"(?:(?:안|못)(?=\s|되|돼|됐|됨|된|한|했|함|$)|아니|아닌|아님)|"
     r"완료(?:\s*(?:처리|표시))?\s*(?:가|는|를|로)?\s*(?:되|하)지\s*(?:않|못)|"
     r"완료\s*전|안\s*끝|끝나지\s*않|못\s*끝|완료.*(?:취소|해제)"
 )

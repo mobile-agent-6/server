@@ -280,7 +280,7 @@
       },
       "expectedResult": {
         "kind": "need_more_info",
-        "text": "10월 31일 0시(자정) 말씀이세요?"
+        "text": "10월 30일 0시(자정) 말씀이세요?"
       },
       "expectedModelCalls": 1,
       "expectedSchedules": []

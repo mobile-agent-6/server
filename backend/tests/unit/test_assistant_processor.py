@@ -468,6 +468,11 @@ def test_provider_failures_are_sanitized(
         if getattr(record, "event", None) == "assistant.processor_internal_error"
     ]
     assert bool(internal_records) is (code == "INTERNAL_ERROR")
+    if internal_records:
+        (record,) = internal_records
+        assert record.exc_info is None
+        assert record.exceptionClass == type(step).__name__
+        assert "private" not in record.getMessage()
 
 
 @pytest.mark.parametrize(
@@ -1120,12 +1125,13 @@ def test_valid_selection_and_confirmation_are_provider_free(processor_store) -> 
 
 def _evidence_state(turn: str) -> dict[str, object]:
     return {
-        "evidence": 3,
+        "evidence": 4,
         "turns": [turn],
         "consentGranted": False,
         "pending": None,
         "changeDate": None,
         "changeDateSource": None,
+        "midnightValue": None,
         "midnightSource": None,
         "createConfirmed": None,
         "validatedOutput": None,

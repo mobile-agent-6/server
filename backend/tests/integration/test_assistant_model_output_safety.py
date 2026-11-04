@@ -22,6 +22,7 @@ from fastapi.testclient import TestClient
 from app.core.clock import FixedClock
 from app.core.config import Settings
 from app.main import create_app
+from app.modules.assistant.evidence import texts
 from app.modules.assistant.evidence.provider import EvidenceDecisionProvider
 from app.modules.assistant.schedule_read import ScheduleReadPort, SqlAlchemyScheduleReader
 from app.modules.schedules.category import Category
@@ -172,6 +173,7 @@ def test_model_output_safety_matrix_matches_api_and_database(
     "case", CREATE_GUARD_CASES, ids=[case["caseId"] for case in CREATE_GUARD_CASES]
 )
 def test_create_guard_cases_ask_before_api_write(case: dict, tmp_path: Path) -> None:
+    case_now = datetime.fromisoformat(case.get("referenceTime", NOW.isoformat()))
     model_output = {
         "operations": [
             {
@@ -209,7 +211,7 @@ def test_create_guard_cases_ask_before_api_write(case: dict, tmp_path: Path) -> 
         _assistant_time_trust_source_for_tests=_Trust(),
         _assistant_uuid_factory_for_tests=uuid4,
     )
-    application.state.clock = FixedClock(NOW)
+    application.state.clock = FixedClock(case_now)
     try:
         with TestClient(application) as client:
             reader.inner = SqlAlchemyScheduleReader(
@@ -229,6 +231,86 @@ def test_create_guard_cases_ask_before_api_write(case: dict, tmp_path: Path) -> 
             assert result["text"] == case["expectedText"]
             assert _schedule_rows(application) == []
         assert model.calls == 1
+    finally:
+        application.state.engine.dispose()
+
+
+def test_long_title_asks_without_writing_or_logging_the_user_text(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    title = "민감한제목" * 21
+    turn = f"내일 오후 3시에 {title} 등록해 줘"
+    model = _FixedModel(
+        {
+            "operations": [
+                {
+                    "index": 1,
+                    "kind": "create",
+                    "targetEvidence": {},
+                    "changeEvidence": {
+                        "title": [
+                            {"turn": 1, "text": title, "status": "adopted"}
+                        ],
+                        "date": [
+                            {"turn": 1, "text": "내일", "status": "adopted"}
+                        ],
+                        "time": [
+                            {
+                                "turn": 1,
+                                "text": "오후 3시",
+                                "status": "adopted",
+                            }
+                        ],
+                    },
+                    "filterEvidence": {},
+                    "unsupportedEvidence": [],
+                    "missingInformation": [],
+                }
+            ],
+            "unsupportedEvidence": [],
+            "missingInformation": [],
+        }
+    )
+    reader = _LazyReader()
+    database = tmp_path / "long-title.db"
+    migrate(database)
+    application = create_app(
+        Settings(_env_file=None, database_url=f"sqlite:///{database}"),
+        _assistant_runtime_ready_for_tests=True,
+        _assistant_decision_provider_for_tests=EvidenceDecisionProvider(
+            model, reader
+        ),
+        _assistant_time_trust_source_for_tests=_Trust(),
+        _assistant_uuid_factory_for_tests=uuid4,
+    )
+    application.state.clock = FixedClock(NOW)
+    caplog.set_level("INFO")
+    try:
+        with TestClient(application) as client:
+            reader.inner = SqlAlchemyScheduleReader(
+                application.state.session_factory
+            )
+            request_id = str(uuid4())
+            assert client.post(
+                "/api/v1/assistant/requests",
+                json={
+                    "requestId": request_id,
+                    "input": {"type": "text", "text": turn},
+                },
+            ).status_code == 202
+            result = _wait(client, request_id)["result"]
+            assert result == {
+                "kind": "need_more_info",
+                "text": texts.ASK_TITLE,
+                "questionId": result["questionId"],
+            }
+            assert _schedule_rows(application) == []
+        assert title not in caplog.text
+        assert not any(
+            getattr(record, "event", None)
+            == "assistant.processor_internal_error"
+            for record in caplog.records
+        )
     finally:
         application.state.engine.dispose()
 

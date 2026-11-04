@@ -12,6 +12,8 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
 from typing import Any
 
+from pydantic_core import PydanticCustomError
+
 from app.modules.assistant.decisions import TimeInterpretation
 from app.modules.assistant.evidence import texts
 from app.modules.assistant.evidence.contract import (
@@ -44,6 +46,7 @@ from app.modules.assistant.evidence.normalize import (
 )
 from app.modules.assistant.schedule_read import ScheduleRead, ScheduleReadPort
 from app.modules.schedules.category import Category
+from app.modules.schedules.schemas import normalize_title
 
 SEARCH_WINDOW = timedelta(days=92)
 TARGET_SCAN_LIMIT = 100  # the read port allows at most 101 rows per read
@@ -68,6 +71,7 @@ class Overrides:
 
     change_date: date | None = None
     change_date_source: str | None = None
+    midnight_value: datetime | None = None
     midnight_source: str | None = None
 
 
@@ -126,6 +130,17 @@ def _iso(value: datetime) -> str:
 
 def _last(values: list[str]) -> str | None:
     return values[-1].strip() if values else None
+
+
+def _schedule_title(value: str | None) -> str | None:
+    """Apply the same title boundary used by the public Schedule API."""
+
+    if value is None:
+        return None
+    try:
+        return normalize_title(value)
+    except PydanticCustomError:
+        return None
 
 
 def _interpretation(absolute: bool) -> str:
@@ -245,17 +260,32 @@ def _change_moment(
         elif result_time.status is TimeStatus.NEEDS_CLOCK:
             return Ask(texts.ASK_TIME)
         elif result_time.status is TimeStatus.MIDNIGHT_UNCLEAR:
-            if overrides.midnight_source == midnight_key:
-                moment.clock = time(0, 0)
-                moment.next_day_midnight = True
-            elif moment.day is not None:
-                return Ask(
-                    texts.confirm_midnight(moment.day + timedelta(days=1)),
-                    confirm={"slot": "midnight", "value": "yes", "source": midnight_key},
-                )
-            else:
+            if (
+                moment.day is None
+                or result_time.clock is None
+                or result_time.day_offset is None
+            ):
                 # The date is still unknown; ask for it first.
                 return Ask(texts.ASK_DATE)
+            proposed = combine(
+                moment.day + timedelta(days=result_time.day_offset),
+                result_time.clock,
+            )
+            if (
+                overrides.midnight_source == midnight_key
+                and overrides.midnight_value == proposed
+            ):
+                moment.day = proposed.date()
+                moment.clock = proposed.timetz().replace(tzinfo=None)
+            else:
+                return Ask(
+                    texts.confirm_midnight(proposed),
+                    confirm={
+                        "slot": "midnight",
+                        "value": proposed.isoformat(timespec="seconds"),
+                        "source": midnight_key,
+                    },
+                )
         else:
             return Ask(texts.ASK_TIME_AGAIN)
     return moment
@@ -276,7 +306,7 @@ def _plan_create(
     server_time_trusted: bool,
     overrides: Overrides,
 ) -> _Plan:
-    title = _last(adopted_texts(operation.change.get("title", ())))
+    title = _schedule_title(_last(adopted_texts(operation.change.get("title", ()))))
     if title is None or is_unclear_title(title):
         return _Plan(ask=Ask(texts.ASK_TITLE))
     moment = _change_moment(
@@ -373,8 +403,12 @@ def _plan_list(
         if not result_time.resolved or result_time.clock is None:
             return _Plan(ask=Ask(texts.ASK_TIME_AGAIN))
         decision["timeMinutes"] = _clock_minutes(result_time.clock)
-    title = _last(adopted_texts(operation.filter.get("title", ())))
-    if title is not None:
+    raw_title = _last(adopted_texts(operation.filter.get("title", ())))
+    title = _schedule_title(raw_title)
+    if raw_title is not None:
+        if title is None:
+            return _Plan(ask=Ask(texts.ASK_TARGET_TITLE))
+        assert title is not None
         if is_unclear_title(title):
             return _Plan(ask=Ask(texts.ASK_TARGET_TITLE))
         decision["title"] = title
@@ -396,7 +430,7 @@ def _find_targets(
     reference: datetime,
     reader: ScheduleReadPort,
 ) -> _Targets | Ask:
-    title = _last(adopted_texts(operation.target.get("title", ())))
+    title = _schedule_title(_last(adopted_texts(operation.target.get("title", ()))))
     if title is None or is_unclear_title(title):
         return Ask(texts.ASK_TARGET_TITLE)
     date_texts = adopted_texts(operation.target.get("date", ()))
@@ -551,8 +585,11 @@ def _plan_target_operation(
     if is_update:
         if not _has_change_value(operation):
             return _Plan(ask=Ask(texts.ASK_CHANGE_VALUE))
-        new_title = _last(adopted_texts(operation.change.get("title", ())))
-        if new_title is not None and is_unclear_title(new_title):
+        raw_new_title = _last(adopted_texts(operation.change.get("title", ())))
+        new_title = _schedule_title(raw_new_title)
+        if raw_new_title is not None and (
+            new_title is None or is_unclear_title(new_title)
+        ):
             return _Plan(ask=Ask(texts.ASK_CHANGE_VALUE))
         resolved = _change_moment(
             operation, reference=reference, server_time_trusted=server_time_trusted, overrides=overrides

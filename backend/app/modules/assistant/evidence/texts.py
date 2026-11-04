@@ -42,8 +42,10 @@ def confirm_today(day: date) -> str:
     return f"오늘({_WEEKDAY_NAMES[day.weekday()]}요일) 말씀이세요?"
 
 
-def confirm_midnight(next_day: date) -> str:
-    return f"{next_day.month}월 {next_day.day}일 0시(자정) 말씀이세요?"
+def confirm_midnight(value: datetime) -> str:
+    local = value.astimezone(timezone(timedelta(hours=9)))
+    minute = f" {local.minute}분" if local.minute else ""
+    return f"{local.month}월 {local.day}일 0시{minute}(자정) 말씀이세요?"
 
 
 def confirm_first_create(title: str, scheduled_at: datetime) -> str:

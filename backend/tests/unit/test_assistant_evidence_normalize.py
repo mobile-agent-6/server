@@ -111,6 +111,14 @@ def test_weekday_that_is_today_asks() -> None:
         "이틀 뒤",
         "일주일 후",
         "한 달 뒤",
+        "내년 12월 5일",
+        "내후년 12월 5일",
+        "2주 뒤 금요일",
+        "일주일 뒤 금요일",
+        "한 달 뒤 5일",
+        "2개월 후 5일",
+        "3일 전",
+        "2주 전 금요일",
     ],
 )
 def test_unsupported_date_expressions_ask_instead_of_guessing(text: str) -> None:
@@ -241,10 +249,27 @@ def test_times_resolve(texts: list[str], hour: int, minute: int) -> None:
     assert (result.hour, result.minute) == (hour, minute)
 
 
-@pytest.mark.parametrize("text", ["아침 12시", "저녁 12시", "밤 12시", "새벽 12시"])
-def test_evening_and_night_twelve_ask(text: str) -> None:
+@pytest.mark.parametrize(
+    ("text", "minute", "day_offset"),
+    [
+        ("아침 12시", 0, 0),
+        ("아침 12시 30분", 30, 0),
+        ("새벽 12시", 0, 0),
+        ("새벽 12시 반", 30, 0),
+        ("저녁 12시", 0, 1),
+        ("밤 12시 반", 30, 1),
+    ],
+)
+def test_midnight_expressions_keep_minutes_and_date_offset(
+    text: str, minute: int, day_offset: int
+) -> None:
     # Bug fix: "저녁 12시" used to become 12:00 noon.
-    assert resolve_time([text]).status is TimeStatus.MIDNIGHT_UNCLEAR
+    assert resolve_time([text]) == TimeResult(
+        TimeStatus.MIDNIGHT_UNCLEAR,
+        0,
+        minute,
+        day_offset,
+    )
 
 
 @pytest.mark.parametrize("text", ["저녁 1시", "저녁 2시", "저녁 3시", "저녁 4시", "저녁 5시"])
@@ -295,7 +320,12 @@ def test_colon_and_korean_hours_without_period_ask_am_or_pm(text: str) -> None:
 
 
 def test_midnight_word_asks_like_night_twelve() -> None:
-    assert resolve_time(["자정"]).status is TimeStatus.MIDNIGHT_UNCLEAR
+    assert resolve_time(["자정"]) == TimeResult(
+        TimeStatus.MIDNIGHT_UNCLEAR,
+        0,
+        0,
+        1,
+    )
 
 
 @pytest.mark.parametrize(("text", "status"), [("점심", TimeStatus.NEEDS_CLOCK), ("점심 5시", TimeStatus.PERIOD_UNCLEAR)])
@@ -377,6 +407,16 @@ def test_multiple_category_cues_are_not_resolved_by_pattern_order() -> None:
         ("완료 표시 안 한", False),
         ("완료가 되지 않은", False),
         ("완료를 못 한", False),
+        ("완료 안됨", False),
+        ("완료 안 됨", False),
+        ("완료 안됐어", False),
+        ("완료 안 됐는데", False),
+        ("완료가 안됐어", False),
+        ("완료 아님", False),
+        ("완료가 아닌", False),
+        ("완료 아니야", False),
+        ("완료 안 돼 있어", False),
+        ("완료 처리 안 됨", False),
         ("완료 전", False),
         ("회의", None),
     ],
@@ -400,6 +440,50 @@ def test_day_only_does_not_roll_from_an_invalid_current_month_date() -> None:
     result = resolve_date(["31일"], reference, purpose=DatePurpose.SCHEDULE)
 
     assert result.status is DateStatus.INVALID_DATE
+
+
+@pytest.mark.parametrize(
+    ("reference", "text", "purpose", "expected_status", "expected_dates"),
+    [
+        (
+            datetime(2027, 1, 30, 10, 0, tzinfo=SEOUL),
+            "29일",
+            DatePurpose.SCHEDULE,
+            DateStatus.INVALID_DATE,
+            (),
+        ),
+        (
+            datetime(2027, 1, 31, 10, 0, tzinfo=SEOUL),
+            "30일",
+            DatePurpose.SCHEDULE,
+            DateStatus.INVALID_DATE,
+            (),
+        ),
+        (
+            datetime(2027, 1, 30, 10, 0, tzinfo=SEOUL),
+            "29일",
+            DatePurpose.SEARCH,
+            DateStatus.RESOLVED,
+            (date(2027, 1, 29),),
+        ),
+        (
+            datetime(2027, 1, 31, 10, 0, tzinfo=SEOUL),
+            "30일",
+            DatePurpose.SEARCH,
+            DateStatus.RESOLVED,
+            (date(2027, 1, 30),),
+        ),
+    ],
+)
+def test_day_only_never_skips_an_invalid_next_month(
+    reference: datetime,
+    text: str,
+    purpose: DatePurpose,
+    expected_status: DateStatus,
+    expected_dates: tuple[date, ...],
+) -> None:
+    result = resolve_date([text], reference, purpose=purpose)
+    assert (result.status, result.dates) == (expected_status, expected_dates)
 
 
 @pytest.mark.parametrize(

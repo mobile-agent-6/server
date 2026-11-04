@@ -1134,10 +1134,14 @@ def process_one(
                 SCHEDULE_UNAVAILABLE_TEXT,
             )
         )
-    except Exception:
-        logger.exception(
+    except Exception as exc:
+        logger.error(
             "Assistant processor internal error",
-            extra={"event": "assistant.processor_internal_error", "requestId": str(request_id)},
+            extra={
+                "event": "assistant.processor_internal_error",
+                "requestId": str(request_id),
+                "exceptionClass": type(exc).__name__,
+            },
         )
         prepared = _prepare(
             _failure(
