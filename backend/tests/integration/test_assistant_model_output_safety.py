@@ -42,6 +42,12 @@ CREATE_GUARD_FIXTURE = json.loads(
     )
 )
 CREATE_GUARD_CASES = CREATE_GUARD_FIXTURE["cases"]
+MULTITURN_FIXTURE = json.loads(
+    (FIXTURE_PATH.parent / "assistant_multiturn_safety_v1.json").read_text(
+        encoding="utf-8"
+    )
+)
+MULTITURN_CASES = MULTITURN_FIXTURE["cases"]
 SEOUL = timezone(timedelta(hours=9))
 NOW = datetime(2026, 10, 29, 10, 0, tzinfo=SEOUL)
 
@@ -72,6 +78,20 @@ class _FixedModel:
     def extract(self, **kwargs) -> str:
         self.calls += 1
         return json.dumps(self.model_output, ensure_ascii=False)
+
+
+class _ScriptedModel:
+    def __init__(self, model_outputs: list[dict]) -> None:
+        self.model_outputs = list(model_outputs)
+        self.calls = 0
+        self.seen: list[list[str]] = []
+
+    def extract(self, *, turns, **kwargs) -> str:
+        self.calls += 1
+        self.seen.append(list(turns))
+        if not self.model_outputs:
+            raise AssertionError("unexpected model call")
+        return json.dumps(self.model_outputs.pop(0), ensure_ascii=False)
 
 
 def _wait(client: TestClient, request_id: str) -> dict:
@@ -315,6 +335,87 @@ def test_long_title_asks_without_writing_or_logging_the_user_text(
         application.state.engine.dispose()
 
 
+@pytest.mark.parametrize(
+    "case", MULTITURN_CASES, ids=[case["caseId"] for case in MULTITURN_CASES]
+)
+def test_multiturn_safety_matches_api_model_calls_and_database(
+    case: dict, tmp_path: Path
+) -> None:
+    case_now = datetime.fromisoformat(case["referenceTime"])
+    model = _ScriptedModel(case["modelOutputs"])
+    reader = _LazyReader()
+    database = tmp_path / (case["caseId"] + ".db")
+    migrate(database)
+    application = create_app(
+        Settings(_env_file=None, database_url=f"sqlite:///{database}"),
+        _assistant_runtime_ready_for_tests=True,
+        _assistant_decision_provider_for_tests=EvidenceDecisionProvider(
+            model, reader
+        ),
+        _assistant_time_trust_source_for_tests=_Trust(),
+        _assistant_uuid_factory_for_tests=uuid4,
+    )
+    application.state.clock = FixedClock(case_now)
+    try:
+        with TestClient(application) as client:
+            reader.inner = SqlAlchemyScheduleReader(
+                application.state.session_factory
+            )
+            _seed_schedules(application, case["initialSchedules"])
+            conversation_id: str | None = None
+            last_result: dict | None = None
+            for index, turn in enumerate(case["turns"], 1):
+                request_id = str(uuid4())
+                payload: dict[str, object] = {"requestId": request_id}
+                if conversation_id is not None:
+                    payload["conversationId"] = conversation_id
+                question_id = (last_result or {}).get("questionId")
+                if turn["inputType"] == "text":
+                    input_value: dict[str, object] = {
+                        "type": "text",
+                        "text": turn["text"],
+                    }
+                    if turn.get("answersPreviousQuestion"):
+                        assert question_id is not None, (case["caseId"], index)
+                        input_value["questionId"] = question_id
+                elif turn["inputType"] == "confirmation":
+                    assert question_id is not None, (case["caseId"], index)
+                    input_value = {
+                        "type": "confirmation",
+                        "questionId": question_id,
+                        "approved": turn["approved"],
+                    }
+                else:
+                    raise AssertionError(
+                        f"unsupported fixture input: {turn['inputType']}"
+                    )
+                payload["input"] = input_value
+                response = client.post(
+                    "/api/v1/assistant/requests", json=payload
+                )
+                assert response.status_code == 202, (
+                    case["caseId"],
+                    index,
+                    response.text,
+                )
+                body = _wait(client, request_id)
+                conversation_id = body["conversationId"]
+                last_result = body["result"]
+                for key, expected in turn["expectedResult"].items():
+                    assert last_result.get(key) == expected, (
+                        case["caseId"],
+                        index,
+                        key,
+                        last_result,
+                    )
+                assert model.calls == turn["expectedModelCalls"]
+                assert _schedule_rows(application) == turn["expectedSchedules"]
+        assert model.seen == case["expectedModelTurns"]
+        assert model.model_outputs == []
+    finally:
+        application.state.engine.dispose()
+
+
 def test_safety_fixture_is_independent_of_production_value_interpreters() -> None:
     tree = ast.parse(Path(__file__).read_text(encoding="utf-8"))
     imported = {
@@ -351,3 +452,14 @@ def test_safety_fixture_covers_required_failure_and_control_classes() -> None:
     assert len(normal) == 2
     assert all(case["expectedResult"]["kind"] == "outcome" for case in normal)
     assert all(len(case["expectedSchedules"]) == 1 for case in normal)
+
+
+def test_multiturn_fixture_covers_confirmation_resume_and_reset_boundaries() -> None:
+    assert MULTITURN_FIXTURE["version"] == 1
+    assert {case["caseId"] for case in MULTITURN_CASES} == {
+        "update-public-confirmation-approved",
+        "new-create-confirmation-approved",
+        "morning-midnight-confirmation-approved",
+        "midnight-confirmation-declined",
+        "declined-create-does-not-leak-into-new-request",
+    }

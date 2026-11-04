@@ -186,6 +186,20 @@ turn 수와 입력 글자 수, 입력 SHA-256, 출력 byte 수와 출력 SHA-256
 SQLite나 오류 응답에는 들어가지 않는다. hash와 길이도 운영 정보이므로 로그 파일은 Git이나
 팀 공유 위치에 올리지 않는다.
 
+Assistant processor의 예기치 않은 내부 오류는 event, 요청 ID와 예외 class만
+기록한다. 예외 message, traceback과 입력 원문은 이 로그에 남기지 않는다.
+긴 제목과 같이 예상 가능한 제약 위반은 planner가 재입력 질문으로 처리하여
+내부 예외로 보내지 않는다.
+
+backend가 직접 만든 등록 확인 질문은 저장할 절대 연도, 날짜와 시각을 표시한다.
+표시한 값은 title, scheduledAt, category signature와 함께 확인 state에 고정된다.
+사용자가 동의하면 모델을 다시 부르지 않고 검증된 모델 출력과 확인받은 값으로 planner를
+재개한다. 자정 계열 확인은 확인받은 로컬 datetime과 근거 source가 다시 계산한 값과
+같을 때만 사용한다. 예전 state 형식이거나 손상된 state는 쓰기 근거로 사용하지 않고
+새로 시작한다. public update와 delete confirmation은 화면에 고정된 pending write를
+실행하며, safe writer가 과거 시각, 대상 ID, `updated_at` 충돌, 멱등성과 최대 1건 write를
+저장 직전에 다시 검사한다.
+
 Orange Pi용 모델 변환, 실행과 성능 측정은 별도 작업이다.
 
 `20261017_0004` downgrade 전에는 위 runtime을 포함한 서버를 먼저 중지하고 정확한
@@ -206,14 +220,15 @@ Orange Pi용 모델 변환, 실행과 성능 측정은 별도 작업이다.
 python -m pytest --cov=app --cov-branch --cov-report=term-missing
 ```
 
-Assistant evidence 경로는 다음 네 묶음을 서로 분리해 검사한다.
+Assistant evidence 경로는 다음 다섯 묶음을 서로 분리해 검사한다.
 
 | 묶음 | 고정 기준 |
 |---|---|
-| 모델 오답 안전 행렬 | API부터 임시 SQLite까지 13개 안전 사례에서 의도하지 않은 write 0 |
+| 모델 오답 안전 행렬 | API부터 임시 SQLite까지 단일 turn 안전 사례 33개에서 확인 전 write 0 또는 사람이 고정한 정확한 DB 행 |
 | 정상 대조군 | 등록 2개와 완료 부정 조회 1개가 질문으로 바뀌지 않고 기대 DB 행 또는 조회 결과와 일치 |
+| 멀티 turn 확인 경계 | 수정 승인, 등록 확인 승인, 자정 확인 승인과 거절, state 초기화 5개 사례의 모델 호출 수와 전체 DB 행 일치 |
 | locked56 | correct 49 이상, unsafe 0 |
-| 기존 정답 재생 | pilot, batch 1부터 6, Test 50의 정답 849행이 `3b0f937` 기준선과 일치하고 승인 목록 밖 차이 0 |
+| 기존 정답 재생 | pilot, batch 1부터 6, Test 50의 정답 849행에서 승인된 확인 추가 2건만 허용하고 `3b0f937` 기준선 밖 차이 0 |
 
 ```bash
 python -m pytest -q -p no:cacheprovider \
