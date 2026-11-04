@@ -1339,6 +1339,15 @@ def test_query_words_read_as_create_ask_before_creating(turn: str) -> None:
         "내일 오후 3시 회의 등록하신 거 맞으세요",
         "내일 오후 3시 이미 등록한 회의야",
         "내일 오후 3시 회의 등록해야 돼",
+        "내일 오후 3시 회의 등록 다 했어",
+        "내일 오후 3시 회의 등록 이미 됐어",
+        "내일 오후 3시 회의 등록은 벌써 했지",
+        "내일 오후 3시 회의 등록 잘 됐어",
+        "내일 오후 3시 회의 등록해 줬어",
+        "내일 오후 3시 회의 등록해 주셨어요",
+        "내일 오후 3시 회의 추가해 줬지",
+        "내일 오후 3시 회의 넣어 줬어",
+        "내일 오후 3시 회의 만들어 주셨네",
     ],
 )
 def test_non_create_wording_read_as_create_requires_confirmation(turn: str) -> None:
@@ -1376,6 +1385,9 @@ def test_non_create_wording_read_as_create_requires_confirmation(turn: str) -> N
         "등록해 주시겠어요?",
         "추가해 주실래요?",
         "등록 부탁드리겠습니다",
+        "등록해 줘",
+        "등록하고 싶어",
+        "등록해 주면 좋겠어",
     ],
 )
 def test_create_capability_question_is_still_a_create_request(request_phrase: str) -> None:

@@ -646,6 +646,17 @@ def _has_ss_batchim(value: str) -> bool:
     )
 
 
+def _has_past_ss_batchim(value: str) -> bool:
+    """Find a past-tense ㅆ after an action, ignoring non-past auxiliaries."""
+
+    return any(
+        character not in {"겠", "있", "없"}
+        and 0xAC00 <= ord(character) <= 0xD7A3
+        and (ord(character) - 0xAC00) % 28 == 20
+        for character in value
+    )
+
+
 def _has_create_status_or_obligation(value: str) -> bool:
     """Distinguish a creation status statement from an execution request."""
 
@@ -658,6 +669,8 @@ def _has_create_status_or_obligation(value: str) -> bool:
         if first_word.startswith(("하", "되", "돼", "됐")) and _has_ss_batchim(
             first_word
         ):
+            return True
+        if _has_past_ss_batchim(tail):
             return True
         if (
             _CREATE_ATTRIBUTIVE_STATUS.search(tail)

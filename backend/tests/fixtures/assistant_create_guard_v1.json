@@ -475,6 +475,78 @@
       "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
     },
     {
+      "caseId": "adverb-before-past-create-status",
+      "input": "내일 오후 3시 회의 등록 다 했어",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "already-before-passive-past-create-status",
+      "input": "내일 오후 3시 회의 등록 이미 됐어",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "particle-and-adverb-before-past-create-status",
+      "input": "내일 오후 3시 회의 등록은 벌써 했지",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "quality-adverb-before-passive-past-create-status",
+      "input": "내일 오후 3시 회의 등록 잘 됐어",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "past-give-auxiliary-after-register",
+      "input": "내일 오후 3시 회의 등록해 줬어",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "honorific-past-give-auxiliary-after-register",
+      "input": "내일 오후 3시 회의 등록해 주셨어요",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "past-give-auxiliary-after-add",
+      "input": "내일 오후 3시 회의 추가해 줬지",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "past-give-auxiliary-after-insert",
+      "input": "내일 오후 3시 회의 넣어 줬어",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
+      "caseId": "honorific-past-give-auxiliary-after-create",
+      "input": "내일 오후 3시 회의 만들어 주셨네",
+      "title": "회의",
+      "date": "내일",
+      "time": "오후 3시",
+      "expectedText": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+    },
+    {
       "caseId": "title-does-not-cover-adjacent-date-modifier",
       "input": "재고 회의 두 달 뒤 5일 오후 2시에 등록해 줘",
       "title": "재고 회의 두 달 뒤",
