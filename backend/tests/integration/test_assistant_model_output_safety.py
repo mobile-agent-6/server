@@ -445,7 +445,7 @@ def test_safety_fixture_covers_required_failure_and_control_classes() -> None:
         "unsupported_request_consent",
     }
     assert {case["class"] for case in CASES} == required
-    assert len(CASES) == 16
+    assert len(CASES) == 19
     assert len({case["caseId"] for case in CASES}) == len(CASES)
 
     normal = [case for case in CASES if case["class"].startswith("normal_")]
@@ -453,8 +453,17 @@ def test_safety_fixture_covers_required_failure_and_control_classes() -> None:
     assert all(case["expectedResult"]["kind"] == "outcome" for case in normal)
     assert all(len(case["expectedSchedules"]) == 1 for case in normal)
 
+    incomplete_controls = [
+        case for case in CASES if case["class"] == "completed_negation_filter"
+    ]
+    assert len(incomplete_controls) == 4
+    assert all(
+        case["expectedItemTitles"] == ["미완료 운영 점검"]
+        for case in incomplete_controls
+    )
+
     assert CREATE_GUARD_FIXTURE["version"] == 1
-    assert len(CREATE_GUARD_CASES) == 25
+    assert len(CREATE_GUARD_CASES) == 31
     assert len({case["caseId"] for case in CREATE_GUARD_CASES}) == len(
         CREATE_GUARD_CASES
     )

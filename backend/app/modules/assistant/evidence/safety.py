@@ -25,6 +25,7 @@ from app.modules.assistant.evidence.contract import (
 )
 from app.modules.assistant.evidence.gate import EvidenceGateError
 from app.modules.assistant.evidence.normalize import (
+    DATE_MODIFIER_PATTERN,
     SEOUL,
     DatePurpose,
     DateStatus,
@@ -69,7 +70,7 @@ class _LocatedSpan:
 
 
 _DATE_EXPRESSION = re.compile(
-    r"(?:내년|내후년|후년|작년)\s*\d{1,2}\s*월(?:\s*\d{1,2}\s*일)?|"
+    rf"(?:{DATE_MODIFIER_PATTERN})|"
     r"(?:\d{1,3}|한)\s*(?:주|개월|달)\s*(?:뒤|후|전)"
     r"(?:\s*(?:\d{1,2}\s*일|[월화수목금토일]요일))?|"
     r"(?:일\s*주일|보름)\s*(?:뒤|후|전)"

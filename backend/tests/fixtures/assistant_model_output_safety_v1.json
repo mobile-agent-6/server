@@ -454,6 +454,192 @@
       ]
     },
     {
+      "caseId": "list-completed-not-yet-control",
+      "class": "completed_negation_filter",
+      "input": "완료 아직 안 됐어 일정 보여 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "list",
+            "targetEvidence": {},
+            "changeEvidence": {},
+            "filterEvidence": {
+              "completed": [
+                {"turn": 1, "text": "완료 아직 안 됐어", "status": "adopted"}
+              ]
+            },
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "initialSchedules": [
+        {
+          "id": "72000000-0000-4000-8000-000000000001",
+          "title": "미완료 운영 점검",
+          "scheduledAt": "2026-10-30T06:00:00Z",
+          "category": "OTHER",
+          "completed": false
+        },
+        {
+          "id": "72000000-0000-4000-8000-000000000002",
+          "title": "완료 운영 점검",
+          "scheduledAt": "2026-10-30T07:00:00Z",
+          "category": "OTHER",
+          "completed": true
+        }
+      ],
+      "expectedResult": {
+        "kind": "outcome",
+        "outcome": "success",
+        "operation": "list",
+        "schedulesChanged": false
+      },
+      "expectedItemTitles": ["미완료 운영 점검"],
+      "expectedModelCalls": 1,
+      "expectedSchedules": [
+        {
+          "title": "미완료 운영 점검",
+          "scheduledAt": "2026-10-30T06:00:00Z",
+          "category": "OTHER",
+          "completed": false
+        },
+        {
+          "title": "완료 운영 점검",
+          "scheduledAt": "2026-10-30T07:00:00Z",
+          "category": "OTHER",
+          "completed": true
+        }
+      ]
+    },
+    {
+      "caseId": "list-completed-is-not-control",
+      "class": "completed_negation_filter",
+      "input": "완료된 게 아니야 일정 보여 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "list",
+            "targetEvidence": {},
+            "changeEvidence": {},
+            "filterEvidence": {
+              "completed": [
+                {"turn": 1, "text": "완료된 게 아니야", "status": "adopted"}
+              ]
+            },
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "initialSchedules": [
+        {
+          "id": "73000000-0000-4000-8000-000000000001",
+          "title": "미완료 운영 점검",
+          "scheduledAt": "2026-10-30T06:00:00Z",
+          "category": "OTHER",
+          "completed": false
+        },
+        {
+          "id": "73000000-0000-4000-8000-000000000002",
+          "title": "완료 운영 점검",
+          "scheduledAt": "2026-10-30T07:00:00Z",
+          "category": "OTHER",
+          "completed": true
+        }
+      ],
+      "expectedResult": {
+        "kind": "outcome",
+        "outcome": "success",
+        "operation": "list",
+        "schedulesChanged": false
+      },
+      "expectedItemTitles": ["미완료 운영 점검"],
+      "expectedModelCalls": 1,
+      "expectedSchedules": [
+        {
+          "title": "미완료 운영 점검",
+          "scheduledAt": "2026-10-30T06:00:00Z",
+          "category": "OTHER",
+          "completed": false
+        },
+        {
+          "title": "완료 운영 점검",
+          "scheduledAt": "2026-10-30T07:00:00Z",
+          "category": "OTHER",
+          "completed": true
+        }
+      ]
+    },
+    {
+      "caseId": "list-completed-not-control",
+      "class": "completed_negation_filter",
+      "input": "완료된 거 아님 일정 보여 줘",
+      "modelOutput": {
+        "operations": [
+          {
+            "index": 1,
+            "kind": "list",
+            "targetEvidence": {},
+            "changeEvidence": {},
+            "filterEvidence": {
+              "completed": [
+                {"turn": 1, "text": "완료된 거 아님", "status": "adopted"}
+              ]
+            },
+            "unsupportedEvidence": [],
+            "missingInformation": []
+          }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": []
+      },
+      "initialSchedules": [
+        {
+          "id": "74000000-0000-4000-8000-000000000001",
+          "title": "미완료 운영 점검",
+          "scheduledAt": "2026-10-30T06:00:00Z",
+          "category": "OTHER",
+          "completed": false
+        },
+        {
+          "id": "74000000-0000-4000-8000-000000000002",
+          "title": "완료 운영 점검",
+          "scheduledAt": "2026-10-30T07:00:00Z",
+          "category": "OTHER",
+          "completed": true
+        }
+      ],
+      "expectedResult": {
+        "kind": "outcome",
+        "outcome": "success",
+        "operation": "list",
+        "schedulesChanged": false
+      },
+      "expectedItemTitles": ["미완료 운영 점검"],
+      "expectedModelCalls": 1,
+      "expectedSchedules": [
+        {
+          "title": "미완료 운영 점검",
+          "scheduledAt": "2026-10-30T06:00:00Z",
+          "category": "OTHER",
+          "completed": false
+        },
+        {
+          "title": "완료 운영 점검",
+          "scheduledAt": "2026-10-30T07:00:00Z",
+          "category": "OTHER",
+          "completed": true
+        }
+      ]
+    },
+    {
       "caseId": "normal-create-control",
       "class": "normal_create",
       "input": "내일 오후 3시에 운영 회의 등록해 줘",

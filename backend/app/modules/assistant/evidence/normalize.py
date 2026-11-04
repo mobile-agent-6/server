@@ -79,12 +79,14 @@ _OTHER_WEEK_DAY = re.compile(r"(다다음|다음|지난|저번)\s*주\s*([월화
 _WEEK_SHIFT = {"다음": 1, "다다음": 2, "지난": -1, "저번": -1, "이번": 0}
 _MONTH_SHIFT_DAY = re.compile(r"(이번|다다음|다음|지난|저번)\s*달\s*(\d{1,2})\s*일")
 _DAYS_LATER = re.compile(r"(?<!\d)(\d{1,3})\s*일\s*(?:뒤|후)")
-_UNSUPPORTED_DATE_MODIFIER = re.compile(
-    r"내년|내후년|후년|작년|"
-    r"(?:\d{1,3}|한)\s*(?:주|개월|달)\s*(?:뒤|후|전)|"
-    r"(?:일\s*주일|보름)\s*(?:뒤|후|전)|"
+DATE_MODIFIER_PATTERN = (
+    r"(?:내\s*년|내\s*후년|후년|작년|다음\s*해|이듬해)|"
+    r"(?:\d{1,3}|한|두|세|네|다섯|여섯|일곱|여덟|아홉|열|몇)"
+    r"\s*(?:주(?:일)?|개월|달|년)\s*(?:뒤|후|전)|"
+    r"(?:일\s*주일|보름|이틀|사흘|나흘|닷새|열흘)\s*(?:뒤|후|전)|"
     r"\d{1,3}\s*일\s*전"
 )
+_UNSUPPORTED_DATE_MODIFIER = re.compile(DATE_MODIFIER_PATTERN)
 # A day of the month alone ("15일에").  Not part of "N일 뒤", "N일간" or "M월 N일".
 _DAY_ONLY = re.compile(r"(?<![\d월])(?<!월\s)(\d{1,2})\s*일(?!\s*(?:뒤|후|간|동안))")
 # Recurring wording is not a single date.
@@ -583,7 +585,8 @@ def resolve_category(texts: Sequence[str]) -> str | None:
 
 _NOT_COMPLETED = re.compile(
     r"미완료|"
-    r"완료(?:\s*(?:처리|표시))?\s*(?:가|는|를|로)?\s*"
+    r"완료\s*(?:된|되|처리|표시)?\s*(?:게|거|건|것)?\s*"
+    r"(?:가|는|은|이|를|로)?\s*(?:아직\s*)?"
     r"(?:(?:안|못)(?=\s|되|돼|됐|됨|된|한|했|함|$)|아니|아닌|아님)|"
     r"완료(?:\s*(?:처리|표시))?\s*(?:가|는|를|로)?\s*(?:되|하)지\s*(?:않|못)|"
     r"완료\s*전|안\s*끝|끝나지\s*않|못\s*끝|완료.*(?:취소|해제)"

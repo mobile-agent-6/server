@@ -195,6 +195,54 @@
       "expectedText": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
     },
     {
+      "caseId": "full-two-korean-months-later-date",
+      "input": "두 달 뒤 5일 오후 3시 회의 등록해 줘",
+      "title": "회의",
+      "date": "두 달 뒤 5일",
+      "time": "오후 3시",
+      "expectedText": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+    },
+    {
+      "caseId": "full-three-korean-weeks-later-date",
+      "input": "세 주 뒤 금요일 오후 3시 회의 등록해 줘",
+      "title": "회의",
+      "date": "세 주 뒤 금요일",
+      "time": "오후 3시",
+      "expectedText": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+    },
+    {
+      "caseId": "full-two-week-days-later-date",
+      "input": "2주일 뒤 금요일 오후 3시 회의 등록해 줘",
+      "title": "회의",
+      "date": "2주일 뒤 금요일",
+      "time": "오후 3시",
+      "expectedText": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+    },
+    {
+      "caseId": "full-one-year-later-date",
+      "input": "1년 뒤 12월 5일 오후 3시 회의 등록해 줘",
+      "title": "회의",
+      "date": "1년 뒤 12월 5일",
+      "time": "오후 3시",
+      "expectedText": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+    },
+    {
+      "caseId": "full-next-year-word-date",
+      "input": "다음 해 12월 5일 오후 3시 회의 등록해 줘",
+      "title": "회의",
+      "date": "다음 해 12월 5일",
+      "time": "오후 3시",
+      "expectedText": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+    },
+    {
+      "caseId": "missing-two-korean-months-offset",
+      "input": "두 달 뒤 5일 오후 3시 회의 등록해 줘",
+      "title": "회의",
+      "date": "5일",
+      "time": "오후 3시",
+      "expectedText": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+    },
+    {
       "caseId": "day-only-does-not-skip-february",
       "referenceTime": "2027-01-31T10:00:00+09:00",
       "input": "30일 오후 3시 회의 등록해 줘",
