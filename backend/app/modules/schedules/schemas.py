@@ -14,6 +14,7 @@ from pydantic import (
     BeforeValidator,
     ConfigDict,
     Field,
+    WithJsonSchema,
     field_serializer,
 )
 from pydantic.alias_generators import to_camel
@@ -28,6 +29,11 @@ _DATETIME_PATTERN = re.compile(
 _DATETIME_WITHOUT_ZONE = re.compile(
     r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?$"
 )
+_OPENAPI_DATETIME_PATTERN = (
+    r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}"
+    r"(?:\.[0-9]{1,6})?(?:Z|[+-][0-9]{2}:[0-9]{2})$"
+)
+_OPENAPI_TITLE_PATTERN = r"^[^\u0000-\u001F\u007F-\u009F]*$"
 
 
 def parse_api_datetime(value: object) -> datetime:
@@ -60,8 +66,37 @@ def normalize_title(value: object) -> str:
     return normalized
 
 
-ApiDateTime = Annotated[datetime, BeforeValidator(parse_api_datetime)]
-Title = Annotated[str, BeforeValidator(normalize_title)]
+ApiDateTime = Annotated[
+    datetime,
+    BeforeValidator(parse_api_datetime),
+    WithJsonSchema(
+        {
+            "type": "string",
+            "format": "date-time",
+            "pattern": _OPENAPI_DATETIME_PATTERN,
+            "description": (
+                "RFC 3339 datetime with seconds and uppercase Z or a colon-separated "
+                "offset; fractional seconds may contain 1 to 6 digits."
+            ),
+        }
+    ),
+]
+Title = Annotated[
+    str,
+    BeforeValidator(normalize_title),
+    WithJsonSchema(
+        {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": _OPENAPI_TITLE_PATTERN,
+            "description": (
+                "Trimmed before validation; 1 to 100 Unicode code points; "
+                "Cc control characters are not allowed."
+            ),
+        }
+    ),
+]
 
 
 def parse_category(value: object) -> object:
@@ -106,6 +141,8 @@ class ScheduleCreate(RequestModel):
 
 
 class ScheduleUpdate(RequestModel):
+    model_config = ConfigDict(json_schema_extra={"minProperties": 1})
+
     title: Title = None  # type: ignore[assignment]
     scheduled_at: ApiDateTime = None  # type: ignore[assignment]
     category: CategoryValue = None  # type: ignore[assignment]

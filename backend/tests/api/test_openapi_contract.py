@@ -1,4 +1,22 @@
+import re
+
 from fastapi.testclient import TestClient
+
+
+DATETIME_PATTERN = (
+    r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}"
+    r"(?:\.[0-9]{1,6})?(?:Z|[+-][0-9]{2}:[0-9]{2})$"
+)
+TITLE_PATTERN = r"^[^\u0000-\u001F\u007F-\u009F]*$"
+IDEMPOTENCY_KEY_PATTERN = r"^[\x20-\x7E]*$"
+DATETIME_DESCRIPTION = (
+    "RFC 3339 datetime with seconds and uppercase Z or a colon-separated "
+    "offset; fractional seconds may contain 1 to 6 digits."
+)
+TITLE_DESCRIPTION = (
+    "Trimmed before validation; 1 to 100 Unicode code points; "
+    "Cc control characters are not allowed."
+)
 
 
 def test_complete_openapi_contract(client: TestClient) -> None:
@@ -73,8 +91,25 @@ def test_complete_openapi_contract(client: TestClient) -> None:
         "scheduledAt",
         "category",
     }
+    for component in ("ScheduleCreate", "ScheduleUpdate"):
+        assert components[component]["properties"]["title"] == {
+            "description": TITLE_DESCRIPTION,
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": TITLE_PATTERN,
+            "title": "Title",
+            "type": "string",
+        }
+        assert components[component]["properties"]["scheduledAt"] == {
+            "description": DATETIME_DESCRIPTION,
+            "format": "date-time",
+            "pattern": DATETIME_PATTERN,
+            "title": "Scheduledat",
+            "type": "string",
+        }
     assert "completed" not in components["ScheduleCreate"]["properties"]
     assert "required" not in components["ScheduleUpdate"]
+    assert components["ScheduleUpdate"]["minProperties"] == 1
     for field in ("title", "scheduledAt", "category", "completed"):
         assert {branch.get("type") for branch in components["ScheduleUpdate"]["properties"][field].get("anyOf", [])} != {"null"}
         assert not any(
@@ -231,11 +266,50 @@ def test_openapi_problem_content_and_headers(client: TestClient) -> None:
                         "$ref": "#/components/schemas/Problem"
                     }
     create = schema["paths"]["/api/v1/schedules"]["post"]
+    listed = schema["paths"]["/api/v1/schedules"]["get"]
+    list_parameters = {parameter["name"]: parameter for parameter in listed["parameters"]}
+    for name, title in (("from", "From"), ("to", "To")):
+        assert list_parameters[name]["schema"] == {
+            "description": DATETIME_DESCRIPTION,
+            "format": "date-time",
+            "pattern": DATETIME_PATTERN,
+            "title": title,
+            "type": "string",
+        }
+        assert "(?P" not in list_parameters[name]["schema"]["pattern"]
+    assert list_parameters["completed"]["required"] is False
+    assert list_parameters["completed"]["schema"] == {
+        "description": "When present, send lowercase true or false.",
+        "title": "Completed",
+        "type": "boolean",
+    }
+    assert list_parameters["category"]["required"] is False
+    assert list_parameters["category"]["schema"] == {
+        "$ref": "#/components/schemas/Category"
+    }
     assert {parameter["name"] for parameter in create["parameters"]} == {"Idempotency-Key"}
     assert create["parameters"][0]["required"] is True
+    assert create["parameters"][0]["schema"] == {
+        "description": "1 to 255 control-free ASCII characters.",
+        "maxLength": 255,
+        "minLength": 1,
+        "pattern": IDEMPOTENCY_KEY_PATTERN,
+        "title": "Idempotency-Key",
+        "type": "string",
+    }
     assert {"Location", "Idempotent-Replayed", "X-Request-ID"} <= set(
         create["responses"]["201"]["headers"]
     )
+    assert create["responses"]["201"]["headers"]["Location"] == {
+        "description": "Relative path of the created schedule.",
+        "schema": {"type": "string"},
+    }
+    assert create["responses"]["201"]["headers"]["Idempotent-Replayed"] == {
+        "description": (
+            "Present only when this 201 response replays an earlier successful create."
+        ),
+        "schema": {"enum": ["true"], "type": "string"},
+    }
     assert "content" not in schema["paths"]["/api/v1/schedules/{scheduleId}"]["delete"]["responses"]["204"]
 
     expected_errors = {
@@ -292,3 +366,76 @@ def test_assistant_openapi_success_statuses(client: TestClient) -> None:
             if status.startswith(("2", "3"))
         }
         assert actual_statuses == expected_statuses
+
+
+def test_schedule_openapi_patterns_match_http_contract(client: TestClient) -> None:
+    schema = client.get("/openapi.json").json()
+    components = schema["components"]["schemas"]
+    create_operation = schema["paths"]["/api/v1/schedules"]["post"]
+
+    datetime_schema = components["ScheduleCreate"]["properties"]["scheduledAt"]
+    datetime_cases = (
+        ("2026-09-13T04:45:00Z", True),
+        ("2026-09-13T13:45:00+09:00", True),
+        ("2026-09-13T04:45:00.123456Z", True),
+        ("2026-09-13T04:45:00.1234567Z", False),
+        ("2026-09-13t04:45:00z", False),
+        ("2026-09-13T04:45:00", False),
+    )
+    for index, (value, expected) in enumerate(datetime_cases):
+        assert (re.fullmatch(datetime_schema["pattern"], value) is not None) is expected
+        response = client.post(
+            "/api/v1/schedules",
+            json={"title": "datetime contract", "scheduledAt": value, "category": "OTHER"},
+            headers={"Idempotency-Key": f"datetime-contract-{index}"},
+        )
+        assert (response.status_code == 201) is expected
+
+    title_schema = components["ScheduleCreate"]["properties"]["title"]
+    title_cases = (
+        ("재고 확인", True),
+        ("😀" * 100, True),
+        ("😀" * 101, False),
+        ("제\n목", False),
+    )
+    for index, (value, expected) in enumerate(title_cases):
+        schema_accepts = (
+            title_schema["minLength"] <= len(value) <= title_schema["maxLength"]
+            and re.fullmatch(title_schema["pattern"], value) is not None
+        )
+        assert schema_accepts is expected
+        response = client.post(
+            "/api/v1/schedules",
+            json={
+                "title": value,
+                "scheduledAt": "2026-09-13T04:50:00Z",
+                "category": "OTHER",
+            },
+            headers={"Idempotency-Key": f"title-contract-{index}"},
+        )
+        assert (response.status_code == 201) is expected
+
+    key_schema = create_operation["parameters"][0]["schema"]
+    key_cases = (
+        ("contract-key", True),
+        ("", False),
+        ("a" * 256, False),
+        ("한글", False),
+    )
+    for index, (value, expected) in enumerate(key_cases):
+        schema_accepts = (
+            key_schema["minLength"] <= len(value) <= key_schema["maxLength"]
+            and re.fullmatch(key_schema["pattern"], value) is not None
+        )
+        assert schema_accepts is expected
+        header_value: str | bytes = value.encode() if value == "한글" else value
+        response = client.post(
+            "/api/v1/schedules",
+            json={
+                "title": f"key contract {index}",
+                "scheduledAt": "2026-09-13T04:55:00Z",
+                "category": "OTHER",
+            },
+            headers={"Idempotency-Key": header_value},
+        )
+        assert (response.status_code == 201) is expected

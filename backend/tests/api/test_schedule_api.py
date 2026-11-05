@@ -306,6 +306,86 @@ def test_body_content_and_validation_contract(client: TestClient) -> None:
     assert removed_reminder.json()["errors"][0]["code"] == "UNKNOWN_FIELD"
 
 
+def test_validation_error_order_is_stable(client: TestClient) -> None:
+    invalid_body = create_payload(title="", scheduledAt="bad")
+
+    missing_key = client.post("/api/v1/schedules", json=invalid_body)
+    assert missing_key.status_code == 422
+    assert missing_key.json()["errors"] == [
+        {
+            "location": "header",
+            "code": "REQUIRED",
+            "detail": "This value is required.",
+            "parameter": "Idempotency-Key",
+        },
+        {
+            "location": "body",
+            "code": "TOO_SHORT",
+            "detail": "This value is too short.",
+            "pointer": "/title",
+        },
+        {
+            "location": "body",
+            "code": "INVALID_FORMAT",
+            "detail": "The value has an invalid format.",
+            "pointer": "/scheduledAt",
+        },
+    ]
+
+    long_key = client.post(
+        "/api/v1/schedules",
+        json=invalid_body,
+        headers={"Idempotency-Key": "a" * 256},
+    )
+    assert long_key.status_code == 422
+    assert long_key.json()["errors"] == [
+        {
+            "location": "header",
+            "parameter": "Idempotency-Key",
+            "code": "TOO_LONG",
+            "detail": "The header cannot exceed 255 characters.",
+        }
+    ]
+
+    invalid_completed = client.get(
+        "/api/v1/schedules",
+        params={
+            "from": "bad",
+            "to": "2026-09-14T00:00:00Z",
+            "completed": "yes",
+        },
+    )
+    assert invalid_completed.status_code == 422
+    assert invalid_completed.json()["errors"] == [
+        {
+            "location": "query",
+            "parameter": "completed",
+            "code": "INVALID_FORMAT",
+            "detail": "Only lowercase true or false is allowed.",
+        }
+    ]
+
+    invalid_range = client.get(
+        "/api/v1/schedules",
+        params={"from": "bad", "to": "also-bad"},
+    )
+    assert invalid_range.status_code == 422
+    assert invalid_range.json()["errors"] == [
+        {
+            "location": "query",
+            "code": "INVALID_FORMAT",
+            "detail": "The value has an invalid format.",
+            "parameter": "from",
+        },
+        {
+            "location": "query",
+            "code": "INVALID_FORMAT",
+            "detail": "The value has an invalid format.",
+            "parameter": "to",
+        },
+    ]
+
+
 @pytest.mark.parametrize(
     ("field", "value"),
     [

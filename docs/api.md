@@ -297,6 +297,7 @@ GET /api/v1/schedules?from=2026-09-01T00:00:00%2B09:00&to=2026-10-01T00:00:00%2B
 - 삭제되지 않았고 `scheduledAt`이 `[from, to)`에 속하는 일정을 반환한다.
 - `to <= from`이면 `422 INVALID_DATE_RANGE`다.
 - `to - from`이 92일을 초과하면 `422 DATE_RANGE_TOO_LARGE`다.
+- `completed`는 소문자 `true` 또는 `false`로만 전송한다.
 - 정렬은 `scheduledAt ASC`, `createdAt ASC`, `id ASC`다.
 - MVP에는 정렬 parameter와 pagination이 없다.
 - 결과가 없으면 `items`는 빈 배열이다.
