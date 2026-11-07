@@ -93,6 +93,7 @@ def _signature(target: dict, conversation: dict, turn_number: int) -> str:
         request_id=UUID("aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"),
         conversation_id=UUID("bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"),
         input={"type": "text", "text": turns[-1]["text"]},
+        request_accepted_at=datetime.fromisoformat(context["referenceTime"]),
         task_reference_accepted_at=datetime.fromisoformat(context["referenceTime"]),
         server_time_trusted=context["serverTimeTrusted"],
         is_question_follow_up=bool(previous),

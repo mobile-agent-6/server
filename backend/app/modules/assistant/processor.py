@@ -138,6 +138,7 @@ class _StoredInput:
     request_id: UUID
     conversation_id: UUID
     input: dict[str, object]
+    request_accepted_at: datetime
     task_reference_accepted_at: datetime
     control_state_version: int | None
     control_state: object | None
@@ -165,6 +166,7 @@ class _FinalizePlan:
     control_state_version: int | None = None
     control_state: object | None = None
     clear_control_state: bool = False
+    reset_task_reference: bool = False
 
 
 @dataclass(frozen=True)
@@ -177,6 +179,7 @@ class _PreparedPlan:
     control_state_version: int | None
     control_state: object | None
     clear_control_state: bool
+    reset_task_reference: bool
 
 
 def _aware_utc(value: datetime) -> datetime:
@@ -264,6 +267,7 @@ def _load_stored_input(
             request_id=request.id,
             conversation_id=request.conversation_id,
             input=dict(normalized["input"]),
+            request_accepted_at=request.accepted_at,
             task_reference_accepted_at=request.task_reference_accepted_at,
             control_state_version=conversation.control_state_version,
             control_state=conversation.control_state_json,
@@ -285,6 +289,7 @@ def _decision_context(
         request_id=stored.request_id,
         conversation_id=stored.conversation_id,
         input=stored.input,
+        request_accepted_at=stored.request_accepted_at,
         task_reference_accepted_at=stored.task_reference_accepted_at,
         timezone="Asia/Seoul",
         server_time_trusted=server_time_trusted,
@@ -608,7 +613,7 @@ def _from_saved_confirmation(
     )
 
 
-def _provider_decision_plan(
+def _provider_decision_plan_body(
     envelope: DecisionEnvelope,
     *,
     schedule_reader: ScheduleReadPort,
@@ -883,6 +888,24 @@ def _provider_decision_plan(
     raise _InvalidDecision("unknown Decision variant")
 
 
+def _provider_decision_plan(
+    envelope: DecisionEnvelope,
+    *,
+    schedule_reader: ScheduleReadPort,
+    issue_time_factory: Callable[[], datetime],
+    uuid_factory: Callable[[], UUID],
+    server_time_trusted: bool,
+) -> _FinalizePlan:
+    plan = _provider_decision_plan_body(
+        envelope,
+        schedule_reader=schedule_reader,
+        issue_time_factory=issue_time_factory,
+        uuid_factory=uuid_factory,
+        server_time_trusted=server_time_trusted,
+    )
+    return replace(plan, reset_task_reference=envelope.starts_new_task)
+
+
 def _prepare(plan: _FinalizePlan) -> _PreparedPlan:
     if plan.clear_control_state and plan.control_state is not None:
         raise RuntimeError("cannot set and clear control state together")
@@ -925,6 +948,7 @@ def _prepare(plan: _FinalizePlan) -> _PreparedPlan:
         control_state_version=plan.control_state_version,
         control_state=plan.control_state,
         clear_control_state=plan.clear_control_state,
+        reset_task_reference=plan.reset_task_reference,
     )
 
 
@@ -961,6 +985,9 @@ def _finalize(
                     return ProcessOneResult.LOST_FINALIZE
                 if runtime_guard.stop_requested():
                     return ProcessOneResult.LOST_FINALIZE
+
+                if plan.reset_task_reference:
+                    request.task_reference_accepted_at = request.accepted_at
 
                 if plan.question is not None:
                     question = plan.question

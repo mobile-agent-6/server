@@ -172,10 +172,17 @@ def schedule(
     )
 
 
-def envelope(decision: dict[str, object], *, state: object | None = None):
+def envelope(
+    decision: dict[str, object],
+    *,
+    state: object | None = None,
+    starts_new_task: bool = False,
+):
     payload: dict[str, object] = {"decision": decision}
     if state is not None:
         payload.update({"controlStateVersion": 1, "controlState": state})
+    if starts_new_task:
+        payload["startsNewTask"] = True
     return DecisionEnvelope.model_validate(payload)
 
 
@@ -438,6 +445,33 @@ def test_ask_claims_and_atomically_persists_question_and_control_state(
     assert provider.contexts[0].server_time_trusted is True
     assert provider.contexts[0].timezone == "Asia/Seoul"
     assert provider.contexts[0].task_reference_accepted_at == NOW
+
+
+def test_new_task_resets_persisted_reference_to_request_accepted_at(
+    processor_store,
+) -> None:
+    previous_reference = NOW - timedelta(days=1)
+    admit(processor_store, request_data())
+    with processor_store.begin() as session:
+        request = session.get(AssistantRequest, REQUEST_ID)
+        assert request is not None
+        request.task_reference_accepted_at = previous_reference
+    provider = ScriptedDecisionProvider(
+        [
+            envelope(
+                {"kind": "ask", "text": "몇 시인가요?"},
+                state={"step": 1},
+                starts_new_task=True,
+            )
+        ]
+    )
+
+    result = run(processor_store, provider, MemoryScheduleReader())
+
+    assert result is ProcessOneResult.COMPLETED
+    assert provider.contexts[0].request_accepted_at == NOW
+    assert provider.contexts[0].task_reference_accepted_at == previous_reference
+    assert stored_request(processor_store).task_reference_accepted_at == NOW
 
 
 @pytest.mark.parametrize(
