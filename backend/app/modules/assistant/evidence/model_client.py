@@ -20,7 +20,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from app.modules.assistant.decisions import DecisionProviderTimeout
+from app.modules.assistant.decisions import (
+    DecisionProviderInvalidOutput,
+    DecisionProviderTimeout,
+)
 from app.modules.assistant.evidence.normalize import SEOUL
 
 PROMPT_PATH = Path(__file__).with_name("prompt.txt")
@@ -122,7 +125,9 @@ class ChatCompletionsModel:
         except urllib.error.HTTPError as exc:
             if exc.code in {400, 413}:
                 # The server rejected this input; asking again would not help.
-                raise ValueError(f"model server rejected the request: HTTP {exc.code}") from exc
+                raise DecisionProviderInvalidOutput(
+                    f"model server rejected the request: HTTP {exc.code}"
+                ) from exc
             raise ModelServerUnavailable(f"model server error: HTTP {exc.code}") from exc
         except (TimeoutError, socket.timeout) as exc:
             raise DecisionProviderTimeout("model server timed out") from exc
@@ -133,11 +138,13 @@ class ChatCompletionsModel:
         except OSError as exc:
             raise ModelServerUnavailable("model server connection failed") from exc
         if len(raw) > MAX_RESPONSE_BYTES:
-            raise ValueError("model server response is too large")
+            raise DecisionProviderInvalidOutput("model server response is too large")
         try:
             content = json.loads(raw)["choices"][0]["message"]["content"]
         except (ValueError, KeyError, IndexError, TypeError) as exc:
-            raise ValueError("model server response has no message content") from exc
+            raise DecisionProviderInvalidOutput(
+                "model server response has no message content"
+            ) from exc
         if not isinstance(content, str):
-            raise ValueError("model message content is not text")
+            raise DecisionProviderInvalidOutput("model message content is not text")
         return content.strip()

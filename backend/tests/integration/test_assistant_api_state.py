@@ -628,12 +628,12 @@ def test_cancelled_request_is_visible_through_original_get(
 
     assert response.status_code == 200
     assert response.json()["targetState"] == "cancelled"
-    assert response.json()["text"]
+    assert response.json()["text"] == "대상을 취소했습니다."
     assert status.status_code == 200
     assert status.json()["status"] == "completed"
     assert status.json()["result"] == {
         "kind": "outcome",
-        "text": "The Assistant request was cancelled.",
+        "text": "요청을 취소했습니다.",
         "outcome": "cancelled",
         "schedulesChanged": False,
     }

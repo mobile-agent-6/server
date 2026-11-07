@@ -277,7 +277,8 @@ def test_request_cancel_completes_once_without_extending_conversation(
 
     assert first.target_state is AssistantCancelTargetState.CANCELLED
     assert second.target_state is AssistantCancelTargetState.ALREADY_COMPLETED
-    assert first.text
+    assert first.text == "대상을 취소했습니다."
+    assert second.text == "요청이 이미 완료되었습니다."
     with factory() as session:
         stored = session.get(AssistantRequest, request_id)
         conversation = session.get(AssistantConversation, conversation_id)
@@ -287,7 +288,7 @@ def test_request_cancel_completes_once_without_extending_conversation(
             "kind": "outcome",
             "outcome": "cancelled",
             "schedulesChanged": False,
-            "text": "The Assistant request was cancelled.",
+            "text": "요청을 취소했습니다.",
         }
         assert stored.completed_at == stored.cancelled_at == stored.retention_started_at == NOW
         assert conversation.last_valid_input_at == last_valid_input
@@ -448,6 +449,9 @@ def test_write_marker_and_uncertain_results_are_not_overwritten(state_store) -> 
         now=NOW,
     )
     assert marked_response.target_state is AssistantCancelTargetState.NOT_GUARANTEED
+    assert marked_response.text == (
+        "취소 여부를 보장할 수 없습니다. 원래 요청을 확인해 주세요."
+    )
 
     uncertain_response = cancel_assistant_target(
         factory,
@@ -456,6 +460,7 @@ def test_write_marker_and_uncertain_results_are_not_overwritten(state_store) -> 
         now=NOW + timedelta(seconds=1),
     )
     assert uncertain_response.target_state is AssistantCancelTargetState.UNCERTAIN
+    assert uncertain_response.text == "요청 결과가 아직 불확실합니다."
     with factory() as session:
         marked = session.get(AssistantRequest, uncertain_id)
         assert marked is not None
@@ -506,6 +511,7 @@ def test_question_cancel_and_expiry_do_not_change_source_result(state_store) -> 
         now=NOW,
     )
     assert cancelled.target_state is AssistantCancelTargetState.CANCELLED
+    assert cancelled.text == "대상을 취소했습니다."
 
     with factory.begin() as session:
         session.add(
@@ -532,6 +538,7 @@ def test_question_cancel_and_expiry_do_not_change_source_result(state_store) -> 
         now=NOW,
     )
     assert expired.target_state is AssistantCancelTargetState.NOT_ACTIVE
+    assert expired.text == "질문이 더 이상 활성 상태가 아닙니다."
     with factory() as session:
         active = session.get(AssistantQuestion, active_id)
         old = session.get(AssistantQuestion, expired_id)
