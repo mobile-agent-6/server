@@ -289,3 +289,9 @@ def test_plain_request_has_no_findings() -> None:
     analysis = analyze_text("내일 오후 3시 회의 잡아 줘")
     assert analysis.findings == ()
     assert analysis.supported_operation is True
+
+
+def test_create_request_with_connective_is_supported() -> None:
+    analysis = analyze_text("내일 오후 3시에 출고 검수 일정을 잡되 알림도 켜 줘")
+    assert analysis.has_unsupported_request is True
+    assert analysis.supported_operation is True

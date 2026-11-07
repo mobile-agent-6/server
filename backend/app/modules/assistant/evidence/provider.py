@@ -533,7 +533,7 @@ _CREATE_PASSIVE_OR_OBLIGATION_STATUS = re.compile(
 )
 _COMPLETION_REQUEST = re.compile(r"완료(?:로|\s*(?:처리|표시))")
 _CLEAR_SUPPORTED_ACTION = re.compile(
-    r"등록|넣어|잡아|추가해|만들어|옮겨|바꿔|변경|수정|지워|삭제|"
+    r"등록|넣어|잡아|잡되|추가해|만들어|옮겨|바꿔|변경|수정|지워|삭제|"
     r"완료로|완료\s*처리|조회"
 )
 _SCHEDULE_LIST_REQUEST = re.compile(
