@@ -469,9 +469,12 @@ def test_colloquial_create_with_unsupported_feature_asks_consent(
     [
         "잡되게 굴지 말고 알림 켜 줘",
         "잡되지 않게 알림 켜 줘",
+        "일정 변경되면 알림 보내 줘",
+        "수정된 일정 있으면 문자 보내 줘",
+        "잡자재 입고 알림 켜 줘",
     ],
 )
-def test_japdoeda_adjective_with_unsupported_feature_keeps_guidance(
+def test_non_operation_phrase_with_unsupported_feature_keeps_guidance(
     user_text: str,
 ) -> None:
     model = ScriptedModel()
@@ -532,6 +535,8 @@ def test_japdoe_request_missing_from_model_output_is_rejected() -> None:
         "내일 오후 3시에 회의 잡을래",
         "내일 오후 3시에 회의 넣자",
         "내일 오후 3시에 회의 잡고 장소는 2층으로",
+        "내일 오후 3시 회의를 변경해 줘",
+        "내일 오후 3시 회의를 수정해 줘",
     ],
 )
 def test_shared_supported_action_missing_from_model_output_is_rejected(

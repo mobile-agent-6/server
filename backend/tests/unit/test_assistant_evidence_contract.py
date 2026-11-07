@@ -313,11 +313,27 @@ def test_colloquial_create_requests_are_supported(text: str) -> None:
 @pytest.mark.parametrize(
     "text",
     [
-        "잡되게 굴지 말고 알림 켜 줘",
-        "잡되지 않게 알림 켜 줘",
+        "회의 일정 변경해 줘",
+        "회의 일정 수정해 줘",
     ],
 )
-def test_japdoeda_adjective_is_not_a_schedule_operation(text: str) -> None:
+def test_change_requests_are_supported(text: str) -> None:
+    analysis = analyze_text(text)
+    assert analysis.has_unsupported_request is False
+    assert analysis.supported_operation is True
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "잡되게 굴지 말고 알림 켜 줘",
+        "잡되지 않게 알림 켜 줘",
+        "일정 변경되면 알림 보내 줘",
+        "수정된 일정 있으면 문자 보내 줘",
+        "잡자재 입고 알림 켜 줘",
+    ],
+)
+def test_non_operation_phrases_are_not_schedule_operations(text: str) -> None:
     analysis = analyze_text(text)
     assert analysis.has_unsupported_request is True
     assert analysis.supported_operation is False
