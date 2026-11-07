@@ -437,6 +437,16 @@ def test_unsupported_request_asks_consent_then_creates() -> None:
     assert model.seen == [["내일 오후 4시에 회의 등록하고 알림도 켜 줘"]]
 
 
+def test_supported_create_with_connective_asks_consent() -> None:
+    model = ScriptedModel()
+    provider = EvidenceDecisionProvider(model, FakeReader())
+    _, decision = decide(
+        provider, "내일 오후 3시에 출고 검수 일정을 잡되 알림도 켜 줘"
+    )
+    assert decision == {"kind": "ask", "text": texts.CONSENT_QUESTION}
+    assert model.seen == []
+
+
 def test_declined_consent_cancels() -> None:
     provider = EvidenceDecisionProvider(ScriptedModel(), FakeReader())
     first, _ = decide(provider, "내일 오후 4시에 회의 등록하고 알림도 켜 줘")
