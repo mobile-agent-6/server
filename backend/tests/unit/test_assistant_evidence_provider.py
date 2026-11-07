@@ -447,6 +447,43 @@ def test_supported_create_with_connective_asks_consent() -> None:
     assert model.seen == []
 
 
+@pytest.mark.parametrize(
+    "user_text",
+    [
+        "내일 오후 3시에 출고 검수 일정 잡자 알림도 켜 줘",
+        "내일 오후 3시에 출고 검수 일정 잡을래 알림도 켜 줘",
+    ],
+)
+def test_colloquial_create_with_unsupported_feature_asks_consent(
+    user_text: str,
+) -> None:
+    model = ScriptedModel()
+    provider = EvidenceDecisionProvider(model, FakeReader())
+    _, decision = decide(provider, user_text)
+    assert decision == {"kind": "ask", "text": texts.CONSENT_QUESTION}
+    assert model.seen == []
+
+
+@pytest.mark.parametrize(
+    "user_text",
+    [
+        "잡되게 굴지 말고 알림 켜 줘",
+        "잡되지 않게 알림 켜 줘",
+        "일정 변경되면 알림 보내 줘",
+        "수정된 일정 있으면 문자 보내 줘",
+        "잡자재 입고 알림 켜 줘",
+    ],
+)
+def test_non_operation_phrase_with_unsupported_feature_keeps_guidance(
+    user_text: str,
+) -> None:
+    model = ScriptedModel()
+    provider = EvidenceDecisionProvider(model, FakeReader())
+    _, decision = decide(provider, user_text)
+    assert decision == {"kind": "ask", "text": texts.GUIDANCE}
+    assert model.seen == []
+
+
 def test_declined_consent_cancels() -> None:
     provider = EvidenceDecisionProvider(ScriptedModel(), FakeReader())
     first, _ = decide(provider, "내일 오후 4시에 회의 등록하고 알림도 켜 줘")
@@ -489,6 +526,25 @@ def test_japdoe_request_missing_from_model_output_is_rejected() -> None:
     provider = EvidenceDecisionProvider(ScriptedModel(output()), FakeReader())
     with pytest.raises(DecisionProviderInvalidOutput, match="SUPPORTED_OPERATION_MISSING"):
         decide(provider, "내일 오후 3시에 회의 잡되 장소는 2층으로")
+
+
+@pytest.mark.parametrize(
+    "user_text",
+    [
+        "내일 오후 3시에 회의 잡자",
+        "내일 오후 3시에 회의 잡을래",
+        "내일 오후 3시에 회의 넣자",
+        "내일 오후 3시에 회의 잡고 장소는 2층으로",
+        "내일 오후 3시 회의를 변경해 줘",
+        "내일 오후 3시 회의를 수정해 줘",
+    ],
+)
+def test_shared_supported_action_missing_from_model_output_is_rejected(
+    user_text: str,
+) -> None:
+    provider = EvidenceDecisionProvider(ScriptedModel(output()), FakeReader())
+    with pytest.raises(DecisionProviderInvalidOutput, match="SUPPORTED_OPERATION_MISSING"):
+        decide(provider, user_text)
 
 
 def test_consented_supported_request_missing_from_unsupported_output_is_rejected() -> None:
