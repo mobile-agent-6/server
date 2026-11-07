@@ -295,3 +295,29 @@ def test_create_request_with_connective_is_supported() -> None:
     analysis = analyze_text("내일 오후 3시에 출고 검수 일정을 잡되 알림도 켜 줘")
     assert analysis.has_unsupported_request is True
     assert analysis.supported_operation is True
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "내일 오후 3시에 출고 검수 일정 잡자 알림도 켜 줘",
+        "내일 오후 3시에 출고 검수 일정 잡을래 알림도 켜 줘",
+    ],
+)
+def test_colloquial_create_requests_are_supported(text: str) -> None:
+    analysis = analyze_text(text)
+    assert analysis.has_unsupported_request is True
+    assert analysis.supported_operation is True
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "잡되게 굴지 말고 알림 켜 줘",
+        "잡되지 않게 알림 켜 줘",
+    ],
+)
+def test_japdoeda_adjective_is_not_a_schedule_operation(text: str) -> None:
+    analysis = analyze_text(text)
+    assert analysis.has_unsupported_request is True
+    assert analysis.supported_operation is False

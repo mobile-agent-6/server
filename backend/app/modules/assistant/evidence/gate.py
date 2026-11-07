@@ -38,6 +38,7 @@ from app.modules.assistant.evidence.normalize import (
     resolve_month_range,
     resolve_time,
 )
+from app.modules.assistant.evidence.operation_cues import find_supported_operation
 from app.modules.assistant.evidence.role_contract import ROLE_SLOTS
 
 # Words that only name the request, never the schedule itself.
@@ -165,10 +166,6 @@ _EXCLUSION = re.compile(
     r"(?:보내|켜|설정하|달|추가하|하)지\s*(?:말|마)|안\s*(?:보내|켜|해도|해|달아))"
 )
 _CUE_WORD = re.compile(_CUE)
-_SUPPORTED_OP = re.compile(
-    r"(?:등록|넣어|넣고|넣자|잡아|잡고|잡되|추가해|만들어|옮겨|바꿔|변경해|수정해|지워|지우고|삭제|"
-    r"보여\s*줘|보여줘|알려\s*줘|알려줘|조회|완료로|완료\s*처리|일정\s*있어|뭐\s*있어)"
-)
 _REQUEST_STEM = re.compile(r"(?:보내|발송\s*해|전송\s*해|켜\s*줘|켜$|맞춰|설정\s*해|설정해|달아|울려|띄워|날려)")
 _TITLE_FOLLOWER = re.compile(r"^[가-힣A-Za-z0-9]")
 _PARTICLE_ONLY = re.compile(r"^(?:은|는|이|가|을|를|도|만|로|으로)(?![가-힣])")
@@ -242,7 +239,7 @@ def analyze_text(text: str) -> TextAnalysis:
         if is_covered(match.start()):
             continue
         rest = value[match.end():]
-        verb = _SUPPORTED_OP.search(rest)
+        verb = find_supported_operation(rest, include_contextless_query=True)
         between = rest[: verb.start()] if verb else rest
         compound = bool(_TITLE_FOLLOWER.match(rest)) and not _PARTICLE_ONLY.match(rest)
         noun_phrase = (
@@ -269,7 +266,12 @@ def analyze_text(text: str) -> TextAnalysis:
     residual = value
     for start, end in sorted(covered, reverse=True):
         residual = residual[:start] + " " * (end - start) + residual[end:]
-    return TextAnalysis(findings=tuple(findings), supported_operation=bool(_SUPPORTED_OP.search(residual)))
+    return TextAnalysis(
+        findings=tuple(findings),
+        supported_operation=bool(
+            find_supported_operation(residual, include_contextless_query=True)
+        ),
+    )
 
 
 # ------------------------------------------------------ yes or no answers

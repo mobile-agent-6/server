@@ -39,6 +39,7 @@ from app.modules.assistant.evidence.gate import (
     classify_answer,
 )
 from app.modules.assistant.evidence.normalize import mentions_date_or_time, normalize_text
+from app.modules.assistant.evidence.operation_cues import find_supported_operation
 from app.modules.assistant.evidence.planner import Ask, Overrides, plan_operation
 from app.modules.assistant.evidence.safety import (
     EvidenceQuestion,
@@ -532,10 +533,6 @@ _CREATE_PASSIVE_OR_OBLIGATION_STATUS = re.compile(
     r"^(?:(?:돼|되어|되었|되는|된|됐|됨)|해야\s*(?:하|돼|되|$))"
 )
 _COMPLETION_REQUEST = re.compile(r"완료(?:로|\s*(?:처리|표시))")
-_CLEAR_SUPPORTED_ACTION = re.compile(
-    r"등록|넣어|잡아|잡되|추가해|만들어|옮겨|바꿔|변경|수정|지워|삭제|"
-    r"완료로|완료\s*처리|조회"
-)
 _SCHEDULE_LIST_REQUEST = re.compile(
     r"(?:(?:일정|스케줄|할\s*일|회의|점검|검수|업무|작업).*"
     r"(?:보여|알려|있(?:어|나요|습니까))|뭐\s*있(?:어|나요|습니까))"
@@ -566,7 +563,7 @@ def _is_change_request(turn: str, *, first: bool) -> bool:
 def _has_clear_supported_request(turn: str) -> bool:
     value = normalize_text(turn)
     return bool(
-        _CLEAR_SUPPORTED_ACTION.search(value)
+        find_supported_operation(value)
         or _SCHEDULE_LIST_REQUEST.search(value)
     )
 
