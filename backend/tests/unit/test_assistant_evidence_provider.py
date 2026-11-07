@@ -485,6 +485,12 @@ def test_supported_request_missing_from_model_output_is_rejected() -> None:
         decide(provider, "내일 오후 3시에 회의 등록해 줘")
 
 
+def test_japdoe_request_missing_from_model_output_is_rejected() -> None:
+    provider = EvidenceDecisionProvider(ScriptedModel(output()), FakeReader())
+    with pytest.raises(DecisionProviderInvalidOutput, match="SUPPORTED_OPERATION_MISSING"):
+        decide(provider, "내일 오후 3시에 회의 잡되 장소는 2층으로")
+
+
 def test_consented_supported_request_missing_from_unsupported_output_is_rejected() -> None:
     model = ScriptedModel(output(unsupported=[span("알림도 보내 줘")]))
     provider = EvidenceDecisionProvider(model, FakeReader())
