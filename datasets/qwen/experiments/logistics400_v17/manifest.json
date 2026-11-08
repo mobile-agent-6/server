@@ -3,8 +3,8 @@
   "scope": "Git source-only data and postprocessing package; no model weights",
   "files": {
     "README.md": {
-      "bytes": 6819,
-      "sha256": "a6b29acdd1e84a41f8bed7f555105adc69c78e74d5ec2fdacb244e8d2b5ec8f5"
+      "bytes": 7106,
+      "sha256": "dd01a035ea82906ceb81e1a3245b9cea242e0bf4e0df00fced131aef32e45e51"
     },
     "data/stage1-train222.jsonl": {
       "bytes": 1493021,
@@ -269,6 +269,14 @@
     "training/stage2-178/training-complete.json": {
       "bytes": 733,
       "sha256": "ad724d8c50883fd7c1642283aa2e512b25536f4e07e724b802d02b1fb1bc8085"
+    },
+    "INTEGRATION.md": {
+      "bytes": 6682,
+      "sha256": "2c657959efe8771ba571d74f46b38ee55b2966fcdfb7654bbc11f586ab62a90f"
+    },
+    "model-artifacts.json": {
+      "bytes": 933,
+      "sha256": "a1331cf15566a7a245b715eef9213cda65efbe4d8cdd856711e4fdd714bfd112"
     }
   }
 }

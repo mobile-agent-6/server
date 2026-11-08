@@ -1,0 +1,25 @@
+{
+  "purpose": "Backend/model-runtime integration handoff",
+  "publishedToGitHub": false,
+  "weightsCommitted": false,
+  "files": [
+    {
+      "name": "01_review-and-trained-adapter.zip",
+      "bytes": 31565937,
+      "sha256": "9d9f33f43b465bdca38e08b5406958f27141291aa8f8d02c01943cc31b29e945",
+      "role": "Final trained LoRA, exact tokenizer/template, rules and evaluation"
+    },
+    {
+      "name": "02_exact-base-model.zip",
+      "bytes": 2263022843,
+      "sha256": "2d4f326250da79f80ddf4e0ab7b7e2251a6ca5c279ab7dda8457ec363cb2e7cc",
+      "role": "Exact MLX base weights"
+    }
+  ],
+  "requiredTogetherForExactModel": true,
+  "currentFormat": "MLX quantized Qwen3-4B base + MLX LoRA",
+  "orangePiExecutionVerified": false,
+  "conversionPerformed": false,
+  "targetRuntime": null,
+  "note": "Base archive exceeds GitHub single release asset 2 GiB; split/repackage or use an external artifact download when publishing."
+}
