@@ -1,0 +1,15 @@
+{
+  "baseModel": "EXTERNAL_BASE_MODEL_DIRECTORY",
+  "adapter": "EXTERNAL_FINAL_ADAPTER_DIRECTORY",
+  "systemPrompt": "runtime/backend/app/modules/assistant/evidence/prompt.txt",
+  "rules": "runtime/rules",
+  "ruleModule": "evidence_postprocess_v17",
+  "ruleFunction": "apply_rules",
+  "temperature": 0.0,
+  "seed": 29,
+  "maxTokens": 1024,
+  "enableThinking": false,
+  "fullBackendIncluded": false,
+  "orangePiVerified": false,
+  "weightsIncluded": false
+}

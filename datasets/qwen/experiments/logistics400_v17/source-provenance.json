@@ -1,0 +1,271 @@
+{
+  "source": "qwen-logistics400-v17-team-20261108-001 review bundle",
+  "sourceFiles": {
+    "data/stage1-train222.jsonl": {
+      "sourceSha256": "88b583c198c94fb3fbf06c55b6b22f319690a3d6f8eb9bc08a5b5244c82101df",
+      "localPathRedacted": false
+    },
+    "data/stage2-train178.jsonl": {
+      "sourceSha256": "781f8bd1ff9439ac33b2b287067b960f4de815207b2b74c41a279c913ce436d8",
+      "localPathRedacted": false
+    },
+    "data/train400-index.jsonl": {
+      "sourceSha256": "55f87d2913dba282d23f5bba527c6ff39fbc516579b5703265362624335e104c",
+      "localPathRedacted": true
+    },
+    "data/train400.jsonl": {
+      "sourceSha256": "c880e5b3f4c29f63ac7f1b2c570fb208cd881f28347abeeb1c9e79af59323f13",
+      "localPathRedacted": false
+    },
+    "data/valid20-index.jsonl": {
+      "sourceSha256": "856200e2544f61df5f09f61d08c35b2cef96f4db256411ad5e8674f0f2404a7a",
+      "localPathRedacted": false
+    },
+    "data/valid20.jsonl": {
+      "sourceSha256": "33fd9404aa2aabc7fa13db5426c035ef173c8a3f5980a1d2dd084fa98cdb1adf",
+      "localPathRedacted": false
+    },
+    "data/학습400건_눈으로보기.txt": {
+      "sourceSha256": "8fccf02c9581af80dee8cd7e38eb72be76350721bdf1858005089082e0957623",
+      "localPathRedacted": false
+    },
+    "training/observed-environment.json": {
+      "sourceSha256": "a41328c629e84d2009d50cdf30db9f31e5e6036ec274df40ab7e1b04dc8b47ad",
+      "localPathRedacted": false
+    },
+    "training/stage1-222/metrics.jsonl": {
+      "sourceSha256": "6e098033dc420e36fbecaec13d4646e57fae4672ddd8322854ab3b8f576c0a23",
+      "localPathRedacted": false
+    },
+    "training/stage1-222/train.yaml": {
+      "sourceSha256": "ca304724b678bd50e47dd8b518d99556793fdbc3eafd7130f0819fe597171d95",
+      "localPathRedacted": true
+    },
+    "training/stage1-222/training-complete.json": {
+      "sourceSha256": "d218b3a2aad87f648c6a8713659d05d2958b957708cd95ea00d5cad3b42cde01",
+      "localPathRedacted": false
+    },
+    "training/stage2-178/metrics.jsonl": {
+      "sourceSha256": "e03cad10449b56fde497c148fc19edd0e677fa6cd174d2e46bf9ac859a0216f4",
+      "localPathRedacted": false
+    },
+    "training/stage2-178/train.yaml": {
+      "sourceSha256": "be1215c08e1f4c0aef2c530f997c4f09cf56c4f8876c57ff65122b0aec38aee1",
+      "localPathRedacted": true
+    },
+    "training/stage2-178/training-complete.json": {
+      "sourceSha256": "fb9689c809de28727a187dc86c2eb0355c37b317860f2e15b72bbe46c980f4ae",
+      "localPathRedacted": true
+    },
+    "evaluation/regression-inputs150.jsonl": {
+      "sourceSha256": "623a869d211c2b5e36012d2af85a188209934614733b724dd6a3fbcee8f430b4",
+      "localPathRedacted": false
+    },
+    "evaluation/regression-results150.jsonl": {
+      "sourceSha256": "f7c5d802e327e88627c4a1a3bcf5a32c73f96d3d23ce74e25885c5f29a62ec3f",
+      "localPathRedacted": false
+    },
+    "evaluation/regression-targets150.jsonl": {
+      "sourceSha256": "7008fda30b74ce241ebbb5a02f5bc9bfa21b07c451b1cd72ae7f23e7b006765b",
+      "localPathRedacted": false
+    },
+    "evaluation/summary.json": {
+      "sourceSha256": "0dc1dfc55199207f79b00c81e995de27a29095659393dcff02fc98064d26ad7f",
+      "localPathRedacted": false
+    },
+    "runtime/backend/app/modules/assistant/evidence/__init__.py": {
+      "sourceSha256": "c7add66d2a4a4fdd42ab548e69db2cfd8d92b06fb61b7eb8d470a376fd82e3d2",
+      "localPathRedacted": false
+    },
+    "runtime/backend/app/modules/assistant/evidence/contract.py": {
+      "sourceSha256": "3809f25eda6efb1fa938634700cf49a3ed487b72d9076f33411fd27efb14a19d",
+      "localPathRedacted": false
+    },
+    "runtime/backend/app/modules/assistant/evidence/gate.py": {
+      "sourceSha256": "fdc640f96bf200e62884b494371508e26d485328f6f97255d9c219f9f0c83b09",
+      "localPathRedacted": false
+    },
+    "runtime/backend/app/modules/assistant/evidence/model_client.py": {
+      "sourceSha256": "aa29795c6b536aa66573ce630c6841d8e7b6efda17bd5e3a9f02cbda69190cbb",
+      "localPathRedacted": false
+    },
+    "runtime/backend/app/modules/assistant/evidence/normalize.py": {
+      "sourceSha256": "5c479b53eacf88e711330e9023ed6a9daecd727c1d64f072c9a2af5ed411e5f8",
+      "localPathRedacted": false
+    },
+    "runtime/backend/app/modules/assistant/evidence/planner.py": {
+      "sourceSha256": "176b5f17fcd289bb6f727978c706e7d0da9538c6ff0e37d5b29c448906896094",
+      "localPathRedacted": false
+    },
+    "runtime/backend/app/modules/assistant/evidence/prompt.txt": {
+      "sourceSha256": "afc3dab1355cc9d75fe2e73d0bc9957b72da90d6fcfc4783718a00895949a262",
+      "localPathRedacted": false
+    },
+    "runtime/backend/app/modules/assistant/evidence/provider.py": {
+      "sourceSha256": "2f8ff33629f968e5d9acbb203de21eea1949087488198043c932598715ea40e6",
+      "localPathRedacted": false
+    },
+    "runtime/backend/app/modules/assistant/evidence/role_contract.py": {
+      "sourceSha256": "b6357759c125115b14b44e3562d427364515e60ad5a8c56963c4ec12bc56048b",
+      "localPathRedacted": false
+    },
+    "runtime/backend/app/modules/assistant/evidence/safety.py": {
+      "sourceSha256": "40935e67fc1eacaf20cfe48d1f73621bed3890b921cb784af6b78f2a36d14ffc",
+      "localPathRedacted": false
+    },
+    "runtime/backend/app/modules/assistant/evidence/texts.py": {
+      "sourceSha256": "1a708f98af99d849af01e07255eed5598bff0615a5f6919a6ae10b1bfcbaa05f",
+      "localPathRedacted": false
+    },
+    "runtime/inference-settings.json": {
+      "sourceSha256": "3fa3ab0e62bca4fdefc4802f8ccb8fb77fdf225133051bb4fb19b9400e9a867f",
+      "localPathRedacted": false
+    },
+    "runtime/rules/category_postprocess.py": {
+      "sourceSha256": "2e4bb67fb8bad89da5cdf8e54b43d5354da66cd83067357980c931ae8858927f",
+      "localPathRedacted": false
+    },
+    "runtime/rules/correction_bridge.py": {
+      "sourceSha256": "77ae0264bc22ebddd3ffa201c3dc70162890d33a4a9384211963c05514169018",
+      "localPathRedacted": false
+    },
+    "runtime/rules/correction_bridge_v11.py": {
+      "sourceSha256": "ef29fb20ad87d07d29e54ac28fccfc307492c082c1fb9561ef89e321f77c17d9",
+      "localPathRedacted": false
+    },
+    "runtime/rules/correction_bridge_v12.py": {
+      "sourceSha256": "5571459452aaf7acd897e4c6a79997b5dfd69b5d51f6283535cfe40fff9054d5",
+      "localPathRedacted": false
+    },
+    "runtime/rules/correction_bridge_v13.py": {
+      "sourceSha256": "6349fadd7b89f1a77487e4979fe1599c53fb17861d4a570c14a4deccf626b455",
+      "localPathRedacted": false
+    },
+    "runtime/rules/correction_bridge_v14.py": {
+      "sourceSha256": "650af363cf4f0f1b0d2adbfdaa284dd2c5d615aaf4acd8816070e71e75768437",
+      "localPathRedacted": false
+    },
+    "runtime/rules/correction_bridge_v15.py": {
+      "sourceSha256": "933c247eeef2a37238151b99bd9bd5cf8e6532d7e785bf66e44919f57759989e",
+      "localPathRedacted": false
+    },
+    "runtime/rules/correction_bridge_v16.py": {
+      "sourceSha256": "d78d66269f2960bdb64ff862a508d59fe73a9f4bc0ae9c2d4c48a50701061396",
+      "localPathRedacted": false
+    },
+    "runtime/rules/correction_bridge_v17.py": {
+      "sourceSha256": "f8017c5cf5f0e0a9a694ed2183d339486aeae40d359400ea6b738fdd3c6643fe",
+      "localPathRedacted": false
+    },
+    "runtime/rules/evidence_postprocess.py": {
+      "sourceSha256": "ed9cd32ea659b63cf9328cd7329be7b52bdaf4f8e9e1caed818179d90969af8e",
+      "localPathRedacted": false
+    },
+    "runtime/rules/evidence_postprocess_v10.py": {
+      "sourceSha256": "7b881875ade4b43609c72014dece2c124be1d3c89c10bd137478e762ac83279d",
+      "localPathRedacted": false
+    },
+    "runtime/rules/evidence_postprocess_v11.py": {
+      "sourceSha256": "b717edda3876a1b99d77fd9fff17db31f558fd74d24d1df8eaf611459e8f0093",
+      "localPathRedacted": false
+    },
+    "runtime/rules/evidence_postprocess_v12.py": {
+      "sourceSha256": "ae41d5b9e45e2cb71442d29dbfbb8f5a3c360f62c5b82acafe3442630a690458",
+      "localPathRedacted": false
+    },
+    "runtime/rules/evidence_postprocess_v13.py": {
+      "sourceSha256": "f6bc2544caf2e4e5c1783a65fa043bddd4b150290d09016e9b3cb2f222c9b0db",
+      "localPathRedacted": false
+    },
+    "runtime/rules/evidence_postprocess_v14.py": {
+      "sourceSha256": "3058520d689dac7abb308695ff96c23c4956a075cdc19ce6dc5429726715d678",
+      "localPathRedacted": false
+    },
+    "runtime/rules/evidence_postprocess_v15.py": {
+      "sourceSha256": "141748d554a4f756596cfc3ddfd49c245102dc3ad3bf542d74d34d18fe90ae0d",
+      "localPathRedacted": false
+    },
+    "runtime/rules/evidence_postprocess_v16.py": {
+      "sourceSha256": "f9486389295ae5f862b21ff2b8dc6640ead5238cc9bf80874f83db7d9bf9c0b9",
+      "localPathRedacted": false
+    },
+    "runtime/rules/evidence_postprocess_v17.py": {
+      "sourceSha256": "bff8c0a572ed96cd3ac09573b3a7788f2f99e5cf293287e350020e7195c77f64",
+      "localPathRedacted": false
+    },
+    "runtime/rules/evidence_postprocess_v3.py": {
+      "sourceSha256": "3db84090ab77151235201d3839bdd97974a4a7855859d263e5579aefb3ff331b",
+      "localPathRedacted": false
+    },
+    "runtime/rules/evidence_postprocess_v4.py": {
+      "sourceSha256": "e61ba39d573cf96584e53e4f7bd228696564545b4c9bf26fcb97acdb81b40c5a",
+      "localPathRedacted": false
+    },
+    "runtime/rules/evidence_postprocess_v5.py": {
+      "sourceSha256": "462a44fe964a93259c931a20468ab0a6bc46af9b00d31acd32eb5f46aafb9865",
+      "localPathRedacted": false
+    },
+    "runtime/rules/evidence_postprocess_v6.py": {
+      "sourceSha256": "40fe0c60f0360441ff3d80b62b334801b94f58a1e7026cb226b888eb9924c139",
+      "localPathRedacted": false
+    },
+    "runtime/rules/evidence_postprocess_v7.py": {
+      "sourceSha256": "b1c65e43b41f9294138480160d8bf14d8a901609591cea91d70f31f5d198b9c6",
+      "localPathRedacted": false
+    },
+    "runtime/rules/evidence_postprocess_v8.py": {
+      "sourceSha256": "281d5627025a2a9423111a6361e7ee1754809895d28d973b1d355228392f053e",
+      "localPathRedacted": false
+    },
+    "runtime/rules/evidence_postprocess_v9.py": {
+      "sourceSha256": "17301bdbec409d7f9522a85767748efe243274caaa1c6fb7db4b193d62a1a884",
+      "localPathRedacted": false
+    },
+    "tools/common.py": {
+      "sourceSha256": "0788ffde6bedded67c028e684aa74dd45f0ce7e4ec82b4a71b36cd589d0d7937",
+      "localPathRedacted": false
+    },
+    "tools/example-input.json": {
+      "sourceSha256": "602cc57191a8c93015405aad3f3749ec54ee2e7521f0096abc03fed557b7b861",
+      "localPathRedacted": false
+    },
+    "tools/example-model-raw.txt": {
+      "sourceSha256": "81832420f5e47710ad7c386d5f32f5aabcba3530b70a594690b90c32ec7bacd5",
+      "localPathRedacted": false
+    },
+    "tools/postprocess.py": {
+      "sourceSha256": "110e2a99b9aa1fb1fdb07e1f71764b1df3fb1013049aaa36be457955ba93e9ca",
+      "localPathRedacted": false
+    },
+    "tools/verify.py": {
+      "sourceSha256": "467ee45d90da9c672900a62a37ba3e83d8347e9028890cac4a1e2d3533c9981a",
+      "localPathRedacted": false
+    },
+    "reference/dataset-guide.md": {
+      "sourceSha256": "02f7198e9854e1023ccc0846d6c8c9de8716a265faf3c8e199a4a81bcbf4d0f8",
+      "localPathRedacted": false
+    },
+    "reports/copy-fault-injection.json": {
+      "sourceSha256": "096b2262153ff146364971ddd4468e55adce66533cb86e3324b7cfa0e3292235",
+      "localPathRedacted": false
+    },
+    "reports/verification.json": {
+      "sourceSha256": "e315dcb5b2bed16f7f90576f0f0308c12d8f0641a20af0507c3775a5e3e1a645",
+      "localPathRedacted": false
+    },
+    "reports/복사오류7건_수정결과.txt": {
+      "sourceSha256": "81954589bb272d2e764caa57596b2991cf736bb1f543bb682c4ae645ad7f7963",
+      "localPathRedacted": false
+    }
+  },
+  "changes": [
+    "Local author workspace prefix replaced by <SOURCE_WORKSPACE> in metadata only",
+    "tools/verify.py adapted to Git source manifest without external weights",
+    "runtime/inference-settings.json marks external weight directories",
+    "README and model-info added; original conversation/selection notes omitted",
+    "Normalized trailing blank line in copy-failure report"
+  ],
+  "runtimeBackendSnapshotCommit": "988235f202b73ba02a2954b20d6a16c93e54fc72",
+  "gitBaseFromLocalTrackingRef": "988235f202b73ba02a2954b20d6a16c93e54fc72",
+  "remoteFreshnessVerified": false
+}

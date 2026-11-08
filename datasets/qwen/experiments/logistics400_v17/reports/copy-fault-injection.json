@@ -1,0 +1,23 @@
+{
+  "sourceUniqueGoldRows": 500,
+  "injectedTitleErrorCases": 2011,
+  "results": {
+    "v16": {
+      "exact": 519,
+      "ask": 223,
+      "invalid": 1269,
+      "validWrong": 0
+    },
+    "v17": {
+      "exact": 1196,
+      "ask": 815,
+      "invalid": 0,
+      "validWrong": 0
+    }
+  },
+  "previousRecoveredAnswersLost": 0,
+  "validWrongIssues": [],
+  "losses": [],
+  "newInference": false,
+  "interpretation": "Synthetic fault injection over opened gold fixtures; not model accuracy or independent evaluation."
+}
