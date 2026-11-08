@@ -18,6 +18,7 @@ from pydantic import BaseModel, TypeAdapter, ValidationError
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.modules.assistant import repository
+from app.modules.assistant.evidence import texts
 from app.modules.assistant.decisions import (
     CandidateQuestionIntents,
     ConfirmationQuestionIntent,
@@ -76,8 +77,8 @@ from app.modules.assistant.serialization import (
     SnapshotSerializationError,
     serialize_snapshot,
 )
-from app.modules.assistant.runtime_failures import timeout_snapshot
 from app.modules.assistant.evidence.normalize import SEOUL, title_contains
+from app.modules.assistant.runtime_failures import timeout_snapshot
 from app.modules.assistant.runtime_guard import ProcessDeadlineGuard
 from app.modules.schedules.schemas import ScheduleCreate, ScheduleUpdate
 
@@ -89,18 +90,26 @@ PROVIDER_SAFETY_MARGIN_SECONDS = 10.0
 # A title-filtered list reads the bounded range first; beyond this it asks to narrow.
 LIST_TITLE_SCAN_LIMIT = 100  # post-filtered reads allow at most 100 results
 RELATIVE_TIME_QUESTION = (
-    "서버 시각을 신뢰할 수 없습니다. 절대 날짜와 시각을 알려 주세요."
+    "서버 시각을 신뢰할 수 없어요. 연도, 월, 일과 시간을 함께 알려 주세요."
 )
 LIST_NARROWING_QUESTION = (
-    "일정이 100개를 초과합니다. 기간, category 또는 완료 여부를 좁혀 주세요."
+    "일정이 100개를 넘어요. 기간, 카테고리 또는 완료 여부를 추가해 "
+    "범위를 좁혀 주세요."
 )
-NO_MATCH_TEXT = "조건에 맞는 일정을 찾지 못했습니다."
-ALREADY_APPLIED_TEXT = "이미 요청한 상태입니다."
-CANCELLED_TEXT = "요청한 변경을 취소했습니다."
-MODEL_OUTPUT_INVALID_TEXT = "입력을 해석하지 못했습니다. 내용을 수정해 주세요."
-MODEL_TIMEOUT_TEXT = "모델 응답 시간이 초과되었습니다. 나중에 다시 시도해 주세요."
-SCHEDULE_UNAVAILABLE_TEXT = "일정 정보를 읽을 수 없습니다. 나중에 다시 시도해 주세요."
-INTERNAL_ERROR_TEXT = "요청을 처리하지 못했습니다."
+NO_MATCH_TEXT = "조건에 맞는 일정을 찾지 못했어요."
+ALREADY_APPLIED_TEXT = "이미 요청한 상태예요."
+CANCELLED_TEXT = "요청한 변경을 취소했어요."
+TARGET_AMBIGUOUS_TEXT = (
+    "일정을 하나로 특정하지 못했어요. 제목이나 날짜를 더 구체적으로 말씀해 주세요."
+)
+MODEL_OUTPUT_INVALID_TEXT = (
+    "입력을 이해하지 못했어요. 내용을 확인해 다시 말씀해 주세요."
+)
+MODEL_TIMEOUT_TEXT = (
+    "일시적으로 요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요."
+)
+SCHEDULE_UNAVAILABLE_TEXT = "요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요."
+INTERNAL_ERROR_TEXT = "요청을 처리하지 못했어요."
 
 _PENDING_WRITE_ADAPTER = TypeAdapter(PendingWriteIntent)
 
@@ -560,8 +569,14 @@ def _from_saved_selection(
     )
     if intent is None:
         return replace(_already_applied(), clear_control_state=True)
+    if isinstance(intent, PendingUpdateIntent):
+        confirmation_text = texts.confirm_update(schedule.title)
+    elif isinstance(intent, PendingDeleteIntent):
+        confirmation_text = texts.confirm_delete(schedule.title)
+    else:
+        raise RuntimeError("stored selection intent has unsupported operation")
     return _confirmation_plan(
-        text="이 일정에 요청한 변경을 적용할까요?",
+        text=confirmation_text,
         intent=intent,
         schedule=schedule,
         issue_time=issue_time_factory(),
@@ -797,7 +812,7 @@ def _provider_decision_plan_body(
             return _FinalizePlan(
                 result=AssistantResultFailure(
                     kind=AssistantResultKind.FAILURE,
-                    text=decision.text,
+                    text=TARGET_AMBIGUOUS_TEXT,
                     code=AssistantFailureCode.TARGET_AMBIGUOUS,
                     next_action=AssistantFailureNextAction.REVISE_INPUT,
                 ),

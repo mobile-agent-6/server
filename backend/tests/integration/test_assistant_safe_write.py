@@ -956,6 +956,7 @@ def test_corrupt_pending_snapshot_fails_without_schedule_write(stores) -> None:
     with api() as session:
         request = session.get(AssistantRequest, REQUEST_ID)
         assert request.result_json["code"] == "INTERNAL_ERROR"
+        assert request.result_json["text"] == "요청을 처리하지 못했어요."
         assert request.write_started is False
         assert session.scalar(sa.select(sa.func.count()).select_from(Schedule)) == 0
 
