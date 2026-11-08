@@ -18,6 +18,7 @@ from pydantic import BaseModel, TypeAdapter, ValidationError
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.modules.assistant import repository
+from app.modules.assistant.evidence import texts
 from app.modules.assistant.decisions import (
     CandidateQuestionIntents,
     ConfirmationQuestionIntent,
@@ -76,8 +77,8 @@ from app.modules.assistant.serialization import (
     SnapshotSerializationError,
     serialize_snapshot,
 )
-from app.modules.assistant.runtime_failures import timeout_snapshot
 from app.modules.assistant.evidence.normalize import SEOUL, title_contains
+from app.modules.assistant.runtime_failures import timeout_snapshot
 from app.modules.assistant.runtime_guard import ProcessDeadlineGuard
 from app.modules.schedules.schemas import ScheduleCreate, ScheduleUpdate
 
@@ -563,8 +564,13 @@ def _from_saved_selection(
     )
     if intent is None:
         return replace(_already_applied(), clear_control_state=True)
+    confirmation_text = (
+        texts.confirm_update(schedule.title)
+        if isinstance(intent, PendingUpdateIntent)
+        else texts.confirm_delete(schedule.title)
+    )
     return _confirmation_plan(
-        text=f"'{schedule.title}' 일정을 다음 내용으로 변경할까요?",
+        text=confirmation_text,
         intent=intent,
         schedule=schedule,
         issue_time=issue_time_factory(),

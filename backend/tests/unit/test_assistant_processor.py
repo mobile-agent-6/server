@@ -874,6 +874,88 @@ def test_candidate_selection_uses_opaque_ids_and_current_snapshots(
     assert question.candidates_json == request.result_json["candidates"]
 
 
+@pytest.mark.parametrize(
+    ("operation", "changes", "expected_text"),
+    [
+        ("delete", None, "'재고 확인' 일정을 삭제할까요?"),
+        (
+            "update",
+            {"completed": True},
+            "'재고 확인' 일정을 다음 내용으로 변경할까요?",
+        ),
+    ],
+)
+def test_candidate_selection_confirmation_text_matches_operation(
+    processor_store,
+    operation: str,
+    changes: dict[str, object] | None,
+    expected_text: str,
+) -> None:
+    first = schedule()
+    second = schedule(
+        SCHEDULE_B,
+        title="반품 확인",
+        at=NOW + timedelta(hours=2),
+        category=Category.RETURN,
+    )
+    uuids = UuidSequence()
+    candidates: list[dict[str, object]] = []
+    for identifier in (SCHEDULE_A, SCHEDULE_B):
+        candidate: dict[str, object] = {
+            "scheduleId": str(identifier),
+            "operation": operation,
+            "timeInterpretation": "absolute",
+        }
+        if changes is not None:
+            candidate["changes"] = changes
+        candidates.append(candidate)
+
+    admit(processor_store, request_data())
+    run(
+        processor_store,
+        ScriptedDecisionProvider(
+            [
+                envelope(
+                    {
+                        "kind": "select_candidate",
+                        "text": "대상을 선택하세요.",
+                        "candidates": candidates,
+                    }
+                )
+            ]
+        ),
+        MemoryScheduleReader([first, second]),
+        uuid_factory=uuids,
+    )
+    candidate_question = active_question(processor_store)
+    selection_id = UUID("dddddddd-dddd-4ddd-8ddd-dddddddddddd")
+    selection = request_data(
+        selection_id,
+        conversation_id=CONVERSATION_ID,
+        input_payload={
+            "type": "selection",
+            "questionId": str(candidate_question.id),
+            "candidateId": candidate_question.candidates_json[0]["candidateId"],
+        },
+    )
+    admit(processor_store, selection, provider_available=False)
+
+    no_provider = ScriptedDecisionProvider([])
+    assert run(
+        processor_store,
+        no_provider,
+        MemoryScheduleReader([first, second]),
+        request_id=selection_id,
+        uuid_factory=uuids,
+    ) is ProcessOneResult.COMPLETED
+
+    result = stored_request(processor_store, selection_id).result_json
+    assert result["kind"] == "confirmation"
+    assert result["operation"] == operation
+    assert result["text"] == expected_text
+    assert no_provider.call_count == 0
+
+
 def test_candidate_question_uses_issue_time_after_provider_and_all_reads(
     processor_store,
 ) -> None:
