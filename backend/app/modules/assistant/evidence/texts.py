@@ -14,18 +14,23 @@ ASK_TIME = "몇 시로 할까요?"
 ASK_AMPM = "오전인가요, 오후인가요?"
 ASK_DATE_AGAIN = "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
 ASK_TIME_AGAIN = "시간을 '오후 3시'처럼 다시 말씀해 주세요."
-ASK_ABSOLUTE_DATE = "서버 시각을 확인할 수 없어요. 연도와 월, 일을 함께 알려 주세요."
+ASK_ABSOLUTE_DATE = "서버 시각을 확인할 수 없어요. 연도, 월, 일을 함께 알려 주세요."
 ASK_CHANGE_VALUE = "무엇으로 바꿀까요?"
-ASK_CATEGORY = "어떤 분류인가요? 입고, 재고, 출고, 반품 또는 기타로 말씀해 주세요."
+ASK_CATEGORY = (
+    "일정 카테고리를 하나로 정해 주세요. "
+    "입고, 재고, 출고, 반품, 기타 중에서 말씀해 주세요."
+)
 ASK_TARGET_TITLE = "어떤 일정인지 이름을 알려 주세요."
-ASK_NARROW = "해당하는 일정이 너무 많아요. 날짜를 함께 알려 주세요."
-ASK_LIST_SCOPE = "언제 일정을 볼까요?"
+ASK_NARROW = "조건에 맞는 일정이 너무 많아요. 날짜를 함께 말씀해 주세요."
+ASK_LIST_SCOPE = (
+    "확인할 일정의 기간을 말씀해 주세요. 예: 오늘, 이번 주, 다음 주."
+)
 SELECT_TARGET = "어떤 일정인가요? 하나를 골라 주세요."
 CONSENT_QUESTION = "알림과 문자 기능은 지원하지 않아요. 알림 없이 일정만 진행할까요?"
 CONSENT_DECLINED = "요청을 취소했어요."
 GUIDANCE = "그 요청은 도와드릴 수 없어요. 일정 등록, 조회, 변경, 삭제를 말씀해 주세요."
 LIST_RESULT = "요청한 일정이에요."
-NO_MATCH = "조건에 맞는 일정을 찾지 못했습니다."
+NO_MATCH = "조건에 맞는 일정을 찾지 못했어요."
 MORE_REQUESTS_NOTE = " 나머지 요청은 이어서 말씀해 주세요."
 FIRST_DECLINED = "요청을 취소했어요. 필요한 일정은 하나씩 말씀해 주세요."
 ASK_DATETIME_AGAIN = "날짜와 시간을 다시 말씀해 주세요."
@@ -83,7 +88,7 @@ def confirm_new_create(title: str, scheduled_at: datetime) -> str:
 
 
 def confirm_update(title: str) -> str:
-    return f"'{title}' 일정을 바꿀까요?"
+    return f"'{title}' 일정을 다음 내용으로 변경할까요?"
 
 
 def confirm_delete(title: str) -> str:

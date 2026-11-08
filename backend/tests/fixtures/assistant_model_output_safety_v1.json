@@ -155,7 +155,7 @@
         "kind": "outcome",
         "outcome": "no_match",
         "operation": "delete",
-        "text": "조건에 맞는 일정을 찾지 못했습니다. 나머지 요청은 이어서 말씀해 주세요."
+        "text": "조건에 맞는 일정을 찾지 못했어요. 나머지 요청은 이어서 말씀해 주세요."
       },
       "expectedModelCalls": 1,
       "expectedSchedules": []
@@ -340,7 +340,7 @@
       },
       "expectedResult": {
         "kind": "need_more_info",
-        "text": "어떤 분류인가요? 입고, 재고, 출고, 반품 또는 기타로 말씀해 주세요."
+        "text": "일정 카테고리를 하나로 정해 주세요. 입고, 재고, 출고, 반품, 기타 중에서 말씀해 주세요."
       },
       "expectedModelCalls": 1,
       "expectedSchedules": []
@@ -664,7 +664,7 @@
       },
       "expectedResult": {
         "kind": "outcome",
-        "text": "일정을 등록했습니다.",
+        "text": "일정을 등록했어요.",
         "outcome": "success",
         "operation": "create",
         "schedulesChanged": true
@@ -704,7 +704,7 @@
       },
       "expectedResult": {
         "kind": "outcome",
-        "text": "일정을 등록했습니다.",
+        "text": "일정을 등록했어요.",
         "outcome": "success",
         "operation": "create",
         "schedulesChanged": true

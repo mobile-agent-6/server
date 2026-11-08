@@ -723,7 +723,7 @@ def test_all_noop_update_completes_no_match_without_question(processor_store) ->
     request = stored_request(processor_store)
     assert request.result_json == {
         "kind": "outcome",
-        "text": "이미 요청한 상태입니다.",
+        "text": "이미 요청한 상태예요.",
         "outcome": "no_match",
         "schedulesChanged": False,
         "operation": "update",
@@ -786,7 +786,7 @@ def test_select_candidate_noop_only_results_are_already_applied(
     request = stored_request(processor_store)
     assert request.result_json == {
         "kind": "outcome",
-        "text": "이미 요청한 상태입니다.",
+        "text": "이미 요청한 상태예요.",
         "outcome": "no_match",
         "schedulesChanged": False,
         "operation": "update",

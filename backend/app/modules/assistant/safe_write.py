@@ -40,6 +40,7 @@ from app.modules.assistant.model import (
     AssistantWriteOperation,
 )
 from app.modules.assistant.processor import ProcessOneResult
+from app.modules.assistant.runtime_failures import PROCESSING_TIMEOUT_TEXT
 from app.modules.assistant.runtime_guard import ProcessDeadlineGuard
 from app.modules.assistant.schemas import (
     AssistantConfirmationChanges,
@@ -62,18 +63,22 @@ from app.modules.schedules.model import Schedule
 from app.modules.schedules.schemas import ScheduleCreate, ScheduleUpdate
 
 QUESTION_TTL = timedelta(minutes=10)
-CREATE_SUCCESS_TEXT = "일정을 등록했습니다."
-UPDATE_SUCCESS_TEXT = "일정을 변경했습니다."
-DELETE_SUCCESS_TEXT = "일정을 삭제했습니다."
-NO_MATCH_TEXT = "조건에 맞는 일정을 찾지 못했습니다."
-ALREADY_APPLIED_TEXT = "이미 요청한 상태입니다."
-RECONFIRM_TEXT = "일정이 변경되었습니다. 현재 내용으로 다시 확인해 주세요."
-SCHEDULE_REJECTED_TEXT = "일정에 적용할 수 없는 요청입니다. 내용을 수정해 주세요."
-SCHEDULE_UNAVAILABLE_TEXT = (
-    "일정 저장소를 사용할 수 없습니다. 나중에 다시 시도해 주세요."
+CREATE_SUCCESS_TEXT = "일정을 등록했어요."
+UPDATE_SUCCESS_TEXT = "일정을 변경했어요."
+DELETE_SUCCESS_TEXT = "일정을 삭제했어요."
+NO_MATCH_TEXT = "조건에 맞는 일정을 찾지 못했어요."
+ALREADY_APPLIED_TEXT = "이미 요청한 상태예요."
+RECONFIRM_TEXT = "일정이 변경됐어요. 현재 내용을 확인하고 다시 승인해 주세요."
+SCHEDULE_REJECTED_TEXT = (
+    "일정에 적용할 수 없는 요청이에요. 내용을 확인해 다시 말씀해 주세요."
 )
-INTERNAL_ERROR_TEXT = "요청을 처리하지 못했습니다."
-UNCERTAIN_TEXT = "일정 변경 결과를 확인할 수 없습니다. 원래 요청 상태를 확인해 주세요."
+SCHEDULE_UNAVAILABLE_TEXT = (
+    "요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요."
+)
+INTERNAL_ERROR_TEXT = "요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요."
+UNCERTAIN_TEXT = (
+    "일정 처리 결과를 확인할 수 없어요. 일정 상태를 먼저 확인해 주세요."
+)
 
 _PENDING_ADAPTER = TypeAdapter(PendingWriteIntent)
 _DEFAULT_GATE_RETRY_DELAYS = (0.01, 0.02, 0.05, 0.1, 0.25)
@@ -454,7 +459,7 @@ class AssistantSafeWriter:
                         result_json=_failure_snapshot(
                             AssistantFailureCode.PROCESSING_TIMEOUT,
                             AssistantFailureNextAction.RETRY_LATER,
-                            "요청 처리 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.",
+                            PROCESSING_TIMEOUT_TEXT,
                         ),
                         at=_utc(self._clock.now()),
                     )
@@ -628,7 +633,7 @@ class AssistantSafeWriter:
                             result_json=_failure_snapshot(
                                 AssistantFailureCode.PROCESSING_TIMEOUT,
                                 AssistantFailureNextAction.RETRY_LATER,
-                                "요청 처리 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.",
+                                PROCESSING_TIMEOUT_TEXT,
                             ),
                             at=_utc(self._clock.now()),
                         )
@@ -895,7 +900,7 @@ class AssistantSafeWriter:
                             result_json=_failure_snapshot(
                                 AssistantFailureCode.PROCESSING_TIMEOUT,
                                 AssistantFailureNextAction.RETRY_LATER,
-                                "요청 처리 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.",
+                                PROCESSING_TIMEOUT_TEXT,
                             ),
                             at=now,
                         )

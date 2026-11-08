@@ -56,20 +56,21 @@ from app.modules.assistant.schemas import (
 )
 from app.modules.assistant.serialization import SnapshotSerializationError
 
-CANCELLED_RESULT_TEXT = "요청을 취소했습니다."
+CANCELLED_RESULT_TEXT = "요청을 취소했어요."
 CANCEL_RESPONSE_TEXT = {
-    AssistantCancelTargetState.CANCELLED: "대상을 취소했습니다.",
+    AssistantCancelTargetState.CANCELLED: "취소했어요.",
     AssistantCancelTargetState.NOT_GUARANTEED: (
-        "취소 여부를 보장할 수 없습니다. 원래 요청을 확인해 주세요."
+        "이미 일정 처리가 시작되어 취소하지 못할 수 있어요. "
+        "원래 요청 결과를 확인해 주세요."
     ),
     AssistantCancelTargetState.ALREADY_COMPLETED: (
-        "요청이 이미 완료되었습니다."
+        "요청이 이미 완료됐어요."
     ),
     AssistantCancelTargetState.UNCERTAIN: (
-        "요청 결과가 아직 불확실합니다."
+        "요청 결과를 아직 확인할 수 없어요. 원래 요청 상태를 확인해 주세요."
     ),
     AssistantCancelTargetState.NOT_ACTIVE: (
-        "질문이 더 이상 활성 상태가 아닙니다."
+        "이미 답변했거나 만료된 질문이에요."
     ),
 }
 
