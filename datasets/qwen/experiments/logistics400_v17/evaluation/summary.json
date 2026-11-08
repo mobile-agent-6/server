@@ -1,0 +1,73 @@
+{
+  "verification": {
+    "status": "PASS",
+    "unitTestsPassed": 89,
+    "warehouseOutputsReplayed": 350,
+    "uniqueGoldPreserved": 500,
+    "legacyFixtureOutputsReplayed": 200,
+    "previousExactAnswersLost": 0,
+    "knownFailuresRepaired": 7,
+    "knownFailureBreakdown": {
+      "titleCopy": 5,
+      "timeCopy": 1,
+      "unknownTimeAsValue": 1
+    },
+    "latest25": {
+      "v16Exact": 12,
+      "v17Exact": 19,
+      "v16Contract": 15,
+      "v17Contract": 22,
+      "v17Clarifications": 3
+    },
+    "syntheticTitleFaultInjection": {
+      "cases": 2011,
+      "exactRecovery": 1196,
+      "clarification": 815,
+      "validWrong": 0,
+      "invalidReturned": 0,
+      "previousRecoveriesLost": 0,
+      "modelAccuracyClaim": false
+    },
+    "weightsChanged": false,
+    "newTrainingStarted": false,
+    "newModelInference": false,
+    "independentTest": false,
+    "backendDeployed": false,
+    "orangePiVerified": false,
+    "fixedCaseIds": [
+      "warehouse-frozen-v15-update-01",
+      "warehouse-frozen-v15-completed_update-01",
+      "warehouse-frozen-v15-create-03",
+      "warehouse-frozen-v15-list-03",
+      "warehouse-frozen-v15-update-03",
+      "warehouse-frozen-v15-delete-03",
+      "warehouse-frozen-v15-create-05"
+    ]
+  },
+  "selected400DevelopmentGroups": {
+    "development100": {
+      "rows": 100,
+      "postExact": 94,
+      "postContract": 96,
+      "clarifications": 4
+    },
+    "opened25_v14": {
+      "rows": 25,
+      "postExact": 24,
+      "postContract": 25,
+      "clarifications": 0
+    },
+    "opened25_v15": {
+      "rows": 25,
+      "postExact": 19,
+      "postContract": 22,
+      "clarifications": 3
+    }
+  },
+  "current400OutputsReplayedAtSelection": 150,
+  "independentTest": false,
+  "independentHumanReview": false,
+  "apiDatabaseReplayPerformed": false,
+  "orangePiVerified": false,
+  "scope": "Opened development outputs replayed. No new inference; source-copy fault tests are synthetic fixtures, not model accuracy."
+}

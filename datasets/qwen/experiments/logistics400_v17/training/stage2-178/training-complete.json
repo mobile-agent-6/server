@@ -1,0 +1,16 @@
+{
+  "steps": 178,
+  "trainRows": 178,
+  "uniqueExamplesInThisTraining": 178,
+  "newUniqueExamples": 178,
+  "replayedExistingExamples": 0,
+  "cumulativeUniqueTrainingExamples": 400,
+  "epochsOnAdditional178": 1,
+  "initialization": "selected_warehouse222_weights",
+  "sourceAdapterFile": "<SOURCE_WORKSPACE>/qwen-logistics400-20261107-001/run_01/adapters/adapters.safetensors",
+  "sourceAdapterSha256": "e70b64c475795cd398e0934a498d223b9ccd99ddd4f34dfaddbf8527782e23e7",
+  "secondsIncludingPauses": 2826.366577915993,
+  "finalAdapterSha256": "5033e11ba43faeba15370b6cc3f86832e4d73ae2ad352a2ed8ac96308b8a27f9",
+  "finalConfigSha256": "4d2979eb1d83299fab5687aa7b5987850a211e4a502f7ec7fb8267b62c159e2d",
+  "diskOptimizerResume": false
+}

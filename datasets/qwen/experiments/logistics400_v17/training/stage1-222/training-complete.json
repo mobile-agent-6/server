@@ -1,0 +1,11 @@
+{
+  "steps": 222,
+  "trainRows": 222,
+  "uniqueExamplesInThisTraining": 222,
+  "epochs": 1,
+  "initialization": "base_model_without_previous_learning",
+  "secondsIncludingPauses": 26463.588914208012,
+  "finalAdapterSha256": "e70b64c475795cd398e0934a498d223b9ccd99ddd4f34dfaddbf8527782e23e7",
+  "finalConfigSha256": "aa4b3dcecb3eb25d22bcab0d864b6edb3b07298cac17cb2c4fcab844f5e7b254",
+  "diskOptimizerResume": false
+}
