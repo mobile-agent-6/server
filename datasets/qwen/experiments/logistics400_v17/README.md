@@ -4,7 +4,7 @@
 
 물류 일정의 등록·조회·수정·삭제·완료 상태 변경을 각 80건, 총 400건 학습한 결과와 v17 후처리 코드를 공유한다. 기본 모델은 `mlx-community/Qwen3-4B-4bit`이며, 기본 가중치에서 222건을 새로 학습한 뒤 신규 178건을 이어 학습했다. 최종 모델이 본 학습 예시는 누적 400건이다. v17은 추가 학습이 아닌 후처리 개선이다.
 
-실제 연동을 준비하는 팀원은 [연동 전달 안내](INTEGRATION.md)를 먼저 확인한다. **현재 모델은 MLX 학습 형식이며 Orange Pi 실행은 아직 검증하지 않았다.** 전달 ZIP의 식별 정보는 [model-artifacts.json](model-artifacts.json)에 있다.
+팀 공유의 시작점은 [모델 팀 공유 안내](../../../../docs/qwen_logistics400_v17_handoff.md)다. 실제 연동 담당자는 [상세 연동 안내](INTEGRATION.md)를 확인한다. **현재 모델은 MLX 학습 형식이며 Orange Pi 실행은 아직 검증하지 않았다.** 전달 ZIP의 식별 정보는 [model-artifacts.json](model-artifacts.json)에 있다.
 
 ## 성능
 

@@ -1,7 +1,7 @@
 # 백엔드·프론트 연동 준비용 전달 안내
 
 상태: **학습 결과와 검증용 후처리 전달 가능. Orange Pi 실행 형식 변환 및 실제 연동은 미검증.**
-이 문서는 2026-11-08 로컬에서 확인한 백엔드 commit `988235f202b73ba02a2954b20d6a16c93e54fc72`를 기준으로 한다. 원격 최신 코드는 연결 오류로 확인하지 못했다. 실제 반영 전 담당자가 현재 백엔드와 비교해야 한다.
+이 문서의 연결 안내는 사용자가 2026-11-08 fetch한 `develop` commit `88c6996bf0bc64795ad549b43aeb0d82cffe6c4f`를 확인해 갱신했다. 평가 재현용 `runtime/backend/`는 이전 `988235f202b73ba02a2954b20d6a16c93e54fc72` 사본을 유지한다. 공유 브랜치에는 확인한 최신 develop을 병합했으며, 이후 원격 변경 여부는 별도 확인이 필요하다.
 
 ## 전달물
 
@@ -43,6 +43,18 @@ Git에 커밋한 텍스트 자료만으로 모델이 실행되지는 않는다. 
 로컬 기준 `backend/app/main.py`의 `_model_provider`는 일반 `EvidenceDecisionProvider`를 생성한다. 이 공유 폴더를 추가하는 것만으로 v17이 활성화되지 않는다. 실제 반영은 백엔드 담당자가 prompt 전달과 provider 생성 지점을 함께 연결해야 한다. 전체 앱 의존성과 현재 provider의 내부 인터페이스를 확인해야 하며, 본 공유에서는 `backend/` 파일을 변경하지 않았다.
 
 `runtime/backend/`는 검증용 사본이지 전체 서버가 아니다. 실제 앱의 `app` 패키지 대신 이 사본을 서비스 import 경로에 앞세우거나 서버 폴더를 덮어쓰지 않는다.
+
+## 최신 백엔드에 연결할 때
+
+`88c6996`의 모델 호출 endpoint, user 메시지 렌더링과 생성 설정은 위 안내와 일치한다. 다만 이전 평가 사본 이후 다음 동작이 바뀌었다.
+
+- 모델 서버 응답 오류는 `DecisionProviderInvalidOutput`으로 구분한다. 오래된 `model_client.py`로 실제 서버를 덮어쓰지 않는다.
+- provider는 새 요청 여부를 `starts_new_task`/`startsNewTask`로 표시하고, 새 작업이면 현재 요청 접수 시각을 기준으로 삼는다.
+- v17의 연결 참고 구현은 이전 `_State`와 `_envelope`에 의존한다. 최신 백엔드에 연결할 때 확인 질문으로 상태를 비운 뒤 전체 요청을 다시 받는 경로, 이전 날짜의 승계 여부, 새 작업 표시를 검증해야 한다. 이 자료만으로 최신 provider 호환성이 검증됐다고 주장하지 않는다.
+- 지원 작업 표현을 판단하는 `operation_cues.py`가 추가됐다. 고정 평가 사본의 판정과 최신 서비스의 판정이 항상 같다고 가정하지 않는다.
+- 기본 backend prompt와 실제 학습 prompt는 다르다. `ChatCompletionsModel(..., prompt=학습_프롬프트_문자열)`처럼 정확한 학습 prompt를 명시하는 연결이 필요하다.
+
+최신 문서의 역할 구분은 [backend README](../../../../backend/README.md#모델-연결), 프론트 계약은 [API 문서](../../../../docs/api.md#16-텍스트-assistant-api-공개-계약)를 따른다. 별도 `docs/assistant-frontend-contract` 브랜치의 제안 변경은 develop의 확정 내용으로 취급하지 않았다.
 
 ## 프론트 연결 지점
 

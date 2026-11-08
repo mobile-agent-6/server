@@ -3,8 +3,8 @@
   "scope": "Git source-only data and postprocessing package; no model weights",
   "files": {
     "README.md": {
-      "bytes": 7106,
-      "sha256": "dd01a035ea82906ceb81e1a3245b9cea242e0bf4e0df00fced131aef32e45e51"
+      "bytes": 7195,
+      "sha256": "1a5e25311e2d20aa9b570721b252249ae11032cdbad93d9058d11f6ea16e0c26"
     },
     "data/stage1-train222.jsonl": {
       "bytes": 1493021,
@@ -219,8 +219,8 @@
       "sha256": "17301bdbec409d7f9522a85767748efe243274caaa1c6fb7db4b193d62a1a884"
     },
     "source-provenance.json": {
-      "bytes": 12072,
-      "sha256": "ea87d39adc9445e6e6dcad32e1aa5d598edb4085c922d2ceca787e807a50d7b3"
+      "bytes": 12291,
+      "sha256": "471bb09775868213c1f3281246375db902d3638eb13a635bf7379a28443f4002"
     },
     "tools/common.py": {
       "bytes": 4234,
@@ -271,8 +271,8 @@
       "sha256": "ad724d8c50883fd7c1642283aa2e512b25536f4e07e724b802d02b1fb1bc8085"
     },
     "INTEGRATION.md": {
-      "bytes": 6682,
-      "sha256": "2c657959efe8771ba571d74f46b38ee55b2966fcdfb7654bbc11f586ab62a90f"
+      "bytes": 8413,
+      "sha256": "08c7015c7b775c981746d6fd8f441df0f7449a2d4fe905c8c3641046cecd060a"
     },
     "model-artifacts.json": {
       "bytes": 933,

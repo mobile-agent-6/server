@@ -267,5 +267,9 @@
   ],
   "runtimeBackendSnapshotCommit": "988235f202b73ba02a2954b20d6a16c93e54fc72",
   "gitBaseFromLocalTrackingRef": "988235f202b73ba02a2954b20d6a16c93e54fc72",
-  "remoteFreshnessVerified": false
+  "remoteFreshnessVerified": false,
+  "integrationDocumentationReviewedAgainst": "88c6996bf0bc64795ad549b43aeb0d82cffe6c4f",
+  "integrationReferenceFetchedByUser": true,
+  "frozenEvaluationRuntimeUpdated": false,
+  "latestBackendEndToEndVerified": false
 }
