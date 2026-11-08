@@ -172,10 +172,17 @@ def schedule(
     )
 
 
-def envelope(decision: dict[str, object], *, state: object | None = None):
+def envelope(
+    decision: dict[str, object],
+    *,
+    state: object | None = None,
+    starts_new_task: bool = False,
+):
     payload: dict[str, object] = {"decision": decision}
     if state is not None:
         payload.update({"controlStateVersion": 1, "controlState": state})
+    if starts_new_task:
+        payload["startsNewTask"] = True
     return DecisionEnvelope.model_validate(payload)
 
 
@@ -440,6 +447,33 @@ def test_ask_claims_and_atomically_persists_question_and_control_state(
     assert provider.contexts[0].task_reference_accepted_at == NOW
 
 
+def test_new_task_resets_persisted_reference_to_request_accepted_at(
+    processor_store,
+) -> None:
+    previous_reference = NOW - timedelta(days=1)
+    admit(processor_store, request_data())
+    with processor_store.begin() as session:
+        request = session.get(AssistantRequest, REQUEST_ID)
+        assert request is not None
+        request.task_reference_accepted_at = previous_reference
+    provider = ScriptedDecisionProvider(
+        [
+            envelope(
+                {"kind": "ask", "text": "몇 시인가요?"},
+                state={"step": 1},
+                starts_new_task=True,
+            )
+        ]
+    )
+
+    result = run(processor_store, provider, MemoryScheduleReader())
+
+    assert result is ProcessOneResult.COMPLETED
+    assert provider.contexts[0].request_accepted_at == NOW
+    assert provider.contexts[0].task_reference_accepted_at == previous_reference
+    assert stored_request(processor_store).task_reference_accepted_at == NOW
+
+
 @pytest.mark.parametrize(
     ("step", "code"),
     [
@@ -462,6 +496,12 @@ def test_provider_failures_are_sanitized(
     request = stored_request(processor_store)
     assert request.result_json["code"] == code
     assert "private" not in request.result_json["text"]
+    if code == "MODEL_TIMEOUT":
+        assert request.result_json["text"] == (
+            "일시적으로 요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요."
+        )
+    if code == "INTERNAL_ERROR":
+        assert request.result_json["text"] == "요청을 처리하지 못했어요."
     internal_records = [
         record
         for record in caplog.records
@@ -689,7 +729,7 @@ def test_all_noop_update_completes_no_match_without_question(processor_store) ->
     request = stored_request(processor_store)
     assert request.result_json == {
         "kind": "outcome",
-        "text": "이미 요청한 상태입니다.",
+        "text": "이미 요청한 상태예요.",
         "outcome": "no_match",
         "schedulesChanged": False,
         "operation": "update",
@@ -752,7 +792,7 @@ def test_select_candidate_noop_only_results_are_already_applied(
     request = stored_request(processor_store)
     assert request.result_json == {
         "kind": "outcome",
-        "text": "이미 요청한 상태입니다.",
+        "text": "이미 요청한 상태예요.",
         "outcome": "no_match",
         "schedulesChanged": False,
         "operation": "update",
@@ -838,6 +878,88 @@ def test_candidate_selection_uses_opaque_ids_and_current_snapshots(
     question = active_question(processor_store)
     assert set(question.candidate_intents_json["candidates"]) == set(candidate_ids)
     assert question.candidates_json == request.result_json["candidates"]
+
+
+@pytest.mark.parametrize(
+    ("operation", "changes", "expected_text"),
+    [
+        ("delete", None, "'재고 확인' 일정을 삭제할까요?"),
+        (
+            "update",
+            {"completed": True},
+            "'재고 확인' 일정을 다음 내용으로 변경할까요?",
+        ),
+    ],
+)
+def test_candidate_selection_confirmation_text_matches_operation(
+    processor_store,
+    operation: str,
+    changes: dict[str, object] | None,
+    expected_text: str,
+) -> None:
+    first = schedule()
+    second = schedule(
+        SCHEDULE_B,
+        title="반품 확인",
+        at=NOW + timedelta(hours=2),
+        category=Category.RETURN,
+    )
+    uuids = UuidSequence()
+    candidates: list[dict[str, object]] = []
+    for identifier in (SCHEDULE_A, SCHEDULE_B):
+        candidate: dict[str, object] = {
+            "scheduleId": str(identifier),
+            "operation": operation,
+            "timeInterpretation": "absolute",
+        }
+        if changes is not None:
+            candidate["changes"] = changes
+        candidates.append(candidate)
+
+    admit(processor_store, request_data())
+    run(
+        processor_store,
+        ScriptedDecisionProvider(
+            [
+                envelope(
+                    {
+                        "kind": "select_candidate",
+                        "text": "대상을 선택하세요.",
+                        "candidates": candidates,
+                    }
+                )
+            ]
+        ),
+        MemoryScheduleReader([first, second]),
+        uuid_factory=uuids,
+    )
+    candidate_question = active_question(processor_store)
+    selection_id = UUID("dddddddd-dddd-4ddd-8ddd-dddddddddddd")
+    selection = request_data(
+        selection_id,
+        conversation_id=CONVERSATION_ID,
+        input_payload={
+            "type": "selection",
+            "questionId": str(candidate_question.id),
+            "candidateId": candidate_question.candidates_json[0]["candidateId"],
+        },
+    )
+    admit(processor_store, selection, provider_available=False)
+
+    no_provider = ScriptedDecisionProvider([])
+    assert run(
+        processor_store,
+        no_provider,
+        MemoryScheduleReader([first, second]),
+        request_id=selection_id,
+        uuid_factory=uuids,
+    ) is ProcessOneResult.COMPLETED
+
+    result = stored_request(processor_store, selection_id).result_json
+    assert result["kind"] == "confirmation"
+    assert result["operation"] == operation
+    assert result["text"] == expected_text
+    assert no_provider.call_count == 0
 
 
 def test_candidate_question_uses_issue_time_after_provider_and_all_reads(
@@ -1038,7 +1160,13 @@ def test_identical_public_candidates_fail_ambiguous(processor_store) -> None:
     )
 
     run(processor_store, provider, MemoryScheduleReader([first, second]))
-    assert stored_request(processor_store).result_json["code"] == "TARGET_AMBIGUOUS"
+    result = stored_request(processor_store).result_json
+    assert result["code"] == "TARGET_AMBIGUOUS"
+    assert result["nextAction"] == "revise_input"
+    assert result["text"] == (
+        "일정을 하나로 특정하지 못했어요. "
+        "제목이나 날짜를 더 구체적으로 말씀해 주세요."
+    )
 
 
 def test_valid_selection_and_confirmation_are_provider_free(processor_store) -> None:

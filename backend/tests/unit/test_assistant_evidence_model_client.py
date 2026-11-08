@@ -11,7 +11,10 @@ from pathlib import Path
 
 import pytest
 
-from app.modules.assistant.decisions import DecisionProviderTimeout
+from app.modules.assistant.decisions import (
+    DecisionProviderInvalidOutput,
+    DecisionProviderTimeout,
+)
 from app.modules.assistant.evidence.model_client import (
     PROMPT_PATH,
     ChatCompletionsModel,
@@ -122,7 +125,7 @@ def test_is_ready(server: FakeServer) -> None:
 @pytest.mark.parametrize("status", [400, 413])
 def test_rejected_input_is_invalid_output(server: FakeServer, status: int) -> None:
     server.status = status
-    with pytest.raises(ValueError):
+    with pytest.raises(DecisionProviderInvalidOutput, match=f"HTTP {status}"):
         ChatCompletionsModel(base_url=server.url, timeout_seconds=5).extract(
             turns=["x"], reference_time=REFERENCE, server_time_trusted=True
         )
@@ -142,7 +145,7 @@ def test_server_errors_are_unavailable(server: FakeServer, status: int) -> None:
 )
 def test_malformed_responses_are_invalid_output(server: FakeServer, body: object) -> None:
     server.body = body
-    with pytest.raises(ValueError):
+    with pytest.raises(DecisionProviderInvalidOutput):
         ChatCompletionsModel(base_url=server.url, timeout_seconds=5).extract(
             turns=["x"], reference_time=REFERENCE, server_time_trusted=True
         )

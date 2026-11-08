@@ -39,6 +39,7 @@ from app.modules.assistant.evidence.gate import (
     classify_answer,
 )
 from app.modules.assistant.evidence.normalize import mentions_date_or_time, normalize_text
+from app.modules.assistant.evidence.operation_cues import find_supported_operation
 from app.modules.assistant.evidence.planner import Ask, Overrides, plan_operation
 from app.modules.assistant.evidence.safety import (
     EvidenceQuestion,
@@ -75,6 +76,8 @@ class EvidenceModel(Protocol):
 @dataclass
 class _State:
     turns: list[str] = field(default_factory=list)
+    # Runtime-only marker. It is deliberately not serialized into control state.
+    starts_new_task: bool = False
     consent_granted: bool = False
     # {"kind": "consent"} or {"kind": "confirm", "slot": ..., "value": ..., "text": ...}
     pending: dict[str, str] | None = None
@@ -167,13 +170,18 @@ def _load_state(value: object) -> _State | None:
 
 def _envelope(decision: dict[str, Any], state: _State) -> DecisionEnvelope:
     return DecisionEnvelope.model_validate(
-        {"decision": decision, "controlStateVersion": STATE_VERSION, "controlState": state.to_json()}
+        {
+            "decision": decision,
+            "controlStateVersion": STATE_VERSION,
+            "controlState": state.to_json(),
+            "startsNewTask": state.starts_new_task,
+        }
     )
 
 
-def _cleared() -> _State:
+def _cleared(state: _State) -> _State:
     # Overwrite stored turns once a task ends, so user text is not kept longer than needed.
-    return _State()
+    return _State(starts_new_task=state.starts_new_task)
 
 
 def _digest(value: str) -> str:
@@ -218,8 +226,8 @@ class EvidenceDecisionProvider:
         previous = None
         if context.is_question_follow_up and context.answered_question_kind == "need_more_info":
             previous = _load_state(context.control_state)
-        if previous is None or len(previous.turns) >= MAX_TURNS:
-            return _State(turns=[text])
+        if previous is None or not previous.turns or len(previous.turns) >= MAX_TURNS:
+            return _State(turns=[text], starts_new_task=True)
         previous.turns.append(text)
         if previous.pending is None:
             # A processor-owned question supplied new evidence. Re-run model
@@ -234,7 +242,11 @@ class EvidenceDecisionProvider:
             raise ValueError("evidence provider accepts text input only")
         text = context.input["text"][:MAX_TURN_CHARS]
         state = self._starting_state(context, text)
-        reference = context.task_reference_accepted_at
+        reference = (
+            context.request_accepted_at
+            if state.starts_new_task
+            else context.task_reference_accepted_at
+        )
 
         pending = state.pending
         if pending is not None:
@@ -246,7 +258,7 @@ class EvidenceDecisionProvider:
                     )
                 except (TypeError, ValueError):
                     return _envelope(
-                        {"kind": "ask", "text": texts.ASK_RESTATE}, _cleared()
+                        {"kind": "ask", "text": texts.ASK_RESTATE}, _cleared(state)
                     )
                 if not clarification_answer_matches(question, text):
                     state.turns.pop()
@@ -260,7 +272,10 @@ class EvidenceDecisionProvider:
                     # The model was never trained on it and misreads the request when it is there.
                     state.turns.pop()
                     if answer is Answer.NO:
-                        return _envelope({"kind": "cancel", "text": texts.CONSENT_DECLINED}, _cleared())
+                        return _envelope(
+                            {"kind": "cancel", "text": texts.CONSENT_DECLINED},
+                            _cleared(state),
+                        )
                     if answer is Answer.UNKNOWN:
                         state.pending = pending
                         return self._ask(texts.CONSENT_QUESTION, state)
@@ -283,13 +298,13 @@ class EvidenceDecisionProvider:
                             if slot == "first_operation":
                                 return _envelope(
                                     {"kind": "cancel", "text": texts.FIRST_DECLINED},
-                                    _cleared(),
+                                    _cleared(state),
                                 )
                             if slot == "new_create":
                                 # Probably a change to an existing schedule: start over.
                                 return _envelope(
                                     {"kind": "ask", "text": texts.ASK_RESTATE},
-                                    _cleared(),
+                                    _cleared(state),
                                 )
                             if slot == "values":
                                 return self._ask(texts.ASK_DATETIME_AGAIN, state)
@@ -309,7 +324,7 @@ class EvidenceDecisionProvider:
                             state.create_confirmed = pending.get("value")
                 else:
                     return _envelope(
-                        {"kind": "ask", "text": texts.ASK_RESTATE}, _cleared()
+                        {"kind": "ask", "text": texts.ASK_RESTATE}, _cleared(state)
                     )
 
         if not state.consent_granted:
@@ -318,7 +333,9 @@ class EvidenceDecisionProvider:
                 if any(item.supported_operation for item in analyses):
                     state.pending = {"kind": "consent"}
                     return self._ask(texts.CONSENT_QUESTION, state)
-                return _envelope({"kind": "ask", "text": texts.GUIDANCE}, _cleared())
+                return _envelope(
+                    {"kind": "ask", "text": texts.GUIDANCE}, _cleared(state)
+                )
 
         output = (
             self._restore_output(state, reference)
@@ -403,11 +420,13 @@ class EvidenceDecisionProvider:
                 raise EvidenceGateError("SUPPORTED_OPERATION_MISSING")
             if output.unsupported:
                 return _envelope(
-                    {"kind": "ask", "text": texts.GUIDANCE}, _cleared()
+                    {"kind": "ask", "text": texts.GUIDANCE}, _cleared(state)
                 )
             if any(_has_clear_supported_request(turn) for turn in state.turns):
                 raise EvidenceGateError("SUPPORTED_OPERATION_MISSING")
-            return _envelope({"kind": "ask", "text": texts.GUIDANCE}, _cleared())
+            return _envelope(
+                {"kind": "ask", "text": texts.GUIDANCE}, _cleared(state)
+            )
         operation = output.operations[0]
         several = len(output.operations) > 1
         model_saw_unsupported = bool(output.unsupported) or any(
@@ -483,7 +502,7 @@ class EvidenceDecisionProvider:
             # question. Keep the original turns, but not the model payload.
             state.validated_output = None
             return _envelope(decision, state)
-        return _envelope(decision, _cleared())
+        return _envelope(decision, _cleared(state))
 
 
 # "말고", "대신", "아니" mark a correction; "아니요" and "아니오" are answers, not corrections.
@@ -532,10 +551,6 @@ _CREATE_PASSIVE_OR_OBLIGATION_STATUS = re.compile(
     r"^(?:(?:돼|되어|되었|되는|된|됐|됨)|해야\s*(?:하|돼|되|$))"
 )
 _COMPLETION_REQUEST = re.compile(r"완료(?:로|\s*(?:처리|표시))")
-_CLEAR_SUPPORTED_ACTION = re.compile(
-    r"등록|넣어|잡아|추가해|만들어|옮겨|바꿔|변경|수정|지워|삭제|"
-    r"완료로|완료\s*처리|조회"
-)
 _SCHEDULE_LIST_REQUEST = re.compile(
     r"(?:(?:일정|스케줄|할\s*일|회의|점검|검수|업무|작업).*"
     r"(?:보여|알려|있(?:어|나요|습니까))|뭐\s*있(?:어|나요|습니까))"
@@ -566,7 +581,7 @@ def _is_change_request(turn: str, *, first: bool) -> bool:
 def _has_clear_supported_request(turn: str) -> bool:
     value = normalize_text(turn)
     return bool(
-        _CLEAR_SUPPORTED_ACTION.search(value)
+        find_supported_operation(value)
         or _SCHEDULE_LIST_REQUEST.search(value)
     )
 

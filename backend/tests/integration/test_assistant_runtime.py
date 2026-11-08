@@ -417,7 +417,7 @@ def test_invalid_completed_uncertain_create_evidence_rolls_back_startup_recovery
     }
     uncertain = {
         "kind": "uncertain",
-        "text": "일정 변경 결과를 확인할 수 없습니다. 원래 요청 상태를 확인해 주세요.",
+        "text": "일정 처리 결과를 확인할 수 없어요. 일정 상태를 먼저 확인해 주세요.",
         "code": "EXECUTION_RESULT_UNKNOWN",
         "nextAction": "check_status",
     }

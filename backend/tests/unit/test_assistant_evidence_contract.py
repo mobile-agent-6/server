@@ -289,3 +289,51 @@ def test_plain_request_has_no_findings() -> None:
     analysis = analyze_text("내일 오후 3시 회의 잡아 줘")
     assert analysis.findings == ()
     assert analysis.supported_operation is True
+
+
+def test_create_request_with_connective_is_supported() -> None:
+    analysis = analyze_text("내일 오후 3시에 출고 검수 일정을 잡되 알림도 켜 줘")
+    assert analysis.has_unsupported_request is True
+    assert analysis.supported_operation is True
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "내일 오후 3시에 출고 검수 일정 잡자 알림도 켜 줘",
+        "내일 오후 3시에 출고 검수 일정 잡을래 알림도 켜 줘",
+    ],
+)
+def test_colloquial_create_requests_are_supported(text: str) -> None:
+    analysis = analyze_text(text)
+    assert analysis.has_unsupported_request is True
+    assert analysis.supported_operation is True
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "회의 일정 변경해 줘",
+        "회의 일정 수정해 줘",
+    ],
+)
+def test_change_requests_are_supported(text: str) -> None:
+    analysis = analyze_text(text)
+    assert analysis.has_unsupported_request is False
+    assert analysis.supported_operation is True
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "잡되게 굴지 말고 알림 켜 줘",
+        "잡되지 않게 알림 켜 줘",
+        "일정 변경되면 알림 보내 줘",
+        "수정된 일정 있으면 문자 보내 줘",
+        "잡자재 입고 알림 켜 줘",
+    ],
+)
+def test_non_operation_phrases_are_not_schedule_operations(text: str) -> None:
+    analysis = analyze_text(text)
+    assert analysis.has_unsupported_request is True
+    assert analysis.supported_operation is False

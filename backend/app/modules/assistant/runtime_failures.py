@@ -11,10 +11,10 @@ from app.modules.assistant.schemas import AssistantResultFailure
 from app.modules.assistant.serialization import serialize_snapshot
 
 PROCESSING_INTERRUPTED_TEXT = (
-    "요청 처리가 중단되었습니다. 잠시 후 다시 시도해 주세요."
+    "요청 처리가 중단됐어요. 잠시 후 다시 시도해 주세요."
 )
 PROCESSING_TIMEOUT_TEXT = (
-    "요청 처리 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요."
+    "요청 처리 시간이 초과됐어요. 잠시 후 다시 시도해 주세요."
 )
 
 

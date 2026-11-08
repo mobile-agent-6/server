@@ -6,6 +6,7 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, Path, Query, Request, Response, status
+from pydantic import WithJsonSchema
 from sqlalchemy.orm import Session
 
 from app.core.clock import SystemClock
@@ -27,6 +28,7 @@ router = APIRouter(prefix="/api/v1/schedules", tags=["schedules"])
 REQUEST_ID_HEADER = {
     "X-Request-ID": {"description": "Server-generated request UUID", "schema": {"type": "string", "format": "uuid"}}
 }
+_IDEMPOTENCY_KEY_PATTERN = r"^[\x20-\x7E]*$"
 
 
 def _problem_responses(*statuses: int) -> dict[int, dict[str, object]]:
@@ -61,7 +63,19 @@ def _require_json_content_type(request: Request) -> None:
 
 
 def _idempotency_key(
-    value: Annotated[str, Header(alias="Idempotency-Key")],
+    value: Annotated[
+        str,
+        WithJsonSchema(
+            {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": _IDEMPOTENCY_KEY_PATTERN,
+                "description": "1 to 255 control-free ASCII characters.",
+            }
+        ),
+        Header(alias="Idempotency-Key"),
+    ],
 ) -> str:
     if len(value) == 0:
         code = "TOO_SHORT"
@@ -87,7 +101,16 @@ def _idempotency_key(
 
 
 def _strict_completed(
-    value: str | None = Query(default=None, alias="completed"),
+    value: Annotated[
+        str | None,
+        WithJsonSchema(
+            {
+                "type": "boolean",
+                "description": "When present, send lowercase true or false.",
+            }
+        ),
+        Query(alias="completed"),
+    ] = None,
 ) -> bool | None:
     if value is None:
         return None
@@ -118,7 +141,11 @@ def list_schedules(
     to: Annotated[ApiDateTime, Query()],
     session: Annotated[Session, Depends(get_session)],
     completed: Annotated[bool | None, Depends(_strict_completed)],
-    category: Annotated[Category | None, Query()] = None,
+    category: Annotated[
+        Category | None,
+        WithJsonSchema({"$ref": "#/components/schemas/Category"}),
+        Query(),
+    ] = None,
 ) -> ScheduleListResponse:
     return service.list_schedules(
         session,
@@ -139,8 +166,17 @@ def list_schedules(
         201: {
             "headers": {
                 **REQUEST_ID_HEADER,
-                "Location": {"schema": {"type": "string"}},
-                "Idempotent-Replayed": {"schema": {"type": "string"}},
+                "Location": {
+                    "description": "Relative path of the created schedule.",
+                    "schema": {"type": "string"},
+                },
+                "Idempotent-Replayed": {
+                    "description": (
+                        "Present only when this 201 response replays an earlier "
+                        "successful create."
+                    ),
+                    "schema": {"type": "string", "enum": ["true"]},
+                },
             }
         },
         **_problem_responses(400, 409, 422, 500, 503),

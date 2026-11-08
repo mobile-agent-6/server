@@ -204,6 +204,9 @@ class DecisionEnvelope(_InternalModel):
     decision: Decision
     control_state_version: int | None = Field(default=None, ge=1)
     control_state: object | None = None
+    # The provider starts a new task when no usable task state remains. The
+    # processor then persists this request's accepted_at as the new reference.
+    starts_new_task: bool = False
 
     @model_validator(mode="after")
     def validate_control_state(self) -> "DecisionEnvelope":
@@ -229,6 +232,7 @@ class DecisionContext(_InternalModel):
     request_id: AssistantUuid
     conversation_id: AssistantUuid
     input: dict[str, object]
+    request_accepted_at: AssistantDateTime
     task_reference_accepted_at: AssistantDateTime
     timezone: Literal["Asia/Seoul"] = "Asia/Seoul"
     server_time_trusted: bool

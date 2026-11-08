@@ -52,9 +52,11 @@ class ScriptedModel:
     def __init__(self, *outputs: dict) -> None:
         self.outputs = list(outputs)
         self.seen: list[list[str]] = []
+        self.references: list[datetime] = []
 
     def extract(self, *, turns, reference_time, server_time_trusted, timeout_seconds=None) -> str:
         self.seen.append(list(turns))
+        self.references.append(reference_time)
         return json.dumps(self.outputs.pop(0), ensure_ascii=False)
 
 
@@ -103,12 +105,25 @@ def op(kind: str, index: int = 1, **evidence: dict) -> dict:
     }
 
 
-def context(text: str, *, follow_up: bool = False, state: object | None = None, trusted: bool = True) -> DecisionContext:
+def context(
+    text: str,
+    *,
+    follow_up: bool = False,
+    state: object | None = None,
+    trusted: bool = True,
+    request_accepted_at: datetime | None = None,
+    task_reference_accepted_at: datetime | None = None,
+) -> DecisionContext:
     return DecisionContext(
         request_id=uuid4(),
         conversation_id=UUID("bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"),
         input={"type": "text", "text": text},
-        task_reference_accepted_at=REFERENCE.astimezone(timezone.utc),
+        request_accepted_at=(request_accepted_at or REFERENCE).astimezone(
+            timezone.utc
+        ),
+        task_reference_accepted_at=(
+            task_reference_accepted_at or REFERENCE
+        ).astimezone(timezone.utc),
         server_time_trusted=trusted,
         is_question_follow_up=follow_up,
         answered_question_kind="need_more_info" if follow_up else None,
@@ -437,6 +452,53 @@ def test_unsupported_request_asks_consent_then_creates() -> None:
     assert model.seen == [["내일 오후 4시에 회의 등록하고 알림도 켜 줘"]]
 
 
+def test_supported_create_with_connective_asks_consent() -> None:
+    model = ScriptedModel()
+    provider = EvidenceDecisionProvider(model, FakeReader())
+    _, decision = decide(
+        provider, "내일 오후 3시에 출고 검수 일정을 잡되 알림도 켜 줘"
+    )
+    assert decision == {"kind": "ask", "text": texts.CONSENT_QUESTION}
+    assert model.seen == []
+
+
+@pytest.mark.parametrize(
+    "user_text",
+    [
+        "내일 오후 3시에 출고 검수 일정 잡자 알림도 켜 줘",
+        "내일 오후 3시에 출고 검수 일정 잡을래 알림도 켜 줘",
+    ],
+)
+def test_colloquial_create_with_unsupported_feature_asks_consent(
+    user_text: str,
+) -> None:
+    model = ScriptedModel()
+    provider = EvidenceDecisionProvider(model, FakeReader())
+    _, decision = decide(provider, user_text)
+    assert decision == {"kind": "ask", "text": texts.CONSENT_QUESTION}
+    assert model.seen == []
+
+
+@pytest.mark.parametrize(
+    "user_text",
+    [
+        "잡되게 굴지 말고 알림 켜 줘",
+        "잡되지 않게 알림 켜 줘",
+        "일정 변경되면 알림 보내 줘",
+        "수정된 일정 있으면 문자 보내 줘",
+        "잡자재 입고 알림 켜 줘",
+    ],
+)
+def test_non_operation_phrase_with_unsupported_feature_keeps_guidance(
+    user_text: str,
+) -> None:
+    model = ScriptedModel()
+    provider = EvidenceDecisionProvider(model, FakeReader())
+    _, decision = decide(provider, user_text)
+    assert decision == {"kind": "ask", "text": texts.GUIDANCE}
+    assert model.seen == []
+
+
 def test_declined_consent_cancels() -> None:
     provider = EvidenceDecisionProvider(ScriptedModel(), FakeReader())
     first, _ = decide(provider, "내일 오후 4시에 회의 등록하고 알림도 켜 줘")
@@ -473,6 +535,31 @@ def test_supported_request_missing_from_model_output_is_rejected() -> None:
     provider = EvidenceDecisionProvider(ScriptedModel(output()), FakeReader())
     with pytest.raises(DecisionProviderInvalidOutput, match="SUPPORTED_OPERATION_MISSING"):
         decide(provider, "내일 오후 3시에 회의 등록해 줘")
+
+
+def test_japdoe_request_missing_from_model_output_is_rejected() -> None:
+    provider = EvidenceDecisionProvider(ScriptedModel(output()), FakeReader())
+    with pytest.raises(DecisionProviderInvalidOutput, match="SUPPORTED_OPERATION_MISSING"):
+        decide(provider, "내일 오후 3시에 회의 잡되 장소는 2층으로")
+
+
+@pytest.mark.parametrize(
+    "user_text",
+    [
+        "내일 오후 3시에 회의 잡자",
+        "내일 오후 3시에 회의 잡을래",
+        "내일 오후 3시에 회의 넣자",
+        "내일 오후 3시에 회의 잡고 장소는 2층으로",
+        "내일 오후 3시 회의를 변경해 줘",
+        "내일 오후 3시 회의를 수정해 줘",
+    ],
+)
+def test_shared_supported_action_missing_from_model_output_is_rejected(
+    user_text: str,
+) -> None:
+    provider = EvidenceDecisionProvider(ScriptedModel(output()), FakeReader())
+    with pytest.raises(DecisionProviderInvalidOutput, match="SUPPORTED_OPERATION_MISSING"):
+        decide(provider, user_text)
 
 
 def test_consented_supported_request_missing_from_unsupported_output_is_rejected() -> None:
@@ -1017,9 +1104,166 @@ def test_invalid_model_output_is_rejected() -> None:
 def test_stored_state_from_another_shape_starts_fresh() -> None:
     model = ScriptedModel(output(op("create", change={"title": [span("회의")]})))
     provider = EvidenceDecisionProvider(model, FakeReader())
-    envelope = provider.decide(context("회의 잡아 줘", follow_up=True, state={"something": "else"}))
+    current = REFERENCE + timedelta(hours=1)
+    envelope = provider.decide(
+        context(
+            "회의 잡아 줘",
+            follow_up=True,
+            state={"something": "else"},
+            request_accepted_at=current,
+        )
+    )
+    assert envelope.control_state["turns"] == ["회의 잡아 줘"]
+    assert envelope.starts_new_task is True
+    assert model.seen == [["회의 잡아 줘"]]
+    assert model.references == [current.astimezone(timezone.utc)]
+
+
+def test_cleared_state_uses_current_request_time_after_midnight() -> None:
+    previous_reference = datetime(2026, 11, 7, 23, 50, tzinfo=SEOUL)
+    current_request = datetime(2026, 11, 8, 0, 10, tzinfo=SEOUL)
+    model = ScriptedModel(
+        output(),
+        output(
+            op(
+                "create",
+                change={
+                    "title": [span("회의")],
+                    "date": [span("내일")],
+                    "time": [span("오후 3시")],
+                },
+            )
+        ),
+    )
+    provider = EvidenceDecisionProvider(model, FakeReader())
+
+    guidance = provider.decide(
+        context(
+            "음 뭐였더라",
+            request_accepted_at=previous_reference,
+            task_reference_accepted_at=previous_reference,
+        )
+    )
+    assert guidance.decision.model_dump(mode="json", by_alias=True) == {
+        "kind": "ask",
+        "text": texts.GUIDANCE,
+    }
+    assert guidance.control_state["turns"] == []
+
+    created = provider.decide(
+        context(
+            "내일 오후 3시에 회의 잡아 줘",
+            follow_up=True,
+            state=guidance.control_state,
+            request_accepted_at=current_request,
+            task_reference_accepted_at=previous_reference,
+        )
+    )
+
+    decision = created.decision.model_dump(
+        mode="json", by_alias=True, exclude_none=True
+    )
+    assert created.starts_new_task is True
+    assert decision["kind"] == "create_intent"
+    assert decision["scheduledAt"] == "2026-11-09T06:00:00Z"
+    assert model.references == [
+        previous_reference.astimezone(timezone.utc),
+        current_request.astimezone(timezone.utc),
+    ]
+
+
+def test_active_task_keeps_original_reference_after_midnight() -> None:
+    previous_reference = datetime(2026, 11, 7, 23, 50, tzinfo=SEOUL)
+    current_request = datetime(2026, 11, 8, 0, 10, tzinfo=SEOUL)
+    model = ScriptedModel(
+        output(
+            op(
+                "create",
+                change={
+                    "title": [span("회의")],
+                    "date": [span("내일")],
+                },
+            )
+        ),
+        output(
+            op(
+                "create",
+                change={
+                    "title": [span("회의")],
+                    "date": [span("내일")],
+                    "time": [span("오후 3시", turn=2)],
+                },
+            )
+        ),
+    )
+    provider = EvidenceDecisionProvider(model, FakeReader())
+
+    question = provider.decide(
+        context(
+            "내일 회의 잡아 줘",
+            request_accepted_at=previous_reference,
+            task_reference_accepted_at=previous_reference,
+        )
+    )
+    assert question.decision.model_dump(mode="json", by_alias=True) == {
+        "kind": "ask",
+        "text": texts.ASK_TIME,
+    }
+
+    created = provider.decide(
+        context(
+            "오후 3시",
+            follow_up=True,
+            state=question.control_state,
+            request_accepted_at=current_request,
+            task_reference_accepted_at=previous_reference,
+        )
+    )
+
+    decision = created.decision.model_dump(
+        mode="json", by_alias=True, exclude_none=True
+    )
+    assert created.starts_new_task is False
+    assert decision["kind"] == "create_intent"
+    assert decision["scheduledAt"] == "2026-11-08T06:00:00Z"
+    assert model.references == [
+        previous_reference.astimezone(timezone.utc),
+        previous_reference.astimezone(timezone.utc),
+    ]
+
+
+def test_turn_limit_starts_new_task_with_current_request_time() -> None:
+    previous_reference = REFERENCE
+    current_request = REFERENCE + timedelta(hours=2)
+    state = {
+        "evidence": 4,
+        "turns": [f"이전 입력 {index}" for index in range(8)],
+        "consentGranted": False,
+        "pending": None,
+        "changeDate": None,
+        "changeDateSource": None,
+        "midnightValue": None,
+        "midnightSource": None,
+        "createConfirmed": None,
+        "validatedOutput": None,
+    }
+    model = ScriptedModel(output(op("create", change={"title": [span("회의")]})))
+    provider = EvidenceDecisionProvider(model, FakeReader())
+
+    envelope = provider.decide(
+        context(
+            "회의 잡아 줘",
+            follow_up=True,
+            state=state,
+            request_accepted_at=current_request,
+            task_reference_accepted_at=previous_reference,
+        )
+    )
+
+    assert envelope.starts_new_task is True
     assert envelope.control_state["turns"] == ["회의 잡아 줘"]
     assert model.seen == [["회의 잡아 줘"]]
+    assert model.references == [current_request.astimezone(timezone.utc)]
 
 
 # ------------------------------------------- stage 3: model mistake guards
