@@ -496,6 +496,12 @@ def test_provider_failures_are_sanitized(
     request = stored_request(processor_store)
     assert request.result_json["code"] == code
     assert "private" not in request.result_json["text"]
+    if code == "MODEL_TIMEOUT":
+        assert request.result_json["text"] == (
+            "일시적으로 요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요."
+        )
+    if code == "INTERNAL_ERROR":
+        assert request.result_json["text"] == "요청을 처리하지 못했어요."
     internal_records = [
         record
         for record in caplog.records
@@ -1154,7 +1160,13 @@ def test_identical_public_candidates_fail_ambiguous(processor_store) -> None:
     )
 
     run(processor_store, provider, MemoryScheduleReader([first, second]))
-    assert stored_request(processor_store).result_json["code"] == "TARGET_AMBIGUOUS"
+    result = stored_request(processor_store).result_json
+    assert result["code"] == "TARGET_AMBIGUOUS"
+    assert result["nextAction"] == "revise_input"
+    assert result["text"] == (
+        "일정을 하나로 특정하지 못했어요. "
+        "제목이나 날짜를 더 구체적으로 말씀해 주세요."
+    )
 
 
 def test_valid_selection_and_confirmation_are_provider_free(processor_store) -> None:

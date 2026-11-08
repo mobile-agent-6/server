@@ -75,7 +75,7 @@ SCHEDULE_REJECTED_TEXT = (
 SCHEDULE_UNAVAILABLE_TEXT = (
     "요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요."
 )
-INTERNAL_ERROR_TEXT = "요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요."
+INTERNAL_ERROR_TEXT = "요청을 처리하지 못했어요."
 UNCERTAIN_TEXT = (
     "일정 처리 결과를 확인할 수 없어요. 일정 상태를 먼저 확인해 주세요."
 )

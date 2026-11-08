@@ -99,12 +99,17 @@ LIST_NARROWING_QUESTION = (
 NO_MATCH_TEXT = "조건에 맞는 일정을 찾지 못했어요."
 ALREADY_APPLIED_TEXT = "이미 요청한 상태예요."
 CANCELLED_TEXT = "요청한 변경을 취소했어요."
+TARGET_AMBIGUOUS_TEXT = (
+    "일정을 하나로 특정하지 못했어요. 제목이나 날짜를 더 구체적으로 말씀해 주세요."
+)
 MODEL_OUTPUT_INVALID_TEXT = (
     "입력을 이해하지 못했어요. 내용을 확인해 다시 말씀해 주세요."
 )
-MODEL_TIMEOUT_TEXT = "요청 처리 시간이 초과됐어요. 잠시 후 다시 시도해 주세요."
+MODEL_TIMEOUT_TEXT = (
+    "일시적으로 요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요."
+)
 SCHEDULE_UNAVAILABLE_TEXT = "요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요."
-INTERNAL_ERROR_TEXT = "요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요."
+INTERNAL_ERROR_TEXT = "요청을 처리하지 못했어요."
 
 _PENDING_WRITE_ADAPTER = TypeAdapter(PendingWriteIntent)
 
@@ -564,11 +569,12 @@ def _from_saved_selection(
     )
     if intent is None:
         return replace(_already_applied(), clear_control_state=True)
-    confirmation_text = (
-        texts.confirm_update(schedule.title)
-        if isinstance(intent, PendingUpdateIntent)
-        else texts.confirm_delete(schedule.title)
-    )
+    if isinstance(intent, PendingUpdateIntent):
+        confirmation_text = texts.confirm_update(schedule.title)
+    elif isinstance(intent, PendingDeleteIntent):
+        confirmation_text = texts.confirm_delete(schedule.title)
+    else:
+        raise RuntimeError("stored selection intent has unsupported operation")
     return _confirmation_plan(
         text=confirmation_text,
         intent=intent,
@@ -806,7 +812,7 @@ def _provider_decision_plan_body(
             return _FinalizePlan(
                 result=AssistantResultFailure(
                     kind=AssistantResultKind.FAILURE,
-                    text=decision.text,
+                    text=TARGET_AMBIGUOUS_TEXT,
                     code=AssistantFailureCode.TARGET_AMBIGUOUS,
                     next_action=AssistantFailureNextAction.REVISE_INPUT,
                 ),

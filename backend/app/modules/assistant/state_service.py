@@ -70,7 +70,7 @@ CANCEL_RESPONSE_TEXT = {
         "요청 결과를 아직 확인할 수 없어요. 원래 요청 상태를 확인해 주세요."
     ),
     AssistantCancelTargetState.NOT_ACTIVE: (
-        "이미 답변했거나 만료된 질문이에요."
+        "더 이상 답할 수 없는 질문이에요."
     ),
 }
 

@@ -541,7 +541,7 @@ def test_question_cancel_and_expiry_do_not_change_source_result(state_store) -> 
         now=NOW,
     )
     assert expired.target_state is AssistantCancelTargetState.NOT_ACTIVE
-    assert expired.text == "이미 답변했거나 만료된 질문이에요."
+    assert expired.text == "더 이상 답할 수 없는 질문이에요."
     with factory() as session:
         active = session.get(AssistantQuestion, active_id)
         old = session.get(AssistantQuestion, expired_id)
