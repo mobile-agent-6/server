@@ -36,7 +36,7 @@ def test_prompt_and_authoring_guide_describe_the_implemented_roles() -> None:
         encoding="utf-8"
     )
     assert _sha256(PRODUCTION / "prompt.txt") == (
-        "6352d687dd9093f783ff1c23e95d6f84433af30c3776a524aaa980a83db5f24b"
+        "afc3dab1355cc9d75fe2e73d0bc9957b72da90d6fcfc4783718a00895949a262"
     )
     assert (
         "- update: 기존 일정을 찾는 title/date/time/category/completedState는 "

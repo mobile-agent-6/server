@@ -147,7 +147,10 @@ changes가 완전한 selection/confirmation은 모델 없이 접수되어 backen
 모델은 사용자 원문의 근거 단어만 출력하고, 값 계산과 판단은 backend
 (`app/modules/assistant/evidence/`)가 한다. 모델 서버는 OpenAI 호환
 `/v1/chat/completions` endpoint면 된다. 시스템 prompt는 학습 때와 같은
-`app/modules/assistant/evidence/prompt.txt`를 사용한다.
+`app/modules/assistant/evidence/prompt.txt`를 사용하며, 시작과 재연결 때 학습 prompt의
+고정 SHA-256을 검사한다. 파일이 없거나 읽을 수 없거나 hash가 다르면 모델 서버를 호출하지
+않고 Assistant만 `503 ASSISTANT_UNAVAILABLE` 상태로 유지한다. Schedule API와 health는
+이 prompt 오류 때문에 중단하지 않는다.
 
 | 환경변수 | 기본값 | 설명 |
 |---|---|---|
