@@ -31,7 +31,11 @@ from app.modules.assistant.decisions import (
     TrustedTimeSource,
 )
 from app.modules.assistant.cleanup import cleanup_once
-from app.modules.assistant.evidence.model_client import ChatCompletionsModel
+from app.modules.assistant.evidence.model_client import (
+    ChatCompletionsModel,
+    TrainingPromptIntegrityError,
+    load_verified_training_prompt,
+)
 from app.modules.assistant.evidence.provider import EvidenceDecisionProvider
 from app.modules.assistant.router import router as assistant_router
 from app.modules.assistant.readiness import probe_assistant_schema
@@ -96,10 +100,26 @@ def _install_openapi_contract(application: FastAPI) -> None:
 def _model_provider(settings: Settings, application: FastAPI) -> DecisionProvider | None:
     """Connect the model server, or leave the Assistant unavailable (503) if it is down."""
 
+    try:
+        prompt = load_verified_training_prompt()
+    except TrainingPromptIntegrityError as exc:
+        cause = exc.__cause__
+        exception_class = type(cause).__name__ if cause is not None else type(exc).__name__
+        logging.getLogger(__name__).warning(
+            "Assistant training prompt integrity check failed: %s",
+            exception_class,
+            extra={
+                "event": "assistant.prompt_integrity_failed",
+                "promptSha256": exc.actual_sha256,
+                "exceptionClass": exception_class,
+            },
+        )
+        return None
     model = ChatCompletionsModel(
         base_url=settings.assistant_model_base_url,
         timeout_seconds=settings.assistant_model_timeout_seconds,
         model=settings.assistant_model_name or None,
+        prompt=prompt,
     )
     if not model.is_ready():
         logging.getLogger(__name__).warning(

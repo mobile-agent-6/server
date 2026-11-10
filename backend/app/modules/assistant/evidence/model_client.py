@@ -27,6 +27,9 @@ from app.modules.assistant.decisions import (
 from app.modules.assistant.evidence.normalize import SEOUL
 
 PROMPT_PATH = Path(__file__).with_name("prompt.txt")
+EXPECTED_TRAINING_PROMPT_SHA256 = (
+    "afc3dab1355cc9d75fe2e73d0bc9957b72da90d6fcfc4783718a00895949a262"
+)
 # Training and evaluation used these values (Issue #32).
 TEMPERATURE = 0.0
 SEED = 29
@@ -37,6 +40,31 @@ READY_TIMEOUT_SECONDS = 3.0
 
 class ModelServerUnavailable(DecisionProviderTimeout):
     """The model server could not be reached; reported like a timeout (retry later)."""
+
+
+class TrainingPromptIntegrityError(RuntimeError):
+    """The bundled system prompt is missing, unreadable, or not the trained prompt."""
+
+    def __init__(self, *, actual_sha256: str | None = None) -> None:
+        super().__init__("training prompt integrity check failed")
+        self.actual_sha256 = actual_sha256
+
+
+def load_verified_training_prompt(path: Path | None = None) -> str:
+    """Load the exact training prompt after verifying its byte-level digest."""
+
+    prompt_path = PROMPT_PATH if path is None else path
+    try:
+        raw = prompt_path.read_bytes()
+    except OSError as exc:
+        raise TrainingPromptIntegrityError() from exc
+    digest = hashlib.sha256(raw).hexdigest()
+    if digest != EXPECTED_TRAINING_PROMPT_SHA256:
+        raise TrainingPromptIntegrityError(actual_sha256=digest)
+    try:
+        return raw.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise TrainingPromptIntegrityError(actual_sha256=digest) from exc
 
 
 def render_user_message(
@@ -73,7 +101,7 @@ class ChatCompletionsModel:
         self._base_url = base_url.rstrip("/")
         self._timeout = timeout_seconds
         self._model = model
-        self._prompt = prompt if prompt is not None else PROMPT_PATH.read_text(encoding="utf-8")
+        self._prompt = prompt if prompt is not None else load_verified_training_prompt()
         # Shown in the model call log so a run can be tied to its model and prompt.
         self.name = model or "default"
         self.prompt_sha256 = hashlib.sha256(self._prompt.encode("utf-8")).hexdigest()

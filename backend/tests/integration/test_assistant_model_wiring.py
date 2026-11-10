@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+import logging
 import time
 from pathlib import Path
 from threading import Event
@@ -15,8 +17,13 @@ from fastapi.testclient import TestClient
 from app.core.clock import FixedClock
 from app.core.config import Settings
 from app.main import create_app
-from app.modules.assistant.evidence.model_client import ChatCompletionsModel
+from app.modules.assistant.evidence import model_client
+from app.modules.assistant.evidence.model_client import (
+    EXPECTED_TRAINING_PROMPT_SHA256,
+    ChatCompletionsModel,
+)
 from app.modules.assistant.evidence.normalize import SEOUL
+from app.modules.assistant.model import AssistantRequest
 from app.modules.schedules.model import Schedule
 from app.modules.system.time_sync import DisabledTimeSyncAdapter
 from tests.unit.test_assistant_evidence_model_client import FakeServer
@@ -134,9 +141,99 @@ def test_model_server_down_keeps_assistant_unavailable(database_path: Path) -> N
         application.state.engine.dispose()
 
 
-def test_first_request_reconnects_a_model_server_that_started_late(
-    database_path: Path, monkeypatch: pytest.MonkeyPatch
+@pytest.mark.parametrize(
+    ("prompt_contents", "expected_sha256", "expected_exception_class"),
+    [
+        (
+            b"not the training prompt",
+            hashlib.sha256(b"not the training prompt").hexdigest(),
+            "TrainingPromptIntegrityError",
+        ),
+        (None, None, "FileNotFoundError"),
+    ],
+)
+def test_invalid_training_prompt_stays_unavailable_before_model_readiness(
+    database_path: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+    prompt_contents: bytes | None,
+    expected_sha256: str | None,
+    expected_exception_class: str,
 ) -> None:
+    damaged_prompt = tmp_path / "prompt.txt"
+    if prompt_contents is not None:
+        damaged_prompt.write_bytes(prompt_contents)
+    monkeypatch.setattr(model_client, "PROMPT_PATH", damaged_prompt)
+    readiness_calls = 0
+
+    def count_readiness(_model: ChatCompletionsModel) -> bool:
+        nonlocal readiness_calls
+        readiness_calls += 1
+        return True
+
+    monkeypatch.setattr(ChatCompletionsModel, "is_ready", count_readiness)
+    caplog.set_level(logging.WARNING)
+    application = _app(
+        database_path,
+        assistant_model_enabled=True,
+        assistant_model_base_url="http://127.0.0.1:9",
+    )
+    try:
+        with TestClient(application) as client:
+            assert application.state.assistant_provider_available is False
+            response = client.post(
+                "/api/v1/assistant/requests",
+                json={
+                    "requestId": str(uuid4()),
+                    "input": {"type": "text", "text": "회의 잡아 줘"},
+                },
+            )
+            assert response.status_code == 503
+            assert response.json()["code"] == "ASSISTANT_UNAVAILABLE"
+            assert client.get("/health").status_code == 200
+            assert readiness_calls == 0
+            with application.state.assistant_session_factory() as session:
+                assert session.scalar(sa.select(sa.func.count()).select_from(AssistantRequest)) == 0
+            with application.state.session_factory() as session:
+                assert session.scalar(sa.select(sa.func.count()).select_from(Schedule)) == 0
+
+            schedule = client.post(
+                "/api/v1/schedules",
+                headers={"Idempotency-Key": "prompt-integrity-schedule"},
+                json={
+                    "title": "Prompt integrity isolation",
+                    "scheduledAt": "2026-11-01T09:00:00Z",
+                    "category": "OTHER",
+                },
+            )
+            assert schedule.status_code == 201
+            with application.state.session_factory() as session:
+                assert session.scalar(sa.select(sa.func.count()).select_from(Schedule)) == 1
+            with application.state.assistant_session_factory() as session:
+                assert session.scalar(sa.select(sa.func.count()).select_from(AssistantRequest)) == 0
+
+        failures = [
+            record
+            for record in caplog.records
+            if getattr(record, "event", None) == "assistant.prompt_integrity_failed"
+        ]
+        assert len(failures) == 2  # startup and the first text request's reconnect attempt
+        assert {record.promptSha256 for record in failures} == {expected_sha256}
+        assert {record.exceptionClass for record in failures} == {
+            expected_exception_class
+        }
+        assert str(damaged_prompt) not in caplog.text
+    finally:
+        application.state.engine.dispose()
+
+
+def test_first_request_reconnects_a_model_server_that_started_late(
+    database_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    caplog.set_level(logging.INFO)
     readiness = iter((False, True))
     monkeypatch.setattr(ChatCompletionsModel, "is_ready", lambda self: next(readiness))
     monkeypatch.setattr(
@@ -169,6 +266,15 @@ def test_first_request_reconnects_a_model_server_that_started_late(
                 "success",
                 "create",
             )
+        calls = [
+            record
+            for record in caplog.records
+            if getattr(record, "event", None) == "assistant.model_call"
+        ]
+        assert calls
+        assert {record.promptSha256 for record in calls} == {
+            EXPECTED_TRAINING_PROMPT_SHA256
+        }
     finally:
         application.state.engine.dispose()
 

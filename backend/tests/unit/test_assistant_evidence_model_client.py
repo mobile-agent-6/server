@@ -16,15 +16,19 @@ from app.modules.assistant.decisions import (
     DecisionProviderTimeout,
 )
 from app.modules.assistant.evidence.model_client import (
+    EXPECTED_TRAINING_PROMPT_SHA256,
     PROMPT_PATH,
     ChatCompletionsModel,
     ModelServerUnavailable,
+    TrainingPromptIntegrityError,
+    load_verified_training_prompt,
     render_user_message,
 )
 
-TRAINING_PROMPT_SHA256 = "6352d687dd9093f783ff1c23e95d6f84433af30c3776a524aaa980a83db5f24b"
 REPO_ROOT = Path(__file__).resolve().parents[3]
-DATASET_PROMPT = REPO_ROOT / "datasets/qwen/experiments/structured_output_contract_v0.1/candidate-c-prompt-v0.1.txt"
+EXPERIMENT_ROOT = REPO_ROOT / "datasets/qwen/experiments/logistics400_v17"
+DATASET_PROMPT = EXPERIMENT_ROOT / "runtime/backend/app/modules/assistant/evidence/prompt.txt"
+MODEL_INFO = EXPERIMENT_ROOT / "model-info.json"
 REFERENCE = datetime(2026, 10, 29, 1, 0, tzinfo=timezone.utc)  # 10:00 in Seoul
 
 
@@ -80,9 +84,30 @@ def server() -> Iterator[FakeServer]:
 
 
 def test_backend_prompt_is_the_training_prompt() -> None:
-    assert hashlib.sha256(PROMPT_PATH.read_bytes()).hexdigest() == TRAINING_PROMPT_SHA256
-    if DATASET_PROMPT.exists():
-        assert PROMPT_PATH.read_bytes() == DATASET_PROMPT.read_bytes()
+    assert hashlib.sha256(PROMPT_PATH.read_bytes()).hexdigest() == EXPECTED_TRAINING_PROMPT_SHA256
+    assert PROMPT_PATH.read_bytes() == DATASET_PROMPT.read_bytes()
+    assert json.loads(MODEL_INFO.read_text(encoding="utf-8"))["systemPromptSha256"] == (
+        EXPECTED_TRAINING_PROMPT_SHA256
+    )
+
+
+def test_verified_training_prompt_loads_exact_bytes() -> None:
+    assert load_verified_training_prompt() == PROMPT_PATH.read_bytes().decode("utf-8")
+
+
+def test_verified_training_prompt_rejects_hash_mismatch(tmp_path: Path) -> None:
+    prompt = tmp_path / "prompt.txt"
+    prompt.write_bytes(b"not the training prompt")
+    with pytest.raises(TrainingPromptIntegrityError) as captured:
+        load_verified_training_prompt(prompt)
+    assert captured.value.actual_sha256 == hashlib.sha256(prompt.read_bytes()).hexdigest()
+
+
+def test_verified_training_prompt_rejects_missing_file(tmp_path: Path) -> None:
+    with pytest.raises(TrainingPromptIntegrityError) as captured:
+        load_verified_training_prompt(tmp_path / "missing.txt")
+    assert captured.value.actual_sha256 is None
+    assert isinstance(captured.value.__cause__, FileNotFoundError)
 
 
 def test_user_message_matches_the_training_rendering() -> None:
@@ -105,7 +130,10 @@ def test_extract_sends_training_decoding_and_returns_content(server: FakeServer)
     body = sent["body"]
     assert "model" not in body
     assert (body["temperature"], body["seed"], body["max_tokens"]) == (0.0, 29, 1024)
-    assert body["messages"][0] == {"role": "system", "content": PROMPT_PATH.read_text(encoding="utf-8")}
+    assert body["messages"][0] == {
+        "role": "system",
+        "content": PROMPT_PATH.read_bytes().decode("utf-8"),
+    }
     assert body["messages"][1]["role"] == "user"
     assert '"serverTimeTrusted":false' in body["messages"][1]["content"]
 
