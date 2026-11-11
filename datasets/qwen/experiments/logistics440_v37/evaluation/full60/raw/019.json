@@ -1,0 +1,16 @@
+{
+  "key": "caf4e3b37288e0d43659a47c7c447e424eb910b2dc4e066233194b0916820ea4",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"completed\":[{\"turn\":2,\"text\":\"완료된\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":3,\"text\":\"6시\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"대신\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"오후 6시\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":2,\"text\":\"완료된\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "08b204f7ec2d20f935b0bdf9d156d02f67364891c9177c4f1c733de250ef7cdb",
+  "seconds": 9.849312167003518
+}

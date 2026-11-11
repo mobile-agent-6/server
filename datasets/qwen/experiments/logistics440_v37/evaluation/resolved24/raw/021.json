@@ -1,0 +1,16 @@
+{
+  "key": "982acc200bc35552a36eac34b467f8468a59824d387ba1582174c5c3eba4bb12",
+  "identity": {
+    "freezeSha256": "07bfb630c7cec6da7572d9657da328c7aaea072902a2139ce4fbff89c79d4173",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"입고 작업대 보조선반 세척\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":2,\"text\":\"미완료\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":2,\"text\":\"완료 중\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"완료 중\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "a2204f07e9dc2f3a091e210aa99d6129b761d2fb8c0225159a7fcdaf09434c45",
+  "seconds": 9.472123791987542
+}

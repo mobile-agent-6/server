@@ -1,0 +1,16 @@
+{
+  "key": "c878cfba2fce0f18181b01c88719a8e53b53f9387bd3dc20b67d2c4694d97980",
+  "identity": {
+    "freezeSha256": "e0ac9aba89edee1cb6318fb07376860dcc6d3c4b5073f7c591bcc4415acd3265",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":2,\"text\":\"운반대 미스드레인 패드 확인\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"오후 2시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"운반\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "c34ead72123f07d231978a4a1078e5b301c82e135c70751ffe90edd33204e581",
+  "seconds": 8.967718917003367
+}

@@ -1,0 +1,16 @@
+{
+  "key": "bb08b03dd29bbb543aabd9e5c6d8f0da297ce1d727ce1c0e1a21d08b1942a8f8",
+  "identity": {
+    "freezeSha256": "e0ac9aba89edee1cb6318fb07376860dcc6d3c4b5073f7c591bcc4415acd3265",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"completedState\":[{\"turn\":1,\"text\":\"미완료로 표시해 줘\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"분류대 안내판 방향 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "7b6291a00a1f8d3634939e833d4bbd64f85c26b2e8babfae42d25a322540e40d",
+  "seconds": 7.805731041007675
+}

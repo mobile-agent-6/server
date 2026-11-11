@@ -1,0 +1,16 @@
+{
+  "key": "673ae92502ea9bb908dc2d114a313686b6330b110fbc15f565e2114f0526b27f",
+  "identity": {
+    "freezeSha256": "14d9351b65aa64766b77e997e569fc9d12625f2e77207e09def91daf39f2aab9",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"상품 코드와 규격 대조\",\"status\":\"superseded\"},{\"turn\":1,\"text\":\"대신\",\"status\":\"correction_marker\"},{\"turn\":1,\"text\":\"상품 중량 정보 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "db429c2e1c91ad4377e1448a7cc141f1ac5838881f0a4fc0ea5e4f8d57f5a2b4",
+  "seconds": 8.07767062500352
+}

@@ -1,0 +1,16 @@
+{
+  "key": "dca13a631915ec2aada029c12ca0fd47dc1a3e2eb569ac1fa01ac4501c70d86d",
+  "identity": {
+    "freezeSha256": "c3ec03a58f880d92ae94aeffa816940216f98bc8d4f763fb9fa63abbfd9a7c51",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":1,\"text\":\"하차 지연 차량 확인\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"7월 7일\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"하차\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "26700a794612bc5c76050c6a613fd5a21406e513555fe82df20da4de955dcab1",
+  "seconds": 8.136145291966386
+}

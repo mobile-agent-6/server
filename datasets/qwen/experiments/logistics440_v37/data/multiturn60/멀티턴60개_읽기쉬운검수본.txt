@@ -1,0 +1,1657 @@
+mt60-create-r3-v0 | 3라운드 | create
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 입고 팔레트 검수 일정 등록해 줘
+Assistant: 며칠로 할까요?
+모델 호출: 예 / kind=create
+  changeEvidence.title: 입고 팔레트 검수 [입력 1턴, adopted]
+  changeEvidence.category: 입고 [입력 1턴, adopted]
+  부족 정보: date, time
+사용자 2: 내일이야
+Assistant: 몇 시로 할까요?
+모델 호출: 예 / kind=create
+  changeEvidence.title: 입고 팔레트 검수 [입력 1턴, adopted]
+  changeEvidence.category: 입고 [입력 1턴, adopted]
+  changeEvidence.date: 내일 [입력 2턴, adopted]
+  부족 정보: time
+사용자 3: 오후 3시에 시작해
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 예 / kind=create
+  changeEvidence.title: 입고 팔레트 검수 [입력 1턴, adopted]
+  changeEvidence.category: 입고 [입력 1턴, adopted]
+  changeEvidence.date: 내일 [입력 2턴, adopted]
+  changeEvidence.time: 오후 3시 [입력 3턴, adopted]
+  부족 정보: 없음
+
+mt60-create-r3-v1 | 3라운드 | create
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 오후 4시에 일정 등록해 줘
+Assistant: 어떤 일정인가요? 일정 이름을 알려 주세요.
+모델 호출: 예 / kind=create
+  changeEvidence.date: 내일 [입력 1턴, adopted]
+  changeEvidence.time: 오후 4시 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 아니, 날짜는 모레로 해 줘
+Assistant: 어떤 일정인가요? 일정 이름을 알려 주세요.
+모델 호출: 예 / kind=create
+  changeEvidence.date: 내일 [입력 1턴, superseded]
+  changeEvidence.date: 아니 [입력 2턴, correction_marker]
+  changeEvidence.date: 모레 [입력 2턴, adopted]
+  changeEvidence.time: 오후 4시 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 3: 제목은 반품 상품 외관 검사야
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 예 / kind=create
+  changeEvidence.date: 내일 [입력 1턴, superseded]
+  changeEvidence.date: 아니 [입력 2턴, correction_marker]
+  changeEvidence.date: 모레 [입력 2턴, adopted]
+  changeEvidence.time: 오후 4시 [입력 1턴, adopted]
+  changeEvidence.title: 반품 상품 외관 검사 [입력 3턴, adopted]
+  changeEvidence.category: 반품 [입력 3턴, adopted]
+  부족 정보: 없음
+
+mt60-create-r3-v2 | 3라운드 | create
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 출고 상차 순서 점검 일정 추가해 줘
+Assistant: 며칠로 할까요?
+모델 호출: 예 / kind=create
+  changeEvidence.title: 출고 상차 순서 점검 [입력 1턴, adopted]
+  changeEvidence.category: 출고 [입력 1턴, adopted]
+  부족 정보: date, time
+사용자 2: 내일 새벽 12시에 시작해
+Assistant: 1월 11일 0시(자정) 말씀이세요?
+모델 호출: 예 / kind=create
+  changeEvidence.title: 출고 상차 순서 점검 [입력 1턴, adopted]
+  changeEvidence.category: 출고 [입력 1턴, adopted]
+  changeEvidence.date: 내일 [입력 2턴, adopted]
+  changeEvidence.time: 새벽 12시 [입력 2턴, adopted]
+  부족 정보: 없음
+사용자 3: 응
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-create-r3-v3 | 3라운드 | create
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 새벽 12시에 재고 유통기한 확인 등록해 줘
+Assistant: 1월 11일 0시(자정) 말씀이세요?
+모델 호출: 예 / kind=create
+  changeEvidence.date: 내일 [입력 1턴, adopted]
+  changeEvidence.time: 새벽 12시 [입력 1턴, adopted]
+  changeEvidence.title: 재고 유통기한 확인 [입력 1턴, adopted]
+  changeEvidence.category: 재고 [입력 1턴, adopted]
+  부족 정보: 없음
+사용자 2: 아니
+Assistant: 시간을 '오후 3시'처럼 다시 말씀해 주세요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 3: 새벽 12시 말고 오후 5시로 등록해 줘
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 예 / kind=create
+  changeEvidence.date: 내일 [입력 1턴, adopted]
+  changeEvidence.time: 새벽 12시 [입력 2턴, superseded]
+  changeEvidence.time: 말고 [입력 2턴, correction_marker]
+  changeEvidence.time: 오후 5시 [입력 2턴, adopted]
+  changeEvidence.title: 재고 유통기한 확인 [입력 1턴, adopted]
+  changeEvidence.category: 재고 [입력 1턴, adopted]
+  부족 정보: 없음
+
+mt60-list-r3-v0 | 3라운드 | list
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 3시 일정 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 3시 [입력 1턴, adopted]
+  부족 정보: ampm
+사용자 2: 아니, 날짜는 모레로 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, superseded]
+  filterEvidence.date: 아니 [입력 2턴, correction_marker]
+  filterEvidence.date: 모레 [입력 2턴, adopted]
+  filterEvidence.time: 3시 [입력 1턴, adopted]
+  부족 정보: ampm
+사용자 3: 3시 말고 오후 3시 일정이야
+Assistant: 조건에 맞는 일정은 출고 운송장 대조입니다.
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, superseded]
+  filterEvidence.date: 아니 [입력 2턴, correction_marker]
+  filterEvidence.date: 모레 [입력 2턴, adopted]
+  filterEvidence.time: 3시 [입력 3턴, superseded, occurrence=1]
+  filterEvidence.time: 말고 [입력 3턴, correction_marker]
+  filterEvidence.time: 오후 3시 [입력 3턴, adopted]
+  부족 정보: 없음
+
+mt60-list-r3-v1 | 3라운드 | list
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 5시 일정 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 5시 [입력 1턴, adopted]
+  부족 정보: ampm
+사용자 2: 분류는 재고 분류로 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 5시 [입력 1턴, adopted]
+  filterEvidence.category: 재고 분류 [입력 2턴, adopted]
+  부족 정보: ampm
+사용자 3: 5시 대신 오후 5시 일정이야
+Assistant: 조건에 맞는 일정은 재고 보관 구역 점검입니다.
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 5시 [입력 3턴, superseded, occurrence=1]
+  filterEvidence.time: 대신 [입력 3턴, correction_marker]
+  filterEvidence.time: 오후 5시 [입력 3턴, adopted]
+  filterEvidence.category: 재고 분류 [입력 2턴, adopted]
+  부족 정보: 없음
+
+mt60-list-r3-v2 | 3라운드 | list
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 6시 반품 수량 확인 일정 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 6시 [입력 1턴, adopted]
+  filterEvidence.title: 반품 수량 확인 [입력 1턴, adopted]
+  부족 정보: ampm
+사용자 2: 완료된 일정만 찾아 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 6시 [입력 1턴, adopted]
+  filterEvidence.title: 반품 수량 확인 [입력 1턴, adopted]
+  filterEvidence.completed: 완료된 [입력 2턴, adopted]
+  부족 정보: ampm
+사용자 3: 6시 대신 오후 6시 일정이야
+Assistant: 조건에 맞는 일정은 반품 수량 확인입니다.
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 6시 [입력 3턴, superseded, occurrence=1]
+  filterEvidence.time: 대신 [입력 3턴, correction_marker]
+  filterEvidence.time: 오후 6시 [입력 3턴, adopted]
+  filterEvidence.title: 반품 수량 확인 [입력 1턴, adopted]
+  filterEvidence.completed: 완료된 [입력 2턴, adopted]
+  부족 정보: 없음
+
+mt60-list-r3-v3 | 3라운드 | list
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 7시 입고 인수증 정리 일정 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 7시 [입력 1턴, adopted]
+  filterEvidence.title: 입고 인수증 정리 [입력 1턴, adopted]
+  부족 정보: ampm
+사용자 2: 입고 인수증 정리 말고 입고 라벨 누락 확인 일정을 찾아 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 7시 [입력 1턴, adopted]
+  filterEvidence.title: 입고 인수증 정리 [입력 2턴, superseded]
+  filterEvidence.title: 말고 [입력 2턴, correction_marker]
+  filterEvidence.title: 입고 라벨 누락 확인 [입력 2턴, adopted]
+  부족 정보: ampm
+사용자 3: 7시 대신 오후 7시 일정이야
+Assistant: 조건에 맞는 일정은 입고 라벨 누락 확인입니다.
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 7시 [입력 3턴, superseded, occurrence=1]
+  filterEvidence.time: 대신 [입력 3턴, correction_marker]
+  filterEvidence.time: 오후 7시 [입력 3턴, adopted]
+  filterEvidence.title: 입고 인수증 정리 [입력 2턴, superseded]
+  filterEvidence.title: 말고 [입력 2턴, correction_marker]
+  filterEvidence.title: 입고 라벨 누락 확인 [입력 2턴, adopted]
+  부족 정보: 없음
+
+mt60-update-r3-v0 | 3라운드 | update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 재고 순환 실사 일정 수정해 줘
+Assistant: 무엇으로 바꿀까요?
+모델 호출: 예 / kind=update
+  targetEvidence.title: 재고 순환 실사 [입력 1턴, adopted]
+  부족 정보: change_value
+사용자 2: 시각을 오후 3시로 바꿔 줘
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 예 / kind=update
+  targetEvidence.title: 재고 순환 실사 [입력 1턴, adopted]
+  changeEvidence.time: 오후 3시 [입력 2턴, adopted]
+  부족 정보: 없음
+사용자 3: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-update-r3-v1 | 3라운드 | update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 출고 도크 대기품 정리 제목을 수정해 줘
+Assistant: 무엇으로 바꿀까요?
+모델 호출: 예 / kind=update
+  targetEvidence.title: 출고 도크 대기품 정리 [입력 1턴, adopted]
+  부족 정보: change_value
+사용자 2: 새 제목은 출고 기사 인수증 대조야
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 예 / kind=update
+  targetEvidence.title: 출고 도크 대기품 정리 [입력 1턴, adopted]
+  changeEvidence.title: 출고 기사 인수증 대조 [입력 2턴, adopted]
+  부족 정보: 없음
+사용자 3: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-update-r3-v2 | 3라운드 | update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 반품 회수 용기 세척 날짜를 1월 5일로 바꿔 줘
+Assistant: 1월 5일은 이미 지났어요. 2029년 1월 5일 말씀이세요?
+모델 호출: 예 / kind=update
+  targetEvidence.title: 반품 회수 용기 세척 [입력 1턴, adopted]
+  changeEvidence.date: 1월 5일 [입력 1턴, adopted]
+  부족 정보: 없음
+사용자 2: 응
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 3: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-update-r3-v3 | 3라운드 | update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 그 일정 시각을 오후 6시로 바꿔 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  changeEvidence.time: 오후 6시 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 대상 제목은 입고 적치 위치 배정이야
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 예 / kind=update
+  targetEvidence.title: 입고 적치 위치 배정 [입력 2턴, adopted]
+  changeEvidence.time: 오후 6시 [입력 1턴, adopted]
+  부족 정보: 없음
+사용자 3: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-delete-r3-v0 | 3라운드 | delete
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 일정 하나 삭제해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.date: 내일 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 제목은 반품 회수품 접수야
+Assistant: 선택한 일정을 삭제할까요?
+모델 호출: 예 / kind=delete
+  targetEvidence.date: 내일 [입력 1턴, adopted]
+  targetEvidence.title: 반품 회수품 접수 [입력 2턴, adopted]
+  부족 정보: 없음
+사용자 3: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-delete-r3-v1 | 3라운드 | delete
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 완료된 일정 하나 삭제해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.completedState: 완료된 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 대상 제목은 출고 봉인 기록 확인이야
+Assistant: 선택한 일정을 삭제할까요?
+모델 호출: 예 / kind=delete
+  targetEvidence.completedState: 완료된 [입력 1턴, adopted]
+  targetEvidence.title: 출고 봉인 기록 확인 [입력 2턴, adopted]
+  부족 정보: 없음
+사용자 3: 거절
+Assistant: 요청을 취소했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-delete-r3-v2 | 3라운드 | delete
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 3시 입고 납품서 대조 일정 삭제해 줘
+Assistant: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.date: 내일 [입력 1턴, adopted]
+  targetEvidence.time: 3시 [입력 1턴, adopted]
+  targetEvidence.title: 입고 납품서 대조 [입력 1턴, adopted]
+  부족 정보: 없음
+사용자 2: 두 번째 일정 선택
+Assistant: 선택한 일정을 삭제할까요?
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 3: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-delete-r3-v3 | 3라운드 | delete
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 그 일정 삭제해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=delete
+  부족 정보: task_or_title
+사용자 2: 대상 제목은 재고 파손품 조사야
+Assistant: 선택한 일정을 삭제할까요?
+모델 호출: 예 / kind=delete
+  targetEvidence.title: 재고 파손품 조사 [입력 2턴, adopted]
+  부족 정보: 없음
+사용자 3: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-completed_update-r3-v0 | 3라운드 | completed_update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 그 일정 완료로 표시해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  changeEvidence.completed: 완료로 표시해 줘 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 대상 제목은 보냉 운반함 세척이야
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 예 / kind=update
+  targetEvidence.title: 보냉 운반함 세척 [입력 2턴, adopted]
+  changeEvidence.completed: 완료로 표시해 줘 [입력 1턴, adopted]
+  부족 정보: 없음
+사용자 3: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-completed_update-r3-v1 | 3라운드 | completed_update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 그 일정 완료 처리를 취소해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  changeEvidence.completed: 완료 처리를 취소해 줘 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 대상 제목은 반품 검수표 작성이야
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 예 / kind=update
+  targetEvidence.title: 반품 검수표 작성 [입력 2턴, adopted]
+  changeEvidence.completed: 완료 처리를 취소해 줘 [입력 1턴, adopted]
+  부족 정보: 없음
+사용자 3: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-completed_update-r3-v2 | 3라운드 | completed_update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 미완료인 출고 운송장 점검 일정을 완료로 표시해 줘
+Assistant: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+모델 호출: 예 / kind=update
+  targetEvidence.completedState: 미완료인 [입력 1턴, adopted]
+  targetEvidence.date: 내일 [입력 1턴, adopted]
+  targetEvidence.title: 출고 운송장 점검 [입력 1턴, adopted]
+  changeEvidence.completed: 완료로 표시해 줘 [입력 1턴, adopted]
+  부족 정보: 없음
+사용자 2: 두 번째 일정 선택
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 3: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-completed_update-r3-v3 | 3라운드 | completed_update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 그 일정 완료로 표시해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  changeEvidence.completed: 완료로 표시해 줘 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 아니, 재고 적치 높이 점검 일정을 완료 처리를 취소해 줘
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 예 / kind=update
+  targetEvidence.title: 재고 적치 높이 점검 [입력 2턴, adopted]
+  changeEvidence.completed: 완료로 표시해 줘 [입력 1턴, superseded]
+  changeEvidence.completed: 아니 [입력 2턴, correction_marker]
+  changeEvidence.completed: 완료 처리를 취소해 줘 [입력 2턴, adopted]
+  부족 정보: 없음
+사용자 3: 거절
+Assistant: 요청을 취소했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-create-r4-v0 | 4라운드 | create
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 일정 하나 등록해 줘
+Assistant: 어떤 일정인가요? 일정 이름을 알려 주세요.
+모델 호출: 예 / kind=create
+  부족 정보: task_or_title, date, time
+사용자 2: 제목은 입고 팔레트 검수야
+Assistant: 며칠로 할까요?
+모델 호출: 예 / kind=create
+  changeEvidence.title: 입고 팔레트 검수 [입력 2턴, adopted]
+  changeEvidence.category: 입고 [입력 2턴, adopted]
+  부족 정보: date, time
+사용자 3: 내일로 해 줘
+Assistant: 몇 시로 할까요?
+모델 호출: 예 / kind=create
+  changeEvidence.title: 입고 팔레트 검수 [입력 2턴, adopted]
+  changeEvidence.category: 입고 [입력 2턴, adopted]
+  changeEvidence.date: 내일 [입력 3턴, adopted]
+  부족 정보: time
+사용자 4: 오후 3시야
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 예 / kind=create
+  changeEvidence.title: 입고 팔레트 검수 [입력 2턴, adopted]
+  changeEvidence.category: 입고 [입력 2턴, adopted]
+  changeEvidence.date: 내일 [입력 3턴, adopted]
+  changeEvidence.time: 오후 3시 [입력 4턴, adopted]
+  부족 정보: 없음
+
+mt60-create-r4-v1 | 4라운드 | create
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 4시에 일정 등록해 줘
+Assistant: 어떤 일정인가요? 일정 이름을 알려 주세요.
+모델 호출: 예 / kind=create
+  changeEvidence.date: 내일 [입력 1턴, adopted]
+  changeEvidence.time: 4시 [입력 1턴, adopted]
+  부족 정보: task_or_title, ampm
+사용자 2: 제목은 반품 상품 외관 검사야
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=create
+  changeEvidence.date: 내일 [입력 1턴, adopted]
+  changeEvidence.time: 4시 [입력 1턴, adopted]
+  changeEvidence.title: 반품 상품 외관 검사 [입력 2턴, adopted]
+  changeEvidence.category: 반품 [입력 2턴, adopted]
+  부족 정보: ampm
+사용자 3: 아니, 날짜는 모레로 해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=create
+  changeEvidence.date: 내일 [입력 1턴, superseded]
+  changeEvidence.date: 아니 [입력 3턴, correction_marker]
+  changeEvidence.date: 모레 [입력 3턴, adopted]
+  changeEvidence.time: 4시 [입력 1턴, adopted]
+  changeEvidence.title: 반품 상품 외관 검사 [입력 2턴, adopted]
+  changeEvidence.category: 반품 [입력 2턴, adopted]
+  부족 정보: ampm
+사용자 4: 4시 말고 오후 4시로 등록해 줘
+Assistant: 요청한 일정 처리를 완료했어요.
+[후처리 진단] 올바른 정답을 넣어도 v18 후보에서 재질문. 학습 필요 근거로 단독 사용 금지.
+모델 호출: 예 / kind=create
+  changeEvidence.date: 내일 [입력 1턴, superseded]
+  changeEvidence.date: 아니 [입력 3턴, correction_marker]
+  changeEvidence.date: 모레 [입력 3턴, adopted]
+  changeEvidence.time: 4시 [입력 4턴, superseded, occurrence=1]
+  changeEvidence.time: 말고 [입력 4턴, correction_marker]
+  changeEvidence.time: 오후 4시 [입력 4턴, adopted]
+  changeEvidence.title: 반품 상품 외관 검사 [입력 2턴, adopted]
+  changeEvidence.category: 반품 [입력 2턴, adopted]
+  부족 정보: 없음
+
+mt60-create-r4-v2 | 4라운드 | create
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 출고 상차 순서 점검 일정 추가해 줘
+Assistant: 며칠로 할까요?
+모델 호출: 예 / kind=create
+  changeEvidence.title: 출고 상차 순서 점검 [입력 1턴, adopted]
+  changeEvidence.category: 출고 [입력 1턴, adopted]
+  부족 정보: date, time
+사용자 2: 날짜는 내일이야
+Assistant: 몇 시로 할까요?
+모델 호출: 예 / kind=create
+  changeEvidence.title: 출고 상차 순서 점검 [입력 1턴, adopted]
+  changeEvidence.category: 출고 [입력 1턴, adopted]
+  changeEvidence.date: 내일 [입력 2턴, adopted]
+  부족 정보: time
+사용자 3: 새벽 12시에 시작해
+Assistant: 1월 11일 0시(자정) 말씀이세요?
+모델 호출: 예 / kind=create
+  changeEvidence.title: 출고 상차 순서 점검 [입력 1턴, adopted]
+  changeEvidence.category: 출고 [입력 1턴, adopted]
+  changeEvidence.date: 내일 [입력 2턴, adopted]
+  changeEvidence.time: 새벽 12시 [입력 3턴, adopted]
+  부족 정보: 없음
+사용자 4: 응
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-create-r4-v3 | 4라운드 | create
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 재고 유통기한 확인 등록해 줘
+Assistant: 며칠로 할까요?
+모델 호출: 예 / kind=create
+  changeEvidence.title: 재고 유통기한 확인 [입력 1턴, adopted]
+  changeEvidence.category: 재고 [입력 1턴, adopted]
+  부족 정보: date, time
+사용자 2: 내일 새벽 12시에 시작해
+Assistant: 1월 11일 0시(자정) 말씀이세요?
+모델 호출: 예 / kind=create
+  changeEvidence.title: 재고 유통기한 확인 [입력 1턴, adopted]
+  changeEvidence.category: 재고 [입력 1턴, adopted]
+  changeEvidence.date: 내일 [입력 2턴, adopted]
+  changeEvidence.time: 새벽 12시 [입력 2턴, adopted]
+  부족 정보: 없음
+사용자 3: 아니
+Assistant: 시간을 '오후 3시'처럼 다시 말씀해 주세요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 4: 새벽 12시 말고 오후 5시로 등록해 줘
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 예 / kind=create
+  changeEvidence.title: 재고 유통기한 확인 [입력 1턴, adopted]
+  changeEvidence.category: 재고 [입력 1턴, adopted]
+  changeEvidence.date: 내일 [입력 2턴, adopted]
+  changeEvidence.time: 새벽 12시 [입력 3턴, superseded]
+  changeEvidence.time: 말고 [입력 3턴, correction_marker]
+  changeEvidence.time: 오후 5시 [입력 3턴, adopted]
+  부족 정보: 없음
+
+mt60-list-r4-v0 | 4라운드 | list
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 3시 일정 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 3시 [입력 1턴, adopted]
+  부족 정보: ampm
+사용자 2: 제목은 입고 바코드 검수로 찾아 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 3시 [입력 1턴, adopted]
+  filterEvidence.title: 입고 바코드 검수 [입력 2턴, adopted]
+  부족 정보: ampm
+사용자 3: 아니, 날짜는 모레로 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, superseded]
+  filterEvidence.date: 아니 [입력 3턴, correction_marker]
+  filterEvidence.date: 모레 [입력 3턴, adopted]
+  filterEvidence.time: 3시 [입력 1턴, adopted]
+  filterEvidence.title: 입고 바코드 검수 [입력 2턴, adopted]
+  부족 정보: ampm
+사용자 4: 3시 말고 오후 3시 일정이야
+Assistant: 조건에 맞는 일정은 입고 바코드 검수입니다.
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, superseded]
+  filterEvidence.date: 아니 [입력 3턴, correction_marker]
+  filterEvidence.date: 모레 [입력 3턴, adopted]
+  filterEvidence.time: 3시 [입력 4턴, superseded, occurrence=1]
+  filterEvidence.time: 말고 [입력 4턴, correction_marker]
+  filterEvidence.time: 오후 3시 [입력 4턴, adopted]
+  filterEvidence.title: 입고 바코드 검수 [입력 2턴, adopted]
+  부족 정보: 없음
+
+mt60-list-r4-v1 | 4라운드 | list
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 5시 일정 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 5시 [입력 1턴, adopted]
+  부족 정보: ampm
+사용자 2: 분류는 재고 분류로 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 5시 [입력 1턴, adopted]
+  filterEvidence.category: 재고 분류 [입력 2턴, adopted]
+  부족 정보: ampm
+사용자 3: 아니, 날짜는 모레로 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, superseded]
+  filterEvidence.date: 아니 [입력 3턴, correction_marker]
+  filterEvidence.date: 모레 [입력 3턴, adopted]
+  filterEvidence.time: 5시 [입력 1턴, adopted]
+  filterEvidence.category: 재고 분류 [입력 2턴, adopted]
+  부족 정보: ampm
+사용자 4: 5시 대신 오후 5시 일정이야
+Assistant: 조건에 맞는 일정은 재고 보관 구역 점검입니다.
+[후처리 진단] 올바른 정답을 넣어도 v18 후보에서 재질문. 학습 필요 근거로 단독 사용 금지.
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, superseded]
+  filterEvidence.date: 아니 [입력 3턴, correction_marker]
+  filterEvidence.date: 모레 [입력 3턴, adopted]
+  filterEvidence.time: 5시 [입력 4턴, superseded, occurrence=1]
+  filterEvidence.time: 대신 [입력 4턴, correction_marker]
+  filterEvidence.time: 오후 5시 [입력 4턴, adopted]
+  filterEvidence.category: 재고 분류 [입력 2턴, adopted]
+  부족 정보: 없음
+
+mt60-list-r4-v2 | 4라운드 | list
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 6시 반품 수량 확인 일정 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 6시 [입력 1턴, adopted]
+  filterEvidence.title: 반품 수량 확인 [입력 1턴, adopted]
+  부족 정보: ampm
+사용자 2: 완료된 일정만 찾아 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 6시 [입력 1턴, adopted]
+  filterEvidence.title: 반품 수량 확인 [입력 1턴, adopted]
+  filterEvidence.completed: 완료된 [입력 2턴, adopted]
+  부족 정보: ampm
+사용자 3: 반품 분류에서 찾아 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 6시 [입력 1턴, adopted]
+  filterEvidence.title: 반품 수량 확인 [입력 1턴, adopted]
+  filterEvidence.completed: 완료된 [입력 2턴, adopted]
+  filterEvidence.category: 반품 분류 [입력 3턴, adopted]
+  부족 정보: ampm
+사용자 4: 6시 대신 오후 6시 일정이야
+Assistant: 조건에 맞는 일정은 반품 수량 확인입니다.
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 6시 [입력 4턴, superseded, occurrence=1]
+  filterEvidence.time: 대신 [입력 4턴, correction_marker]
+  filterEvidence.time: 오후 6시 [입력 4턴, adopted]
+  filterEvidence.title: 반품 수량 확인 [입력 1턴, adopted]
+  filterEvidence.completed: 완료된 [입력 2턴, adopted]
+  filterEvidence.category: 반품 분류 [입력 3턴, adopted]
+  부족 정보: 없음
+
+mt60-list-r4-v3 | 4라운드 | list
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 7시 입고 인수증 정리 일정 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 7시 [입력 1턴, adopted]
+  filterEvidence.title: 입고 인수증 정리 [입력 1턴, adopted]
+  부족 정보: ampm
+사용자 2: 입고 인수증 정리 말고 입고 라벨 누락 확인 일정을 찾아 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 7시 [입력 1턴, adopted]
+  filterEvidence.title: 입고 인수증 정리 [입력 2턴, superseded]
+  filterEvidence.title: 말고 [입력 2턴, correction_marker]
+  filterEvidence.title: 입고 라벨 누락 확인 [입력 2턴, adopted]
+  부족 정보: ampm
+사용자 3: 미완료인 일정만 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 7시 [입력 1턴, adopted]
+  filterEvidence.title: 입고 인수증 정리 [입력 2턴, superseded]
+  filterEvidence.title: 말고 [입력 2턴, correction_marker]
+  filterEvidence.title: 입고 라벨 누락 확인 [입력 2턴, adopted]
+  filterEvidence.completed: 미완료인 [입력 3턴, adopted]
+  부족 정보: ampm
+사용자 4: 7시 대신 오후 7시 일정이야
+Assistant: 조건에 맞는 일정은 입고 라벨 누락 확인입니다.
+[후처리 진단] 올바른 정답을 넣어도 v18 후보에서 재질문. 학습 필요 근거로 단독 사용 금지.
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 7시 [입력 4턴, superseded, occurrence=1]
+  filterEvidence.time: 대신 [입력 4턴, correction_marker]
+  filterEvidence.time: 오후 7시 [입력 4턴, adopted]
+  filterEvidence.title: 입고 인수증 정리 [입력 2턴, superseded]
+  filterEvidence.title: 말고 [입력 2턴, correction_marker]
+  filterEvidence.title: 입고 라벨 누락 확인 [입력 2턴, adopted]
+  filterEvidence.completed: 미완료인 [입력 3턴, adopted]
+  부족 정보: 없음
+
+mt60-update-r4-v0 | 4라운드 | update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 그 일정을 수정해 줘
+Assistant: 무엇으로 바꿀까요?
+모델 호출: 예 / kind=update
+  부족 정보: task_or_title, change_value
+사용자 2: 시각을 오후 3시로 바꿔 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  changeEvidence.time: 오후 3시 [입력 2턴, adopted]
+  부족 정보: task_or_title
+사용자 3: 대상은 재고 순환 실사야
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 예 / kind=update
+  targetEvidence.title: 재고 순환 실사 [입력 3턴, adopted]
+  changeEvidence.time: 오후 3시 [입력 2턴, adopted]
+  부족 정보: 없음
+사용자 4: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-update-r4-v1 | 4라운드 | update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 그 일정 제목을 바꿔 줘
+Assistant: 무엇으로 바꿀까요?
+모델 호출: 예 / kind=update
+  부족 정보: task_or_title, change_value
+사용자 2: 새 제목은 출고 기사 인수증 대조야
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  changeEvidence.title: 출고 기사 인수증 대조 [입력 2턴, adopted]
+  부족 정보: task_or_title
+사용자 3: 대상 제목은 출고 도크 대기품 정리야
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 예 / kind=update
+  targetEvidence.title: 출고 도크 대기품 정리 [입력 3턴, adopted]
+  changeEvidence.title: 출고 기사 인수증 대조 [입력 2턴, adopted]
+  부족 정보: 없음
+사용자 4: 거절
+Assistant: 요청을 취소했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-update-r4-v2 | 4라운드 | update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 반품 회수 용기 세척 일정 수정해 줘
+Assistant: 무엇으로 바꿀까요?
+모델 호출: 예 / kind=update
+  targetEvidence.title: 반품 회수 용기 세척 [입력 1턴, adopted]
+  부족 정보: change_value
+사용자 2: 날짜를 1월 5일로 바꿔 줘
+Assistant: 1월 5일은 이미 지났어요. 2029년 1월 5일 말씀이세요?
+모델 호출: 예 / kind=update
+  targetEvidence.title: 반품 회수 용기 세척 [입력 1턴, adopted]
+  changeEvidence.date: 1월 5일 [입력 2턴, adopted]
+  부족 정보: 없음
+사용자 3: 응
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 4: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-update-r4-v3 | 4라운드 | update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 그 일정을 내일 6시로 옮겨 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=update
+  changeEvidence.date: 내일 [입력 1턴, adopted]
+  changeEvidence.time: 6시 [입력 1턴, adopted]
+  부족 정보: task_or_title, ampm
+사용자 2: 6시 말고 오후 6시로 바꿔 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  changeEvidence.date: 내일 [입력 1턴, adopted]
+  changeEvidence.time: 6시 [입력 2턴, superseded, occurrence=1]
+  changeEvidence.time: 말고 [입력 2턴, correction_marker]
+  changeEvidence.time: 오후 6시 [입력 2턴, adopted]
+  부족 정보: task_or_title
+사용자 3: 대상 제목은 입고 적치 위치 배정이야
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 예 / kind=update
+  targetEvidence.title: 입고 적치 위치 배정 [입력 3턴, adopted]
+  changeEvidence.date: 내일 [입력 1턴, adopted]
+  changeEvidence.time: 6시 [입력 2턴, superseded, occurrence=1]
+  changeEvidence.time: 말고 [입력 2턴, correction_marker]
+  changeEvidence.time: 오후 6시 [입력 2턴, adopted]
+  부족 정보: 없음
+사용자 4: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-delete-r4-v0 | 4라운드 | delete
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 일정 하나 삭제해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.date: 내일 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 제목은 반품 회수품 접수야
+Assistant: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.date: 내일 [입력 1턴, adopted]
+  targetEvidence.title: 반품 회수품 접수 [입력 2턴, adopted]
+  부족 정보: 없음
+사용자 3: 두 번째 일정 선택
+Assistant: 선택한 일정을 삭제할까요?
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 4: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-delete-r4-v1 | 4라운드 | delete
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 완료된 일정 하나 삭제해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.completedState: 완료된 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 대상 날짜는 내일이야
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.completedState: 완료된 [입력 1턴, adopted]
+  targetEvidence.date: 내일 [입력 2턴, adopted]
+  부족 정보: task_or_title
+사용자 3: 대상 제목은 출고 봉인 기록 확인이야
+Assistant: 선택한 일정을 삭제할까요?
+모델 호출: 예 / kind=delete
+  targetEvidence.completedState: 완료된 [입력 1턴, adopted]
+  targetEvidence.date: 내일 [입력 2턴, adopted]
+  targetEvidence.title: 출고 봉인 기록 확인 [입력 3턴, adopted]
+  부족 정보: 없음
+사용자 4: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-delete-r4-v2 | 4라운드 | delete
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 3시 그 일정을 삭제해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.date: 내일 [입력 1턴, adopted]
+  targetEvidence.time: 3시 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 대상 제목은 입고 납품서 대조야
+Assistant: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.date: 내일 [입력 1턴, adopted]
+  targetEvidence.time: 3시 [입력 1턴, adopted]
+  targetEvidence.title: 입고 납품서 대조 [입력 2턴, adopted]
+  부족 정보: 없음
+사용자 3: 두 번째 일정 선택
+Assistant: 선택한 일정을 삭제할까요?
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 4: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-delete-r4-v3 | 4라운드 | delete
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 그 일정 삭제해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=delete
+  부족 정보: task_or_title
+사용자 2: 재고 분류의 일정이야
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.category: 재고 분류 [입력 2턴, adopted]
+  부족 정보: task_or_title
+사용자 3: 대상 제목은 재고 파손품 조사야
+Assistant: 선택한 일정을 삭제할까요?
+모델 호출: 예 / kind=delete
+  targetEvidence.category: 재고 분류 [입력 2턴, adopted]
+  targetEvidence.title: 재고 파손품 조사 [입력 3턴, adopted]
+  부족 정보: 없음
+사용자 4: 거절
+Assistant: 요청을 취소했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-completed_update-r4-v0 | 4라운드 | completed_update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 그 일정 완료로 표시해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  changeEvidence.completed: 완료로 표시해 줘 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 대상 제목은 보냉 운반함 세척이야
+Assistant: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+모델 호출: 예 / kind=update
+  targetEvidence.title: 보냉 운반함 세척 [입력 2턴, adopted]
+  changeEvidence.completed: 완료로 표시해 줘 [입력 1턴, adopted]
+  부족 정보: 없음
+사용자 3: 두 번째 일정 선택
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 4: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-completed_update-r4-v1 | 4라운드 | completed_update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 그 일정 완료 처리를 취소해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  changeEvidence.completed: 완료 처리를 취소해 줘 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 내일 일정이 대상이야
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  targetEvidence.date: 내일 [입력 2턴, adopted]
+  changeEvidence.completed: 완료 처리를 취소해 줘 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 3: 대상 제목은 반품 검수표 작성이야
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 예 / kind=update
+  targetEvidence.date: 내일 [입력 2턴, adopted]
+  targetEvidence.title: 반품 검수표 작성 [입력 3턴, adopted]
+  changeEvidence.completed: 완료 처리를 취소해 줘 [입력 1턴, adopted]
+  부족 정보: 없음
+사용자 4: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-completed_update-r4-v2 | 4라운드 | completed_update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 완료된 그 일정을 완료 처리를 취소해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  targetEvidence.completedState: 완료된 [입력 1턴, adopted]
+  targetEvidence.date: 내일 [입력 1턴, adopted]
+  changeEvidence.completed: 완료 처리를 취소해 줘 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 대상 제목은 출고 운송장 점검이야
+Assistant: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+모델 호출: 예 / kind=update
+  targetEvidence.completedState: 완료된 [입력 1턴, adopted]
+  targetEvidence.date: 내일 [입력 1턴, adopted]
+  targetEvidence.title: 출고 운송장 점검 [입력 2턴, adopted]
+  changeEvidence.completed: 완료 처리를 취소해 줘 [입력 1턴, adopted]
+  부족 정보: 없음
+사용자 3: 두 번째 일정 선택
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 4: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-completed_update-r4-v3 | 4라운드 | completed_update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 그 일정 완료 처리를 취소해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  changeEvidence.completed: 완료 처리를 취소해 줘 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 아니, 완료로 표시해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  changeEvidence.completed: 완료 처리를 취소해 줘 [입력 1턴, superseded]
+  changeEvidence.completed: 아니 [입력 2턴, correction_marker]
+  changeEvidence.completed: 완료로 표시해 줘 [입력 2턴, adopted]
+  부족 정보: task_or_title
+사용자 3: 대상 제목은 재고 적치 높이 점검이야
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 예 / kind=update
+  targetEvidence.title: 재고 적치 높이 점검 [입력 3턴, adopted]
+  changeEvidence.completed: 완료 처리를 취소해 줘 [입력 1턴, superseded]
+  changeEvidence.completed: 아니 [입력 2턴, correction_marker]
+  changeEvidence.completed: 완료로 표시해 줘 [입력 2턴, adopted]
+  부족 정보: 없음
+사용자 4: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-create-r5-v0 | 5라운드 | create
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 입고 팔레트 검수 일정 등록해 줘
+Assistant: 며칠로 할까요?
+모델 호출: 예 / kind=create
+  changeEvidence.title: 입고 팔레트 검수 [입력 1턴, adopted]
+  changeEvidence.category: 입고 [입력 1턴, adopted]
+  부족 정보: date, time
+사용자 2: 내일이야
+Assistant: 몇 시로 할까요?
+모델 호출: 예 / kind=create
+  changeEvidence.title: 입고 팔레트 검수 [입력 1턴, adopted]
+  changeEvidence.category: 입고 [입력 1턴, adopted]
+  changeEvidence.date: 내일 [입력 2턴, adopted]
+  부족 정보: time
+사용자 3: 아니, 제목은 입고 파손 상자 확인이야
+Assistant: 몇 시로 할까요?
+모델 호출: 예 / kind=create
+  changeEvidence.title: 입고 팔레트 검수 [입력 1턴, superseded]
+  changeEvidence.title: 아니 [입력 3턴, correction_marker]
+  changeEvidence.title: 입고 파손 상자 확인 [입력 3턴, adopted]
+  changeEvidence.category: 입고 [입력 3턴, adopted]
+  changeEvidence.date: 내일 [입력 2턴, adopted]
+  부족 정보: time
+사용자 4: 새벽 12시로 등록해 줘
+Assistant: 1월 11일 0시(자정) 말씀이세요?
+모델 호출: 예 / kind=create
+  changeEvidence.title: 입고 팔레트 검수 [입력 1턴, superseded]
+  changeEvidence.title: 아니 [입력 3턴, correction_marker]
+  changeEvidence.title: 입고 파손 상자 확인 [입력 3턴, adopted]
+  changeEvidence.category: 입고 [입력 3턴, adopted]
+  changeEvidence.date: 내일 [입력 2턴, adopted]
+  changeEvidence.time: 새벽 12시 [입력 4턴, adopted]
+  부족 정보: 없음
+사용자 5: 응
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-create-r5-v1 | 5라운드 | create
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 새 일정을 등록해 줘
+Assistant: 어떤 일정인가요? 일정 이름을 알려 주세요.
+모델 호출: 예 / kind=create
+  부족 정보: task_or_title, date, time
+사용자 2: 날짜는 내일이야
+Assistant: 어떤 일정인가요? 일정 이름을 알려 주세요.
+모델 호출: 예 / kind=create
+  changeEvidence.date: 내일 [입력 2턴, adopted]
+  부족 정보: task_or_title, time
+사용자 3: 제목은 반품 상품 외관 검사야
+Assistant: 몇 시로 할까요?
+모델 호출: 예 / kind=create
+  changeEvidence.date: 내일 [입력 2턴, adopted]
+  changeEvidence.title: 반품 상품 외관 검사 [입력 3턴, adopted]
+  changeEvidence.category: 반품 [입력 3턴, adopted]
+  부족 정보: time
+사용자 4: 시각은 4시야
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=create
+  changeEvidence.date: 내일 [입력 2턴, adopted]
+  changeEvidence.title: 반품 상품 외관 검사 [입력 3턴, adopted]
+  changeEvidence.category: 반품 [입력 3턴, adopted]
+  changeEvidence.time: 4시 [입력 4턴, adopted]
+  부족 정보: ampm
+사용자 5: 4시 말고 오후 4시로 등록해 줘
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 예 / kind=create
+  changeEvidence.date: 내일 [입력 2턴, adopted]
+  changeEvidence.title: 반품 상품 외관 검사 [입력 3턴, adopted]
+  changeEvidence.category: 반품 [입력 3턴, adopted]
+  changeEvidence.time: 4시 [입력 5턴, superseded, occurrence=1]
+  changeEvidence.time: 말고 [입력 5턴, correction_marker]
+  changeEvidence.time: 오후 4시 [입력 5턴, adopted]
+  부족 정보: 없음
+
+mt60-create-r5-v2 | 5라운드 | create
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 일정을 새로 추가해 줘
+Assistant: 어떤 일정인가요? 일정 이름을 알려 주세요.
+모델 호출: 예 / kind=create
+  부족 정보: task_or_title, date, time
+사용자 2: 일정 이름은 출고 상차 순서 점검이야
+Assistant: 며칠로 할까요?
+모델 호출: 예 / kind=create
+  changeEvidence.title: 출고 상차 순서 점검 [입력 2턴, adopted]
+  changeEvidence.category: 출고 [입력 2턴, adopted]
+  부족 정보: date, time
+사용자 3: 날짜는 내일이야
+Assistant: 몇 시로 할까요?
+모델 호출: 예 / kind=create
+  changeEvidence.title: 출고 상차 순서 점검 [입력 2턴, adopted]
+  changeEvidence.category: 출고 [입력 2턴, adopted]
+  changeEvidence.date: 내일 [입력 3턴, adopted]
+  부족 정보: time
+사용자 4: 새벽 12시에 시작해
+Assistant: 1월 11일 0시(자정) 말씀이세요?
+모델 호출: 예 / kind=create
+  changeEvidence.title: 출고 상차 순서 점검 [입력 2턴, adopted]
+  changeEvidence.category: 출고 [입력 2턴, adopted]
+  changeEvidence.date: 내일 [입력 3턴, adopted]
+  changeEvidence.time: 새벽 12시 [입력 4턴, adopted]
+  부족 정보: 없음
+사용자 5: 응
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-create-r5-v3 | 5라운드 | create
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 일정 하나 만들어 줘
+Assistant: 어떤 일정인가요? 일정 이름을 알려 주세요.
+모델 호출: 예 / kind=create
+  부족 정보: task_or_title, date, time
+사용자 2: 제목은 재고 유통기한 확인이야
+Assistant: 며칠로 할까요?
+모델 호출: 예 / kind=create
+  changeEvidence.title: 재고 유통기한 확인 [입력 2턴, adopted]
+  changeEvidence.category: 재고 [입력 2턴, adopted]
+  부족 정보: date, time
+사용자 3: 내일 새벽 12시에 시작해
+Assistant: 1월 11일 0시(자정) 말씀이세요?
+모델 호출: 예 / kind=create
+  changeEvidence.title: 재고 유통기한 확인 [입력 2턴, adopted]
+  changeEvidence.category: 재고 [입력 2턴, adopted]
+  changeEvidence.date: 내일 [입력 3턴, adopted]
+  changeEvidence.time: 새벽 12시 [입력 3턴, adopted]
+  부족 정보: 없음
+사용자 4: 아니
+Assistant: 시간을 '오후 3시'처럼 다시 말씀해 주세요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 5: 새벽 12시 말고 오후 5시로 등록해 줘
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 예 / kind=create
+  changeEvidence.title: 재고 유통기한 확인 [입력 2턴, adopted]
+  changeEvidence.category: 재고 [입력 2턴, adopted]
+  changeEvidence.date: 내일 [입력 3턴, adopted]
+  changeEvidence.time: 새벽 12시 [입력 4턴, superseded]
+  changeEvidence.time: 말고 [입력 4턴, correction_marker]
+  changeEvidence.time: 오후 5시 [입력 4턴, adopted]
+  부족 정보: 없음
+
+mt60-list-r5-v0 | 5라운드 | list
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 3시 일정 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 3시 [입력 1턴, adopted]
+  부족 정보: ampm
+사용자 2: 제목은 입고 바코드 검수로 찾아 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 3시 [입력 1턴, adopted]
+  filterEvidence.title: 입고 바코드 검수 [입력 2턴, adopted]
+  부족 정보: ampm
+사용자 3: 아니, 날짜는 모레로 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, superseded]
+  filterEvidence.date: 아니 [입력 3턴, correction_marker]
+  filterEvidence.date: 모레 [입력 3턴, adopted]
+  filterEvidence.time: 3시 [입력 1턴, adopted]
+  filterEvidence.title: 입고 바코드 검수 [입력 2턴, adopted]
+  부족 정보: ampm
+사용자 4: 입고 바코드 검수 말고 출고 운송장 대조 일정을 찾아 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, superseded]
+  filterEvidence.date: 아니 [입력 3턴, correction_marker]
+  filterEvidence.date: 모레 [입력 3턴, adopted]
+  filterEvidence.time: 3시 [입력 1턴, adopted]
+  filterEvidence.title: 입고 바코드 검수 [입력 4턴, superseded]
+  filterEvidence.title: 말고 [입력 4턴, correction_marker]
+  filterEvidence.title: 출고 운송장 대조 [입력 4턴, adopted]
+  부족 정보: ampm
+사용자 5: 3시 말고 오후 3시 일정이야
+Assistant: 조건에 맞는 일정은 출고 운송장 대조입니다.
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, superseded]
+  filterEvidence.date: 아니 [입력 3턴, correction_marker]
+  filterEvidence.date: 모레 [입력 3턴, adopted]
+  filterEvidence.time: 3시 [입력 5턴, superseded, occurrence=1]
+  filterEvidence.time: 말고 [입력 5턴, correction_marker]
+  filterEvidence.time: 오후 3시 [입력 5턴, adopted]
+  filterEvidence.title: 입고 바코드 검수 [입력 4턴, superseded]
+  filterEvidence.title: 말고 [입력 4턴, correction_marker]
+  filterEvidence.title: 출고 운송장 대조 [입력 4턴, adopted]
+  부족 정보: 없음
+
+mt60-list-r5-v1 | 5라운드 | list
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 5시 일정 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 5시 [입력 1턴, adopted]
+  부족 정보: ampm
+사용자 2: 분류는 재고 분류로 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 5시 [입력 1턴, adopted]
+  filterEvidence.category: 재고 분류 [입력 2턴, adopted]
+  부족 정보: ampm
+사용자 3: 아니, 날짜는 모레로 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, superseded]
+  filterEvidence.date: 아니 [입력 3턴, correction_marker]
+  filterEvidence.date: 모레 [입력 3턴, adopted]
+  filterEvidence.time: 5시 [입력 1턴, adopted]
+  filterEvidence.category: 재고 분류 [입력 2턴, adopted]
+  부족 정보: ampm
+사용자 4: 제목은 재고 보관 구역 점검으로 찾아 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, superseded]
+  filterEvidence.date: 아니 [입력 3턴, correction_marker]
+  filterEvidence.date: 모레 [입력 3턴, adopted]
+  filterEvidence.time: 5시 [입력 1턴, adopted]
+  filterEvidence.category: 재고 분류 [입력 2턴, adopted]
+  filterEvidence.title: 재고 보관 구역 점검 [입력 4턴, adopted]
+  부족 정보: ampm
+사용자 5: 5시 대신 오후 5시 일정이야
+Assistant: 조건에 맞는 일정은 재고 보관 구역 점검입니다.
+[후처리 진단] 올바른 정답을 넣어도 v18 후보에서 재질문. 학습 필요 근거로 단독 사용 금지.
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, superseded]
+  filterEvidence.date: 아니 [입력 3턴, correction_marker]
+  filterEvidence.date: 모레 [입력 3턴, adopted]
+  filterEvidence.time: 5시 [입력 5턴, superseded, occurrence=1]
+  filterEvidence.time: 대신 [입력 5턴, correction_marker]
+  filterEvidence.time: 오후 5시 [입력 5턴, adopted]
+  filterEvidence.category: 재고 분류 [입력 2턴, adopted]
+  filterEvidence.title: 재고 보관 구역 점검 [입력 4턴, adopted]
+  부족 정보: 없음
+
+mt60-list-r5-v2 | 5라운드 | list
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 6시 반품 수량 확인 일정 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 6시 [입력 1턴, adopted]
+  filterEvidence.title: 반품 수량 확인 [입력 1턴, adopted]
+  부족 정보: ampm
+사용자 2: 완료된 일정만 찾아 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 6시 [입력 1턴, adopted]
+  filterEvidence.title: 반품 수량 확인 [입력 1턴, adopted]
+  filterEvidence.completed: 완료된 [입력 2턴, adopted]
+  부족 정보: ampm
+사용자 3: 반품 분류에서 찾아 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 6시 [입력 1턴, adopted]
+  filterEvidence.title: 반품 수량 확인 [입력 1턴, adopted]
+  filterEvidence.completed: 완료된 [입력 2턴, adopted]
+  filterEvidence.category: 반품 분류 [입력 3턴, adopted]
+  부족 정보: ampm
+사용자 4: 아니, 날짜는 모레로 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, superseded]
+  filterEvidence.date: 아니 [입력 4턴, correction_marker]
+  filterEvidence.date: 모레 [입력 4턴, adopted]
+  filterEvidence.time: 6시 [입력 1턴, adopted]
+  filterEvidence.title: 반품 수량 확인 [입력 1턴, adopted]
+  filterEvidence.completed: 완료된 [입력 2턴, adopted]
+  filterEvidence.category: 반품 분류 [입력 3턴, adopted]
+  부족 정보: ampm
+사용자 5: 6시 대신 오후 6시 일정이야
+Assistant: 조건에 맞는 일정은 반품 수량 확인입니다.
+[후처리 진단] 올바른 정답을 넣어도 v18 후보에서 재질문. 학습 필요 근거로 단독 사용 금지.
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, superseded]
+  filterEvidence.date: 아니 [입력 4턴, correction_marker]
+  filterEvidence.date: 모레 [입력 4턴, adopted]
+  filterEvidence.time: 6시 [입력 5턴, superseded, occurrence=1]
+  filterEvidence.time: 대신 [입력 5턴, correction_marker]
+  filterEvidence.time: 오후 6시 [입력 5턴, adopted]
+  filterEvidence.title: 반품 수량 확인 [입력 1턴, adopted]
+  filterEvidence.completed: 완료된 [입력 2턴, adopted]
+  filterEvidence.category: 반품 분류 [입력 3턴, adopted]
+  부족 정보: 없음
+
+mt60-list-r5-v3 | 5라운드 | list
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 7시 입고 인수증 정리 일정 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 7시 [입력 1턴, adopted]
+  filterEvidence.title: 입고 인수증 정리 [입력 1턴, adopted]
+  부족 정보: ampm
+사용자 2: 입고 인수증 정리 말고 입고 라벨 누락 확인 일정을 찾아 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 7시 [입력 1턴, adopted]
+  filterEvidence.title: 입고 인수증 정리 [입력 2턴, superseded]
+  filterEvidence.title: 말고 [입력 2턴, correction_marker]
+  filterEvidence.title: 입고 라벨 누락 확인 [입력 2턴, adopted]
+  부족 정보: ampm
+사용자 3: 미완료인 일정만 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, adopted]
+  filterEvidence.time: 7시 [입력 1턴, adopted]
+  filterEvidence.title: 입고 인수증 정리 [입력 2턴, superseded]
+  filterEvidence.title: 말고 [입력 2턴, correction_marker]
+  filterEvidence.title: 입고 라벨 누락 확인 [입력 2턴, adopted]
+  filterEvidence.completed: 미완료인 [입력 3턴, adopted]
+  부족 정보: ampm
+사용자 4: 아니, 날짜는 모레로 조회해 줘
+Assistant: 오전인가요, 오후인가요?
+[후처리 진단] 올바른 정답을 넣어도 v18 후보에서 재질문. 학습 필요 근거로 단독 사용 금지.
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, superseded]
+  filterEvidence.date: 아니 [입력 4턴, correction_marker]
+  filterEvidence.date: 모레 [입력 4턴, adopted]
+  filterEvidence.time: 7시 [입력 1턴, adopted]
+  filterEvidence.title: 입고 인수증 정리 [입력 2턴, superseded]
+  filterEvidence.title: 말고 [입력 2턴, correction_marker]
+  filterEvidence.title: 입고 라벨 누락 확인 [입력 2턴, adopted]
+  filterEvidence.completed: 미완료인 [입력 3턴, adopted]
+  부족 정보: ampm
+사용자 5: 7시 대신 오후 7시 일정이야
+Assistant: 조건에 맞는 일정은 입고 라벨 누락 확인입니다.
+[후처리 진단] 올바른 정답을 넣어도 v18 후보에서 재질문. 학습 필요 근거로 단독 사용 금지.
+모델 호출: 예 / kind=list
+  filterEvidence.date: 내일 [입력 1턴, superseded]
+  filterEvidence.date: 아니 [입력 4턴, correction_marker]
+  filterEvidence.date: 모레 [입력 4턴, adopted]
+  filterEvidence.time: 7시 [입력 5턴, superseded, occurrence=1]
+  filterEvidence.time: 대신 [입력 5턴, correction_marker]
+  filterEvidence.time: 오후 7시 [입력 5턴, adopted]
+  filterEvidence.title: 입고 인수증 정리 [입력 2턴, superseded]
+  filterEvidence.title: 말고 [입력 2턴, correction_marker]
+  filterEvidence.title: 입고 라벨 누락 확인 [입력 2턴, adopted]
+  filterEvidence.completed: 미완료인 [입력 3턴, adopted]
+  부족 정보: 없음
+
+mt60-update-r5-v0 | 5라운드 | update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 그 일정의 시각을 3시로 바꿔 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=update
+  changeEvidence.time: 3시 [입력 1턴, adopted]
+  부족 정보: task_or_title, ampm
+사용자 2: 3시 말고 오후 3시로 바꿔 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  changeEvidence.time: 3시 [입력 2턴, superseded, occurrence=1]
+  changeEvidence.time: 말고 [입력 2턴, correction_marker]
+  changeEvidence.time: 오후 3시 [입력 2턴, adopted]
+  부족 정보: task_or_title
+사용자 3: 일정 제목은 재고 순환 실사야
+Assistant: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+모델 호출: 예 / kind=update
+  targetEvidence.title: 재고 순환 실사 [입력 3턴, adopted]
+  changeEvidence.time: 3시 [입력 2턴, superseded, occurrence=1]
+  changeEvidence.time: 말고 [입력 2턴, correction_marker]
+  changeEvidence.time: 오후 3시 [입력 2턴, adopted]
+  부족 정보: 없음
+사용자 4: 두 번째 일정 선택
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 5: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-update-r5-v1 | 5라운드 | update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 그 일정 제목을 바꿔 줘
+Assistant: 무엇으로 바꿀까요?
+모델 호출: 예 / kind=update
+  부족 정보: task_or_title, change_value
+사용자 2: 새 제목은 출고 기사 인수증 대조야
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  changeEvidence.title: 출고 기사 인수증 대조 [입력 2턴, adopted]
+  부족 정보: task_or_title
+사용자 3: 대상 제목은 출고 도크 대기품 정리야
+Assistant: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+모델 호출: 예 / kind=update
+  targetEvidence.title: 출고 도크 대기품 정리 [입력 3턴, adopted]
+  changeEvidence.title: 출고 기사 인수증 대조 [입력 2턴, adopted]
+  부족 정보: 없음
+사용자 4: 두 번째 일정 선택
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 5: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-update-r5-v2 | 5라운드 | update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 그 일정을 수정해 줘
+Assistant: 무엇으로 바꿀까요?
+모델 호출: 예 / kind=update
+  부족 정보: task_or_title, change_value
+사용자 2: 날짜를 1월 5일로 바꿔 줘
+Assistant: 1월 5일은 이미 지났어요. 2029년 1월 5일 말씀이세요?
+모델 호출: 예 / kind=update
+  changeEvidence.date: 1월 5일 [입력 2턴, adopted]
+  부족 정보: task_or_title
+사용자 3: 응
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 4: 대상 제목은 반품 회수 용기 세척이야
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 예 / kind=update
+  targetEvidence.title: 반품 회수 용기 세척 [입력 3턴, adopted]
+  changeEvidence.date: 1월 5일 [입력 2턴, adopted]
+  부족 정보: 없음
+사용자 5: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-update-r5-v3 | 5라운드 | update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 그 일정을 내일 6시로 옮겨 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=update
+  changeEvidence.date: 내일 [입력 1턴, adopted]
+  changeEvidence.time: 6시 [입력 1턴, adopted]
+  부족 정보: task_or_title, ampm
+사용자 2: 아니, 날짜는 모레로 바꿔 줘
+Assistant: 오전인가요, 오후인가요?
+모델 호출: 예 / kind=update
+  changeEvidence.date: 내일 [입력 1턴, superseded]
+  changeEvidence.date: 아니 [입력 2턴, correction_marker]
+  changeEvidence.date: 모레 [입력 2턴, adopted]
+  changeEvidence.time: 6시 [입력 1턴, adopted]
+  부족 정보: task_or_title, ampm
+사용자 3: 6시 말고 오후 6시로 바꿔 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+[후처리 진단] 올바른 정답을 넣어도 v18 후보에서 재질문. 학습 필요 근거로 단독 사용 금지.
+모델 호출: 예 / kind=update
+  changeEvidence.date: 내일 [입력 1턴, superseded]
+  changeEvidence.date: 아니 [입력 2턴, correction_marker]
+  changeEvidence.date: 모레 [입력 2턴, adopted]
+  changeEvidence.time: 6시 [입력 3턴, superseded, occurrence=1]
+  changeEvidence.time: 말고 [입력 3턴, correction_marker]
+  changeEvidence.time: 오후 6시 [입력 3턴, adopted]
+  부족 정보: task_or_title
+사용자 4: 대상 제목은 입고 적치 위치 배정이야
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+[후처리 진단] 올바른 정답을 넣어도 v18 후보에서 재질문. 학습 필요 근거로 단독 사용 금지.
+모델 호출: 예 / kind=update
+  targetEvidence.title: 입고 적치 위치 배정 [입력 4턴, adopted]
+  changeEvidence.date: 내일 [입력 1턴, superseded]
+  changeEvidence.date: 아니 [입력 2턴, correction_marker]
+  changeEvidence.date: 모레 [입력 2턴, adopted]
+  changeEvidence.time: 6시 [입력 3턴, superseded, occurrence=1]
+  changeEvidence.time: 말고 [입력 3턴, correction_marker]
+  changeEvidence.time: 오후 6시 [입력 3턴, adopted]
+  부족 정보: 없음
+사용자 5: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-delete-r5-v0 | 5라운드 | delete
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 일정 하나 삭제해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.date: 내일 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 아니, 삭제할 날짜는 모레야
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.date: 내일 [입력 1턴, superseded]
+  targetEvidence.date: 아니 [입력 2턴, correction_marker]
+  targetEvidence.date: 모레 [입력 2턴, adopted]
+  부족 정보: task_or_title
+사용자 3: 제목은 반품 회수품 접수야
+Assistant: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.date: 내일 [입력 1턴, superseded]
+  targetEvidence.date: 아니 [입력 2턴, correction_marker]
+  targetEvidence.date: 모레 [입력 2턴, adopted]
+  targetEvidence.title: 반품 회수품 접수 [입력 3턴, adopted]
+  부족 정보: 없음
+사용자 4: 두 번째 일정 선택
+Assistant: 선택한 일정을 삭제할까요?
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 5: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-delete-r5-v1 | 5라운드 | delete
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 완료된 일정 하나 삭제해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.completedState: 완료된 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 대상 날짜는 내일이야
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.completedState: 완료된 [입력 1턴, adopted]
+  targetEvidence.date: 내일 [입력 2턴, adopted]
+  부족 정보: task_or_title
+사용자 3: 대상 제목은 출고 봉인 기록 확인이야
+Assistant: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.completedState: 완료된 [입력 1턴, adopted]
+  targetEvidence.date: 내일 [입력 2턴, adopted]
+  targetEvidence.title: 출고 봉인 기록 확인 [입력 3턴, adopted]
+  부족 정보: 없음
+사용자 4: 두 번째 일정 선택
+Assistant: 선택한 일정을 삭제할까요?
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 5: 거절
+Assistant: 요청을 취소했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-delete-r5-v2 | 5라운드 | delete
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 3시 그 일정을 삭제해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.date: 내일 [입력 1턴, adopted]
+  targetEvidence.time: 3시 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 아니, 날짜는 모레야
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.date: 내일 [입력 1턴, superseded]
+  targetEvidence.date: 아니 [입력 2턴, correction_marker]
+  targetEvidence.date: 모레 [입력 2턴, adopted]
+  targetEvidence.time: 3시 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 3: 대상 제목은 입고 납품서 대조야
+Assistant: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.date: 내일 [입력 1턴, superseded]
+  targetEvidence.date: 아니 [입력 2턴, correction_marker]
+  targetEvidence.date: 모레 [입력 2턴, adopted]
+  targetEvidence.time: 3시 [입력 1턴, adopted]
+  targetEvidence.title: 입고 납품서 대조 [입력 3턴, adopted]
+  부족 정보: 없음
+사용자 4: 두 번째 일정 선택
+Assistant: 선택한 일정을 삭제할까요?
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 5: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-delete-r5-v3 | 5라운드 | delete
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 그 일정 삭제해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=delete
+  부족 정보: task_or_title
+사용자 2: 재고 분류의 일정이야
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.category: 재고 분류 [입력 2턴, adopted]
+  부족 정보: task_or_title
+사용자 3: 대상 날짜는 내일이야
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=delete
+  targetEvidence.category: 재고 분류 [입력 2턴, adopted]
+  targetEvidence.date: 내일 [입력 3턴, adopted]
+  부족 정보: task_or_title
+사용자 4: 대상 제목은 재고 파손품 조사야
+Assistant: 선택한 일정을 삭제할까요?
+모델 호출: 예 / kind=delete
+  targetEvidence.category: 재고 분류 [입력 2턴, adopted]
+  targetEvidence.date: 내일 [입력 3턴, adopted]
+  targetEvidence.title: 재고 파손품 조사 [입력 4턴, adopted]
+  부족 정보: 없음
+사용자 5: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-completed_update-r5-v0 | 5라운드 | completed_update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 그 일정 완료로 표시해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  changeEvidence.completed: 완료로 표시해 줘 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 아니, 완료 처리를 취소해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  changeEvidence.completed: 완료로 표시해 줘 [입력 1턴, superseded]
+  changeEvidence.completed: 아니 [입력 2턴, correction_marker]
+  changeEvidence.completed: 완료 처리를 취소해 줘 [입력 2턴, adopted]
+  부족 정보: task_or_title
+사용자 3: 대상 제목은 보냉 운반함 세척이야
+Assistant: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+모델 호출: 예 / kind=update
+  targetEvidence.title: 보냉 운반함 세척 [입력 3턴, adopted]
+  changeEvidence.completed: 완료로 표시해 줘 [입력 1턴, superseded]
+  changeEvidence.completed: 아니 [입력 2턴, correction_marker]
+  changeEvidence.completed: 완료 처리를 취소해 줘 [입력 2턴, adopted]
+  부족 정보: 없음
+사용자 4: 두 번째 일정 선택
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 5: 거절
+Assistant: 요청을 취소했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-completed_update-r5-v1 | 5라운드 | completed_update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 그 일정 완료로 표시해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  changeEvidence.completed: 완료로 표시해 줘 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 내일 일정이 대상이야
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  targetEvidence.date: 내일 [입력 2턴, adopted]
+  changeEvidence.completed: 완료로 표시해 줘 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 3: 대상 제목은 반품 검수표 작성이야
+Assistant: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+모델 호출: 예 / kind=update
+  targetEvidence.date: 내일 [입력 2턴, adopted]
+  targetEvidence.title: 반품 검수표 작성 [입력 3턴, adopted]
+  changeEvidence.completed: 완료로 표시해 줘 [입력 1턴, adopted]
+  부족 정보: 없음
+사용자 4: 두 번째 일정 선택
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 5: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-completed_update-r5-v2 | 5라운드 | completed_update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 내일 미완료인 그 일정을 완료로 표시해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  targetEvidence.completedState: 미완료인 [입력 1턴, adopted]
+  targetEvidence.date: 내일 [입력 1턴, adopted]
+  changeEvidence.completed: 완료로 표시해 줘 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 아니, 날짜는 모레야
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  targetEvidence.completedState: 미완료인 [입력 1턴, adopted]
+  targetEvidence.date: 내일 [입력 1턴, superseded]
+  targetEvidence.date: 아니 [입력 2턴, correction_marker]
+  targetEvidence.date: 모레 [입력 2턴, adopted]
+  changeEvidence.completed: 완료로 표시해 줘 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 3: 대상 제목은 출고 운송장 점검이야
+Assistant: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+모델 호출: 예 / kind=update
+  targetEvidence.completedState: 미완료인 [입력 1턴, adopted]
+  targetEvidence.date: 내일 [입력 1턴, superseded]
+  targetEvidence.date: 아니 [입력 2턴, correction_marker]
+  targetEvidence.date: 모레 [입력 2턴, adopted]
+  targetEvidence.title: 출고 운송장 점검 [입력 3턴, adopted]
+  changeEvidence.completed: 완료로 표시해 줘 [입력 1턴, adopted]
+  부족 정보: 없음
+사용자 4: 두 번째 일정 선택
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 5: 승인
+Assistant: 요청한 일정 처리를 완료했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+
+mt60-completed_update-r5-v3 | 5라운드 | completed_update
+Assistant 발화와 실행 결과는 작성한 기대값이며 실제 API 관측값이 아님.
+사용자 1: 그 일정 완료로 표시해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  changeEvidence.completed: 완료로 표시해 줘 [입력 1턴, adopted]
+  부족 정보: task_or_title
+사용자 2: 아니, 완료 처리를 취소해 줘
+Assistant: 어떤 일정인지 이름을 알려 주세요.
+모델 호출: 예 / kind=update
+  changeEvidence.completed: 완료로 표시해 줘 [입력 1턴, superseded]
+  changeEvidence.completed: 아니 [입력 2턴, correction_marker]
+  changeEvidence.completed: 완료 처리를 취소해 줘 [입력 2턴, adopted]
+  부족 정보: task_or_title
+사용자 3: 대상 제목은 재고 적치 높이 점검이야
+Assistant: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+모델 호출: 예 / kind=update
+  targetEvidence.title: 재고 적치 높이 점검 [입력 3턴, adopted]
+  changeEvidence.completed: 완료로 표시해 줘 [입력 1턴, superseded]
+  changeEvidence.completed: 아니 [입력 2턴, correction_marker]
+  changeEvidence.completed: 완료 처리를 취소해 줘 [입력 2턴, adopted]
+  부족 정보: 없음
+사용자 4: 두 번째 일정 선택
+Assistant: 선택한 일정에 요청한 변경을 적용할까요?
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.
+사용자 5: 거절
+Assistant: 요청을 취소했어요.
+모델 호출: 아니오 — 선택/승인/거절은 학습 evidence 행으로 만들지 않음.

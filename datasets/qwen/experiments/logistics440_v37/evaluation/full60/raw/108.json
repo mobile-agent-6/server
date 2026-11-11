@@ -1,0 +1,16 @@
+{
+  "key": "e35a5b3b1100425b9611c605e38d9c82a4bb81e901ce220eb18cbe93bc8572eb",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":3,\"text\":\"반품 분류\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":4,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":4,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":5,\"text\":\"6시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":5,\"text\":\"대신\",\"status\":\"correction_marker\"},{\"turn\":5,\"text\":\"오후 6시\",\"status\":\"adopted\"}],\"completed\":[{\"turn\":2,\"text\":\"완료된\",\"status\":\"adopted\"}],\"futureScope\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "3ae9a05b542c14f73cbd846395571f55f301e3ebe07efb92dc17a9772ef8bbdd",
+  "seconds": 11.893269207997946
+}

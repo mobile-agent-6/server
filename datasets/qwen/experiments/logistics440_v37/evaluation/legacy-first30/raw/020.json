@@ -1,0 +1,16 @@
+{
+  "key": "87825dc57121662c14aa4fd64790746f78540e67059e37e257c5cf06a467de61",
+  "identity": {
+    "freezeSha256": "14d9351b65aa64766b77e997e569fc9d12625f2e77207e09def91daf39f2aab9",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"상품 원산지 표시 확인\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"7월 11일\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "af6d8ea32d7492944ec28fd962a36e9a5361e2bb4b224f7fc8f2ee420c69115d",
+  "seconds": 7.634553292009514
+}

@@ -1,0 +1,16 @@
+{
+  "key": "928ffcdb95064f533865910bcf89761a5c07f154dcab46bbbea30e7a10872c9d",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":2,\"text\":\"1월 5일\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+  "rawSha256": "fa738184ce4e19526a0e9785ee8738deb1428a7fb94cf42f1cafc792492c62ae",
+  "seconds": 7.001728874980472
+}

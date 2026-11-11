@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "sourceDialogues": 184,
+  "allSnapshotOccurrences": 381,
+  "newIntermediateOccurrences": 197,
+  "uniqueInputs": 356,
+  "uniqueNewIntermediateInputs": 172,
+  "contractSourceRolePass": 381,
+  "prefixSemanticInvariantChecks": 197,
+  "futureMutationChecks": 197,
+  "valueTransitionChecks": 49,
+  "sameInputConflictingTargets": 0,
+  "documentedFinalOrderNormalizations": 41,
+  "documentedSourceTextRepairProposals": 1,
+  "originalSourceUnchanged": true,
+  "independentHumanReview": false,
+  "newTraining": false,
+  "newModelInference": false,
+  "apiReplay": false,
+  "scope": "Explicit AI-authored prefix labels plus automatic structural/semantic invariants. Data correctness checks, not model accuracy or API flow verification."
+}

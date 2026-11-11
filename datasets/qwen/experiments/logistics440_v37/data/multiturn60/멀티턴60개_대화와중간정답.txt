@@ -1,0 +1,1318 @@
+mt60-create-r3-v0 | 3라운드 | create
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 입고 팔레트 검수 일정 등록해 줘
+Assistant 기대 발화: 며칠로 할까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "며칠로 할까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["date","time"],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"입고","turn":1}],"title":[{"status":"adopted","text":"입고 팔레트 검수","turn":1}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["date","time"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 내일이야
+Assistant 기대 발화: 몇 시로 할까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "몇 시로 할까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["time"],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"입고","turn":1}],"date":[{"status":"adopted","text":"내일","turn":2}],"title":[{"status":"adopted","text":"입고 팔레트 검수","turn":1}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["time"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 오후 3시에 시작해
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "operation": "create", "outcome": "success", "schedulesChanged": true}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"입고","turn":1}],"date":[{"status":"adopted","text":"내일","turn":2}],"time":[{"status":"adopted","text":"오후 3시","turn":3}],"title":[{"status":"adopted","text":"입고 팔레트 검수","turn":1}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+
+mt60-create-r3-v1 | 3라운드 | create
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 오후 4시에 일정 등록해 줘
+Assistant 기대 발화: 어떤 일정인가요? 일정 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인가요? 일정 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"오후 4시","turn":1}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 아니, 날짜는 모레로 해 줘
+Assistant 기대 발화: 어떤 일정인가요? 일정 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인가요? 일정 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":2},{"status":"adopted","text":"모레","turn":2}],"time":[{"status":"adopted","text":"오후 4시","turn":1}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 제목은 반품 상품 외관 검사야
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "operation": "create", "outcome": "success", "schedulesChanged": true}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"반품","turn":3}],"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":2},{"status":"adopted","text":"모레","turn":2}],"time":[{"status":"adopted","text":"오후 4시","turn":1}],"title":[{"status":"adopted","text":"반품 상품 외관 검사","turn":3}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+
+mt60-create-r3-v2 | 3라운드 | create
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 출고 상차 순서 점검 일정 추가해 줘
+Assistant 기대 발화: 며칠로 할까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "며칠로 할까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["date","time"],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"출고","turn":1}],"title":[{"status":"adopted","text":"출고 상차 순서 점검","turn":1}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["date","time"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 내일 새벽 12시에 시작해
+Assistant 기대 발화: 1월 11일 0시(자정) 말씀이세요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "1월 11일 0시(자정) 말씀이세요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"출고","turn":1}],"date":[{"status":"adopted","text":"내일","turn":2}],"time":[{"status":"adopted","text":"새벽 12시","turn":2}],"title":[{"status":"adopted","text":"출고 상차 순서 점검","turn":1}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 응
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "operation": "create", "outcome": "success", "schedulesChanged": true}
+모델 호출 기대: False
+
+mt60-create-r3-v3 | 3라운드 | create
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 새벽 12시에 재고 유통기한 확인 등록해 줘
+Assistant 기대 발화: 1월 11일 0시(자정) 말씀이세요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "1월 11일 0시(자정) 말씀이세요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"재고","turn":1}],"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"새벽 12시","turn":1}],"title":[{"status":"adopted","text":"재고 유통기한 확인","turn":1}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 아니
+Assistant 기대 발화: 시간을 '오후 3시'처럼 다시 말씀해 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "시간을 '오후 3시'처럼 다시 말씀해 주세요."}
+모델 호출 기대: False
+사용자 3: 새벽 12시 말고 오후 5시로 등록해 줘
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "operation": "create", "outcome": "success", "schedulesChanged": true}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"재고","turn":1}],"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"superseded","text":"새벽 12시","turn":2},{"status":"correction_marker","text":"말고","turn":2},{"status":"adopted","text":"오후 5시","turn":2}],"title":[{"status":"adopted","text":"재고 유통기한 확인","turn":1}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+
+mt60-list-r3-v0 | 3라운드 | list
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 3시 일정 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"3시","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 아니, 날짜는 모레로 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":2},{"status":"adopted","text":"모레","turn":2}],"time":[{"status":"adopted","text":"3시","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 3시 말고 오후 3시 일정이야
+Assistant 기대 발화: 조건에 맞는 일정은 출고 운송장 대조입니다.
+Assistant 기대 결과: {"kind": "outcome", "operation": "list", "outcome": "success", "schedulesChanged": false}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":2},{"status":"adopted","text":"모레","turn":2}],"time":[{"occurrence":1,"status":"superseded","text":"3시","turn":3},{"status":"correction_marker","text":"말고","turn":3},{"status":"adopted","text":"오후 3시","turn":3}]},"index":1,"kind":"list","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+
+mt60-list-r3-v1 | 3라운드 | list
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 5시 일정 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"5시","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 분류는 재고 분류로 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"category":[{"status":"adopted","text":"재고 분류","turn":2}],"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"5시","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 5시 대신 오후 5시 일정이야
+Assistant 기대 발화: 조건에 맞는 일정은 재고 보관 구역 점검입니다.
+Assistant 기대 결과: {"kind": "outcome", "operation": "list", "outcome": "success", "schedulesChanged": false}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{"category":[{"status":"adopted","text":"재고 분류","turn":2}],"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"occurrence":1,"status":"superseded","text":"5시","turn":3},{"status":"correction_marker","text":"대신","turn":3},{"status":"adopted","text":"오후 5시","turn":3}]},"index":1,"kind":"list","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+
+mt60-list-r3-v2 | 3라운드 | list
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 6시 반품 수량 확인 일정 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"6시","turn":1}],"title":[{"status":"adopted","text":"반품 수량 확인","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 완료된 일정만 찾아 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"completed":[{"status":"adopted","text":"완료된","turn":2}],"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"6시","turn":1}],"title":[{"status":"adopted","text":"반품 수량 확인","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 6시 대신 오후 6시 일정이야
+Assistant 기대 발화: 조건에 맞는 일정은 반품 수량 확인입니다.
+Assistant 기대 결과: {"kind": "outcome", "operation": "list", "outcome": "success", "schedulesChanged": false}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{"completed":[{"status":"adopted","text":"완료된","turn":2}],"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"occurrence":1,"status":"superseded","text":"6시","turn":3},{"status":"correction_marker","text":"대신","turn":3},{"status":"adopted","text":"오후 6시","turn":3}],"title":[{"status":"adopted","text":"반품 수량 확인","turn":1}]},"index":1,"kind":"list","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+
+mt60-list-r3-v3 | 3라운드 | list
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 7시 입고 인수증 정리 일정 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"7시","turn":1}],"title":[{"status":"adopted","text":"입고 인수증 정리","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 입고 인수증 정리 말고 입고 라벨 누락 확인 일정을 찾아 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"7시","turn":1}],"title":[{"status":"superseded","text":"입고 인수증 정리","turn":2},{"status":"correction_marker","text":"말고","turn":2},{"status":"adopted","text":"입고 라벨 누락 확인","turn":2}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 7시 대신 오후 7시 일정이야
+Assistant 기대 발화: 조건에 맞는 일정은 입고 라벨 누락 확인입니다.
+Assistant 기대 결과: {"kind": "outcome", "operation": "list", "outcome": "success", "schedulesChanged": false}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"occurrence":1,"status":"superseded","text":"7시","turn":3},{"status":"correction_marker","text":"대신","turn":3},{"status":"adopted","text":"오후 7시","turn":3}],"title":[{"status":"superseded","text":"입고 인수증 정리","turn":2},{"status":"correction_marker","text":"말고","turn":2},{"status":"adopted","text":"입고 라벨 누락 확인","turn":2}]},"index":1,"kind":"list","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+
+mt60-update-r3-v0 | 3라운드 | update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 재고 순환 실사 일정 수정해 줘
+Assistant 기대 발화: 무엇으로 바꿀까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "무엇으로 바꿀까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["change_value"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["change_value"],"targetEvidence":{"title":[{"status":"adopted","text":"재고 순환 실사","turn":1}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 시각을 오후 3시로 바꿔 줘
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"time":[{"status":"adopted","text":"오후 3시","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"title":[{"status":"adopted","text":"재고 순환 실사","turn":1}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "update"}
+모델 호출 기대: False
+
+mt60-update-r3-v1 | 3라운드 | update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 출고 도크 대기품 정리 제목을 수정해 줘
+Assistant 기대 발화: 무엇으로 바꿀까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "무엇으로 바꿀까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["change_value"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["change_value"],"targetEvidence":{"title":[{"status":"adopted","text":"출고 도크 대기품 정리","turn":1}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 새 제목은 출고 기사 인수증 대조야
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"title":[{"status":"adopted","text":"출고 기사 인수증 대조","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"title":[{"status":"adopted","text":"출고 도크 대기품 정리","turn":1}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "update"}
+모델 호출 기대: False
+
+mt60-update-r3-v2 | 3라운드 | update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 반품 회수 용기 세척 날짜를 1월 5일로 바꿔 줘
+Assistant 기대 발화: 1월 5일은 이미 지났어요. 2029년 1월 5일 말씀이세요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "1월 5일은 이미 지났어요. 2029년 1월 5일 말씀이세요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"date":[{"status":"adopted","text":"1월 5일","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"title":[{"status":"adopted","text":"반품 회수 용기 세척","turn":1}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 응
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: False
+사용자 3: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "update"}
+모델 호출 기대: False
+
+mt60-update-r3-v3 | 3라운드 | update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 그 일정 시각을 오후 6시로 바꿔 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"time":[{"status":"adopted","text":"오후 6시","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 대상 제목은 입고 적치 위치 배정이야
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"time":[{"status":"adopted","text":"오후 6시","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"title":[{"status":"adopted","text":"입고 적치 위치 배정","turn":2}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "update"}
+모델 호출 기대: False
+
+mt60-delete-r3-v0 | 3라운드 | delete
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 일정 하나 삭제해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":["task_or_title"],"targetEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 제목은 반품 회수품 접수야
+Assistant 기대 발화: 선택한 일정을 삭제할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":[],"targetEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"title":[{"status":"adopted","text":"반품 회수품 접수","turn":2}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "delete"}
+모델 호출 기대: False
+
+mt60-delete-r3-v1 | 3라운드 | delete
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 완료된 일정 하나 삭제해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":["task_or_title"],"targetEvidence":{"completedState":[{"status":"adopted","text":"완료된","turn":1}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 대상 제목은 출고 봉인 기록 확인이야
+Assistant 기대 발화: 선택한 일정을 삭제할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":[],"targetEvidence":{"completedState":[{"status":"adopted","text":"완료된","turn":1}],"title":[{"status":"adopted","text":"출고 봉인 기록 확인","turn":2}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 거절
+Assistant 기대 발화: 요청을 취소했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "cancelled", "schedulesChanged": false, "operation": "delete"}
+모델 호출 기대: False
+
+mt60-delete-r3-v2 | 3라운드 | delete
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 3시 입고 납품서 대조 일정 삭제해 줘
+Assistant 기대 발화: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+Assistant 기대 결과: {"kind": "candidate_selection"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":[],"targetEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"3시","turn":1}],"title":[{"status":"adopted","text":"입고 납품서 대조","turn":1}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 후보 2 선택
+Assistant 기대 발화: 선택한 일정을 삭제할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: False
+사용자 3: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "delete"}
+모델 호출 기대: False
+
+mt60-delete-r3-v3 | 3라운드 | delete
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 그 일정 삭제해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 대상 제목은 재고 파손품 조사야
+Assistant 기대 발화: 선택한 일정을 삭제할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":[],"targetEvidence":{"title":[{"status":"adopted","text":"재고 파손품 조사","turn":2}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "delete"}
+모델 호출 기대: False
+
+mt60-completed_update-r3-v0 | 3라운드 | completed_update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 그 일정 완료로 표시해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료로 표시해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 대상 제목은 보냉 운반함 세척이야
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료로 표시해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"title":[{"status":"adopted","text":"보냉 운반함 세척","turn":2}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "update"}
+모델 호출 기대: False
+
+mt60-completed_update-r3-v1 | 3라운드 | completed_update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 그 일정 완료 처리를 취소해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료 처리를 취소해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 대상 제목은 반품 검수표 작성이야
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료 처리를 취소해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"title":[{"status":"adopted","text":"반품 검수표 작성","turn":2}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "update"}
+모델 호출 기대: False
+
+mt60-completed_update-r3-v2 | 3라운드 | completed_update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 미완료인 출고 운송장 점검 일정을 완료로 표시해 줘
+Assistant 기대 발화: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+Assistant 기대 결과: {"kind": "candidate_selection"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료로 표시해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"completedState":[{"status":"adopted","text":"미완료인","turn":1}],"date":[{"status":"adopted","text":"내일","turn":1}],"title":[{"status":"adopted","text":"출고 운송장 점검","turn":1}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 후보 2 선택
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: False
+사용자 3: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "update"}
+모델 호출 기대: False
+
+mt60-completed_update-r3-v3 | 3라운드 | completed_update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 그 일정 완료로 표시해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료로 표시해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 아니, 재고 적치 높이 점검 일정을 완료 처리를 취소해 줘
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"completed":[{"status":"superseded","text":"완료로 표시해 줘","turn":1},{"status":"correction_marker","text":"아니","turn":2},{"status":"adopted","text":"완료 처리를 취소해 줘","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"title":[{"status":"adopted","text":"재고 적치 높이 점검","turn":2}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 거절
+Assistant 기대 발화: 요청을 취소했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "cancelled", "schedulesChanged": false, "operation": "update"}
+모델 호출 기대: False
+
+mt60-create-r4-v0 | 4라운드 | create
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 일정 하나 등록해 줘
+Assistant 기대 발화: 어떤 일정인가요? 일정 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인가요? 일정 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title","date","time"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["task_or_title","date","time"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 제목은 입고 팔레트 검수야
+Assistant 기대 발화: 며칠로 할까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "며칠로 할까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["date","time"],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"입고","turn":2}],"title":[{"status":"adopted","text":"입고 팔레트 검수","turn":2}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["date","time"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 내일로 해 줘
+Assistant 기대 발화: 몇 시로 할까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "몇 시로 할까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["time"],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"입고","turn":2}],"date":[{"status":"adopted","text":"내일","turn":3}],"title":[{"status":"adopted","text":"입고 팔레트 검수","turn":2}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["time"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 오후 3시야
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "operation": "create", "outcome": "success", "schedulesChanged": true}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"입고","turn":2}],"date":[{"status":"adopted","text":"내일","turn":3}],"time":[{"status":"adopted","text":"오후 3시","turn":4}],"title":[{"status":"adopted","text":"입고 팔레트 검수","turn":2}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+
+mt60-create-r4-v1 | 4라운드 | create
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 4시에 일정 등록해 줘
+Assistant 기대 발화: 어떤 일정인가요? 일정 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인가요? 일정 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title","ampm"],"operations":[{"changeEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"4시","turn":1}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["task_or_title","ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 제목은 반품 상품 외관 검사야
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"반품","turn":2}],"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"4시","turn":1}],"title":[{"status":"adopted","text":"반품 상품 외관 검사","turn":2}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 아니, 날짜는 모레로 해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"반품","turn":2}],"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":3},{"status":"adopted","text":"모레","turn":3}],"time":[{"status":"adopted","text":"4시","turn":1}],"title":[{"status":"adopted","text":"반품 상품 외관 검사","turn":2}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 4시 말고 오후 4시로 등록해 줘
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "operation": "create", "outcome": "success", "schedulesChanged": true}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"반품","turn":2}],"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":3},{"status":"adopted","text":"모레","turn":3}],"time":[{"occurrence":1,"status":"superseded","text":"4시","turn":4},{"status":"correction_marker","text":"말고","turn":4},{"status":"adopted","text":"오후 4시","turn":4}],"title":[{"status":"adopted","text":"반품 상품 외관 검사","turn":2}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+
+mt60-create-r4-v2 | 4라운드 | create
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 출고 상차 순서 점검 일정 추가해 줘
+Assistant 기대 발화: 며칠로 할까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "며칠로 할까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["date","time"],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"출고","turn":1}],"title":[{"status":"adopted","text":"출고 상차 순서 점검","turn":1}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["date","time"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 날짜는 내일이야
+Assistant 기대 발화: 몇 시로 할까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "몇 시로 할까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["time"],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"출고","turn":1}],"date":[{"status":"adopted","text":"내일","turn":2}],"title":[{"status":"adopted","text":"출고 상차 순서 점검","turn":1}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["time"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 새벽 12시에 시작해
+Assistant 기대 발화: 1월 11일 0시(자정) 말씀이세요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "1월 11일 0시(자정) 말씀이세요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"출고","turn":1}],"date":[{"status":"adopted","text":"내일","turn":2}],"time":[{"status":"adopted","text":"새벽 12시","turn":3}],"title":[{"status":"adopted","text":"출고 상차 순서 점검","turn":1}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 응
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "operation": "create", "outcome": "success", "schedulesChanged": true}
+모델 호출 기대: False
+
+mt60-create-r4-v3 | 4라운드 | create
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 재고 유통기한 확인 등록해 줘
+Assistant 기대 발화: 며칠로 할까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "며칠로 할까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["date","time"],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"재고","turn":1}],"title":[{"status":"adopted","text":"재고 유통기한 확인","turn":1}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["date","time"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 내일 새벽 12시에 시작해
+Assistant 기대 발화: 1월 11일 0시(자정) 말씀이세요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "1월 11일 0시(자정) 말씀이세요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"재고","turn":1}],"date":[{"status":"adopted","text":"내일","turn":2}],"time":[{"status":"adopted","text":"새벽 12시","turn":2}],"title":[{"status":"adopted","text":"재고 유통기한 확인","turn":1}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 아니
+Assistant 기대 발화: 시간을 '오후 3시'처럼 다시 말씀해 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "시간을 '오후 3시'처럼 다시 말씀해 주세요."}
+모델 호출 기대: False
+사용자 4: 새벽 12시 말고 오후 5시로 등록해 줘
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "operation": "create", "outcome": "success", "schedulesChanged": true}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"재고","turn":1}],"date":[{"status":"adopted","text":"내일","turn":2}],"time":[{"status":"superseded","text":"새벽 12시","turn":3},{"status":"correction_marker","text":"말고","turn":3},{"status":"adopted","text":"오후 5시","turn":3}],"title":[{"status":"adopted","text":"재고 유통기한 확인","turn":1}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+
+mt60-list-r4-v0 | 4라운드 | list
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 3시 일정 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"3시","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 제목은 입고 바코드 검수로 찾아 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"3시","turn":1}],"title":[{"status":"adopted","text":"입고 바코드 검수","turn":2}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 아니, 날짜는 모레로 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":3},{"status":"adopted","text":"모레","turn":3}],"time":[{"status":"adopted","text":"3시","turn":1}],"title":[{"status":"adopted","text":"입고 바코드 검수","turn":2}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 3시 말고 오후 3시 일정이야
+Assistant 기대 발화: 조건에 맞는 일정은 입고 바코드 검수입니다.
+Assistant 기대 결과: {"kind": "outcome", "operation": "list", "outcome": "success", "schedulesChanged": false}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":3},{"status":"adopted","text":"모레","turn":3}],"time":[{"occurrence":1,"status":"superseded","text":"3시","turn":4},{"status":"correction_marker","text":"말고","turn":4},{"status":"adopted","text":"오후 3시","turn":4}],"title":[{"status":"adopted","text":"입고 바코드 검수","turn":2}]},"index":1,"kind":"list","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+
+mt60-list-r4-v1 | 4라운드 | list
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 5시 일정 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"5시","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 분류는 재고 분류로 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"category":[{"status":"adopted","text":"재고 분류","turn":2}],"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"5시","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 아니, 날짜는 모레로 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"category":[{"status":"adopted","text":"재고 분류","turn":2}],"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":3},{"status":"adopted","text":"모레","turn":3}],"time":[{"status":"adopted","text":"5시","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 5시 대신 오후 5시 일정이야
+Assistant 기대 발화: 조건에 맞는 일정은 재고 보관 구역 점검입니다.
+Assistant 기대 결과: {"kind": "outcome", "operation": "list", "outcome": "success", "schedulesChanged": false}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{"category":[{"status":"adopted","text":"재고 분류","turn":2}],"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":3},{"status":"adopted","text":"모레","turn":3}],"time":[{"occurrence":1,"status":"superseded","text":"5시","turn":4},{"status":"correction_marker","text":"대신","turn":4},{"status":"adopted","text":"오후 5시","turn":4}]},"index":1,"kind":"list","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+
+mt60-list-r4-v2 | 4라운드 | list
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 6시 반품 수량 확인 일정 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"6시","turn":1}],"title":[{"status":"adopted","text":"반품 수량 확인","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 완료된 일정만 찾아 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"completed":[{"status":"adopted","text":"완료된","turn":2}],"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"6시","turn":1}],"title":[{"status":"adopted","text":"반품 수량 확인","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 반품 분류에서 찾아 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"category":[{"status":"adopted","text":"반품 분류","turn":3}],"completed":[{"status":"adopted","text":"완료된","turn":2}],"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"6시","turn":1}],"title":[{"status":"adopted","text":"반품 수량 확인","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 6시 대신 오후 6시 일정이야
+Assistant 기대 발화: 조건에 맞는 일정은 반품 수량 확인입니다.
+Assistant 기대 결과: {"kind": "outcome", "operation": "list", "outcome": "success", "schedulesChanged": false}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{"category":[{"status":"adopted","text":"반품 분류","turn":3}],"completed":[{"status":"adopted","text":"완료된","turn":2}],"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"occurrence":1,"status":"superseded","text":"6시","turn":4},{"status":"correction_marker","text":"대신","turn":4},{"status":"adopted","text":"오후 6시","turn":4}],"title":[{"status":"adopted","text":"반품 수량 확인","turn":1}]},"index":1,"kind":"list","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+
+mt60-list-r4-v3 | 4라운드 | list
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 7시 입고 인수증 정리 일정 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"7시","turn":1}],"title":[{"status":"adopted","text":"입고 인수증 정리","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 입고 인수증 정리 말고 입고 라벨 누락 확인 일정을 찾아 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"7시","turn":1}],"title":[{"status":"superseded","text":"입고 인수증 정리","turn":2},{"status":"correction_marker","text":"말고","turn":2},{"status":"adopted","text":"입고 라벨 누락 확인","turn":2}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 미완료인 일정만 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"completed":[{"status":"adopted","text":"미완료인","turn":3}],"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"7시","turn":1}],"title":[{"status":"superseded","text":"입고 인수증 정리","turn":2},{"status":"correction_marker","text":"말고","turn":2},{"status":"adopted","text":"입고 라벨 누락 확인","turn":2}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 7시 대신 오후 7시 일정이야
+Assistant 기대 발화: 조건에 맞는 일정은 입고 라벨 누락 확인입니다.
+Assistant 기대 결과: {"kind": "outcome", "operation": "list", "outcome": "success", "schedulesChanged": false}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{"completed":[{"status":"adopted","text":"미완료인","turn":3}],"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"occurrence":1,"status":"superseded","text":"7시","turn":4},{"status":"correction_marker","text":"대신","turn":4},{"status":"adopted","text":"오후 7시","turn":4}],"title":[{"status":"superseded","text":"입고 인수증 정리","turn":2},{"status":"correction_marker","text":"말고","turn":2},{"status":"adopted","text":"입고 라벨 누락 확인","turn":2}]},"index":1,"kind":"list","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+
+mt60-update-r4-v0 | 4라운드 | update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 그 일정을 수정해 줘
+Assistant 기대 발화: 무엇으로 바꿀까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "무엇으로 바꿀까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title","change_value"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title","change_value"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 시각을 오후 3시로 바꿔 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"time":[{"status":"adopted","text":"오후 3시","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 대상은 재고 순환 실사야
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"time":[{"status":"adopted","text":"오후 3시","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"title":[{"status":"adopted","text":"재고 순환 실사","turn":3}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "update"}
+모델 호출 기대: False
+
+mt60-update-r4-v1 | 4라운드 | update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 그 일정 제목을 바꿔 줘
+Assistant 기대 발화: 무엇으로 바꿀까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "무엇으로 바꿀까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title","change_value"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title","change_value"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 새 제목은 출고 기사 인수증 대조야
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"title":[{"status":"adopted","text":"출고 기사 인수증 대조","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 대상 제목은 출고 도크 대기품 정리야
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"title":[{"status":"adopted","text":"출고 기사 인수증 대조","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"title":[{"status":"adopted","text":"출고 도크 대기품 정리","turn":3}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 거절
+Assistant 기대 발화: 요청을 취소했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "cancelled", "schedulesChanged": false, "operation": "update"}
+모델 호출 기대: False
+
+mt60-update-r4-v2 | 4라운드 | update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 반품 회수 용기 세척 일정 수정해 줘
+Assistant 기대 발화: 무엇으로 바꿀까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "무엇으로 바꿀까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["change_value"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["change_value"],"targetEvidence":{"title":[{"status":"adopted","text":"반품 회수 용기 세척","turn":1}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 날짜를 1월 5일로 바꿔 줘
+Assistant 기대 발화: 1월 5일은 이미 지났어요. 2029년 1월 5일 말씀이세요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "1월 5일은 이미 지났어요. 2029년 1월 5일 말씀이세요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"date":[{"status":"adopted","text":"1월 5일","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"title":[{"status":"adopted","text":"반품 회수 용기 세척","turn":1}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 응
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: False
+사용자 4: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "update"}
+모델 호출 기대: False
+
+mt60-update-r4-v3 | 4라운드 | update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 그 일정을 내일 6시로 옮겨 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title","ampm"],"operations":[{"changeEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"6시","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title","ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 6시 말고 오후 6시로 바꿔 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"occurrence":1,"status":"superseded","text":"6시","turn":2},{"status":"correction_marker","text":"말고","turn":2},{"status":"adopted","text":"오후 6시","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 대상 제목은 입고 적치 위치 배정이야
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"occurrence":1,"status":"superseded","text":"6시","turn":2},{"status":"correction_marker","text":"말고","turn":2},{"status":"adopted","text":"오후 6시","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"title":[{"status":"adopted","text":"입고 적치 위치 배정","turn":3}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "update"}
+모델 호출 기대: False
+
+mt60-delete-r4-v0 | 4라운드 | delete
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 일정 하나 삭제해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":["task_or_title"],"targetEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 제목은 반품 회수품 접수야
+Assistant 기대 발화: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+Assistant 기대 결과: {"kind": "candidate_selection"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":[],"targetEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"title":[{"status":"adopted","text":"반품 회수품 접수","turn":2}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 후보 2 선택
+Assistant 기대 발화: 선택한 일정을 삭제할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: False
+사용자 4: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "delete"}
+모델 호출 기대: False
+
+mt60-delete-r4-v1 | 4라운드 | delete
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 완료된 일정 하나 삭제해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":["task_or_title"],"targetEvidence":{"completedState":[{"status":"adopted","text":"완료된","turn":1}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 대상 날짜는 내일이야
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":["task_or_title"],"targetEvidence":{"completedState":[{"status":"adopted","text":"완료된","turn":1}],"date":[{"status":"adopted","text":"내일","turn":2}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 대상 제목은 출고 봉인 기록 확인이야
+Assistant 기대 발화: 선택한 일정을 삭제할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":[],"targetEvidence":{"completedState":[{"status":"adopted","text":"완료된","turn":1}],"date":[{"status":"adopted","text":"내일","turn":2}],"title":[{"status":"adopted","text":"출고 봉인 기록 확인","turn":3}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "delete"}
+모델 호출 기대: False
+
+mt60-delete-r4-v2 | 4라운드 | delete
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 3시 그 일정을 삭제해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":["task_or_title"],"targetEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"3시","turn":1}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 대상 제목은 입고 납품서 대조야
+Assistant 기대 발화: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+Assistant 기대 결과: {"kind": "candidate_selection"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":[],"targetEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"3시","turn":1}],"title":[{"status":"adopted","text":"입고 납품서 대조","turn":2}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 후보 2 선택
+Assistant 기대 발화: 선택한 일정을 삭제할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: False
+사용자 4: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "delete"}
+모델 호출 기대: False
+
+mt60-delete-r4-v3 | 4라운드 | delete
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 그 일정 삭제해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 재고 분류의 일정이야
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":["task_or_title"],"targetEvidence":{"category":[{"status":"adopted","text":"재고 분류","turn":2}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 대상 제목은 재고 파손품 조사야
+Assistant 기대 발화: 선택한 일정을 삭제할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":[],"targetEvidence":{"category":[{"status":"adopted","text":"재고 분류","turn":2}],"title":[{"status":"adopted","text":"재고 파손품 조사","turn":3}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 거절
+Assistant 기대 발화: 요청을 취소했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "cancelled", "schedulesChanged": false, "operation": "delete"}
+모델 호출 기대: False
+
+mt60-completed_update-r4-v0 | 4라운드 | completed_update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 그 일정 완료로 표시해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료로 표시해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 대상 제목은 보냉 운반함 세척이야
+Assistant 기대 발화: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+Assistant 기대 결과: {"kind": "candidate_selection"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료로 표시해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"title":[{"status":"adopted","text":"보냉 운반함 세척","turn":2}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 후보 2 선택
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: False
+사용자 4: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "update"}
+모델 호출 기대: False
+
+mt60-completed_update-r4-v1 | 4라운드 | completed_update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 그 일정 완료 처리를 취소해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료 처리를 취소해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 내일 일정이 대상이야
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료 처리를 취소해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{"date":[{"status":"adopted","text":"내일","turn":2}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 대상 제목은 반품 검수표 작성이야
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료 처리를 취소해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"date":[{"status":"adopted","text":"내일","turn":2}],"title":[{"status":"adopted","text":"반품 검수표 작성","turn":3}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "update"}
+모델 호출 기대: False
+
+mt60-completed_update-r4-v2 | 4라운드 | completed_update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 완료된 그 일정을 완료 처리를 취소해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료 처리를 취소해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{"completedState":[{"status":"adopted","text":"완료된","turn":1}],"date":[{"status":"adopted","text":"내일","turn":1}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 대상 제목은 출고 운송장 점검이야
+Assistant 기대 발화: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+Assistant 기대 결과: {"kind": "candidate_selection"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료 처리를 취소해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"completedState":[{"status":"adopted","text":"완료된","turn":1}],"date":[{"status":"adopted","text":"내일","turn":1}],"title":[{"status":"adopted","text":"출고 운송장 점검","turn":2}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 후보 2 선택
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: False
+사용자 4: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "update"}
+모델 호출 기대: False
+
+mt60-completed_update-r4-v3 | 4라운드 | completed_update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 그 일정 완료 처리를 취소해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료 처리를 취소해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 아니, 완료로 표시해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"completed":[{"status":"superseded","text":"완료 처리를 취소해 줘","turn":1},{"status":"correction_marker","text":"아니","turn":2},{"status":"adopted","text":"완료로 표시해 줘","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 대상 제목은 재고 적치 높이 점검이야
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"completed":[{"status":"superseded","text":"완료 처리를 취소해 줘","turn":1},{"status":"correction_marker","text":"아니","turn":2},{"status":"adopted","text":"완료로 표시해 줘","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"title":[{"status":"adopted","text":"재고 적치 높이 점검","turn":3}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "update"}
+모델 호출 기대: False
+
+mt60-create-r5-v0 | 5라운드 | create
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 입고 팔레트 검수 일정 등록해 줘
+Assistant 기대 발화: 며칠로 할까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "며칠로 할까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["date","time"],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"입고","turn":1}],"title":[{"status":"adopted","text":"입고 팔레트 검수","turn":1}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["date","time"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 내일이야
+Assistant 기대 발화: 몇 시로 할까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "몇 시로 할까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["time"],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"입고","turn":1}],"date":[{"status":"adopted","text":"내일","turn":2}],"title":[{"status":"adopted","text":"입고 팔레트 검수","turn":1}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["time"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 아니, 제목은 입고 파손 상자 확인이야
+Assistant 기대 발화: 몇 시로 할까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "몇 시로 할까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["time"],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"입고","turn":3}],"date":[{"status":"adopted","text":"내일","turn":2}],"title":[{"status":"superseded","text":"입고 팔레트 검수","turn":1},{"status":"correction_marker","text":"아니","turn":3},{"status":"adopted","text":"입고 파손 상자 확인","turn":3}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["time"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 새벽 12시로 등록해 줘
+Assistant 기대 발화: 1월 11일 0시(자정) 말씀이세요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "1월 11일 0시(자정) 말씀이세요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"입고","turn":3}],"date":[{"status":"adopted","text":"내일","turn":2}],"time":[{"status":"adopted","text":"새벽 12시","turn":4}],"title":[{"status":"superseded","text":"입고 팔레트 검수","turn":1},{"status":"correction_marker","text":"아니","turn":3},{"status":"adopted","text":"입고 파손 상자 확인","turn":3}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 5: 응
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "operation": "create", "outcome": "success", "schedulesChanged": true}
+모델 호출 기대: False
+
+mt60-create-r5-v1 | 5라운드 | create
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 새 일정을 등록해 줘
+Assistant 기대 발화: 어떤 일정인가요? 일정 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인가요? 일정 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title","date","time"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["task_or_title","date","time"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 날짜는 내일이야
+Assistant 기대 발화: 어떤 일정인가요? 일정 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인가요? 일정 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title","time"],"operations":[{"changeEvidence":{"date":[{"status":"adopted","text":"내일","turn":2}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["task_or_title","time"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 제목은 반품 상품 외관 검사야
+Assistant 기대 발화: 몇 시로 할까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "몇 시로 할까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["time"],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"반품","turn":3}],"date":[{"status":"adopted","text":"내일","turn":2}],"title":[{"status":"adopted","text":"반품 상품 외관 검사","turn":3}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["time"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 시각은 4시야
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"반품","turn":3}],"date":[{"status":"adopted","text":"내일","turn":2}],"time":[{"status":"adopted","text":"4시","turn":4}],"title":[{"status":"adopted","text":"반품 상품 외관 검사","turn":3}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 5: 4시 말고 오후 4시로 등록해 줘
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "operation": "create", "outcome": "success", "schedulesChanged": true}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"반품","turn":3}],"date":[{"status":"adopted","text":"내일","turn":2}],"time":[{"occurrence":1,"status":"superseded","text":"4시","turn":5},{"status":"correction_marker","text":"말고","turn":5},{"status":"adopted","text":"오후 4시","turn":5}],"title":[{"status":"adopted","text":"반품 상품 외관 검사","turn":3}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+
+mt60-create-r5-v2 | 5라운드 | create
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 일정을 새로 추가해 줘
+Assistant 기대 발화: 어떤 일정인가요? 일정 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인가요? 일정 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title","date","time"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["task_or_title","date","time"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 일정 이름은 출고 상차 순서 점검이야
+Assistant 기대 발화: 며칠로 할까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "며칠로 할까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["date","time"],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"출고","turn":2}],"title":[{"status":"adopted","text":"출고 상차 순서 점검","turn":2}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["date","time"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 날짜는 내일이야
+Assistant 기대 발화: 몇 시로 할까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "몇 시로 할까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["time"],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"출고","turn":2}],"date":[{"status":"adopted","text":"내일","turn":3}],"title":[{"status":"adopted","text":"출고 상차 순서 점검","turn":2}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["time"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 새벽 12시에 시작해
+Assistant 기대 발화: 1월 11일 0시(자정) 말씀이세요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "1월 11일 0시(자정) 말씀이세요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"출고","turn":2}],"date":[{"status":"adopted","text":"내일","turn":3}],"time":[{"status":"adopted","text":"새벽 12시","turn":4}],"title":[{"status":"adopted","text":"출고 상차 순서 점검","turn":2}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 5: 응
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "operation": "create", "outcome": "success", "schedulesChanged": true}
+모델 호출 기대: False
+
+mt60-create-r5-v3 | 5라운드 | create
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 일정 하나 만들어 줘
+Assistant 기대 발화: 어떤 일정인가요? 일정 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인가요? 일정 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title","date","time"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["task_or_title","date","time"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 제목은 재고 유통기한 확인이야
+Assistant 기대 발화: 며칠로 할까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "며칠로 할까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["date","time"],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"재고","turn":2}],"title":[{"status":"adopted","text":"재고 유통기한 확인","turn":2}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":["date","time"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 내일 새벽 12시에 시작해
+Assistant 기대 발화: 1월 11일 0시(자정) 말씀이세요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "1월 11일 0시(자정) 말씀이세요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"재고","turn":2}],"date":[{"status":"adopted","text":"내일","turn":3}],"time":[{"status":"adopted","text":"새벽 12시","turn":3}],"title":[{"status":"adopted","text":"재고 유통기한 확인","turn":2}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 아니
+Assistant 기대 발화: 시간을 '오후 3시'처럼 다시 말씀해 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "시간을 '오후 3시'처럼 다시 말씀해 주세요."}
+모델 호출 기대: False
+사용자 5: 새벽 12시 말고 오후 5시로 등록해 줘
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "operation": "create", "outcome": "success", "schedulesChanged": true}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"category":[{"status":"adopted","text":"재고","turn":2}],"date":[{"status":"adopted","text":"내일","turn":3}],"time":[{"status":"superseded","text":"새벽 12시","turn":4},{"status":"correction_marker","text":"말고","turn":4},{"status":"adopted","text":"오후 5시","turn":4}],"title":[{"status":"adopted","text":"재고 유통기한 확인","turn":2}]},"filterEvidence":{},"index":1,"kind":"create","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+
+mt60-list-r5-v0 | 5라운드 | list
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 3시 일정 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"3시","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 제목은 입고 바코드 검수로 찾아 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"3시","turn":1}],"title":[{"status":"adopted","text":"입고 바코드 검수","turn":2}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 아니, 날짜는 모레로 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":3},{"status":"adopted","text":"모레","turn":3}],"time":[{"status":"adopted","text":"3시","turn":1}],"title":[{"status":"adopted","text":"입고 바코드 검수","turn":2}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 입고 바코드 검수 말고 출고 운송장 대조 일정을 찾아 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":3},{"status":"adopted","text":"모레","turn":3}],"time":[{"status":"adopted","text":"3시","turn":1}],"title":[{"status":"superseded","text":"입고 바코드 검수","turn":4},{"status":"correction_marker","text":"말고","turn":4},{"status":"adopted","text":"출고 운송장 대조","turn":4}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 5: 3시 말고 오후 3시 일정이야
+Assistant 기대 발화: 조건에 맞는 일정은 출고 운송장 대조입니다.
+Assistant 기대 결과: {"kind": "outcome", "operation": "list", "outcome": "success", "schedulesChanged": false}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":3},{"status":"adopted","text":"모레","turn":3}],"time":[{"occurrence":1,"status":"superseded","text":"3시","turn":5},{"status":"correction_marker","text":"말고","turn":5},{"status":"adopted","text":"오후 3시","turn":5}],"title":[{"status":"superseded","text":"입고 바코드 검수","turn":4},{"status":"correction_marker","text":"말고","turn":4},{"status":"adopted","text":"출고 운송장 대조","turn":4}]},"index":1,"kind":"list","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+
+mt60-list-r5-v1 | 5라운드 | list
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 5시 일정 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"5시","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 분류는 재고 분류로 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"category":[{"status":"adopted","text":"재고 분류","turn":2}],"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"5시","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 아니, 날짜는 모레로 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"category":[{"status":"adopted","text":"재고 분류","turn":2}],"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":3},{"status":"adopted","text":"모레","turn":3}],"time":[{"status":"adopted","text":"5시","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 제목은 재고 보관 구역 점검으로 찾아 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"category":[{"status":"adopted","text":"재고 분류","turn":2}],"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":3},{"status":"adopted","text":"모레","turn":3}],"time":[{"status":"adopted","text":"5시","turn":1}],"title":[{"status":"adopted","text":"재고 보관 구역 점검","turn":4}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 5: 5시 대신 오후 5시 일정이야
+Assistant 기대 발화: 조건에 맞는 일정은 재고 보관 구역 점검입니다.
+Assistant 기대 결과: {"kind": "outcome", "operation": "list", "outcome": "success", "schedulesChanged": false}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{"category":[{"status":"adopted","text":"재고 분류","turn":2}],"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":3},{"status":"adopted","text":"모레","turn":3}],"time":[{"occurrence":1,"status":"superseded","text":"5시","turn":5},{"status":"correction_marker","text":"대신","turn":5},{"status":"adopted","text":"오후 5시","turn":5}],"title":[{"status":"adopted","text":"재고 보관 구역 점검","turn":4}]},"index":1,"kind":"list","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+
+mt60-list-r5-v2 | 5라운드 | list
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 6시 반품 수량 확인 일정 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"6시","turn":1}],"title":[{"status":"adopted","text":"반품 수량 확인","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 완료된 일정만 찾아 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"completed":[{"status":"adopted","text":"완료된","turn":2}],"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"6시","turn":1}],"title":[{"status":"adopted","text":"반품 수량 확인","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 반품 분류에서 찾아 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"category":[{"status":"adopted","text":"반품 분류","turn":3}],"completed":[{"status":"adopted","text":"완료된","turn":2}],"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"6시","turn":1}],"title":[{"status":"adopted","text":"반품 수량 확인","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 아니, 날짜는 모레로 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"category":[{"status":"adopted","text":"반품 분류","turn":3}],"completed":[{"status":"adopted","text":"완료된","turn":2}],"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":4},{"status":"adopted","text":"모레","turn":4}],"time":[{"status":"adopted","text":"6시","turn":1}],"title":[{"status":"adopted","text":"반품 수량 확인","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 5: 6시 대신 오후 6시 일정이야
+Assistant 기대 발화: 조건에 맞는 일정은 반품 수량 확인입니다.
+Assistant 기대 결과: {"kind": "outcome", "operation": "list", "outcome": "success", "schedulesChanged": false}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{"category":[{"status":"adopted","text":"반품 분류","turn":3}],"completed":[{"status":"adopted","text":"완료된","turn":2}],"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":4},{"status":"adopted","text":"모레","turn":4}],"time":[{"occurrence":1,"status":"superseded","text":"6시","turn":5},{"status":"correction_marker","text":"대신","turn":5},{"status":"adopted","text":"오후 6시","turn":5}],"title":[{"status":"adopted","text":"반품 수량 확인","turn":1}]},"index":1,"kind":"list","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+
+mt60-list-r5-v3 | 5라운드 | list
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 7시 입고 인수증 정리 일정 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"7시","turn":1}],"title":[{"status":"adopted","text":"입고 인수증 정리","turn":1}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 입고 인수증 정리 말고 입고 라벨 누락 확인 일정을 찾아 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"7시","turn":1}],"title":[{"status":"superseded","text":"입고 인수증 정리","turn":2},{"status":"correction_marker","text":"말고","turn":2},{"status":"adopted","text":"입고 라벨 누락 확인","turn":2}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 미완료인 일정만 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"completed":[{"status":"adopted","text":"미완료인","turn":3}],"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"7시","turn":1}],"title":[{"status":"superseded","text":"입고 인수증 정리","turn":2},{"status":"correction_marker","text":"말고","turn":2},{"status":"adopted","text":"입고 라벨 누락 확인","turn":2}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 아니, 날짜는 모레로 조회해 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["ampm"],"operations":[{"changeEvidence":{},"filterEvidence":{"completed":[{"status":"adopted","text":"미완료인","turn":3}],"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":4},{"status":"adopted","text":"모레","turn":4}],"time":[{"status":"adopted","text":"7시","turn":1}],"title":[{"status":"superseded","text":"입고 인수증 정리","turn":2},{"status":"correction_marker","text":"말고","turn":2},{"status":"adopted","text":"입고 라벨 누락 확인","turn":2}]},"index":1,"kind":"list","missingInformation":["ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 5: 7시 대신 오후 7시 일정이야
+Assistant 기대 발화: 조건에 맞는 일정은 입고 라벨 누락 확인입니다.
+Assistant 기대 결과: {"kind": "outcome", "operation": "list", "outcome": "success", "schedulesChanged": false}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{"completed":[{"status":"adopted","text":"미완료인","turn":3}],"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":4},{"status":"adopted","text":"모레","turn":4}],"time":[{"occurrence":1,"status":"superseded","text":"7시","turn":5},{"status":"correction_marker","text":"대신","turn":5},{"status":"adopted","text":"오후 7시","turn":5}],"title":[{"status":"superseded","text":"입고 인수증 정리","turn":2},{"status":"correction_marker","text":"말고","turn":2},{"status":"adopted","text":"입고 라벨 누락 확인","turn":2}]},"index":1,"kind":"list","missingInformation":[],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+
+mt60-update-r5-v0 | 5라운드 | update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 그 일정의 시각을 3시로 바꿔 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title","ampm"],"operations":[{"changeEvidence":{"time":[{"status":"adopted","text":"3시","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title","ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 3시 말고 오후 3시로 바꿔 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"time":[{"occurrence":1,"status":"superseded","text":"3시","turn":2},{"status":"correction_marker","text":"말고","turn":2},{"status":"adopted","text":"오후 3시","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 일정 제목은 재고 순환 실사야
+Assistant 기대 발화: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+Assistant 기대 결과: {"kind": "candidate_selection"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"time":[{"occurrence":1,"status":"superseded","text":"3시","turn":2},{"status":"correction_marker","text":"말고","turn":2},{"status":"adopted","text":"오후 3시","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"title":[{"status":"adopted","text":"재고 순환 실사","turn":3}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 후보 2 선택
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: False
+사용자 5: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "update"}
+모델 호출 기대: False
+
+mt60-update-r5-v1 | 5라운드 | update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 그 일정 제목을 바꿔 줘
+Assistant 기대 발화: 무엇으로 바꿀까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "무엇으로 바꿀까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title","change_value"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title","change_value"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 새 제목은 출고 기사 인수증 대조야
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"title":[{"status":"adopted","text":"출고 기사 인수증 대조","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 대상 제목은 출고 도크 대기품 정리야
+Assistant 기대 발화: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+Assistant 기대 결과: {"kind": "candidate_selection"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"title":[{"status":"adopted","text":"출고 기사 인수증 대조","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"title":[{"status":"adopted","text":"출고 도크 대기품 정리","turn":3}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 후보 2 선택
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: False
+사용자 5: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "update"}
+모델 호출 기대: False
+
+mt60-update-r5-v2 | 5라운드 | update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 그 일정을 수정해 줘
+Assistant 기대 발화: 무엇으로 바꿀까요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "무엇으로 바꿀까요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title","change_value"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title","change_value"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 날짜를 1월 5일로 바꿔 줘
+Assistant 기대 발화: 1월 5일은 이미 지났어요. 2029년 1월 5일 말씀이세요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "1월 5일은 이미 지났어요. 2029년 1월 5일 말씀이세요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"date":[{"status":"adopted","text":"1월 5일","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 응
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: False
+사용자 4: 대상 제목은 반품 회수 용기 세척이야
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"date":[{"status":"adopted","text":"1월 5일","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"title":[{"status":"adopted","text":"반품 회수 용기 세척","turn":3}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 5: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "update"}
+모델 호출 기대: False
+
+mt60-update-r5-v3 | 5라운드 | update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 그 일정을 내일 6시로 옮겨 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title","ampm"],"operations":[{"changeEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"6시","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title","ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 아니, 날짜는 모레로 바꿔 줘
+Assistant 기대 발화: 오전인가요, 오후인가요?
+Assistant 기대 결과: {"kind": "need_more_info", "text": "오전인가요, 오후인가요?"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title","ampm"],"operations":[{"changeEvidence":{"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":2},{"status":"adopted","text":"모레","turn":2}],"time":[{"status":"adopted","text":"6시","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title","ampm"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 6시 말고 오후 6시로 바꿔 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":2},{"status":"adopted","text":"모레","turn":2}],"time":[{"occurrence":1,"status":"superseded","text":"6시","turn":3},{"status":"correction_marker","text":"말고","turn":3},{"status":"adopted","text":"오후 6시","turn":3}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 대상 제목은 입고 적치 위치 배정이야
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":2},{"status":"adopted","text":"모레","turn":2}],"time":[{"occurrence":1,"status":"superseded","text":"6시","turn":3},{"status":"correction_marker","text":"말고","turn":3},{"status":"adopted","text":"오후 6시","turn":3}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"title":[{"status":"adopted","text":"입고 적치 위치 배정","turn":4}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 5: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "update"}
+모델 호출 기대: False
+
+mt60-delete-r5-v0 | 5라운드 | delete
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 일정 하나 삭제해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":["task_or_title"],"targetEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 아니, 삭제할 날짜는 모레야
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":["task_or_title"],"targetEvidence":{"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":2},{"status":"adopted","text":"모레","turn":2}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 제목은 반품 회수품 접수야
+Assistant 기대 발화: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+Assistant 기대 결과: {"kind": "candidate_selection"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":[],"targetEvidence":{"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":2},{"status":"adopted","text":"모레","turn":2}],"title":[{"status":"adopted","text":"반품 회수품 접수","turn":3}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 후보 2 선택
+Assistant 기대 발화: 선택한 일정을 삭제할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: False
+사용자 5: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "delete"}
+모델 호출 기대: False
+
+mt60-delete-r5-v1 | 5라운드 | delete
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 완료된 일정 하나 삭제해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":["task_or_title"],"targetEvidence":{"completedState":[{"status":"adopted","text":"완료된","turn":1}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 대상 날짜는 내일이야
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":["task_or_title"],"targetEvidence":{"completedState":[{"status":"adopted","text":"완료된","turn":1}],"date":[{"status":"adopted","text":"내일","turn":2}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 대상 제목은 출고 봉인 기록 확인이야
+Assistant 기대 발화: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+Assistant 기대 결과: {"kind": "candidate_selection"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":[],"targetEvidence":{"completedState":[{"status":"adopted","text":"완료된","turn":1}],"date":[{"status":"adopted","text":"내일","turn":2}],"title":[{"status":"adopted","text":"출고 봉인 기록 확인","turn":3}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 후보 2 선택
+Assistant 기대 발화: 선택한 일정을 삭제할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: False
+사용자 5: 거절
+Assistant 기대 발화: 요청을 취소했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "cancelled", "schedulesChanged": false, "operation": "delete"}
+모델 호출 기대: False
+
+mt60-delete-r5-v2 | 5라운드 | delete
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 3시 그 일정을 삭제해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":["task_or_title"],"targetEvidence":{"date":[{"status":"adopted","text":"내일","turn":1}],"time":[{"status":"adopted","text":"3시","turn":1}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 아니, 날짜는 모레야
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":["task_or_title"],"targetEvidence":{"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":2},{"status":"adopted","text":"모레","turn":2}],"time":[{"status":"adopted","text":"3시","turn":1}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 대상 제목은 입고 납품서 대조야
+Assistant 기대 발화: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+Assistant 기대 결과: {"kind": "candidate_selection"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":[],"targetEvidence":{"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":2},{"status":"adopted","text":"모레","turn":2}],"time":[{"status":"adopted","text":"3시","turn":1}],"title":[{"status":"adopted","text":"입고 납품서 대조","turn":3}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 후보 2 선택
+Assistant 기대 발화: 선택한 일정을 삭제할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: False
+사용자 5: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "delete"}
+모델 호출 기대: False
+
+mt60-delete-r5-v3 | 5라운드 | delete
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 그 일정 삭제해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 재고 분류의 일정이야
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":["task_or_title"],"targetEvidence":{"category":[{"status":"adopted","text":"재고 분류","turn":2}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 대상 날짜는 내일이야
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":["task_or_title"],"targetEvidence":{"category":[{"status":"adopted","text":"재고 분류","turn":2}],"date":[{"status":"adopted","text":"내일","turn":3}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 대상 제목은 재고 파손품 조사야
+Assistant 기대 발화: 선택한 일정을 삭제할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{},"filterEvidence":{},"index":1,"kind":"delete","missingInformation":[],"targetEvidence":{"category":[{"status":"adopted","text":"재고 분류","turn":2}],"date":[{"status":"adopted","text":"내일","turn":3}],"title":[{"status":"adopted","text":"재고 파손품 조사","turn":4}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 5: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "delete"}
+모델 호출 기대: False
+
+mt60-completed_update-r5-v0 | 5라운드 | completed_update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 그 일정 완료로 표시해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료로 표시해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 아니, 완료 처리를 취소해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"completed":[{"status":"superseded","text":"완료로 표시해 줘","turn":1},{"status":"correction_marker","text":"아니","turn":2},{"status":"adopted","text":"완료 처리를 취소해 줘","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 대상 제목은 보냉 운반함 세척이야
+Assistant 기대 발화: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+Assistant 기대 결과: {"kind": "candidate_selection"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"completed":[{"status":"superseded","text":"완료로 표시해 줘","turn":1},{"status":"correction_marker","text":"아니","turn":2},{"status":"adopted","text":"완료 처리를 취소해 줘","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"title":[{"status":"adopted","text":"보냉 운반함 세척","turn":3}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 후보 2 선택
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: False
+사용자 5: 거절
+Assistant 기대 발화: 요청을 취소했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "cancelled", "schedulesChanged": false, "operation": "update"}
+모델 호출 기대: False
+
+mt60-completed_update-r5-v1 | 5라운드 | completed_update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 그 일정 완료로 표시해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료로 표시해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 내일 일정이 대상이야
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료로 표시해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{"date":[{"status":"adopted","text":"내일","turn":2}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 대상 제목은 반품 검수표 작성이야
+Assistant 기대 발화: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+Assistant 기대 결과: {"kind": "candidate_selection"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료로 표시해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"date":[{"status":"adopted","text":"내일","turn":2}],"title":[{"status":"adopted","text":"반품 검수표 작성","turn":3}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 후보 2 선택
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: False
+사용자 5: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "update"}
+모델 호출 기대: False
+
+mt60-completed_update-r5-v2 | 5라운드 | completed_update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 내일 미완료인 그 일정을 완료로 표시해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료로 표시해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{"completedState":[{"status":"adopted","text":"미완료인","turn":1}],"date":[{"status":"adopted","text":"내일","turn":1}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 아니, 날짜는 모레야
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료로 표시해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{"completedState":[{"status":"adopted","text":"미완료인","turn":1}],"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":2},{"status":"adopted","text":"모레","turn":2}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 대상 제목은 출고 운송장 점검이야
+Assistant 기대 발화: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+Assistant 기대 결과: {"kind": "candidate_selection"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료로 표시해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"completedState":[{"status":"adopted","text":"미완료인","turn":1}],"date":[{"status":"superseded","text":"내일","turn":1},{"status":"correction_marker","text":"아니","turn":2},{"status":"adopted","text":"모레","turn":2}],"title":[{"status":"adopted","text":"출고 운송장 점검","turn":3}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 후보 2 선택
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: False
+사용자 5: 승인
+Assistant 기대 발화: 요청한 일정 처리를 완료했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "success", "schedulesChanged": true, "operation": "update"}
+모델 호출 기대: False
+
+mt60-completed_update-r5-v3 | 5라운드 | completed_update
+주의: 아래 API 응답은 작성한 기대값이며 API 실행 관측값이 아님.
+사용자 1: 그 일정 완료로 표시해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"completed":[{"status":"adopted","text":"완료로 표시해 줘","turn":1}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 2: 아니, 완료 처리를 취소해 줘
+Assistant 기대 발화: 어떤 일정인지 이름을 알려 주세요.
+Assistant 기대 결과: {"kind": "need_more_info", "text": "어떤 일정인지 이름을 알려 주세요."}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":["task_or_title"],"operations":[{"changeEvidence":{"completed":[{"status":"superseded","text":"완료로 표시해 줘","turn":1},{"status":"correction_marker","text":"아니","turn":2},{"status":"adopted","text":"완료 처리를 취소해 줘","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":["task_or_title"],"targetEvidence":{},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 3: 대상 제목은 재고 적치 높이 점검이야
+Assistant 기대 발화: 조건에 맞는 일정이 여러 개예요. 하나를 선택해 주세요.
+Assistant 기대 결과: {"kind": "candidate_selection"}
+모델 호출 기대: True
+해당 시점 evidence: {"missingInformation":[],"operations":[{"changeEvidence":{"completed":[{"status":"superseded","text":"완료로 표시해 줘","turn":1},{"status":"correction_marker","text":"아니","turn":2},{"status":"adopted","text":"완료 처리를 취소해 줘","turn":2}]},"filterEvidence":{},"index":1,"kind":"update","missingInformation":[],"targetEvidence":{"title":[{"status":"adopted","text":"재고 적치 높이 점검","turn":3}]},"unsupportedEvidence":[]}],"unsupportedEvidence":[]}
+사용자 4: 후보 2 선택
+Assistant 기대 발화: 선택한 일정에 요청한 변경을 적용할까요?
+Assistant 기대 결과: {"kind": "confirmation"}
+모델 호출 기대: False
+사용자 5: 거절
+Assistant 기대 발화: 요청을 취소했어요.
+Assistant 기대 결과: {"kind": "outcome", "outcome": "cancelled", "schedulesChanged": false, "operation": "update"}
+모델 호출 기대: False

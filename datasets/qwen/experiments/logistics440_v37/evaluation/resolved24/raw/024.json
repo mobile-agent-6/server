@@ -1,0 +1,16 @@
+{
+  "key": "94565a0d201b0484f5fa979178b131a446072df87b08ab52a5da639ea83d94fc",
+  "identity": {
+    "freezeSha256": "07bfb630c7cec6da7572d9657da328c7aaea072902a2139ce4fbff89c79d4173",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"재고 운반판 연결핀 체결\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":2,\"text\":\"미완료인지 완료인지 아직 확실하지 않아요\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "a3a1e27016b192315fc2dac92e6ddae5c8ac70c24f983a408d2601d999ea5a5d",
+  "seconds": 8.045507042028476
+}

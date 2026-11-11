@@ -1,0 +1,16 @@
+{
+  "key": "4901f01e82e33097707c0a6b844c1e778999a3946dca951c171122276dadb37f",
+  "identity": {
+    "freezeSha256": "e06dcd680ad4bc1718721dfa4d24140e29a262fae9017203bc744a71baea3961",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":2,\"text\":\"반품 운반판 측면 손잡이 소독\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"3월 8일\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":1,\"text\":\"완료 표시를 해제해 주세요\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "14bbfbd3bfe553db43e443bc13b0c355a64c28932fd033532063429c0c83cf7f",
+  "seconds": 8.855978292005602
+}

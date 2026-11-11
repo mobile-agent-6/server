@@ -1,0 +1,16 @@
+{
+  "key": "9fe056815a555ce50a2ad1e806d7fb64255efc5a240b3f26b9105569aa2a7286",
+  "identity": {
+    "freezeSha256": "f7ca24d3253ce76f14bcfc7ed1b3e96e1359c1ff0793092acd2e8148ee958474",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"입고 무게추 교정\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"9월 12일\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"입고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "5563e0e06705f9de64a9ed31c4e26f6bac3aef1e0b2a44a12d004dfba0860bc6",
+  "seconds": 10.12039887503488
+}

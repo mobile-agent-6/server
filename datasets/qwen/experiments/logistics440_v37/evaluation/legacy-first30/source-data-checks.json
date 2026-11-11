@@ -1,0 +1,273 @@
+{
+  "status": "PASS",
+  "rows": 30,
+  "byFeature": {
+    "create": 6,
+    "list": 6,
+    "update": 6,
+    "delete": 6,
+    "completed_update": 6
+  },
+  "byPrefixLength": {
+    "1": 24,
+    "2": 6
+  },
+  "sourceDialogues": 28,
+  "selectedFromNewIntermediateOnly": true,
+  "sourceTextRepairIncluded": false,
+  "exactTrainingInputOverlap": 0,
+  "trainingRelatedSourceDialogues": true,
+  "independentTest": false,
+  "sampling": "Manual coverage selection before inference;6 cases per feature, interleaved. Not random or population-representative.",
+  "sourceHashes": {
+    "<SOURCE_WORKSPACE>/qwen-legacy184-prefix-20261111-001/prefix-all381-candidate.jsonl": "96c360db9e4581e3c3d9c8dc3aabec638180ca49165e9cd1f37e21537dfab26f",
+    "<SOURCE_WORKSPACE>/qwen-legacy184-prefix-20261111-001/prefix-all381-index.jsonl": "21007116597c76168f3f0c5bd16ff9e5f765e1313662c77691a47635bfd285ff",
+    "<SOURCE_WORKSPACE>/qwen-legacy184-prefix-20261111-001/verification.json": "a6a6a57ce30e13475f1d830190e8c89f35b6be846b490c5337f15a489c17bec2",
+    "<SOURCE_WORKSPACE>/qwen-legacy184-prefix-20261111-001/source/train400.jsonl": "c880e5b3f4c29f63ac7f1b2c570fb208cd881f28347abeeb1c9e79af59323f13",
+    "<SOURCE_WORKSPACE>/qwen-multiturn-train60-20261110/prepared/train.jsonl": "1444127f7dfd58a7b6ced04de6bb3a55b077ac3be752f4ee002f57c7e7c85490"
+  },
+  "selections": [
+    {
+      "caseId": "legacy184-row006-prefix1",
+      "sourceRow": 6,
+      "round": 1,
+      "feature": "create",
+      "selectionReason": "date_title_known_missing_time",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row053-prefix1",
+      "sourceRow": 53,
+      "round": 1,
+      "feature": "list",
+      "selectionReason": "missing_query_scope",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row100-prefix1",
+      "sourceRow": 100,
+      "round": 1,
+      "feature": "update",
+      "selectionReason": "missing_change_value",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row112-prefix1",
+      "sourceRow": 112,
+      "round": 1,
+      "feature": "delete",
+      "selectionReason": "missing_target_title",
+      "sourceModelTurnCount": 3
+    },
+    {
+      "caseId": "legacy184-row207-prefix1",
+      "sourceRow": 207,
+      "round": 1,
+      "feature": "completed_update",
+      "selectionReason": "missing_target_title",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row007-prefix1",
+      "sourceRow": 7,
+      "round": 1,
+      "feature": "create",
+      "selectionReason": "time_title_known_missing_date",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row079-prefix1",
+      "sourceRow": 79,
+      "round": 1,
+      "feature": "list",
+      "selectionReason": "date_only_filter_before_category",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row167-prefix1",
+      "sourceRow": 167,
+      "round": 1,
+      "feature": "update",
+      "selectionReason": "missing_target_title",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row112-prefix2",
+      "sourceRow": 112,
+      "round": 2,
+      "feature": "delete",
+      "selectionReason": "second_prefix_known_target",
+      "sourceModelTurnCount": 3
+    },
+    {
+      "caseId": "legacy184-row216-prefix1",
+      "sourceRow": 216,
+      "round": 1,
+      "feature": "completed_update",
+      "selectionReason": "before_future_completion_correction",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row010-prefix1",
+      "sourceRow": 10,
+      "round": 1,
+      "feature": "create",
+      "selectionReason": "date_time_known_missing_title",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row080-prefix1",
+      "sourceRow": 80,
+      "round": 1,
+      "feature": "list",
+      "selectionReason": "before_future_title_correction",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row171-prefix1",
+      "sourceRow": 171,
+      "round": 1,
+      "feature": "update",
+      "selectionReason": "explicit_target_category",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row113-prefix1",
+      "sourceRow": 113,
+      "round": 1,
+      "feature": "delete",
+      "selectionReason": "target_date_and_title",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row367-prefix1",
+      "sourceRow": 367,
+      "round": 1,
+      "feature": "completed_update",
+      "selectionReason": "missing_completion_value",
+      "sourceModelTurnCount": 3
+    },
+    {
+      "caseId": "legacy184-row021-prefix1",
+      "sourceRow": 21,
+      "round": 1,
+      "feature": "create",
+      "selectionReason": "ambiguous_ampm",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row086-prefix2",
+      "sourceRow": 86,
+      "round": 2,
+      "feature": "list",
+      "selectionReason": "second_prefix_title_filter",
+      "sourceModelTurnCount": 3
+    },
+    {
+      "caseId": "legacy184-row174-prefix2",
+      "sourceRow": 174,
+      "round": 2,
+      "feature": "update",
+      "selectionReason": "date_change_does_not_require_future_time",
+      "sourceModelTurnCount": 3
+    },
+    {
+      "caseId": "legacy184-row197-prefix1",
+      "sourceRow": 197,
+      "round": 1,
+      "feature": "delete",
+      "selectionReason": "target_date_without_title",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row367-prefix2",
+      "sourceRow": 367,
+      "round": 2,
+      "feature": "completed_update",
+      "selectionReason": "second_prefix_date_but_no_completion_value",
+      "sourceModelTurnCount": 3
+    },
+    {
+      "caseId": "legacy184-row041-prefix2",
+      "sourceRow": 41,
+      "round": 2,
+      "feature": "create",
+      "selectionReason": "second_prefix_missing_time",
+      "sourceModelTurnCount": 3
+    },
+    {
+      "caseId": "legacy184-row150-prefix1",
+      "sourceRow": 150,
+      "round": 1,
+      "feature": "list",
+      "selectionReason": "before_future_date_correction",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row176-prefix1",
+      "sourceRow": 176,
+      "round": 1,
+      "feature": "update",
+      "selectionReason": "target_title_vs_new_title",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row317-prefix1",
+      "sourceRow": 317,
+      "round": 1,
+      "feature": "delete",
+      "selectionReason": "before_future_target_date_correction",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row372-prefix2",
+      "sourceRow": 372,
+      "round": 2,
+      "feature": "completed_update",
+      "selectionReason": "existing_completed_state_not_new_value",
+      "sourceModelTurnCount": 3
+    },
+    {
+      "caseId": "legacy184-row051-prefix1",
+      "sourceRow": 51,
+      "round": 1,
+      "feature": "create",
+      "selectionReason": "before_future_time_correction",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row159-prefix1",
+      "sourceRow": 159,
+      "round": 1,
+      "feature": "list",
+      "selectionReason": "title_before_future_scope",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row264-prefix1",
+      "sourceRow": 264,
+      "round": 1,
+      "feature": "update",
+      "selectionReason": "target_date_vs_new_time",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row343-prefix1",
+      "sourceRow": 343,
+      "round": 1,
+      "feature": "delete",
+      "selectionReason": "target_time_without_title",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row390-prefix1",
+      "sourceRow": 390,
+      "round": 1,
+      "feature": "completed_update",
+      "selectionReason": "known_target_and_completion_value",
+      "sourceModelTurnCount": 2
+    }
+  ],
+  "newTraining": false,
+  "modelInferencePerformed": false
+}

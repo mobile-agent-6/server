@@ -1,0 +1,61 @@
+{
+  "selected": "440+v37",
+  "newTrainingDuringThisHandoff": false,
+  "requests": [
+    {
+      "request": "Per-model-call evidence and missing-information targets",
+      "new60": {
+        "allSnapshots": 179,
+        "uniqueInputs": 132
+      },
+      "existing184": {
+        "allSnapshots": 381,
+        "newIntermediateSnapshots": 197,
+        "uniqueInputs": 356,
+        "uniqueNewIntermediateInputs": 172
+      },
+      "status": "Data authored and automatic semantic/source/contract checks passed;not all trained or model-inferred."
+    },
+    {
+      "request": "Supplement,correction,target specification flows",
+      "status": "Authored scenarios and per-call targets included;model cached results included;API/DB replay remains unperformed."
+    },
+    {
+      "request": "20 alternating scenarios each for3/4/5 rounds",
+      "counts": {
+        "3": 20,
+        "4": 20,
+        "5": 20
+      },
+      "featureDialogues": {
+        "create": 12,
+        "list": 12,
+        "update": 12,
+        "delete": 12,
+        "completed_update": 12
+      },
+      "status": "Expected user/assistant dialogues authored;not observed API transcripts."
+    }
+  ],
+  "training": {
+    "uniqueExamples": 440,
+    "old": 400,
+    "newPrefixExamples": 40,
+    "lastRunReplay": 20,
+    "lastRunSteps": 60,
+    "legacy197NewLabelsTrained": false
+  },
+  "legacyChanges": {
+    "finalCorrectionArrayOrderNormalizations": 41,
+    "explicitSourceTextRepairProposals": 1,
+    "original400Unchanged": true
+  },
+  "remainingModelErrors": {
+    "full60uniqueInputs": 132,
+    "exact": 132,
+    "notExact": 0,
+    "scope": "Opened development cached outputs after fixing15 cases;not independent inference or API success."
+  },
+  "backendIntegrationVerified": false,
+  "orangePiVerified": false
+}

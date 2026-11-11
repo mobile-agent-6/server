@@ -1,0 +1,16 @@
+{
+  "key": "133dfaf5e5db6218095c926b743fd7ad46e9cef70212f022ca278fb9d3e52d51",
+  "identity": {
+    "freezeSha256": "e06dcd680ad4bc1718721dfa4d24140e29a262fae9017203bc744a71baea3961",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료된\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"입고 검수등 전원선 점검\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":1,\"text\":\"완료된\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "9b8c32d6ea52b2f21bafbb7a6b17dcf4845ebcca91d7fcd3d86320a32c36911a",
+  "seconds": 8.27592345798621
+}

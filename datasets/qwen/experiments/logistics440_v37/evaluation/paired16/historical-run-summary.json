@@ -1,0 +1,185 @@
+{
+  "model": "selected440",
+  "baseline": "v35",
+  "candidate": "v36",
+  "overall": {
+    "rows": 16,
+    "raw": {
+      "exact": 2,
+      "contract": 10
+    },
+    "v35": {
+      "exact": 11,
+      "contract": 14,
+      "missingInformationExact": 12,
+      "evidenceOnlyExact": 11,
+      "clarifications": 2,
+      "errors": 0
+    },
+    "v36": {
+      "exact": 16,
+      "contract": 16,
+      "missingInformationExact": 16,
+      "evidenceOnlyExact": 16,
+      "clarifications": 0,
+      "errors": 0
+    },
+    "gains": 5,
+    "losses": 0
+  },
+  "byFeature": {
+    "completed_update": {
+      "rows": 8,
+      "raw": {
+        "exact": 1,
+        "contract": 4
+      },
+      "v35": {
+        "exact": 6,
+        "contract": 8,
+        "missingInformationExact": 6,
+        "evidenceOnlyExact": 6,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "v36": {
+        "exact": 8,
+        "contract": 8,
+        "missingInformationExact": 8,
+        "evidenceOnlyExact": 8,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "gains": 2,
+      "losses": 0
+    },
+    "list": {
+      "rows": 4,
+      "raw": {
+        "exact": 0,
+        "contract": 2
+      },
+      "v35": {
+        "exact": 2,
+        "contract": 2,
+        "missingInformationExact": 2,
+        "evidenceOnlyExact": 2,
+        "clarifications": 2,
+        "errors": 0
+      },
+      "v36": {
+        "exact": 4,
+        "contract": 4,
+        "missingInformationExact": 4,
+        "evidenceOnlyExact": 4,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "gains": 2,
+      "losses": 0
+    },
+    "update": {
+      "rows": 4,
+      "raw": {
+        "exact": 1,
+        "contract": 4
+      },
+      "v35": {
+        "exact": 3,
+        "contract": 4,
+        "missingInformationExact": 4,
+        "evidenceOnlyExact": 3,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "v36": {
+        "exact": 4,
+        "contract": 4,
+        "missingInformationExact": 4,
+        "evidenceOnlyExact": 4,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "gains": 1,
+      "losses": 0
+    }
+  },
+  "byPrefixLength": {
+    "1": {
+      "rows": 8,
+      "raw": {
+        "exact": 0,
+        "contract": 4
+      },
+      "v35": {
+        "exact": 8,
+        "contract": 8,
+        "missingInformationExact": 8,
+        "evidenceOnlyExact": 8,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "v36": {
+        "exact": 8,
+        "contract": 8,
+        "missingInformationExact": 8,
+        "evidenceOnlyExact": 8,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "gains": 0,
+      "losses": 0
+    },
+    "2": {
+      "rows": 8,
+      "raw": {
+        "exact": 2,
+        "contract": 6
+      },
+      "v35": {
+        "exact": 3,
+        "contract": 6,
+        "missingInformationExact": 4,
+        "evidenceOnlyExact": 3,
+        "clarifications": 2,
+        "errors": 0
+      },
+      "v36": {
+        "exact": 8,
+        "contract": 8,
+        "missingInformationExact": 8,
+        "evidenceOnlyExact": 8,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "gains": 5,
+      "losses": 0
+    }
+  },
+  "diagnosticBuckets": {
+    "v35": {
+      "exact": 11,
+      "evidence_and_missing_information_error": 2,
+      "explicit_clarification_instead_of_expected_evidence": 2,
+      "evidence_error_with_matching_missing_information": 1
+    },
+    "v36": {
+      "exact": 16
+    }
+  },
+  "trainingStarted": false,
+  "selectedModelChanged": false,
+  "independentTest": false,
+  "apiDatabaseReplayPerformed": false,
+  "scope": "8 authored two-user-turn scenarios, each evaluated at both prefixes (16 calls). Focused development diagnostic; some first-turn templates overlap prior data. Second-turn gold uses only accumulated user evidence. Same author as rules; not independent test or actual API execution.",
+  "pairedDialogues": {
+    "v35": {
+      "rows": 8,
+      "bothPrefixesExact": 3
+    },
+    "v36": {
+      "rows": 8,
+      "bothPrefixesExact": 8
+    }
+  }
+}

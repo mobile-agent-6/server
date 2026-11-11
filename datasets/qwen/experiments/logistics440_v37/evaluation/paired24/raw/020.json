@@ -1,0 +1,16 @@
+{
+  "key": "e91619306e7744b20b6a03e1a802e7b8bc5dcbb55f6a1be36588fccd8156b9b9",
+  "identity": {
+    "freezeSha256": "e0ac9aba89edee1cb6318fb07376860dcc6d3c4b5073f7c591bcc4415acd3265",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"completedState\":[{\"turn\":1,\"text\":\"미완료로 바꿔줘\",\"status\":\"adopted\"}],\"title\":[{\"turn\":2,\"text\":\"검수대 가림판 고정 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "1e5de569892fd1c123c7e87281c2f096dfa56ecdc8dfc8b15f7e7c5002b20296",
+  "seconds": 7.7519024580251426
+}

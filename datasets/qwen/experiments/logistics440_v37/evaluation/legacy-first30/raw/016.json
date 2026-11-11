@@ -1,0 +1,16 @@
+{
+  "key": "265f525b68f7a67bc5bb7160baecbedef8c8aec98324066c7ea465afec9c1a42",
+  "identity": {
+    "freezeSha256": "14d9351b65aa64766b77e997e569fc9d12625f2e77207e09def91daf39f2aab9",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"출고 사전 회의\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"2028년 5월 21일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"6시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"출고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "5e6d66abb9059df618dba40e0723bf6ffe19929be283771864b51e95da720fde",
+  "seconds": 8.946779291029088
+}

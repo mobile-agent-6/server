@@ -1,0 +1,16 @@
+{
+  "key": "e5c37ee49682ed457e2cae82e8cbf0688ad67bb5aaa4e045542fd74f08405f26",
+  "identity": {
+    "freezeSha256": "07bfb630c7cec6da7572d9657da328c7aaea072902a2139ce4fbff89c79d4173",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"출고 기록판 고정핀 청소\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":2,\"text\":\"완료 처리 해제\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "7e8ff6f5cd6044fc077ae1ae912a839d82ee65f75615ef97ffa393eb1ff8e017",
+  "seconds": 7.738742917019408
+}

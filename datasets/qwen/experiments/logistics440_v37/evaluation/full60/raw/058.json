@@ -1,0 +1,16 @@
+{
+  "key": "235f882a6aa7dcf8e6943d1d56538e16897edd818cf393c63b059fd46d648b5e",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":2,\"text\":\"입고 바코드 검수\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":4,\"text\":\"3시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":4,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":4,\"text\":\"오후 3시\",\"status\":\"adopted\"}],\"completedState\":{},\"futureScope\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "e6fcb6ed60bf34f050e96bb802206a7c925f770d4bfc7a2e7727465a8acd551f",
+  "seconds": 11.406763416016474
+}

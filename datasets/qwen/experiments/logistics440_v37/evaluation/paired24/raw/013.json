@@ -1,0 +1,16 @@
+{
+  "key": "bb0b2c44794abe948b62e0256ecfff4ff71b62d3b71e2aff2e032e22ceee26e8",
+  "identity": {
+    "freezeSha256": "e0ac9aba89edee1cb6318fb07376860dcc6d3c4b5073f7c591bcc4415acd3265",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"물류\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"11월 24일\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "a3a8ad235cfb381af5edd63e1ccf7f37c3f4aef3e9b304fb36b8b917dc6434d2",
+  "seconds": 7.442588249978144
+}

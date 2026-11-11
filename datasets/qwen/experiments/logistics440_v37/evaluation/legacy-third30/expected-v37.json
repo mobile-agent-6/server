@@ -1,0 +1,422 @@
+[
+  {
+    "key": "20c48d2ce1b5b1d81e24408f630aa6b782b3977d757e9d29bfb2b3c8a4ed3ea1",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"date\",\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"date\",\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "f0685986fce0ea4687e89bd7457dc693cd7472899be82b07b5926051709f5e08",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"query_scope\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"query_scope\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "edf0a0dac118a92afe795403b6c5d2a6c0c10405bb561cd3447100f2810d187d",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"낱개 상품 단위 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "11efaddb274f4a48debfb60db88ca5bb2f5ae40506bcb4361bb8ed6a3bb87628",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"컨베이어 종단 센서 시험\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "94036c800713b347c150cfe210687f039848b5430ef2bf6d7c95718dad3643cf",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":2,\"text\":\"회수 상품 폐기 대상 구분\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "d623dfa844422d8eb768df858b751d43a9206cdf32c60f48b0e0cb90c5e607f6",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"포장 샘플 상자 회수\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"포장\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"모레\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "715d13ba8d3df586f2e5365750bd29e01dce07f36c3bb9a5ee715179e52e27b4",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"7월 13일\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"집품 누락 상품 재확인\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "eacbc4173023fc1cc9d51ef51ce95e214e7bf488f8efb183dc3f7f26aeef5ecb",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"검수 보류 상품 격리\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "bc702968c0e873f84b4c473d7705ab67d0cd43bca72267258c18b60a942c6b88",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "f19b254b710d8d5e549be0b7a96f20e9cec3b87bb6379a341b89ff5aba341fce",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":2,\"text\":\"회수 상품 구성품 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "f8c954e97213ed0ea04993e17cfa71049d5b318dc6e101bc65b6ba1fc0f087d2",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"포장 검사 용기 확인\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"포장\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "dca13a631915ec2aada029c12ca0fd47dc1a3e2eb569ac1fa01ac4501c70d86d",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"7월 7일\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"하차 지연 차량 확인\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "a905d826373e53a13f2740bd447402487e105a14199a5db5b60efeb25661cfcd",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"오배송 상품 회수 현황 확인\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":1,\"text\":\"완료된\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "dccd6f2268a7cc0decb0b96b9843ad8470085c05a56bd32911e2042031947b7c",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"빈 도크 배정 협의\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "794cff80678a352116eb890435fb06331bde94545b67bee7055bdeecfeb79071",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"재고 서류함 번호 대조\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "91d50fc945fcf0f87fb296d053eda32e60b0a23177646956788faf6dd124878e",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"2028년 2월 22일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"3시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"입고 차량 예약 확인\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"입고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "67f1becc8074f637db593f9553540569427e123ed40148bed0dcab223ff69272",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":1,\"text\":\"도서 지역 배송 조건 확인\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "3f2c9ebebf104644dd1cf45cb1b0a0908ba8be2ce56c3d096a049e932c8234fd",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"입고 협력업체 연락망 검토\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "15b198c19cb4d256e663fbcff9c388ca56057899ed7112597d8a1b1b87870390",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"훼손된 바코드 재부착\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "2839a21e1cc5aea54c6b015ad293ae3c90ed093872897dd3856b64b209e2599c",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"낱개 상품 단위 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 표시해 주세요\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "9a3a98efa5c6b846ff007573ced1872c4241fce902cd081421e6202582c8d8a3",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"선입선출 순서 대조\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"7월 6일\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "a75fd2e6364fb9b5e3aaa152d66e10837cf34cf60e4307bb686bad82637ad63c",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"query_scope\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"query_scope\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "a6bf6fa9348b57fbf0d392f1dad37c1ffc3289f7426b1b8fe68b95b7f83105b0",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"훼손된 바코드 재부착\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "272dae27aea1763c1f7dcea6f7e7882c0aa9ff247cb0ced2456111b0571c7c33",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"7월 16일\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "b76a1edc9eceb14b2b36809c89ff66d96117b5d2d242ad4b96556ba328d79cfa",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"유통기한별 상품 분리\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "29fac6c8ab829a9ac5a97f517fbbae5427bbb955259ade71cade18af6e876131",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"재고 라벨 접착 시험\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"재고\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"모레\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "50c28521d471fa9e9364cd1d977ce9331b0f5695b3854db71df6d3b9439512dd",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":1,\"text\":\"상자당 상품 수량 확인\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "c0099f52baad7b4d17188c6153fcc18378d88e161451fb28ae2953e8d2307cba",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"빈 로케이션 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "263bb9b7b8afbc2ec27a8f56bd3a8e909794803e98bc08d74df4c79e706eafeb",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"집품 동선 순서 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "1c82b16c0bfb5aef5a6eeb419a4fcc875fd1603eb3290d8b50451913b56ac6fa",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"날카로운 상품 보호재 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"미완료로 되돌려 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  }
+]

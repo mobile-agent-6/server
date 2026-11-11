@@ -1,0 +1,16 @@
+{
+  "key": "9992f4c40b88728371e8f3d723204f134f14a48afbeefbd9e7a54d7845396329",
+  "identity": {
+    "freezeSha256": "f81142e91acc8ea29423099dd67e472ac31b55890bf1007a3dd1f736960f18c4",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"completedState\":[{\"turn\":1,\"text\":\"미완료로 표시해 주세요\",\"status\":\"adopted\"}],\"title\":[{\"turn\":2,\"text\":\"상품 대기선 표지 부착 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "1efa86fa6a73dbf834c99ee64bb674d1f80b00df44757ee37db4163120476c2c",
+  "seconds": 7.824457874987274
+}

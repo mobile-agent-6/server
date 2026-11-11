@@ -1,0 +1,17 @@
+{
+  "status": "STRUCTURAL_PASS_SEE_VERIFICATION_JSON",
+  "sourceSha256": "c880e5b3f4c29f63ac7f1b2c570fb208cd881f28347abeeb1c9e79af59323f13",
+  "guideSha256": "02f7198e9854e1023ccc0846d6c8c9de8716a265faf3c8e199a4a81bcbf4d0f8",
+  "sourceDialogues": 184,
+  "newIntermediateOccurrences": 197,
+  "allSnapshotOccurrences": 381,
+  "uniqueInputs": 356,
+  "uniqueIntermediateInputs": 172,
+  "sourceTextRepairs": 1,
+  "finalRowsReordered": 41,
+  "contractSourceRolePass": 381,
+  "sameInputConflictingTargets": 0,
+  "newTraining": false,
+  "newInference": false,
+  "apiReplay": false
+}

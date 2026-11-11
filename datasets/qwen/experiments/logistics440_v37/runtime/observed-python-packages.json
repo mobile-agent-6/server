@@ -1,0 +1,10 @@
+{
+  "pythonMinimumForVerifier": "3.11",
+  "observedTrainingAndInference": {
+    "mlx": "0.32.4",
+    "mlx-lm": "0.32.0",
+    "transformers": "5.19.0",
+    "tokenizers": "0.23.3"
+  },
+  "note": "CPU verifier uses Python standard library plus system Asia/Seoul timezone data; model runtime packages are not needed for cached replay. Backend contract snapshot uses enum.StrEnum (Python3.11+)."
+}

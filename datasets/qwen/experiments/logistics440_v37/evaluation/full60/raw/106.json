@@ -1,0 +1,16 @@
+{
+  "key": "b08b12a70acc592709d4cab2b577a2434d4927fc669322a47e6697b4810d491b",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":4,\"text\":\"재고 보관 구역 점검\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":5,\"text\":\"5시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":5,\"text\":\"대신\",\"status\":\"correction_marker\"},{\"turn\":5,\"text\":\"오후 5시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"재고 분류\",\"status\":\"adopted\"}],\"completedState\":{},\"futureScope\":{},\"ampm\":{}],\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "f1ccbf8f978783c48fcc5d5e6a8358f4365619f24736e55403ad12bd6d09bb1a",
+  "seconds": 11.997203291975893
+}
