@@ -69,7 +69,7 @@ def add_question_state(
     if kind == "candidate_selection":
         result = {
             "kind": kind,
-            "text": "선택하세요.",
+            "text": "어떤 일정인가요? 하나를 골라 주세요.",
             "questionId": str(QUESTION_ID),
             "expiresAt": "2026-09-13T04:40:00Z",
             "candidates": [
@@ -238,7 +238,9 @@ def test_text_requires_provider_before_insert(database_path: Path) -> None:
     application.state.engine.dispose()
 
 
-def test_complete_selection_is_admitted_without_provider(database_path: Path) -> None:
+def test_complete_selection_with_legacy_text_is_admitted_without_provider(
+    database_path: Path,
+) -> None:
     application = make_app(database_path, runtime_ready=True, provider=None)
     with TestClient(application, raise_server_exceptions=False) as client:
         add_question_state(

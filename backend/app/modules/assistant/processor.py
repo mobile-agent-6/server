@@ -736,10 +736,18 @@ def _provider_decision_plan_body(
                 uuid_factory=uuid_factory,
                 **control,
             )
+        result_text = decision.text
+        if not schedules:
+            suffix = (
+                texts.MORE_REQUESTS_NOTE
+                if decision.text.endswith(texts.MORE_REQUESTS_NOTE)
+                else ""
+            )
+            result_text = texts.NO_MATCH + suffix
         return _FinalizePlan(
             result=AssistantResultOutcome(
                 kind=AssistantResultKind.OUTCOME,
-                text=decision.text,
+                text=result_text,
                 outcome=AssistantOutcome.SUCCESS,
                 schedules_changed=False,
                 operation=AssistantOutcomeOperation.LIST,

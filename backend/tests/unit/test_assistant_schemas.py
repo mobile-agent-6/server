@@ -208,6 +208,11 @@ def test_candidate_preserves_opaque_identifier_case() -> None:
 
 
 def test_confirmation_operation_and_changes_contract() -> None:
+    completed_only = RESULT_ADAPTER.validate_python(result_payload("confirmation"))
+    assert completed_only.model_dump(
+        mode="json", by_alias=True, exclude_none=True
+    )["changes"] == {"completed": True}
+
     normalized = result_payload("confirmation")
     normalized["changes"] = {"scheduledAt": "2026-10-18T10:00:00+09:00"}
     assert RESULT_ADAPTER.validate_python(normalized).model_dump(

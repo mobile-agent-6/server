@@ -14,6 +14,7 @@ from app.core.config import Settings
 from app.core.database import create_assistant_engine, create_session_factory
 from app.modules.assistant import repository
 from app.modules.assistant.admission import admit_request, request_fingerprint
+from app.modules.assistant.evidence import texts
 from app.modules.assistant.decisions import (
     DecisionContext,
     DecisionEnvelope,
@@ -1802,8 +1803,39 @@ def test_list_reads_at_most_101_and_never_returns_partial_success(
     assert result["kind"] == kind
     if count <= 100:
         assert len(result["items"]) == count
+        assert result["outcome"] == "success"
+        assert result["operation"] == "list"
+        assert result["schedulesChanged"] is False
+        assert result["text"] == (
+            texts.NO_MATCH if count == 0 else "조회 결과입니다."
+        )
     else:
         assert "items" not in result
+
+
+def test_empty_list_preserves_more_requests_note(processor_store) -> None:
+    admit(processor_store, request_data())
+    provider = ScriptedDecisionProvider(
+        [
+            envelope(
+                {
+                    "kind": "list_intent",
+                    "text": texts.LIST_RESULT + texts.MORE_REQUESTS_NOTE,
+                    "from": NOW.isoformat(),
+                    "to": (NOW + timedelta(days=1)).isoformat(),
+                    "timeInterpretation": "absolute",
+                }
+            )
+        ]
+    )
+
+    run(processor_store, provider, MemoryScheduleReader())
+
+    result = stored_request(processor_store).result_json
+    assert result["text"] == texts.NO_MATCH + texts.MORE_REQUESTS_NOTE
+    assert result["outcome"] == "success"
+    assert result["operation"] == "list"
+    assert result["items"] == []
 
 
 def test_list_time_filter_is_applied_after_bounded_read(processor_store) -> None:
