@@ -480,6 +480,7 @@ def test_candidate_selection_to_approved_scheduled_at_update_executes_once(
         assert changed.scheduled_at == target_utc
         assert untouched.scheduled_at == NOW + timedelta(hours=2)
         assert completed.result_json["outcome"] == "success"
+        assert completed.result_json["text"] == "일정을 변경했어요."
         assert completed.result_json["affectedScheduleIds"] == [str(SCHEDULE_ID)]
         assert session.get(AssistantWriteGate, 1).owner_request_id is None
 
@@ -513,10 +514,66 @@ def test_expected_updated_at_atomic_write_and_gate_release(
         assert request.result_json["operation"] == operation
         assert gate.owner_request_id is None
         if operation == "update":
+            assert request.result_json["text"] == "일정의 완료 상태를 변경했어요."
             assert stored.completed is True
             assert stored.deleted_at is None
         else:
             assert stored.deleted_at == NOW
+
+
+def test_completed_false_update_uses_completion_status_text(stores) -> None:
+    assistant, api = stores
+    schedule(api)
+    with api.begin() as session:
+        session.get(Schedule, SCHEDULE_ID).completed = True
+    pending_request(
+        assistant,
+        pending={
+            "version": 1,
+            "operation": "update",
+            "targetScheduleId": str(SCHEDULE_ID),
+            "expectedUpdatedAt": OLD.isoformat().replace("+00:00", "Z"),
+            "changes": {"completed": False},
+            "timeInterpretation": "absolute",
+        },
+    )
+
+    assert (
+        writer(assistant, api).execute(request_id=REQUEST_ID, runtime_guard=guard())
+        is ProcessOneResult.COMPLETED
+    )
+    with api() as session:
+        stored = session.get(Schedule, SCHEDULE_ID)
+        request = session.get(AssistantRequest, REQUEST_ID)
+        assert stored.completed is False
+        assert request.result_json["text"] == "일정의 완료 상태를 변경했어요."
+
+
+def test_mixed_update_keeps_generic_update_text(stores) -> None:
+    assistant, api = stores
+    schedule(api)
+    pending_request(
+        assistant,
+        pending={
+            "version": 1,
+            "operation": "update",
+            "targetScheduleId": str(SCHEDULE_ID),
+            "expectedUpdatedAt": OLD.isoformat().replace("+00:00", "Z"),
+            "changes": {"title": "재고 실사", "completed": True},
+            "timeInterpretation": "absolute",
+        },
+    )
+
+    assert (
+        writer(assistant, api).execute(request_id=REQUEST_ID, runtime_guard=guard())
+        is ProcessOneResult.COMPLETED
+    )
+    with api() as session:
+        stored = session.get(Schedule, SCHEDULE_ID)
+        request = session.get(AssistantRequest, REQUEST_ID)
+        assert stored.title == "재고 실사"
+        assert stored.completed is True
+        assert request.result_json["text"] == "일정을 변경했어요."
 
 
 def test_updated_target_is_not_overwritten_and_gets_fresh_confirmation(stores) -> None:

@@ -65,6 +65,7 @@ from app.modules.schedules.schemas import ScheduleCreate, ScheduleUpdate
 QUESTION_TTL = timedelta(minutes=10)
 CREATE_SUCCESS_TEXT = "일정을 등록했어요."
 UPDATE_SUCCESS_TEXT = "일정을 변경했어요."
+COMPLETION_STATUS_UPDATE_SUCCESS_TEXT = "일정의 완료 상태를 변경했어요."
 DELETE_SUCCESS_TEXT = "일정을 삭제했어요."
 NO_MATCH_TEXT = "조건에 맞는 일정을 찾지 못했어요."
 ALREADY_APPLIED_TEXT = "이미 요청한 상태예요."
@@ -138,12 +139,19 @@ def uncertain_snapshot() -> dict[str, object]:
     )
 
 
-def _success_snapshot(operation: AssistantOutcomeOperation, schedule_id: UUID):
+def _success_snapshot(
+    operation: AssistantOutcomeOperation,
+    schedule_id: UUID,
+    *,
+    completion_status_only: bool = False,
+):
     text = {
         AssistantOutcomeOperation.CREATE: CREATE_SUCCESS_TEXT,
         AssistantOutcomeOperation.UPDATE: UPDATE_SUCCESS_TEXT,
         AssistantOutcomeOperation.DELETE: DELETE_SUCCESS_TEXT,
     }[operation]
+    if operation is AssistantOutcomeOperation.UPDATE and completion_status_only:
+        text = COMPLETION_STATUS_UPDATE_SUCCESS_TEXT
     return _snapshot(
         AssistantResultOutcome(
             kind=AssistantResultKind.OUTCOME,
@@ -947,7 +955,12 @@ class AssistantSafeWriter:
                             request_id=request_id,
                             result_kind=AssistantResultKind.OUTCOME,
                             result_json=_success_snapshot(
-                                operation, intent.target_schedule_id
+                                operation,
+                                intent.target_schedule_id,
+                                completion_status_only=(
+                                    isinstance(intent, PendingUpdateIntent)
+                                    and update.model_fields_set == {"completed"}
+                                ),
                             ),
                             completed_at=now,
                             retention_started_at=now,

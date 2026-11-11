@@ -745,7 +745,7 @@ accepted → processing → completed
 - `candidates`는 2~10개다. 각 항목은 `candidateId`·`title`·`scheduledAt`·`category`를 항상 제공한다.
 - candidate의 `category`는 `INBOUND / INVENTORY / OUTBOUND / RETURN / OTHER` 중 하나다.
 - `target`과 조회 `items`의 일정 요약은 `id`·`title`·`scheduledAt`·`category`·`completed`·`updatedAt`이다.
-- `confirmation.operation`은 `update / delete`다. 완료 상태 변경은 `update`와 `changes.completed`를 사용한다. delete에서는 `changes`를 생략한다.
+- `confirmation.operation`은 `update / delete`다. 완료 상태 변경은 `update`와 `changes.completed`를 사용한다. `changes.scheduledAt`은 값이 있을 때 UTC `Z` RFC 3339 datetime string이다. delete에서는 `changes`를 생략한다.
 - `outcome.outcome`은 `success / cancelled / no_match`다.
 - `outcome.operation`은 `create / list / update / delete`이며 작업 특정 전 취소에서는 생략할 수 있다.
 - 성공한 create/update/delete에는 `schedulesChanged: true`와 실제 Schedule ID 하나를 담은 `affectedScheduleIds`가 필수다.

@@ -295,7 +295,10 @@ class AssistantConfirmationChanges(_AssistantResponseModel):
     )
 
     title: Title = None  # type: ignore[assignment]
-    scheduled_at: ApiDateTime = None  # type: ignore[assignment]
+    scheduled_at: ApiDateTime = Field(
+        default=None,
+        json_schema_extra={"format": "date-time"},
+    )  # type: ignore[assignment]
     category: CategoryValue = None  # type: ignore[assignment]
     completed: bool = None  # type: ignore[assignment]
 

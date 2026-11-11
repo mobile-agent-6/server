@@ -695,6 +695,7 @@ def test_target_title_match_ignores_spaces_and_picks_among_several() -> None:
     model = ScriptedModel(output(op("delete", target={"title": [span("회의")]})))
     _, decision = decide(EvidenceDecisionProvider(model, FakeReader([first, second, other])), "회의 지워 줘")
     assert decision["kind"] == "select_candidate"
+    assert decision["text"] == "어떤 일정인가요? 하나를 선택해 주세요."
     assert [c["scheduleId"] for c in decision["candidates"]] == [str(first.id), str(second.id)]
 
 

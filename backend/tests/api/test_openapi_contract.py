@@ -197,7 +197,16 @@ def test_complete_openapi_contract(client: TestClient) -> None:
     confirmation = components["AssistantResultConfirmation"]
     assert "expiresAt" in confirmation["required"]
     assert "allOf" in confirmation
-    assert components["AssistantConfirmationChanges"]["minProperties"] == 1
+    confirmation_changes = components["AssistantConfirmationChanges"]
+    assert confirmation_changes["minProperties"] == 1
+    assert confirmation_changes["properties"]["scheduledAt"] == {
+        "format": "date-time",
+        "title": "Scheduledat",
+        "type": "string",
+    }
+    assert "scheduledAt" not in confirmation_changes.get("required", [])
+    assert "default" not in confirmation_changes["properties"]["scheduledAt"]
+    assert "anyOf" not in confirmation_changes["properties"]["scheduledAt"]
     assert "oneOf" in components["AssistantResultOutcome"]
     assert "oneOf" in components["AssistantResultFailure"]
     assert "schedulesChanged" not in components["AssistantResultUncertain"]["properties"]
