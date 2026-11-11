@@ -1,0 +1,186 @@
+{
+  "model": "440-row selected weights",
+  "clearEvidence12": {
+    "v30": {
+      "rows": 12,
+      "exact": 8,
+      "contract": 9,
+      "clarifications": 0,
+      "errors": 0,
+      "correctionOrderOnly": 0
+    },
+    "v31": {
+      "rows": 12,
+      "exact": 12,
+      "contract": 12,
+      "clarifications": 0,
+      "errors": 0,
+      "correctionOrderOnly": 0
+    }
+  },
+  "raw12": {
+    "exact": 3,
+    "contract": 4
+  },
+  "clarificationBoundary12": {
+    "v30": {
+      "rows": 12,
+      "explicitClarifications": 5,
+      "errors": 0
+    },
+    "v31": {
+      "rows": 12,
+      "explicitClarifications": 10,
+      "errors": 0
+    }
+  },
+  "newGuardOnClearInputs": [],
+  "gains": [
+    {
+      "caseId": "v31clear-resolved-a",
+      "feature": "completed_update",
+      "round": 2
+    },
+    {
+      "caseId": "v31clear-resolved-b",
+      "feature": "completed_update",
+      "round": 2
+    },
+    {
+      "caseId": "v31clear-resolved-c",
+      "feature": "completed_update",
+      "round": 2
+    },
+    {
+      "caseId": "v31clear-resolved-d",
+      "feature": "completed_update",
+      "round": 2
+    }
+  ],
+  "regressions": [],
+  "boundaryGains": [
+    {
+      "caseId": "v31boundary-op-a",
+      "feature": "clarification_boundary",
+      "round": 2
+    },
+    {
+      "caseId": "v31boundary-op-c",
+      "feature": "clarification_boundary",
+      "round": 2
+    },
+    {
+      "caseId": "v31boundary-op-f",
+      "feature": "clarification_boundary",
+      "round": 2
+    },
+    {
+      "caseId": "v31boundary-state-a",
+      "feature": "clarification_boundary",
+      "round": 2
+    },
+    {
+      "caseId": "v31boundary-state-b",
+      "feature": "clarification_boundary",
+      "round": 2
+    }
+  ],
+  "boundaryRegressions": [],
+  "byFeature": {
+    "completed_update": {
+      "v30": {
+        "rows": 8,
+        "exact": 4,
+        "contract": 5,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v31": {
+        "rows": 8,
+        "exact": 8,
+        "contract": 8,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "create": {
+      "v30": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v31": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "delete": {
+      "v30": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v31": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "list": {
+      "v30": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v31": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "update": {
+      "v30": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v31": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    }
+  },
+  "newTraining": false,
+  "modelAutoSelected": false,
+  "independentTest": false,
+  "apiDatabaseReplayPerformed": false,
+  "scope": "Same-author ambiguity diagnostic:12 clear-input snapshots and12 undecided examples scored separately. No combined accuracy; not independent test or full API verification."
+}

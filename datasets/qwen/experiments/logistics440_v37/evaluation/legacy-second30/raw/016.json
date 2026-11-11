@@ -1,0 +1,16 @@
+{
+  "key": "b07212694c7f637cdfd9467ef2fd3d8151479d74ffa6eb940d7412812c5c3709",
+  "identity": {
+    "freezeSha256": "f7ca24d3253ce76f14bcfc7ed1b3e96e1359c1ff0793092acd2e8148ee958474",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"하차 상품 파손 확인\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"2028년 3월 10일\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"하차\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "cfad02ecd4c3a8c04565a12f2355913e86526fdc6910562eb057f0c7ede95941",
+  "seconds": 8.411235917010345
+}

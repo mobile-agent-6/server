@@ -1,0 +1,16 @@
+{
+  "key": "7215f580471b763ca8fee3d94b224b5bd7b4d3094b50539597e729007b415c5a",
+  "identity": {
+    "freezeSha256": "e06dcd680ad4bc1718721dfa4d24140e29a262fae9017203bc744a71baea3961",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"입고 소형 용기 뚜껑 검수\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"3월 5일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"오전 9시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"입고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "a843f33ba1b37c1b4fbfd18f8bd7782b7a2ac62f96441e4588d8350a15048d73",
+  "seconds": 9.058856458985247
+}

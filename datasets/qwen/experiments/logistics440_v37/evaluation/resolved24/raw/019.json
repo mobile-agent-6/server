@@ -1,0 +1,16 @@
+{
+  "key": "89f495b2826f00233ff5857f0c1af21f75be92f4e418ccce44afcf85d84a260e",
+  "identity": {
+    "freezeSha256": "07bfb630c7cec6da7572d9657da328c7aaea072902a2139ce4fbff89c79d4173",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"반품 검수함 안내판 체결\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":2,\"text\":\"미완료로 할지 완료로 할지\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "7a6d27af544c23b88c1ec3ba78d85b8863bc6215bfc51ef64727f3f981eac1e2",
+  "seconds": 8.05656704196008
+}

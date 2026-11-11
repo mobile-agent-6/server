@@ -1,0 +1,16 @@
+{
+  "key": "65fab68428c19267d32b1ac804eee7a621158f76ba1f341b9111a3923159e5a1",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "eba5829305e6b93e7a7fde2afa6d684311b8fc74ead9a9dce9f2c1c8814b023f",
+  "seconds": 8.285031042003538
+}

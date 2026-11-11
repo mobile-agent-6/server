@@ -1,0 +1,16 @@
+{
+  "key": "563c1448776c3f16789e7eb7a4a36539c8209c1838397bf981d5eeb10174a5f1",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"내일 3시\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"아니\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"3시\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "d6dd4d751f5efdb1df30d99a86383955bb945bd4b2c3107f0e711c003fbe7528",
+  "seconds": 8.546417790988926
+}

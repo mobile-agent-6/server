@@ -1,0 +1,16 @@
+{
+  "key": "be24dd72307972c5abd797419cf01ccc8347c8ae81ac84d80ebda5a4b7d7f479",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"재고 유��후한 확인\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":2,\"text\":\"새벽 12시\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"오후 5시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"재고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "efe7cc8a2ef3164becc8a950c61934af482fa8096b5af5b9f8f5beccdf97fa91",
+  "seconds": 10.088463916996261
+}

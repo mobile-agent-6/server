@@ -1,0 +1,16 @@
+{
+  "key": "3f27a1ea2f1946197bbb970672f5db8a554a65aa8b90bcc796a2b024e28a6449",
+  "identity": {
+    "freezeSha256": "f7ca24d3253ce76f14bcfc7ed1b3e96e1359c1ff0793092acd2e8148ee958474",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"회수 상품 사유 코드 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"date\":[{\"turn\":2,\"text\":\"11월 9일\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "18f086a4144d82e6be46dd055441d2c6403622be95881f0e9727a0d3dad6820e",
+  "seconds": 7.6225376250222325
+}

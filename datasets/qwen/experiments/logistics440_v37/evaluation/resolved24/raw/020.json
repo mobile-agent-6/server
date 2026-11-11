@@ -1,0 +1,16 @@
+{
+  "key": "fc903fc338e6ffe9dfa2ec9b44b158627261ee9705733ecef812b6648f79969f",
+  "identity": {
+    "freezeSha256": "07bfb630c7cec6da7572d9657da328c7aaea072902a2139ce4fbff89c79d4173",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"재고 보관칸 먼지커버 점검\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":2,\"text\":\"완료인지 미완료인지 결정을 못 내렸어요\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "3af67919f6b066b4104714fd39c3c8c8f62e2f97cb7af1cc6055def0ca954064",
+  "seconds": 8.039491000003181
+}

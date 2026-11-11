@@ -1,0 +1,16 @@
+{
+  "key": "95bb2c7771360f3c7e3c01559462547351837178ecf9867ad33c64274b911138",
+  "identity": {
+    "freezeSha256": "e0ac9aba89edee1cb6318fb07376860dcc6d3c4b5073f7c591bcc4415acd3265",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"바코드 리더 거치대 고정 확인\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"반품\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "312798a3d8fdc7d58563f5a195e6b0c62858a7171b2497a590909a51d9dc2052",
+  "seconds": 7.581014916009735
+}

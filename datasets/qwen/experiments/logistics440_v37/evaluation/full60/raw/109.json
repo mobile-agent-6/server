@@ -1,0 +1,16 @@
+{
+  "key": "24583b32df4c2ec92f1dae1695153cc141fe36b634907fafe0baf8c61ea064dc",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":2,\"text\":\"입고 인수증 정리\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"입고 라벨 누락 확인\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"7시\",\"status\":\"adopted\"}],\"completed\":[{\"turn\":3,\"text\":\"미완료인\",\"status\":\"adopted\"}],\"futureScope\":[{\"turn\":4,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":4,\"text\":\"모레\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "f9ccb1087672b42fcc33b19a22ab39d55fd1994b4599417e7b5b9eb0e716989a",
+  "seconds": 11.340354832995217
+}

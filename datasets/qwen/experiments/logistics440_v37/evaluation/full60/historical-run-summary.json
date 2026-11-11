@@ -1,0 +1,1266 @@
+{
+  "model": "440-row selected weights",
+  "unique132": {
+    "v27": {
+      "rows": 132,
+      "exact": 106,
+      "contract": 110,
+      "clarifications": 22,
+      "errors": 0,
+      "correctionOrderOnly": 0
+    },
+    "v28": {
+      "rows": 132,
+      "exact": 106,
+      "contract": 110,
+      "clarifications": 22,
+      "errors": 0,
+      "correctionOrderOnly": 0
+    }
+  },
+  "raw132": {
+    "exact": 26,
+    "contract": 74
+  },
+  "mappedSnapshots179": {
+    "v27": {
+      "rows": 179,
+      "exact": 151,
+      "contract": 155,
+      "clarifications": 24,
+      "errors": 0,
+      "correctionOrderOnly": 0
+    },
+    "v28": {
+      "rows": 179,
+      "exact": 151,
+      "contract": 155,
+      "clarifications": 24,
+      "errors": 0,
+      "correctionOrderOnly": 0
+    }
+  },
+  "byTrainingMembership": {
+    "trained_exact_input": {
+      "v27": {
+        "rows": 40,
+        "exact": 27,
+        "contract": 29,
+        "clarifications": 11,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 40,
+        "exact": 27,
+        "contract": 29,
+        "clarifications": 11,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "not_trained_exact_input": {
+      "v27": {
+        "rows": 92,
+        "exact": 79,
+        "contract": 81,
+        "clarifications": 11,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 92,
+        "exact": 79,
+        "contract": 81,
+        "clarifications": 11,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    }
+  },
+  "byFeatureMappedSnapshots": {
+    "completed_update": {
+      "v27": {
+        "rows": 29,
+        "exact": 17,
+        "contract": 19,
+        "clarifications": 10,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 29,
+        "exact": 17,
+        "contract": 19,
+        "clarifications": 10,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "create": {
+      "v27": {
+        "rows": 41,
+        "exact": 37,
+        "contract": 37,
+        "clarifications": 4,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 41,
+        "exact": 37,
+        "contract": 37,
+        "clarifications": 4,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "delete": {
+      "v27": {
+        "rows": 30,
+        "exact": 26,
+        "contract": 27,
+        "clarifications": 3,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 30,
+        "exact": 26,
+        "contract": 27,
+        "clarifications": 3,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "list": {
+      "v27": {
+        "rows": 48,
+        "exact": 41,
+        "contract": 41,
+        "clarifications": 7,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 48,
+        "exact": 41,
+        "contract": 41,
+        "clarifications": 7,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "update": {
+      "v27": {
+        "rows": 31,
+        "exact": 30,
+        "contract": 31,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 31,
+        "exact": 30,
+        "contract": 31,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    }
+  },
+  "byDialogueModelCalls": {
+    "mt60-completed_update-r3-v0": {
+      "v27": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-completed_update-r3-v1": {
+      "v27": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-completed_update-r3-v2": {
+      "v27": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-completed_update-r3-v3": {
+      "v27": {
+        "rows": 2,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 1,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 2,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 1,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-completed_update-r4-v0": {
+      "v27": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-completed_update-r4-v1": {
+      "v27": {
+        "rows": 3,
+        "exact": 1,
+        "contract": 2,
+        "clarifications": 1,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 1,
+        "contract": 2,
+        "clarifications": 1,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-completed_update-r4-v2": {
+      "v27": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-completed_update-r4-v3": {
+      "v27": {
+        "rows": 3,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 1,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 1,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-completed_update-r5-v0": {
+      "v27": {
+        "rows": 3,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 2,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 2,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-completed_update-r5-v1": {
+      "v27": {
+        "rows": 3,
+        "exact": 1,
+        "contract": 2,
+        "clarifications": 1,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 1,
+        "contract": 2,
+        "clarifications": 1,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-completed_update-r5-v2": {
+      "v27": {
+        "rows": 3,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 2,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 2,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-completed_update-r5-v3": {
+      "v27": {
+        "rows": 3,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 2,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 2,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-create-r3-v0": {
+      "v27": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-create-r3-v1": {
+      "v27": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-create-r3-v2": {
+      "v27": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-create-r3-v3": {
+      "v27": {
+        "rows": 2,
+        "exact": 0,
+        "contract": 0,
+        "clarifications": 2,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 2,
+        "exact": 0,
+        "contract": 0,
+        "clarifications": 2,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-create-r4-v0": {
+      "v27": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-create-r4-v1": {
+      "v27": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-create-r4-v2": {
+      "v27": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-create-r4-v3": {
+      "v27": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-create-r5-v0": {
+      "v27": {
+        "rows": 4,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 2,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 4,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 2,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-create-r5-v1": {
+      "v27": {
+        "rows": 5,
+        "exact": 5,
+        "contract": 5,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 5,
+        "exact": 5,
+        "contract": 5,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-create-r5-v2": {
+      "v27": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-create-r5-v3": {
+      "v27": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-delete-r3-v0": {
+      "v27": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-delete-r3-v1": {
+      "v27": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-delete-r3-v2": {
+      "v27": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-delete-r3-v3": {
+      "v27": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-delete-r4-v0": {
+      "v27": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-delete-r4-v1": {
+      "v27": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-delete-r4-v2": {
+      "v27": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-delete-r4-v3": {
+      "v27": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-delete-r5-v0": {
+      "v27": {
+        "rows": 3,
+        "exact": 1,
+        "contract": 2,
+        "clarifications": 1,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 1,
+        "contract": 2,
+        "clarifications": 1,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-delete-r5-v1": {
+      "v27": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-delete-r5-v2": {
+      "v27": {
+        "rows": 3,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 2,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 2,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-delete-r5-v3": {
+      "v27": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-list-r3-v0": {
+      "v27": {
+        "rows": 3,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 2,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 2,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-list-r3-v1": {
+      "v27": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-list-r3-v2": {
+      "v27": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-list-r3-v3": {
+      "v27": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-list-r4-v0": {
+      "v27": {
+        "rows": 4,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 2,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 4,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 2,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-list-r4-v1": {
+      "v27": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-list-r4-v2": {
+      "v27": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-list-r4-v3": {
+      "v27": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-list-r5-v0": {
+      "v27": {
+        "rows": 5,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 2,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 5,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 2,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-list-r5-v1": {
+      "v27": {
+        "rows": 5,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 1,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 5,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 1,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-list-r5-v2": {
+      "v27": {
+        "rows": 5,
+        "exact": 5,
+        "contract": 5,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 5,
+        "exact": 5,
+        "contract": 5,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-list-r5-v3": {
+      "v27": {
+        "rows": 5,
+        "exact": 5,
+        "contract": 5,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 5,
+        "exact": 5,
+        "contract": 5,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-update-r3-v0": {
+      "v27": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-update-r3-v1": {
+      "v27": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-update-r3-v2": {
+      "v27": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-update-r3-v3": {
+      "v27": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-update-r4-v0": {
+      "v27": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-update-r4-v1": {
+      "v27": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-update-r4-v2": {
+      "v27": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 2,
+        "exact": 2,
+        "contract": 2,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-update-r4-v3": {
+      "v27": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-update-r5-v0": {
+      "v27": {
+        "rows": 3,
+        "exact": 2,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 2,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-update-r5-v1": {
+      "v27": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-update-r5-v2": {
+      "v27": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 3,
+        "exact": 3,
+        "contract": 3,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "mt60-update-r5-v3": {
+      "v27": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      },
+      "v28": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0,
+        "errors": 0,
+        "correctionOrderOnly": 0
+      }
+    }
+  },
+  "gains": [],
+  "regressions": [],
+  "trainingPerformed": false,
+  "modelAutoSelected": false,
+  "independentTest": false,
+  "apiDatabaseReplayPerformed": false,
+  "scope": "Development pool,132 unique model inputs mapped to179 snapshots across60 scenarios;61 non-model rounds excluded. Not an API dialogue success rate.92 exact inputs were not trained, but related scenarios and development exposure remain.",
+  "allModelCallTargetsExactByDialogue": {
+    "v27": 44,
+    "v28": 44
+  }
+}

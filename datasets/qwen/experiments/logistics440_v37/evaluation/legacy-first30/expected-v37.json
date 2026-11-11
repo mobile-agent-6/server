@@ -1,0 +1,422 @@
+[
+  {
+    "key": "dc69d3d4c2b0ec28c9142f081c47b3a1ae62e0101185ced2ba7aa97bb822d948",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"입고 수량 대조\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"입고\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"모레\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "07243dc5efb6fc97ae0f2c1d6de2f9bf216563955a6a492c5e64d95d6c17fa58",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"query_scope\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"query_scope\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "bf20f2e1185ee82f487faa978e1489036e1a9658e290aeb1ffb809ba38d92deb",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"포장 완충지 탄성 시험\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "4755dd8736815fc92403fcc05837f13e710803ca464528ecd13f861f62bde868",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "c81e9f2dd75934d653acf8a42ce6042fb7ebaa28df0a8397ba3b704ae9e8f7e4",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "9b7857edd402c9394f07f6e69b62cdf6a2f6de36af0252cbd02613f16bdd8912",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"time\":[{\"turn\":1,\"text\":\"오후 4시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"출고 라인 점검\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"출고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"date\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"date\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "1cee1e8a8e14cf4f221736870d22c526b8baa6d8839cfa4fbb596cc440af5f4d",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"모레\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "3d18ea3c191833620fe74ea391b5334147264a2b0df2241076f0e5993123df35",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{},\"changeEvidence\":{\"time\":[{\"turn\":1,\"text\":\"오후 4시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "b2e5da7ebe97d32a13b9872d5c8f8c36c2ee9e27fa0e69a3dacc8616eaac0451",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"title\":[{\"turn\":2,\"text\":\"검수대 평탄도 측정\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "1fab4f5121572a8b577b665bf0df8efa44720cec59f33ba9ae2e04f0454e902b",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"실사 담당 구역 배정\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "c7141e2bc434dd52492b4f740b480eea4c2f81cc884c57a93921716e0228aeff",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"오후 3시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "e5da72f074d9725980316e8addd395853184e9754cedf8410d829e024882c4cb",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":1,\"text\":\"자재 분류표 인쇄 검사\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "44d2a4549e152a311acb314e59db3b6aeb3684556b3aac9336755b71d8170db7",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"category\":[{\"turn\":1,\"text\":\"분류가 반품인\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"교대조 주문 진행 상황 공유\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "77850c80e4b1b9da93c7ceb8bf3fb73954f11cc21953ac7850aa8d1893a51ab5",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"4월 16일\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"화물대 고무발 교환\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "a296f9c0025488b916d0e9d530f63ff1d18ef2a41434cd33bc3f6e326c6ddc47",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"상품 원산지 표시 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "265f525b68f7a67bc5bb7160baecbedef8c8aec98324066c7ea465afec9c1a42",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"출고 사전 회의\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"2028년 5월 21일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"6시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"출고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "c1406951e771fffcf02c392917773aecb70143807a35a865391f9c02c2cec83d",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":2,\"text\":\"신규 배송구역 안내\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "99a0701481509587ef3cb3f0bc41549373bf014dc9be028aef14847f0f2dfd49",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"배송 거절 화물 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"date\":[{\"turn\":2,\"text\":\"5월 2일\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "5931bb8752dfa7f25f2ffc6834f2546e783990defbe9ff229ab3ff4963946417",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"8월 16일\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "87825dc57121662c14aa4fd64790746f78540e67059e37e257c5cf06a467de61",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"상품 원산지 표시 확인\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"7월 11일\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "bc57c63c0546d7de8a965b2754a1011ab15bfab6d4a542c9a67e456af7673b86",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"반품 봉투 치수 측정\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"4월 3일\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"반품\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "7ed344868667a6810ac1072674399a61054b4ea86abfeb53c42dea75af40fa19",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"4월 7일\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"유통기한 임박 상품 위치 확인\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "673ae92502ea9bb908dc2d114a313686b6330b110fbc15f565e2114f0526b27f",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"상품 코드와 규격 대조\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"상품 중량 정보 확인\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "bf158ab3ad17a21eccd93af066892631cfeb247e5582f028add66b7ebeb8843a",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"7월 10일\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"검수 보류 사유 기록\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "abd91012409bc49fc6e20c7f72b8d20288f7cf855c4d9628f5c5aaba312f1eca",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"사용 불가 상품 구분\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":2,\"text\":\"완료된\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "c164b5b25db0a8916c8d37d5814154140ad1f1580e126b8e5f8db4de9fa5279a",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"8월 14일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"오전 7시 30분\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"지게차 충전 기록 대조\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "b612352451d7de6efb7eddd9570f3443d0c9f6cb6b15a681a760a08972e715b5",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":1,\"text\":\"고중량 상품 상자 강도 확인\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "899612349a8cdf3a9e560cd81bd2f831dbf19f8fa4e5a7c20aa9120d8261575d",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"7월 10일\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"집품 동선 순서 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"time\":[{\"turn\":1,\"text\":\"오후 6시 40분\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "3e2deffd79981feea19f343f188abe8668250d2f3e65372defb62dadcdc1db31",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"time\":[{\"turn\":1,\"text\":\"오후 3시 10분\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "38e8112311d2d62a96a69ff427b7c45abda1ccfde049eb5566a2252928bb3244",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"상자 봉합 상태 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 바꿔 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  }
+]

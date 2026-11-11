@@ -1,0 +1,16 @@
+{
+  "key": "bf84ec23447ce7477e11391d964d8d234933c127b0030640d787556804a527d5",
+  "identity": {
+    "freezeSha256": "07bfb630c7cec6da7572d9657da328c7aaea072902a2139ce4fbff89c79d4173",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"출고 기록함 잠금장치 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"time\":[{\"turn\":1,\"text\":\"오전 11시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "56c0d2930aaba284335a757ce5688be161558c1f6c433a7cca385cc4e14450c0",
+  "seconds": 7.699591083044652
+}

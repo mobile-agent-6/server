@@ -1,0 +1,16 @@
+{
+  "key": "21be5d64f29f5ada2bd54c2b9b48d2d81c6d292ac142d268e639a4f903100598",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":3,\"text\":\"반품 상품 외관 검사\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"오후 4시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":3,\"text\":\"반품\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "59f829eb5c8371c29991ae543da76eaa6c3bc33aec99f8132f4087f1041fbabd",
+  "seconds": 9.98196329100756
+}

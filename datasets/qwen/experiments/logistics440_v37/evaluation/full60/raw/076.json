@@ -1,0 +1,16 @@
+{
+  "key": "fb4c4bf523e54a5345391d590a1d644129abe42d6125c4110e61e8178b60bf8f",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"completedState\":[{\"turn\":1,\"text\":\"완료된\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "59aa24d2f03551a098c2a60cd78480b9da63b112b7665e3ad50d0a4678a6a5d4",
+  "seconds": 7.565542833006475
+}

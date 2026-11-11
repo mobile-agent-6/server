@@ -1,0 +1,16 @@
+{
+  "key": "00a5b2e877fabed38a73a1314d30dedc5ddefab8e8435f922b62ba16ecf0c247",
+  "identity": {
+    "freezeSha256": "f81142e91acc8ea29423099dd67e472ac31b55890bf1007a3dd1f736960f18c4",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"운송 용기 바닥 균열 확인\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":1,\"text\":\"미완료인\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "407587706e63e67bec41473dd540c577307d473f3da2969f28fda864335c369c",
+  "seconds": 7.694689000025392
+}

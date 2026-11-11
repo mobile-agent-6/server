@@ -1,0 +1,16 @@
+{
+  "key": "3d18ea3c191833620fe74ea391b5334147264a2b0df2241076f0e5993123df35",
+  "identity": {
+    "freezeSha256": "14d9351b65aa64766b77e997e569fc9d12625f2e77207e09def91daf39f2aab9",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{},\"changeEvidence\":{\"time\":[{\"turn\":1,\"text\":\"오후 4시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "42308b61099110e9525d10d0290371ffccc412e81809fa1b7cf9bdf14a76ba0f",
+  "seconds": 6.814196625025943
+}

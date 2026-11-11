@@ -1,0 +1,49 @@
+{
+  "createdAt": "2026-11-11T01:19:56.498550+00:00",
+  "evidenceRows": 12,
+  "dialogues": 9,
+  "callSnapshotsPerDialogue": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2
+  ],
+  "byFeature": {
+    "completed_update": 8,
+    "delete": 1,
+    "list": 1,
+    "create": 1,
+    "update": 1
+  },
+  "clarificationBoundaryCases": 12,
+  "totalInferenceCalls": 24,
+  "rulesFrozenBeforeAuthoring": true,
+  "exactHistoryOverlap": 0,
+  "sharedPrefixOrigins": [],
+  "adoptedTitleOverlap": 0,
+  "comparisonSourceRows": 1567,
+  "sourceFileHashes": {
+    "<SOURCE_WORKSPACE>/qwen-fresh24-v29-20261111/inputs24.jsonl": "a864ef4015b3982b94e41ea9eb2500958d3b78d6842c9afd196959a9e7f0af28",
+    "<SOURCE_WORKSPACE>/qwen-fresh24-v28-20261111/inputs24.jsonl": "22d01f5fa240d541efc0b905f8652c1c2dd3b65db46bd110353bd3c35262d523",
+    "<SOURCE_WORKSPACE>/qwen-fresh24-v27-20261111/inputs24.jsonl": "80d5c99424f43c8375d8ec50e868465f32a3e4a354ff992f91f4879cb4454522",
+    "<SOURCE_WORKSPACE>/qwen-fresh24-v26-20261111/inputs24.jsonl": "8ba679e11781b444224c392396c7affa5a50a9c31256101e3d328758f5c0cd33",
+    "<SOURCE_WORKSPACE>/qwen-fresh24-v25-20261111/inputs24.jsonl": "04db82b65a762b40c5c1583304c8631bf9619acdac34f968587ccf33892b356a",
+    "<SOURCE_WORKSPACE>/server-qwen-logistics1000-draft/datasets/qwen/experiments/logistics400_v17/data/train400.jsonl": "c880e5b3f4c29f63ac7f1b2c570fb208cd881f28347abeeb1c9e79af59323f13",
+    "<SOURCE_WORKSPACE>/server-qwen-logistics1000-draft/datasets/qwen/experiments/logistics400_v17/data/valid20.jsonl": "33fd9404aa2aabc7fa13db5426c035ef173c8a3f5980a1d2dd084fa98cdb1adf",
+    "<SOURCE_WORKSPACE>/server-qwen-logistics1000-draft/datasets/qwen/experiments/logistics1000_draft/new600-candidate.jsonl": "6140c7c350f3c28db40f45046a234e07815e9399700764cb16cee4a021de3b5f",
+    "<SOURCE_WORKSPACE>/qwen-multiturn60-20261110/prefix-all-candidate.jsonl": "698aa176eb4db3e25ada99d0edd09ad430ed4a04f805e57fdba5df9f2f19c19f",
+    "<SOURCE_WORKSPACE>/qwen-multiturn-fresh30-20261110/fresh30-inputs.jsonl": "b22f85ef67baedf504419cd13629391f29da7ec81bd81d020d71a382249c12d6",
+    "<SOURCE_WORKSPACE>/qwen-multiturn-fresh34-v22-20261111/inputs34.jsonl": "4a8b1f428fc6707f3157d58bfb809dd37be86ef8e5e0079d20d366e970422ef2",
+    "<SOURCE_WORKSPACE>/qwen-fresh34-v24-20261111/inputs34.jsonl": "cd6dfd953a2455e92aef674b28175e7d1c1b4c17fe04742c3c0f037e7e933764",
+    "<SOURCE_WORKSPACE>/qwen-selected-logistics400-v17-20261108-001/regression-inputs150.jsonl": "623a869d211c2b5e36012d2af85a188209934614733b724dd6a3fbcee8f430b4"
+  },
+  "training": false,
+  "independentHumanReview": false,
+  "independentTest": false,
+  "scope": "Same-author ambiguity contrast diagnostic:12 clear input snapshots and12 undecided requests. No combined accuracy or API/DB verification."
+}

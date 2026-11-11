@@ -1,0 +1,16 @@
+{
+  "key": "7a1cc74eab319d015f88528c31ec0c0de2d807565288f1764aba512c57e2aecf",
+  "identity": {
+    "freezeSha256": "e06dcd680ad4bc1718721dfa4d24140e29a262fae9017203bc744a71baea3961",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"입고 팔레트 받침목 검수\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":2,\"text\":\"미완료인지 완료인지 확실하지 않아\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "b1259151d3bb562cbd6cc79daddc935db5c9bdb42e4e4cbd51cfe2129e73d734",
+  "seconds": 8.030384584038984
+}

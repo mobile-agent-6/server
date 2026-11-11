@@ -1,0 +1,16 @@
+{
+  "key": "46ff9899e823424a8f2fcb12a5c9be8940d67f653ce885aed2332dc099aa5bf9",
+  "identity": {
+    "freezeSha256": "f7ca24d3253ce76f14bcfc7ed1b3e96e1359c1ff0793092acd2e8148ee958474",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"빈 운반 용기 회수 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"오전 10시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "e33057b08d33fffce24e49f24f40bc35b4007c0f0c09a9ce00c72ea6b6a6a584",
+  "seconds": 7.634112624975387
+}

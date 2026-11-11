@@ -1,0 +1,16 @@
+{
+  "key": "faf881ad57527e8047094469b2220073e46109dc92701a177b246f58e52abe74",
+  "identity": {
+    "freezeSha256": "07bfb630c7cec6da7572d9657da328c7aaea072902a2139ce4fbff89c79d4173",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"반품 물품함 결선\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"대조\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":2,\"text\":\"미완료로 할지\",\"status\":\"adopted\"}],\"completed\":[{\"turn\":2,\"text\":\"완료로 할지\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "c7018a0b871b53e6d6fcac6cfeb055a7b993982e98bb0b705342d0b89c717c5c",
+  "seconds": 8.933154958998784
+}

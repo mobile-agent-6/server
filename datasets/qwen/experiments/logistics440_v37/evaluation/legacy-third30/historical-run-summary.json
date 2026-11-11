@@ -1,0 +1,226 @@
+{
+  "model": "selected440",
+  "baseline": "v33",
+  "candidate": "v34",
+  "overall": {
+    "rows": 30,
+    "raw": {
+      "exact": 9,
+      "contract": 25
+    },
+    "v33": {
+      "exact": 24,
+      "contract": 29,
+      "missingInformationExact": 24,
+      "evidenceOnlyExact": 24,
+      "clarifications": 0,
+      "errors": 0
+    },
+    "v34": {
+      "exact": 24,
+      "contract": 29,
+      "missingInformationExact": 24,
+      "evidenceOnlyExact": 24,
+      "clarifications": 0,
+      "errors": 0
+    },
+    "gains": 0,
+    "losses": 0
+  },
+  "byFeature": {
+    "completed_update": {
+      "rows": 6,
+      "raw": {
+        "exact": 2,
+        "contract": 6
+      },
+      "v33": {
+        "exact": 4,
+        "contract": 6,
+        "missingInformationExact": 4,
+        "evidenceOnlyExact": 4,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "v34": {
+        "exact": 4,
+        "contract": 6,
+        "missingInformationExact": 4,
+        "evidenceOnlyExact": 4,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "gains": 0,
+      "losses": 0
+    },
+    "create": {
+      "rows": 6,
+      "raw": {
+        "exact": 0,
+        "contract": 5
+      },
+      "v33": {
+        "exact": 6,
+        "contract": 6,
+        "missingInformationExact": 6,
+        "evidenceOnlyExact": 6,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "v34": {
+        "exact": 6,
+        "contract": 6,
+        "missingInformationExact": 6,
+        "evidenceOnlyExact": 6,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "gains": 0,
+      "losses": 0
+    },
+    "delete": {
+      "rows": 6,
+      "raw": {
+        "exact": 5,
+        "contract": 6
+      },
+      "v33": {
+        "exact": 5,
+        "contract": 6,
+        "missingInformationExact": 5,
+        "evidenceOnlyExact": 5,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "v34": {
+        "exact": 5,
+        "contract": 6,
+        "missingInformationExact": 5,
+        "evidenceOnlyExact": 5,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "gains": 0,
+      "losses": 0
+    },
+    "list": {
+      "rows": 6,
+      "raw": {
+        "exact": 2,
+        "contract": 4
+      },
+      "v33": {
+        "exact": 4,
+        "contract": 6,
+        "missingInformationExact": 4,
+        "evidenceOnlyExact": 4,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "v34": {
+        "exact": 4,
+        "contract": 6,
+        "missingInformationExact": 4,
+        "evidenceOnlyExact": 4,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "gains": 0,
+      "losses": 0
+    },
+    "update": {
+      "rows": 6,
+      "raw": {
+        "exact": 0,
+        "contract": 4
+      },
+      "v33": {
+        "exact": 5,
+        "contract": 5,
+        "missingInformationExact": 5,
+        "evidenceOnlyExact": 5,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "v34": {
+        "exact": 5,
+        "contract": 5,
+        "missingInformationExact": 5,
+        "evidenceOnlyExact": 5,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "gains": 0,
+      "losses": 0
+    }
+  },
+  "byPrefixLength": {
+    "1": {
+      "rows": 28,
+      "raw": {
+        "exact": 9,
+        "contract": 23
+      },
+      "v33": {
+        "exact": 24,
+        "contract": 27,
+        "missingInformationExact": 24,
+        "evidenceOnlyExact": 24,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "v34": {
+        "exact": 24,
+        "contract": 27,
+        "missingInformationExact": 24,
+        "evidenceOnlyExact": 24,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "gains": 0,
+      "losses": 0
+    },
+    "2": {
+      "rows": 2,
+      "raw": {
+        "exact": 0,
+        "contract": 2
+      },
+      "v33": {
+        "exact": 0,
+        "contract": 2,
+        "missingInformationExact": 0,
+        "evidenceOnlyExact": 0,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "v34": {
+        "exact": 0,
+        "contract": 2,
+        "missingInformationExact": 0,
+        "evidenceOnlyExact": 0,
+        "clarifications": 0,
+        "errors": 0
+      },
+      "gains": 0,
+      "losses": 0
+    }
+  },
+  "diagnosticBuckets": {
+    "v33": {
+      "exact": 24,
+      "evidence_and_missing_information_error": 5,
+      "contract_failure": 1
+    },
+    "v34": {
+      "exact": 24,
+      "evidence_and_missing_information_error": 5,
+      "contract_failure": 1
+    }
+  },
+  "trainingStarted": false,
+  "selectedModelChanged": false,
+  "independentTest": false,
+  "apiDatabaseReplayPerformed": false,
+  "scope": "30 additional intermediate snapshots from existing training dialogues. Disjoint from prior60 by source row, exact input and first-user text. Stratified selection before model inference; v34 frozen before selection. These are training-derived development diagnostics, not independent test/API success."
+}

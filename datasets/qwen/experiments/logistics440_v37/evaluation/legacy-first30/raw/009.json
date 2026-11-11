@@ -1,0 +1,16 @@
+{
+  "key": "b2e5da7ebe97d32a13b9872d5c8f8c36c2ee9e27fa0e69a3dacc8616eaac0451",
+  "identity": {
+    "freezeSha256": "14d9351b65aa64766b77e997e569fc9d12625f2e77207e09def91daf39f2aab9",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"title\":[{\"turn\":2,\"text\":\"검수대 평탄도 측정\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "fadac43f70a07ed9167d233c086741dad430573b92f7eacf83918d89c7268540",
+  "seconds": 7.004980792000424
+}

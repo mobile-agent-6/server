@@ -1,0 +1,16 @@
+{
+  "key": "9a3a98efa5c6b846ff007573ced1872c4241fce902cd081421e6202582c8d8a3",
+  "identity": {
+    "freezeSha256": "c3ec03a58f880d92ae94aeffa816940216f98bc8d4f763fb9fa63abbfd9a7c51",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"선입선출 순서 대조\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"7월 6일\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"재활\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "20ec6851051f36e52d732a6c595c63de2871ec9298c2315c39f797b0d2801386",
+  "seconds": 8.1963519169949
+}

@@ -1,0 +1,176 @@
+# source rows | prefix length | kind | target slots | change slots | filter slots | missingInformation
+6|1|create||title=입고 수량 대조;date=모레;category=입고||time
+7|1|create||title=출고 라인 점검;time=오후 4시;category=출고||date
+8|1|create||title=입고 예정표 공유;category=입고||date,time
+9|1|create||title=출고 우선순위 회의;category=출고||date,time
+10|1|create||date=내일;time=오후 3시||task_or_title
+28,124|1|create||date=내일;time=오후 2시||task_or_title
+19|1|create||title=재고 실사 결과 공유;date=2028년 5월 18일;category=재고||time
+20|1|create||title=입고 라인 정비;time=오전 9시 30분;category=입고||date
+21|1|create||title=출고 사전 회의;date=2028년 5월 21일;time=6시;category=출고||ampm
+29|1|create||date=모레;time=오전 9시||task_or_title
+30|1|create||date=2028년 5월 17일;time=오전 10시||task_or_title
+31|1|create||title=박스 납품 업체 입찰 회의;time=오후 3시||date
+32|1|create||title=반품 콜센터 응대 교육;time=오후 5시;category=반품||date
+33|1|create||title=입고 차량 예약 확인;date=2028년 2월 22일;time=3시;category=입고||ampm
+39|1|create||title=입고 포대 봉합 점검;time=오전 10시 40분;category=입고||date
+41|1|create||title=반품 봉투 치수 측정;category=반품||date,time
+41|2|create||title=1:반품 봉투 치수 측정;date=2:4월 3일;category=1:반품||time
+44|1|create||title=포장 검사 용기 확인;date=내일;category=포장||time
+45|1|create||title=재고 라벨 접착 시험;date=모레;category=재고||time
+46|1|create||title=적재함 번호 대조;date=8월 27일;time=10시 30분||ampm
+48|1|create||title=출고 검사표 서명 확인;date=7월 18일;time=오전 8시;category=출고||
+50|1|create||title=입고 무게추 교정;category=입고||date,time
+50|2|create||title=1:입고 무게추 교정;date=2:9월 12일;category=1:입고||time
+51|1|create||title=지게차 충전 기록 대조;date=8월 14일;time=오전 7시 30분||
+52|1|create||title=포장 샘플 상자 회수;date=모레;category=포장||time
+53,54,55,56|1|list||||query_scope
+79|1|list|||date=모레|
+80|1|list|||title=자재 분류표 인쇄 검사|
+82|1|list|||date=글피|
+83|1|list|||date=10월 11일|
+85|1|list|||title=회수 물품 인계 교육|
+86|1|list||||query_scope
+86|2|list|||title=2:신규 배송구역 안내|
+100|1|update|title=포장 완충지 탄성 시험|||change_value
+101|1|update|title=입고 협력업체 연락망 검토|||change_value
+102|1|update|title=출고 적재 순서 교육|||change_value
+111|1|delete|title=컨베이어 종단 센서 시험|||
+112|1|delete||||task_or_title
+112|2|delete|title=2:검수대 평탄도 측정|||
+113|1|delete|title=화물대 고무발 교환;date=4월 16일|||
+114|1|delete|title=창고 출입 로그 검토;date=12월 7일|||
+116|1|delete|date=글피|||task_or_title
+117|1|delete||||task_or_title
+117|2|delete|title=2:택배 포장 지침 설명|||
+121|1|update|title=재고 서류함 번호 대조|||change_value
+125|1|create||date=내일;time=오후 4시||task_or_title
+129|1|create||title=상자 내부 빈 공간 확인;date=3월 16일;time=오후 1시||
+130|1|create||title=냉장 상품 보냉재 준비;date=2월 25일;time=15시||
+131|1|create||title=주문서와 집품 목록 대조;date=모레;time=오후 3시||
+133|1|create||title=냉동 상품 온도 유지 확인;date=내일||time
+135|1|create||title=부족 수량 거래처 확인;date=7월 13일||time
+136|1|create||||task_or_title,date,time
+139|1|create||title=배송 기사 인계 수량 확인;date=내일;time=14시||
+141|1|create||title=회수 상품 도착 수량 확인;date=내일||time
+143,144,145|1|list||||query_scope
+150|1|list|||title=유통기한 임박 상품 위치 확인;date=4월 7일|
+152|1|list|||title=상자당 상품 수량 확인|
+153|1|list|||title=배송 노선별 화물 분리;date=3월 20일|
+156|1|list|||title=차량별 상차 수량 대조;date=8월 12일|
+157|1|list|||title=도서 지역 배송 조건 확인|
+159|1|list|||title=고중량 상품 상자 강도 확인|
+161|1|list|||title=화물 인수 서명 확인;date=10월 4일|
+167|1|update||time=오후 4시||task_or_title
+168|1|update|title=검수 보류 사유 기록|||change_value
+169|1|update|title=검수 보류 상품 격리|||change_value
+171|1|update|title=교대조 주문 진행 상황 공유;category=분류가 반품인|||change_value
+173|1|update|title=복수 상품 주문 구성 확인|time=오전 9시||
+174|1|update|title=배송 거절 화물 확인|||change_value
+174|2|update|title=1:배송 거절 화물 확인|date=2:5월 2일||
+176|1|update|title=상품 코드와 규격 대조|title=상품 중량 정보 확인||
+180|1|update|title=파손 상품 수량 집계;completedState=완료된|||change_value
+181|1|update|title=빈 운송 용기 회수 확인|time=오전 10시||
+182|1|update|title=회수 상품 사유 코드 확인|||change_value
+182|2|update|title=1:회수 상품 사유 코드 확인|date=2:11월 9일||
+187,188|1|delete||||task_or_title
+189|1|delete|title=잘못 분류된 화물 확인|||
+190|1|delete|title=집품 중 상품 부족 확인|||
+193|1|delete|title=상차 완료 서명 확인|||
+194|1|delete||||task_or_title
+197|1|delete|date=8월 16일|||task_or_title
+198|1|delete|title=혼적 화물 구분 작업|||
+201|1|delete|title=차량 적재 한도 확인;date=10월 25일|||
+202|1|delete|title=빈 도크 배정 협의|||
+207|1|update||completed=완료로 표시해 줘||task_or_title
+208|1|update|title=상품별 적정 보관 위치 검토|completed=완료로 표시해 줘||
+211|1|update||completed=완료로 표시해 줘||task_or_title
+211|2|update|title=2:회수 상품 폐기 대상 구분|completed=1:완료로 표시해 줘||
+212|1|update|title=완충재 부족 수량 확인|completed=미완료로 되돌려 줘||
+215|1|update|title=고객 미수령 상품 확인|completed=완료로 표시해 줘||
+216|1|update|title=실사 담당 구역 배정|completed=완료로 표시해 줘||
+217|1|update|title=상품 회수 차량 배정 확인|completed=완료로 표시해 줘||
+219|1|update|title=상품 눌림 방지 상태 확인;date=12월 20일|completed=미완료로 바꿔 줘||
+221|1|update||completed=완료로 표시해 줘||task_or_title
+221|2|update|title=2:회수 상품 구성품 확인|completed=1:완료로 표시해 줘||
+222|1|update|title=온도 민감 상품 보관 구역 확인|completed=미완료로 바꿔 줘||
+225|1|create||title=테이프 접착 상태 확인;date=7월 4일||time
+226|1|create||title=위험물 표시 대상 확인;date=2028년 2월 18일||time
+227|1|create||title=하차 상품 파손 확인;date=2028년 3월 10일||time
+228|1|create||title=협력 운송사 차량 배차 확인;date=7월 5일;time=오전 8시 25분||
+229|1|create||title=상품 식별표 교체;date=2월 21일||time
+230|1|create||title=선입선출 순서 대조;date=7월 6일||time
+232,233,236,237,240,241|1|list||||query_scope
+234|1|list|||title=혼재 상품 위치 정리|
+238|1|list|||date=7월 6일|
+239|1|list|||title=하차 지연 차량 확인;date=7월 7일|
+242|1|list|||title=오배송 상품 회수 현황 확인|
+247|1|list|||title=냉장 화물 온도 기록 확인|
+250|1|list|||date=7월 12일|
+251|1|list|||title=교대조 차량 대기 현황 공유;date=9월 22일|
+252|1|list|||title=운송 용기 식별번호 대조|
+253|1|list|||title=집품 누락 상품 재확인;date=7월 13일|
+254|1|list|||title=단일 상품 주문 분리|
+257|1|update|title=훼손된 바코드 재부착|||change_value
+259|1|update|title=상품 원산지 표시 확인;completedState=완료된|||change_value
+260|1|update|title=배송 권역별 화물 집계|||change_value
+261,266,271|1|update||time=오후 4시||task_or_title
+263|1|update|title=혼재 상품 위치 정리|time=오전 8시 25분||
+264|1|update|title=집품 동선 순서 확인;date=7월 10일|time=오후 6시 40분||
+268|1|update|title=주문별 상품 보관 위치 확인|||change_value
+272|1|update|title=낱개 상품 단위 확인|||change_value
+273|1|update|title=오배송 상품 회수 현황 확인;completedState=완료된|||change_value
+274|1|update|title=회수 상품 봉인 상태 확인|||change_value
+286|1|update|title=실사 결과 이중 확인|time=오전 8시 25분||
+287|1|update|title=상품 외관 검수 기준 공유;date=7월 21일|time=오후 6시 40분||
+289|1|update||time=오전 11시||task_or_title
+293|1|update|title=선입선출 대상 상품 확인|date=11월 2일||
+297|1|update|title=빈 로케이션 확인|||change_value
+298|1|update|title=하차 완료 수량 보고|||change_value
+299|1|update||date=11월 14일||task_or_title
+300|1|update|title=온라인 주문 상품 인계|time=오전 8시||
+303|1|delete|title=훼손된 바코드 재부착|||
+311|1|delete|date=7월 7일|||task_or_title
+315|1|delete|title=예약 주문 처리일 확인|||
+316,318,320,322,324,326,328,330,332|1|delete||||task_or_title
+317|1|delete|title=검수 보류 사유 기록;date=7월 10일|||
+323|1|delete|title=집품 동선 순서 확인|||
+329|1|delete|date=7월 16일|||task_or_title
+333|1|delete|title=주문 취소 건 작업 중지 확인|||
+338|1|delete|title=운송장과 실물 상품 대조|||
+340|1|delete|title=실물 수량과 전산 수량 대조|||
+341|1|delete|title=배송 완료 수량 대조;date=7월 19일|||
+342|1|delete|title=교대조 상품 보류 내역 공유|||
+343|1|delete|time=오후 3시 10분|||task_or_title
+353|1|update||completed=완료로 표시해 주세요||task_or_title
+356|1|update|title=중복 바코드 등록 확인|completed=미완료로 되돌려 줘||
+357|1|update|title=상품 규격 불일치 확인|completed=완료로 표시해 주세요||
+361|1|update|title=해외 배송 서류 확인|completed=완료로 표시해 주세요||
+364|1|update|title=상품 분실 의심 건 확인;date=7월 9일|completed=미완료로 되돌려 줘||
+367|1|update|title=상품 원산지 표시 확인|||change_value
+367|2|update|title=1:상품 원산지 표시 확인;date=2:7월 11일|||change_value
+368|1|update||completed=완료 처리해 주세요||task_or_title
+370|1|update|title=배송 권역별 화물 집계|completed=완료로 표시해 주세요||
+371|1|update||completed=완료로 표시해 줘||task_or_title
+372|1|update|title=사용 불가 상품 구분|||change_value
+372|2|update|title=1:사용 불가 상품 구분;completedState=2:완료된|||change_value
+373|1|update||completed=완료 처리해 주세요||task_or_title
+376|1|update||completed=완료로 표시해 줘||task_or_title
+377|1|update||completed=완료로 표시해 주세요||task_or_title
+378|1|update||completed=완료 처리해 주세요||task_or_title
+379|1|update|title=날카로운 상품 보호재 확인|completed=미완료로 되돌려 줘||
+380|1|update|title=하차 지연 차량 확인|completed=완료로 표시해 주세요||
+381|1|update||completed=완료로 표시해 줘||task_or_title
+382|1|update|title=낱개 상품 단위 확인|completed=완료로 표시해 주세요||
+383|1|update||completed=완료 처리해 주세요||task_or_title
+384|1|update|title=회수 상품 봉인 상태 확인;date=7월 21일|completed=미완료로 되돌려 줘||
+388|1|update|title=로케이션별 상품 수량 확인|||change_value
+388|2|update|title=1:로케이션별 상품 수량 확인;date=2:7월 3일|||change_value
+390|1|update|title=상자 봉합 상태 확인|completed=완료로 바꿔 줘||
+392|1|update||completed=미완료로 되돌려 줘||task_or_title
+393|1|update|title=유통기한별 상품 분리|||change_value
+397|1|update|title=설명서 동봉 대상 확인|completed=완료로 표시해 주세요||
+398|1|update|title=도크 대기 차량 안내|completed=완료로 바꿔 줘||
+399|1|update||completed=미완료로 표시해 줘||task_or_title
+400|1|update|title=중복 주문 작업 여부 확인|||change_value
+400|2|update|title=1:중복 주문 작업 여부 확인;completedState=2:완료된|||change_value

@@ -1,0 +1,16 @@
+{
+  "key": "3768796309a7b2f902715c2c577f4c1ed589f1b64c3c327d67f55d2ccf7b1a8d",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"completedState\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}],\"ampm\":[{\"turn\":2,\"text\":\"아니\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"재고 적치 높이 점검\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료 처리를 취소해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "cc57d1e3146cee87228d269b97ed4f6324880c4060333fe4b2658e3af0e25f22",
+  "seconds": 9.299435791996075
+}

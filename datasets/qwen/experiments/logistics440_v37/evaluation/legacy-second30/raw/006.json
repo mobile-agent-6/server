@@ -1,0 +1,16 @@
+{
+  "key": "9768802a23e0fe534e929f07e2552c039f0a1f6e864d4e581de41ee151c5469c",
+  "identity": {
+    "freezeSha256": "f7ca24d3253ce76f14bcfc7ed1b3e96e1359c1ff0793092acd2e8148ee958474",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"주문서와 집품 목록 대조\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"오후 3시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"집품\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "ec0b191a485c0f1053f447e3c8b54ce338b3051b464317384dab1dc95688ad8c",
+  "seconds": 8.964603125001304
+}

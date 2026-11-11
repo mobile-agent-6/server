@@ -1,0 +1,16 @@
+{
+  "key": "d6d9ba0f9ff24d41952fc7a71d65a06756c142192131eb56462e61ce451df680",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":1,\"text\":\"내일 5시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"재고 분류\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "b51625677e2668120bd3e734415cea93c9b0fee8f66efe6172f7a0526a210d94",
+  "seconds": 7.472524292010348
+}

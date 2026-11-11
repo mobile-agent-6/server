@@ -1,0 +1,16 @@
+{
+  "key": "c164b5b25db0a8916c8d37d5814154140ad1f1580e126b8e5f8db4de9fa5279a",
+  "identity": {
+    "freezeSha256": "14d9351b65aa64766b77e997e569fc9d12625f2e77207e09def91daf39f2aab9",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":1,\"text\":\"지게차 충전 기록 대조\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"8월 14일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"오전 7시 30분\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"지게차\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "ee6e528612577038046cd78a0c8d1ee248345d062fc60ef638fb9abe31974df2",
+  "seconds": 9.161288958974183
+}

@@ -1,0 +1,16 @@
+{
+  "key": "865e5774ba47f9855c3ba9593b1ea4bcc60168d73a7152622e20332cbfaf676a",
+  "identity": {
+    "freezeSha256": "07bfb630c7cec6da7572d9657da328c7aaea072902a2139ce4fbff89c79d4173",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"입고 분류함 구획표 교체\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":2,\"text\":\"완료 취소\",\"status\":\"adopted\"}],\"task_or_title\":[{\"turn\":2,\"text\":\"입고 분류함 구획표 교체\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "55297203cf7e35e0d8f900095bc8348fc0d3bc5e311d7af3464b5b37781defb0",
+  "seconds": 8.526945999998134
+}

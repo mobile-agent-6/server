@@ -1,0 +1,16 @@
+{
+  "key": "3cdfb7c7fbb562115dfda93c9b6257e9f75342ed80548f6c4991b7f3df8e22ee",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"title\":[{\"turn\":3,\"text\":\"재고 파손품 조사\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"재고 분류\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "e56404bcc30911d5f86861b4de662de74b76580de13e952cbc6bb2327b5111a7",
+  "seconds": 7.830978957994375
+}

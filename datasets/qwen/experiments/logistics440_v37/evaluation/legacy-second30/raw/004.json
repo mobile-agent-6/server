@@ -1,0 +1,16 @@
+{
+  "key": "2f58df275cd8af485331c04f00f1f0ec1950206ba0f0d42f83bdc9ff8f359074",
+  "identity": {
+    "freezeSha256": "f7ca24d3253ce76f14bcfc7ed1b3e96e1359c1ff0793092acd2e8148ee958474",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"title\":[{\"turn\":2,\"text\":\"택배 포장 지침 설명\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "22e6c339b639a178788995c5dd8c3ba1e63f44463585ba868e8d8aa06f1b2c0f",
+  "seconds": 6.859755709010642
+}

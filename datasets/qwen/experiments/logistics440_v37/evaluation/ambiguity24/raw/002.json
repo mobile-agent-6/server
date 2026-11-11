@@ -1,0 +1,16 @@
+{
+  "key": "c300e6ceb3d762ca8c41e0ebba5e7bb65693eab5a5f2e53303180d83f264f945",
+  "identity": {
+    "freezeSha256": "e06dcd680ad4bc1718721dfa4d24140e29a262fae9017203bc744a71baea3961",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"반품 포장함 경첩핀 검수\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":1,\"text\":\"완료 처리를 취소해 주세요\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "06391631b52eb7def1bd1930956480ac304dd15d287c247aeccf9197cceb8e4b",
+  "seconds": 7.847567750024609
+}

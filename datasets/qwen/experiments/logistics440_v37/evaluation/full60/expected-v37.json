@@ -1,0 +1,1850 @@
+[
+  {
+    "key": "1ef461587332e5875197b1ea389742196fe80a0f84ee24ae25f4e824bda531d3",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"입고 팔레트 검수\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"입고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"date\",\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"date\",\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "9311a249f431d00c30b6525ee341b7af9d8394635e44ae211dcc1bd10295e05d",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"입고 팔레트 검수\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"입고\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "6e13642ad63b72e426fe5127800efa519d8201d18aa53059694e7027803b52f0",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"입고 팔레트 검수\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":3,\"text\":\"오후 3시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"입고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "d2e3f2cf5d6021b20b7254f8d2d85d02b58e85f204f7beb304eb64c5cead05f6",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"오후 4시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "37d13544847c06906baf18eb677b3e63ae1ced06de214b5172f1c76d3520a354",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"오후 4시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "21be5d64f29f5ada2bd54c2b9b48d2d81c6d292ac142d268e639a4f903100598",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"오후 4시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":3,\"text\":\"반품 상품 외관 검사\",\"status\":\"adopted\"}],\"category\":[{\"turn\":3,\"text\":\"반품\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "2d5851b02c1844c02b862a1ab037f8679954612ffa656c03650a395dcd7af115",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"출고 상차 순서 점검\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"출고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"date\",\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"date\",\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "3a41a1230754cd68e1b596eae26063944554dea48e1d63e7ce6555770ba6856e",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"출고 상차 순서 점검\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"출고\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":2,\"text\":\"새벽 12시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "2eaa47cd19adc6cc345b79a57c91b7b154595f96bbfc7fb7882665726a72d3be",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"재고 유통기한 확인\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"재고\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"새벽 12시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "be24dd72307972c5abd797419cf01ccc8347c8ae81ac84d80ebda5a4b7d7f479",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"재고 유통기한 확인\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"재고\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":2,\"text\":\"새벽 12시\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"오후 5시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "693413e4857b34d26e87343dee0412b1e69f3725f9df59ae1e82c44880d851ae",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"3시\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "5ff7ed962f52e09cf328ff00250104b5751f9a8d473d9e0adfa15e0a89461b12",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"3시\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "f20a754de85662b8c174cbd6c69c967e1c3744ab45359e6a2c9e5a502c659c38",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":3,\"text\":\"3시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":3,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"오후 3시\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "c396df50a23de6c9915b35066930dbaac3c29a9192a5378ac8bf51c0f5974d7a",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"5시\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "d6d9ba0f9ff24d41952fc7a71d65a06756c142192131eb56462e61ce451df680",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"5시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"재고 분류\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "542b88d36db432af6f359a18bb7d1a34cc39acc706e1166cd360fff22827752c",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":3,\"text\":\"5시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":3,\"text\":\"대신\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"오후 5시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"재고 분류\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "5e52abc62f5b0c2637f873ee4ccd3ccd3669feed337cc0f267634467784259fb",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"6시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"반품 수량 확인\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "4886466a3a66c94ae8018f7629e395d4dc815454ca566839e47148e7f1e1c8ce",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"6시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"반품 수량 확인\",\"status\":\"adopted\"}],\"completed\":[{\"turn\":2,\"text\":\"완료된\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "caf4e3b37288e0d43659a47c7c447e424eb910b2dc4e066233194b0916820ea4",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":3,\"text\":\"6시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":3,\"text\":\"대신\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"오후 6시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"반품 수량 확인\",\"status\":\"adopted\"}],\"completed\":[{\"turn\":2,\"text\":\"완료된\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "6c78ac924e0ed7b3e56f3fc5318a67532680dddc1257fae987561c6bf29fcd29",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"7시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"입고 인수증 정리\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "d6af451ed80055848fa1a2e4c01e26e39686bb86fe481061ba65f075a8168b48",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"7시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":2,\"text\":\"입고 인수증 정리\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"입고 라벨 누락 확인\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "bc5d49640293d129667f8e50ddbcac83e6be489e8105cdfaa4015780445eff4f",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":3,\"text\":\"7시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":3,\"text\":\"대신\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"오후 7시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":2,\"text\":\"입고 인수증 정리\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"입고 라벨 누락 확인\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "ebc2d0bba0a4d194bdcef34643a934fe82d826e20199643426816d45a749d018",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"재고 순환 실사\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "3db9586ff12e55543c1303a5bb05efadddb9f5d9e78897515be8436ec5072f31",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"재고 순환 실사\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"time\":[{\"turn\":2,\"text\":\"오후 3시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "5172568133e75e0b6daac53c1e7b1159d220129541c164b39d53cdd5ea929aed",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"출고 도크 대기품 정리\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "a529bc81e0b09fb0b6d592420e9d1e8451a8a2fcf93d1a0f79fb3dbe794f0484",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"출고 도크 대기품 정리\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"title\":[{\"turn\":2,\"text\":\"출고 기사 인수증 대조\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "c1706976eaf77fc72d71a024580527b7c307fed71ed704170973bbfdab6fb8af",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"반품 회수 용기 세척\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"1월 5일\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "361f585a233845c1dd5439f07b8645547f84c6554a2e99b469536568ede5f713",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{},\"changeEvidence\":{\"time\":[{\"turn\":1,\"text\":\"오후 6시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "ed86d25310af58a7d72e9daf8c75e5172c5617ce5217b59addaed127c339f2ac",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":2,\"text\":\"입고 적치 위치 배정\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"time\":[{\"turn\":1,\"text\":\"오후 6시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "f3a8feddf48ea0f39009628e6f87f212a59ff462cdeac61768196ef79f3a4af3",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "320af7d60a1c19399457c81fcdab017ec53796d9441cfe4040db52ef51e5cbea",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"title\":[{\"turn\":2,\"text\":\"반품 회수품 접수\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "a64335664e72d6be672fffb7dfdd6170aad14fff4b6a6b7cdc80ad413b34288a",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"completedState\":[{\"turn\":1,\"text\":\"완료된\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "87f721909f945856f0c2447457f90a81a01dce1454abb7f836dccfd850b7d175",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"completedState\":[{\"turn\":1,\"text\":\"완료된\",\"status\":\"adopted\"}],\"title\":[{\"turn\":2,\"text\":\"출고 봉인 기록 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "a304671f7668bdfcca86894fc077aee4a74d040055643586400ee38d5c3a60af",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"3시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"입고 납품서 대조\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "379b8756502ae63026688d44c882163bff243d3d913f48802aef05a48d8ae941",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "7a22180cf9a13d5a10c5c7c35513982e03fa6bdaf6badea197ab27821df0b6a0",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"title\":[{\"turn\":2,\"text\":\"재고 파손품 조사\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "25dbeae4c6ac9026f5f7aa942007b660a221d0efe9f5257b595cd2a3e5c72ab6",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "beb81e947a17179c88b72f11c9c491325afe6bb69218990a4f8be423c033013c",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":2,\"text\":\"보냉 운반함 세척\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "720b270506d485ee80333d81f641744fa6111c59017652754288b7758e5c85cf",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료 처리를 취소해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "e19c270cde30edaba1fa6c42509ff9817f3fbf84672a40671af343efcbe2a278",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":2,\"text\":\"반품 검수표 작성\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료 처리를 취소해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "f95ed6e777d3e814a276077e8060dfae056e0f07a91ff8e7d38d4fdb8f29f5ce",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":1,\"text\":\"미완료인\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"출고 운송장 점검\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "3768796309a7b2f902715c2c577f4c1ed589f1b64c3c327d67f55d2ccf7b1a8d",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":2,\"text\":\"재고 적치 높이 점검\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"완료 처리를 취소해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "6fd88f86241e983e1590a057e33160859c1ecb36481c540431e05434f2083f14",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"date\",\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"date\",\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "13d1e0482349ee2f98e7cd5d7255cbbd7ea400cd6f678fe9744109bec19425e0",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":2,\"text\":\"입고 팔레트 검수\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"입고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"date\",\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"date\",\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "921406ae4464efbd39fe1f46b69905b81d62d2a0604d08013dd536f340c32751",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":2,\"text\":\"입고 팔레트 검수\",\"status\":\"adopted\"}],\"date\":[{\"turn\":3,\"text\":\"내일\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"입고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "c23a2a58d0c803eddf8044127fef0f3e709e37e7f2f31055c69390a617d2b856",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":2,\"text\":\"입고 팔레트 검수\",\"status\":\"adopted\"}],\"date\":[{\"turn\":3,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":4,\"text\":\"오후 3시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"입고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "2755a319997e813d1af8762b2f83fe431478efc2e08946f0adc2eebe54d356a2",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"4시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "e977157216e5426b41de85fa8dbd93d17a71606bdc0bc9a7972e00643353b065",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"4시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":2,\"text\":\"반품 상품 외관 검사\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"반품\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "e741c5d620a6e65b116b516d03b659d45bb842c306512557b368820eceb30abd",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"4시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":2,\"text\":\"반품 상품 외관 검사\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"반품\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "80b70ca1ea9181fef7ee620e8e5e7b31cda9543d47779ab1e62bc3f9542a4b7c",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":4,\"text\":\"4시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":4,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":4,\"text\":\"오후 4시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":2,\"text\":\"반품 상품 외관 검사\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"반품\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "3aad8e6a44378a4e9d0a2c45334ab0c389bbb370a223734fe7024dd065c29fcf",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"출고 상차 순서 점검\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"출고\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "4d9af22a2bf51f98e84ad8c392852da65951c279333ca91f1e62118bc0ba1377",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"출고 상차 순서 점검\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"출고\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":3,\"text\":\"새벽 12시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "59cbe83a0313ad44aede577fea50d47ca063aa497b4d92cbc206038885120eae",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"재고 유통기한 확인\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"재고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"date\",\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"date\",\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "07d3ed749c33be6c2365c9676881dde6598fb613a3e3e4d6ebe20cd5a9623468",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"재고 유통기한 확인\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"재고\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":2,\"text\":\"새벽 12시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "e29994260fd65e2ca130aff70bff2a979b5736ffc31924bbec3ac39a63a84ef7",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"재고 유통기한 확인\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"재고\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":3,\"text\":\"새벽 12시\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"오후 5시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "a2a6ac11ff2ecca02ba133a8fa0efdf42749d5054c28ca140639d107cf9b6d45",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"3시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":2,\"text\":\"입고 바코드 검수\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "6e56ead2a2e30f8ca9adc9731aefb4d0ba986a56888f4b2ad435fbd5cc5b317c",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"3시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":2,\"text\":\"입고 바코드 검수\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "235f882a6aa7dcf8e6943d1d56538e16897edd818cf393c63b059fd46d648b5e",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":4,\"text\":\"3시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":4,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":4,\"text\":\"오후 3시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":2,\"text\":\"입고 바코드 검수\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "1f656b7e1d716489e3ad60793d882fd23ca475305b3ecfbed0df8bb66bd1f9dc",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"5시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"재고 분류\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "61b70e1b374efa5be3f4c044dee0cf0d737d5e273a52c6e1d9338f974172d03f",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":4,\"text\":\"5시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":4,\"text\":\"대신\",\"status\":\"correction_marker\"},{\"turn\":4,\"text\":\"오후 5시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"재고 분류\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "06b2afec60da259074b0e041f75941c145148a63247b31f2d0f5cd9bc9671919",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"6시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"반품 수량 확인\",\"status\":\"adopted\"}],\"completed\":[{\"turn\":2,\"text\":\"완료된\",\"status\":\"adopted\"}],\"category\":[{\"turn\":3,\"text\":\"반품 분류\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "71d02477eb828cfc5d4fb0cb458fa5cc1b67c359aa5c1c103e5485eeebd6222c",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":4,\"text\":\"6시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":4,\"text\":\"대신\",\"status\":\"correction_marker\"},{\"turn\":4,\"text\":\"오후 6시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"반품 수량 확인\",\"status\":\"adopted\"}],\"completed\":[{\"turn\":2,\"text\":\"완료된\",\"status\":\"adopted\"}],\"category\":[{\"turn\":3,\"text\":\"반품 분류\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "d9fe2c5ca9941fb0eda9686bee34d519f041bf292bd1455636ba1af787d3fba8",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"7시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":2,\"text\":\"입고 인수증 정리\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"입고 라벨 누락 확인\",\"status\":\"adopted\"}],\"completed\":[{\"turn\":3,\"text\":\"미완료인\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "239a5111e00a5e77c757395cbeae0bdd572cd5141d89d4b4329aef9ccaa7ab9f",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":4,\"text\":\"7시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":4,\"text\":\"대신\",\"status\":\"correction_marker\"},{\"turn\":4,\"text\":\"오후 7시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":2,\"text\":\"입고 인수증 정리\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"입고 라벨 누락 확인\",\"status\":\"adopted\"}],\"completed\":[{\"turn\":3,\"text\":\"미완료인\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "3a06a8b3dab30d6f89bd9ebba19243701d81751b7321d95db344cb8f130ce5a5",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"change_value\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"change_value\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "124d67dfc87ed71ce89a90a208ccb3a738723dab1cd6c4ae758d1e0383f194a8",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{},\"changeEvidence\":{\"time\":[{\"turn\":2,\"text\":\"오후 3시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "a315bb5008fd1c86b1234e482787404b00c04ec1105e8cb1154b323ff6e373e2",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":3,\"text\":\"재고 순환 실사\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"time\":[{\"turn\":2,\"text\":\"오후 3시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "d3729e58b1b3afb4cf8d2c38292c1269cfda2206bf2c2d65db4eb98a5baeee16",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"change_value\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"change_value\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "66844cbf6defc83ac1e609dbb84e93d7959de848d99aa699c39daa58c2f044a2",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":2,\"text\":\"출고 기사 인수증 대조\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "e84548edd7e7ab7a07f948f6c04f3935e3a80488a2fa2037cb51a14a63d80895",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":3,\"text\":\"출고 도크 대기품 정리\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"title\":[{\"turn\":2,\"text\":\"출고 기사 인수증 대조\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "35f1a432a25ac7744afa664a860f18db7ff9ae5e52ecd32942a46d51d265c125",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"반품 회수 용기 세척\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"change_value\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "5d5cda6e4668ef7a089983f41d7a57ffde932068cfe28db4a3336fcfed590417",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"반품 회수 용기 세척\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"date\":[{\"turn\":2,\"text\":\"1월 5일\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "248bb8c0c9fb2bf16831f6d4b7b651cd1cd18a99e0dcc65b3dc03b3e9e086a70",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"6시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "b1f9b8b3b41b926f68b774b1a1c1314d0a5551f98ca71e62943cef4a493e50d8",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":2,\"text\":\"6시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":2,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"오후 6시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "d82173b3835e6553b1c2f73fa717fca834505539f5e2b887ac5dce80bc7ae113",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":3,\"text\":\"입고 적치 위치 배정\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":2,\"text\":\"6시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":2,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"오후 6시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "fb4c4bf523e54a5345391d590a1d644129abe42d6125c4110e61e8178b60bf8f",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"completedState\":[{\"turn\":1,\"text\":\"완료된\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "936645251643487a970927875c9ae7a361120e74bddee0e934e39b52c8c50cf6",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"completedState\":[{\"turn\":1,\"text\":\"완료된\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}],\"title\":[{\"turn\":3,\"text\":\"출고 봉인 기록 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "95c53b3fc8fd310ebe242c7c9637677085cfc5f64b1efc0b28803574abb2b3cc",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"3시\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "65458832944547c561df3332cfb48b019606b9c49e23e21dd0747910e053142e",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"3시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":2,\"text\":\"입고 납품서 대조\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "30ff95d3c6fb3f77162b0cebac6d3af30350fe5da6cdbd3b7a681d63307246b3",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"category\":[{\"turn\":2,\"text\":\"재고 분류\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "3cdfb7c7fbb562115dfda93c9b6257e9f75342ed80548f6c4991b7f3df8e22ee",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"category\":[{\"turn\":2,\"text\":\"재고 분류\",\"status\":\"adopted\"}],\"title\":[{\"turn\":3,\"text\":\"재고 파손품 조사\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "d9d4c5eededbdc61342d112aca103e10555bd7ee034a1b3b20c5551530ca0bd7",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료 처리를 취소해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "8ef8f91ef560e513cec1fc36dee269556cce1019761caaec0b0c1a06e9147617",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}],\"title\":[{\"turn\":3,\"text\":\"반품 검수표 작성\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료 처리를 취소해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "d0dbb4432ebff027330f069054b7e744baf7f1a23eb3dd35b1aa277c9fa1f359",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":1,\"text\":\"완료된\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료 처리를 취소해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "d187e0ee424da9a35d0b030a1f0090234d2175c77ce45a90c3bc94a8c2c4cfb9",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":1,\"text\":\"완료된\",\"status\":\"adopted\"}],\"title\":[{\"turn\":2,\"text\":\"출고 운송장 점검\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료 처리를 취소해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "77a5f1853570e6ce1a79f6fa9a1bf5927f05639082837a984ae38329ccd13ca9",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료 처리를 취소해 줘\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "bfb97fb201c4b98c7948a3d6fcd37648892c605d2653539ef42c14870635a677",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":3,\"text\":\"재고 적치 높이 점검\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료 처리를 취소해 줘\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "d35b79846ccbe00d930f416673b010b9c8d10b1a775d56af327e9c6d9e0ee01d",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"입고 팔레트 검수\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"입고 파손 상자 확인\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}],\"category\":[{\"turn\":3,\"text\":\"입고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "d21f90b6d62e0fa5ef1d583e0960d72757ce72c0526578a5e9587e3736665eaf",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"입고 팔레트 검수\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"입고 파손 상자 확인\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}],\"category\":[{\"turn\":3,\"text\":\"입고\",\"status\":\"adopted\"}],\"time\":[{\"turn\":4,\"text\":\"새벽 12시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "a0ca24fb61929965fe77c29d56efa6892e97528e58b8356f988b31f8ce27d35e",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"date\",\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"date\",\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "e731d95753bdd766f16c74570bdce352b395ecea68823bbc5bdf9cd8ba7f3ebb",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "2ae464aacf82b8c2b3490935fe183d190baa98ccea444fd68eeb4cc6d51c5edc",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}],\"title\":[{\"turn\":3,\"text\":\"반품 상품 외관 검사\",\"status\":\"adopted\"}],\"category\":[{\"turn\":3,\"text\":\"반품\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "c4aaccc266784428ff89bae93c52a032eb1ef99c6a2a9d86c263e71303e2af1b",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}],\"title\":[{\"turn\":3,\"text\":\"반품 상품 외관 검사\",\"status\":\"adopted\"}],\"time\":[{\"turn\":4,\"text\":\"4시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":3,\"text\":\"반품\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "e966f75d7aad6be4e27b4f5c3be9f41ddb1e8c9014d1d70a34dbeb38a071c3f6",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}],\"title\":[{\"turn\":3,\"text\":\"반품 상품 외관 검사\",\"status\":\"adopted\"}],\"time\":[{\"turn\":5,\"text\":\"4시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":5,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":5,\"text\":\"오후 4시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":3,\"text\":\"반품\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "8cf5811202b2c5b75d93f135336f5fb533d3b3a84390637f0dd004ba7265af6b",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"date\",\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"date\",\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "7b31cbe86b66c2c1dd4ee4944d8e08428bd0ed3bb3eaa097d7adbaeab35a5c46",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":2,\"text\":\"출고 상차 순서 점검\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"출고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"date\",\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"date\",\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "839f82eecc3731d997881e041e2c8f2c8f287f1df3d34ce190e873e2bf6ade48",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":2,\"text\":\"출고 상차 순서 점검\",\"status\":\"adopted\"}],\"date\":[{\"turn\":3,\"text\":\"내일\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"출고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "c4040c1e87d46eab51161da7a4ebd69d7283b1ff366f1fcc9ecfbfd409e81052",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":2,\"text\":\"출고 상차 순서 점검\",\"status\":\"adopted\"}],\"date\":[{\"turn\":3,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":4,\"text\":\"새벽 12시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"출고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "9e777f1550855dbc6b5bf85a350b2655cba77a3a15d6f55cbd6c437da3516b39",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"date\",\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"date\",\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "0e7fd0d161457df18d236ed6d3fe249301435e5c257493ac8690339863b5cd0d",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":2,\"text\":\"재고 유통기한 확인\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"재고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"date\",\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"date\",\"time\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "6c4bd382fea02f940d82b8faecd24f238a49cdd28432ff575395170513ead7b9",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":2,\"text\":\"재고 유통기한 확인\",\"status\":\"adopted\"}],\"date\":[{\"turn\":3,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":3,\"text\":\"새벽 12시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"재고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "63f7553b2d139be377c01b8cb8ce92e5fbab0d5c8f769af6add493a707eee3fc",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":2,\"text\":\"재고 유통기한 확인\",\"status\":\"adopted\"}],\"date\":[{\"turn\":3,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":4,\"text\":\"새벽 12시\",\"status\":\"superseded\"},{\"turn\":4,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":4,\"text\":\"오후 5시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"재고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "4b750703a3b23678c438340c37a29ab04933837159dc84f397afb891fa823d06",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"3시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":4,\"text\":\"입고 바코드 검수\",\"status\":\"superseded\"},{\"turn\":4,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":4,\"text\":\"출고 운송장 대조\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "82430d8f30d472003f22a3c91cd33876c3950b7b0157d0b103b244491413151e",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":5,\"text\":\"3시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":5,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":5,\"text\":\"오후 3시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":4,\"text\":\"입고 바코드 검수\",\"status\":\"superseded\"},{\"turn\":4,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":4,\"text\":\"출고 운송장 대조\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "eeed7ad2115b801bf041a416b7f21f1d538ceb09687e1d339fc90d2b437b6070",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"5시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"재고 분류\",\"status\":\"adopted\"}],\"title\":[{\"turn\":4,\"text\":\"재고 보관 구역 점검\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "b08b12a70acc592709d4cab2b577a2434d4927fc669322a47e6697b4810d491b",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":5,\"text\":\"5시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":5,\"text\":\"대신\",\"status\":\"correction_marker\"},{\"turn\":5,\"text\":\"오후 5시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"재고 분류\",\"status\":\"adopted\"}],\"title\":[{\"turn\":4,\"text\":\"재고 보관 구역 점검\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "24fbc8b57457884e27522fc21a19e51ebe0cf0082f0cd260044088376e4b1668",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":4,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":4,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"6시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"반품 수량 확인\",\"status\":\"adopted\"}],\"completed\":[{\"turn\":2,\"text\":\"완료된\",\"status\":\"adopted\"}],\"category\":[{\"turn\":3,\"text\":\"반품 분류\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "e35a5b3b1100425b9611c605e38d9c82a4bb81e901ce220eb18cbe93bc8572eb",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":4,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":4,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":5,\"text\":\"6시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":5,\"text\":\"대신\",\"status\":\"correction_marker\"},{\"turn\":5,\"text\":\"오후 6시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"반품 수량 확인\",\"status\":\"adopted\"}],\"completed\":[{\"turn\":2,\"text\":\"완료된\",\"status\":\"adopted\"}],\"category\":[{\"turn\":3,\"text\":\"반품 분류\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "24583b32df4c2ec92f1dae1695153cc141fe36b634907fafe0baf8c61ea064dc",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":4,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":4,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"7시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":2,\"text\":\"입고 인수증 정리\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"입고 라벨 누락 확인\",\"status\":\"adopted\"}],\"completed\":[{\"turn\":3,\"text\":\"미완료인\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "42bb80232d23cd2fd7b1703ca907116ea71e483a2280a092a4941e714401f915",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":4,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":4,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":5,\"text\":\"7시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":5,\"text\":\"대신\",\"status\":\"correction_marker\"},{\"turn\":5,\"text\":\"오후 7시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":2,\"text\":\"입고 인수증 정리\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"입고 라벨 누락 확인\",\"status\":\"adopted\"}],\"completed\":[{\"turn\":3,\"text\":\"미완료인\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "826ad66016154fd2f999570d8b5aee32f3d566724270f143e4ed392f5fbf2a9d",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{},\"changeEvidence\":{\"time\":[{\"turn\":1,\"text\":\"3시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "b28dbd60c55b84b597a7e25a17a99bee1e87af819a84b2b1b892f504ee631b3c",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{},\"changeEvidence\":{\"time\":[{\"turn\":2,\"text\":\"3시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":2,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"오후 3시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "892e3189edb8155ebb7155a83ebb27ed543f51188c332a216a12076dbe17e127",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":3,\"text\":\"재고 순환 실사\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"time\":[{\"turn\":2,\"text\":\"3시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":2,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"오후 3시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "928ffcdb95064f533865910bcf89761a5c07f154dcab46bbbea30e7a10872c9d",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":2,\"text\":\"1월 5일\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "4c870774ea632b31de6a0ac93a15574dad97dc82818fd1dafa9f014b2084e33d",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":3,\"text\":\"반품 회수 용기 세척\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"date\":[{\"turn\":2,\"text\":\"1월 5일\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "e2efe8b58b425c85c496388ab0d91b30cfd1d0b08c3cedcea2cd7bfb484cdf00",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"6시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\",\"ampm\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "fb745a4a2f95c2267c71de114a48bebc6793acbc6d5ec65320eb15167a427386",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":3,\"text\":\"6시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":3,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"오후 6시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "4fcbf80709403f235ca60359296cdf4d393e20837c2e1ff6c0355dd0fbc71884",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":4,\"text\":\"입고 적치 위치 배정\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":3,\"text\":\"6시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":3,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"오후 6시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "bc7e7979e20c9c3940ce354a8e29cab970862209048e20002ca41476610e0b8a",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "07544248b751385624ad7dc0b91b30a5827289840617b0ec0908e558b797beb6",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"title\":[{\"turn\":3,\"text\":\"반품 회수품 접수\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "563c1448776c3f16789e7eb7a4a36539c8209c1838397bf981d5eeb10174a5f1",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"3시\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "aa1f3eee6310f14ed25528f4fc6f0cd22b171640db986504993fa76932d82df0",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"3시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":3,\"text\":\"입고 납품서 대조\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "f024d4cf1e6c98c8bfa62336472794528524f5204189db2355c251075f854d5d",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"category\":[{\"turn\":2,\"text\":\"재고 분류\",\"status\":\"adopted\"}],\"date\":[{\"turn\":3,\"text\":\"내일\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "5c482844ab4679704b308c6a1259ca13acc80a2ca9b206c461537de2b0c48726",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"category\":[{\"turn\":2,\"text\":\"재고 분류\",\"status\":\"adopted\"}],\"date\":[{\"turn\":3,\"text\":\"내일\",\"status\":\"adopted\"}],\"title\":[{\"turn\":4,\"text\":\"재고 파손품 조사\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "0bcb5c6665e67a172feaa5b4a2dbc38f4f99c23992db2bd27faa0fac1203a9f9",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"완료 처리를 취소해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "159e949f971da5f3886d5a3b7aee254266f3e04df9a52f8449e509c2bf6c78bd",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":3,\"text\":\"보냉 운반함 세척\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"완료 처리를 취소해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "65fab68428c19267d32b1ac804eee7a621158f76ba1f341b9111a3923159e5a1",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "b4c46863d4793b4c32dd00fefd2251aeb26f5856c8711fb0695fbd496ecac8e4",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}],\"title\":[{\"turn\":3,\"text\":\"반품 검수표 작성\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "f95636332720d77fa0c28bfdb872a250193566283736da484d0901f9b7e6e465",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":1,\"text\":\"미완료인\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "a43f3a3ea5a26150cd58fa8cf6764be32fa51d3523be39b9d23bb4a360eb988b",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":1,\"text\":\"미완료인\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "212a18864e72bdc8bf8ba8fc1d72cefd262ef217adac0e4e1eeafa53d7df647c",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":1,\"text\":\"미완료인\",\"status\":\"adopted\"}],\"title\":[{\"turn\":3,\"text\":\"출고 운송장 점검\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  },
+  {
+    "key": "64779654652603591dcc4e1fbba16722096fea215220766611a507808863b148",
+    "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":3,\"text\":\"재고 적치 높이 점검\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"완료 처리를 취소해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+    "score": {
+      "parser": true,
+      "roles": true,
+      "overlap": true,
+      "exact": true,
+      "kind": true,
+      "safety_questions": [],
+      "contract_pass": true
+    },
+    "clarification": null
+  }
+]

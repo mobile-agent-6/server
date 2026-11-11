@@ -1,0 +1,16 @@
+{
+  "key": "0a7f3a987ebdf125c56c1a7f523331a2a5330dd46903b1732e14a90ee6541482",
+  "identity": {
+    "freezeSha256": "f81142e91acc8ea29423099dd67e472ac31b55890bf1007a3dd1f736960f18c4",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"completedState\":[{\"turn\":1,\"text\":\"미완료인\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"운송 용기 바닥 균열 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"time\":[{\"turn\":2,\"text\":\"오후 4시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "7d04468763fd262566f7da0012ee72e90ba0f403dce82dcf26a3e43050f7ff84",
+  "seconds": 8.49311595899053
+}

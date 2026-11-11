@@ -1,0 +1,11 @@
+{
+  "files": {
+    "evidence_postprocess_v37_candidate.py": "41db0c23f3914763052abbc01e190048463edce0d63e66829e0e5da55fc118c3",
+    "verify_candidate.py": "403caf54e5cbb9af83e869207f538db9dcb6d13d591d78228c2c624f26a55a5f",
+    "verification.json": "d2eb4069a3cf0d3076f4e27b8144d13d2676da5c27828947d46d9c4a0cb11a76",
+    "test_candidate.py": "b58cdfe9f02c80da3d9b489ed92ac6606700500b8b82e57e7af0197665cdd165",
+    "boundary-checks.json": "4e79ce5c912666c8b5dd36ae739c7d7b9250e14d728c35da6502957be05490bc"
+  },
+  "scope": "Fix existing15 failures;no new inference/training",
+  "createdAt": "2026-11-11T06:42:27.981690+00:00"
+}

@@ -1,0 +1,16 @@
+{
+  "key": "3f2c9ebebf104644dd1cf45cb1b0a0908ba8be2ce56c3d096a049e932c8234fd",
+  "identity": {
+    "freezeSha256": "c3ec03a58f880d92ae94aeffa816940216f98bc8d4f763fb9fa63abbfd9a7c51",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"입고 협력업체 연락망 검토\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"분류\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "7cf7e74006341654db59d187d96688e03561c2503876aae0717ac73c1af73016",
+  "seconds": 7.577859584009275
+}

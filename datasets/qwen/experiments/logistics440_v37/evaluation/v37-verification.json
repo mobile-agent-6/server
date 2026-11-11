@@ -1,0 +1,568 @@
+{
+  "savedModel45_old400": {
+    "counts": {
+      "v36": {
+        "rows": 45,
+        "exact": 45,
+        "contract": 45,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 45,
+        "exact": 45,
+        "contract": 45,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "savedModel30": {
+    "counts": {
+      "v36": {
+        "rows": 30,
+        "exact": 16,
+        "contract": 21,
+        "clarification": 7,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 30,
+        "exact": 16,
+        "contract": 21,
+        "clarification": 7,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "savedModel30_current440": {
+    "counts": {
+      "v36": {
+        "rows": 30,
+        "exact": 25,
+        "contract": 26,
+        "clarification": 1,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 30,
+        "exact": 25,
+        "contract": 26,
+        "clarification": 1,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "savedModel150": {
+    "counts": {
+      "v36": {
+        "rows": 150,
+        "exact": 137,
+        "contract": 143,
+        "clarification": 7,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 150,
+        "exact": 137,
+        "contract": 143,
+        "clarification": 7,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "multiturnGold179": {
+    "counts": {
+      "v36": {
+        "rows": 179,
+        "exact": 179,
+        "contract": 179,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 179,
+        "exact": 179,
+        "contract": 179,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "existingTrainGold400": {
+    "counts": {
+      "v36": {
+        "rows": 400,
+        "exact": 400,
+        "contract": 400,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 400,
+        "exact": 400,
+        "contract": 400,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "existingValidGold20": {
+    "counts": {
+      "v36": {
+        "rows": 20,
+        "exact": 20,
+        "contract": 20,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 20,
+        "exact": 20,
+        "contract": 20,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "candidateGold600": {
+    "counts": {
+      "v36": {
+        "rows": 600,
+        "exact": 572,
+        "contract": 600,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 600,
+        "exact": 572,
+        "contract": 600,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "openedFresh30_current440": {
+    "counts": {
+      "v36": {
+        "rows": 30,
+        "exact": 30,
+        "contract": 30,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 30,
+        "exact": 30,
+        "contract": 30,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "regression30_current440": {
+    "counts": {
+      "v36": {
+        "rows": 30,
+        "exact": 26,
+        "contract": 29,
+        "clarification": 1,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 1
+      },
+      "v37": {
+        "rows": 30,
+        "exact": 26,
+        "contract": 29,
+        "clarification": 1,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 1
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "latestOpened30_current440": {
+    "counts": {
+      "v36": {
+        "rows": 30,
+        "exact": 28,
+        "contract": 30,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 2
+      },
+      "v37": {
+        "rows": 30,
+        "exact": 28,
+        "contract": 30,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 2
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "openedFourTurn20_current440": {
+    "counts": {
+      "v36": {
+        "rows": 20,
+        "exact": 19,
+        "contract": 20,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 20,
+        "exact": 19,
+        "contract": 20,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "newestOpened20_current440": {
+    "counts": {
+      "v36": {
+        "rows": 20,
+        "exact": 20,
+        "contract": 20,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 20,
+        "exact": 20,
+        "contract": 20,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "openedLookup20_current440": {
+    "counts": {
+      "v36": {
+        "rows": 20,
+        "exact": 20,
+        "contract": 20,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 20,
+        "exact": 20,
+        "contract": 20,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "openedFollowup20_current440": {
+    "counts": {
+      "v36": {
+        "rows": 20,
+        "exact": 19,
+        "contract": 19,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 20,
+        "exact": 19,
+        "contract": 19,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "full60_unique132_current440": {
+    "counts": {
+      "v36": {
+        "rows": 132,
+        "exact": 117,
+        "contract": 119,
+        "clarification": 13,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 132,
+        "exact": 132,
+        "contract": 132,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": [
+      "9",
+      "10",
+      "12",
+      "13",
+      "57",
+      "58",
+      "88",
+      "89",
+      "103",
+      "106",
+      "113",
+      "119",
+      "120",
+      "121",
+      "122"
+    ]
+  },
+  "openedCompletion20_current440": {
+    "counts": {
+      "v36": {
+        "rows": 20,
+        "exact": 19,
+        "contract": 19,
+        "clarification": 1,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 20,
+        "exact": 19,
+        "contract": 19,
+        "clarification": 1,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "openedAmbiguityClear12_current440": {
+    "counts": {
+      "v36": {
+        "rows": 12,
+        "exact": 12,
+        "contract": 12,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 12,
+        "exact": 12,
+        "contract": 12,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "openedResolved12_current440": {
+    "counts": {
+      "v36": {
+        "rows": 12,
+        "exact": 12,
+        "contract": 12,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 12,
+        "exact": 12,
+        "contract": 12,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "openedLegacyPrefix30_current440": {
+    "counts": {
+      "v36": {
+        "rows": 30,
+        "exact": 30,
+        "contract": 30,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 30,
+        "exact": 30,
+        "contract": 30,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "additionalLegacyPrefix30_current440": {
+    "counts": {
+      "v36": {
+        "rows": 30,
+        "exact": 30,
+        "contract": 30,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 30,
+        "exact": 30,
+        "contract": 30,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "thirdLegacyPrefix30_current440": {
+    "counts": {
+      "v36": {
+        "rows": 30,
+        "exact": 30,
+        "contract": 30,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 30,
+        "exact": 30,
+        "contract": 30,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "paired24_current440": {
+    "counts": {
+      "v36": {
+        "rows": 24,
+        "exact": 24,
+        "contract": 24,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 24,
+        "exact": 24,
+        "contract": 24,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "paired16_current440": {
+    "counts": {
+      "v36": {
+        "rows": 16,
+        "exact": 16,
+        "contract": 16,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      },
+      "v37": {
+        "rows": 16,
+        "exact": 16,
+        "contract": 16,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 0
+      }
+    },
+    "regressions": [],
+    "gains": []
+  },
+  "legacyPrefixGold381": {
+    "counts": {
+      "v36": {
+        "rows": 381,
+        "exact": 371,
+        "contract": 381,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 8
+      },
+      "v37": {
+        "rows": 381,
+        "exact": 371,
+        "contract": 381,
+        "clarification": 0,
+        "nonIdempotent": 0,
+        "correctionOrderOnly": 8
+      }
+    },
+    "regressions": [],
+    "gains": []
+  }
+}

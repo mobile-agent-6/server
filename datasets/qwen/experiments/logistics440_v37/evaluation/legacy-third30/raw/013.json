@@ -1,0 +1,16 @@
+{
+  "key": "a905d826373e53a13f2740bd447402487e105a14199a5db5b60efeb25661cfcd",
+  "identity": {
+    "freezeSha256": "c3ec03a58f880d92ae94aeffa816940216f98bc8d4f763fb9fa63abbfd9a7c51",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"completedState\":[{\"turn\":1,\"text\":\"완료된\",\"status\":\"adopted\"}],\"task_or_title\":[{\"turn\":1,\"text\":\"오배송 상품 회수 현황 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "f4f4d6c5718e8fedd77266c9bb8df8f0dde21f13e13e2dfce7af016ac1c3f4e9",
+  "seconds": 7.70968658401398
+}

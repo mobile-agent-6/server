@@ -1,0 +1,16 @@
+{
+  "key": "68d6ea804adf4915090c9aa40508e4d25d3db808fe31be722ec75c6f5ba8a269",
+  "identity": {
+    "freezeSha256": "e06dcd680ad4bc1718721dfa4d24140e29a262fae9017203bc744a71baea3961",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"재고 적치함 번호표 점검\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":2,\"text\":\"완료 또는 미완료 중\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "3e9630fb2f2b72fb9b30f43a01dc13a9fd470d5deb3fb4875c2a5eb0796467dc",
+  "seconds": 7.8922280829865485
+}

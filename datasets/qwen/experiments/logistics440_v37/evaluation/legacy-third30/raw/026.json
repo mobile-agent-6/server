@@ -1,0 +1,16 @@
+{
+  "key": "29fac6c8ab829a9ac5a97f517fbbae5427bbb955259ade71cade18af6e876131",
+  "identity": {
+    "freezeSha256": "c3ec03a58f880d92ae94aeffa816940216f98bc8d4f763fb9fa63abbfd9a7c51",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"재고 라벨 접착 시험\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"모레\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"재고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "815b8a956f7f7c32c1a964ea9a147dcdbe4a72f439927da8b2e7039f6b2194d2",
+  "seconds": 8.127040666993707
+}

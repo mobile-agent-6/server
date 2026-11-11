@@ -1,0 +1,16 @@
+{
+  "key": "71d02477eb828cfc5d4fb0cb458fa5cc1b67c359aa5c1c103e5485eeebd6222c",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"completed\":[{\"turn\":2,\"text\":\"완료된\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":4,\"text\":\"6시\",\"status\":\"superseded\"},{\"turn\":4,\"text\":\"대신\",\"status\":\"correction_marker\"},{\"turn\":4,\"text\":\"오후 6시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":3,\"text\":\"반품\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "743e7e48d810dde575a0df4a4a2e2ab829af3db520403371f0dc7e2cf489ebfb",
+  "seconds": 9.861681999987923
+}

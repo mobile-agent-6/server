@@ -1,0 +1,178 @@
+{
+  "paired24": {
+    "rows": 24,
+    "versions": {
+      "v34": {
+        "exact": 10,
+        "contract": 18,
+        "missingInformationExact": 11,
+        "evidenceOnlyExact": 10,
+        "clarifications": 3,
+        "errors": 0
+      },
+      "v35": {
+        "exact": 19,
+        "contract": 21,
+        "missingInformationExact": 20,
+        "evidenceOnlyExact": 19,
+        "clarifications": 2,
+        "errors": 0
+      }
+    },
+    "byPrefixLength": {
+      "1": {
+        "rows": 12,
+        "raw": {
+          "exact": 0,
+          "contract": 6
+        },
+        "v34": {
+          "exact": 5,
+          "contract": 10,
+          "missingInformationExact": 5,
+          "evidenceOnlyExact": 5,
+          "clarifications": 0,
+          "errors": 0
+        },
+        "v35": {
+          "exact": 12,
+          "contract": 12,
+          "missingInformationExact": 12,
+          "evidenceOnlyExact": 12,
+          "clarifications": 0,
+          "errors": 0
+        },
+        "gains": 7,
+        "losses": 0
+      },
+      "2": {
+        "rows": 12,
+        "raw": {
+          "exact": 3,
+          "contract": 6
+        },
+        "v34": {
+          "exact": 5,
+          "contract": 8,
+          "missingInformationExact": 6,
+          "evidenceOnlyExact": 5,
+          "clarifications": 3,
+          "errors": 0
+        },
+        "v35": {
+          "exact": 7,
+          "contract": 9,
+          "missingInformationExact": 8,
+          "evidenceOnlyExact": 7,
+          "clarifications": 2,
+          "errors": 0
+        },
+        "gains": 2,
+        "losses": 0
+      }
+    },
+    "pairedDialogues": {
+      "v34": {
+        "rows": 12,
+        "bothPrefixesExact": 4
+      },
+      "v35": {
+        "rows": 12,
+        "bothPrefixesExact": 7
+      }
+    },
+    "gains": 9,
+    "losses": 0,
+    "independentTest": false,
+    "apiReplay": false,
+    "v36UsedThisToDevelopRules": true
+  },
+  "paired16": {
+    "rows": 16,
+    "versions": {
+      "v35": {
+        "exact": 11,
+        "contract": 14,
+        "missingInformationExact": 12,
+        "evidenceOnlyExact": 11,
+        "clarifications": 2,
+        "errors": 0
+      },
+      "v36": {
+        "exact": 16,
+        "contract": 16,
+        "missingInformationExact": 16,
+        "evidenceOnlyExact": 16,
+        "clarifications": 0,
+        "errors": 0
+      }
+    },
+    "byPrefixLength": {
+      "1": {
+        "rows": 8,
+        "raw": {
+          "exact": 0,
+          "contract": 4
+        },
+        "v35": {
+          "exact": 8,
+          "contract": 8,
+          "missingInformationExact": 8,
+          "evidenceOnlyExact": 8,
+          "clarifications": 0,
+          "errors": 0
+        },
+        "v36": {
+          "exact": 8,
+          "contract": 8,
+          "missingInformationExact": 8,
+          "evidenceOnlyExact": 8,
+          "clarifications": 0,
+          "errors": 0
+        },
+        "gains": 0,
+        "losses": 0
+      },
+      "2": {
+        "rows": 8,
+        "raw": {
+          "exact": 2,
+          "contract": 6
+        },
+        "v35": {
+          "exact": 3,
+          "contract": 6,
+          "missingInformationExact": 4,
+          "evidenceOnlyExact": 3,
+          "clarifications": 2,
+          "errors": 0
+        },
+        "v36": {
+          "exact": 8,
+          "contract": 8,
+          "missingInformationExact": 8,
+          "evidenceOnlyExact": 8,
+          "clarifications": 0,
+          "errors": 0
+        },
+        "gains": 5,
+        "losses": 0
+      }
+    },
+    "pairedDialogues": {
+      "v35": {
+        "rows": 8,
+        "bothPrefixesExact": 3
+      },
+      "v36": {
+        "rows": 8,
+        "bothPrefixesExact": 8
+      }
+    },
+    "gains": 5,
+    "losses": 0,
+    "independentTest": false,
+    "apiReplay": false,
+    "v36UsedThisToDevelopRules": false
+  }
+}

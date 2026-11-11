@@ -1,0 +1,16 @@
+{
+  "key": "b07f2776cedf7ab4e2de8b2bc06054907ae33f7de898c6c920b6400d5cd00cc0",
+  "identity": {
+    "freezeSha256": "e0ac9aba89edee1cb6318fb07376860dcc6d3c4b5073f7c591bcc4415acd3265",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":1,\"text\":\"모레 오후 2시\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":2,\"text\":\"오후 2시\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "ddcbd7084eca5418d50051206f0b5f452ed4dce205f49a9f9508bc3b10d7b067",
+  "seconds": 8.20666533295298
+}

@@ -1,0 +1,16 @@
+{
+  "key": "fb745a4a2f95c2267c71de114a48bebc6793acbc6d5ec65320eb15167a427386",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"내일 6시\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"아니\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":3,\"text\":\"6시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":3,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"오후 6시\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":1,\"text\":\"아니\",\"status\":\"superseded\"}]},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":3,\"text\":\"6시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":3,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"오후 6시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "18ad846b6cfc2c7dc11184866715b7ee6e04f9856e52d4b660da619f9ade304b",
+  "seconds": 13.197862125001848
+}

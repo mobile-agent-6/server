@@ -1,0 +1,72 @@
+v37 연결 검토 안내
+
+모델 구성
+기본 모델: mlx-community/Qwen3-4B-4bit의 정확한 MLX 양자화 가중치.
+필요 파일: 기본 model.safetensors + 이 묶음의 model/base 메타데이터 + model/adapters LoRA.
+기본 가중치 SHA-256은 model-info.json의 baseWeightSha256으로 확인한다.
+모델 이름만 같거나 다른 양자화 방식이라는 이유로 호환된다고 가정하지 않는다.
+adapter_config.json 안의 절대 경로는 원본 학습 이력이다. 전달받은 환경의 로딩 경로로 사용하지 않는다.
+실행기는 실제 기본 모델 경로와 실제 adapter 경로를 명시해서 로드해야 한다.
+이 묶음은 변환 완료본이 아니며 대상 실행기용 변환/실행 명령을 임의로 제시하지 않는다.
+
+동일 모델 출력을 재현할 조건
+- model/base/의 tokenizer와 chat_template을 함께 사용.
+- system prompt: runtime/backend/app/modules/assistant/evidence/prompt.txt의 원문 바이트.
+- user 메시지: 참조 model_client.py의 render_user_message가 만드는 JSON.
+- userTurns는 1부터 순서대로 누적된 사용자 발화. 현재 참조 계약에서는 Assistant 발화를 userTurns에 섞지 않음.
+- taskReferenceTime, serverTimeTrusted 및 그 밖의 renderer 필드를 원형 그대로 유지.
+- enable_thinking=False, temperature=0.0, seed=29, max_tokens=1024.
+- seed가 같아도 다른 변환 형식·실행기에서 동일 출력이 보장되는 것은 아님.
+- 원문 evidence의 turn은 실제 전달된 userTurns 번호와 일치해야 함.
+
+후처리 진입점
+실제 백엔드 환경에서 runtime/rules를 Python 모듈 검색 경로에 추가한 뒤:
+  from evidence_postprocess_v37 import apply_rules, ClarificationRequired
+  result = apply_rules(
+      raw_model_output,
+      user_turns={1: first_user_text, 2: second_user_text},
+      reference=reference_datetime,
+      server_time_trusted=trusted,
+  )
+  processed_raw = result.raw
+이 예시는 호출 인자 설명이다. first_user_text 등의 변수는 실제 누적 입력으로 구성한다.
+후처리는 모델 로딩, API 호출 또는 DB 변경을 하지 않는다.
+result.version은 내부 의존 모듈의 표기를 유지하는 경우가 있으므로 선택 버전은 model-info.json과 소스 해시로 식별한다.
+
+정상 반환 및 확인 질문 처리
+- processed_raw를 그대로 일정 실행으로 연결하지 않는다. 기존 parser/role/source 검사와 계획·후보·승인 절차에 전달한다.
+- ClarificationRequired 발생 시 e.question을 기존 ask/need_more_info 응답 경로에 전달한다.
+- 예외를 잡고 원래 모델 출력을 계속 실행하거나 일반 성공 응답으로 바꾸지 않는다.
+- 해결되지 않은 이전 후보/승인 상태를 유지한 채 '네'만으로 실행하지 않도록 한다.
+- 새 작업으로 재진술하게 하는 기존 bridge 예시는 해당 pending state를 비운다. 완전한 최종 요청을 다시 받는 정책이다.
+- 과거 미결정 턴 이후 별도 턴에서 결정을 밝힌 흐름은 여전히 재진술을 요구할 수 있다.
+
+선택적 provider 예시
+  from correction_bridge_v37 import make_provider
+  provider = make_provider(existing_model, existing_schedule_reader)
+existing_model은 참조 extract/is_ready/prompt_sha256 인터페이스를 구현한 실행기다.
+이 예시는 실제 backend 패키지가 있는 환경에서만 검토한다.
+provider 내부의 _State, _envelope 등에 의존하므로 최신 백엔드에서 그대로 호환되는지 확인해야 한다.
+이 묶음의 runtime/backend는 CPU 평가에 쓰는 고정 사본이다. 실제 서버 파일을 덮어쓰는 용도가 아니다.
+선택적 provider의 실제 API/DB 연동은 검증하지 않았다.
+
+검토용 시나리오 사용
+- data/multiturn60/scenarios60.json: initialSchedules, turns, expectedResult, modelCalls, dialogue.
+- inputType=selection/confirmation을 포함한 모델 비호출 라운드도 따로 있으므로 모든 user 라운드를 무조건 Qwen에 호출하지 않는다.
+- Assistant utterance와 expectedResult는 작성된 기대값이다. API 응답이 동일하다고 보고하지 않는다.
+- 모델 호출이 있는 라운드는 modelCalls[].target과 실제 evidence·부족 정보를 비교.
+- 목표가 정해지지 않은 입력은 임의 변경이 아닌 확인 질문으로 이어지는지 점검.
+- 최종 Schedule 변경 결과는 백엔드가 실제 API/DB 환경에서 검증.
+- 실패 회신에는 해당 caseId와 round, 실행기/모델 버전, 실제 입력 payload 및 원출력·후처리·API 응답을 포함하면 원인 분리가 쉬움.
+
+
+기존184개 전환 자료 사용
+data/legacy184-prefix/의381시점은 누적 사용자 발화 기준의 후보 정답이다.신규중간197개는 학습하지 않았다.
+원문124행 수정제안1개와 최종정답41개 배열순서 정리를 확인한다.원본source/train400.jsonl은 보존했다.
+하위README의v31은 작성당시 기록이며 현재선택은model-info.json의v37이다.
+API가 질문/선택/승인 후 userTurns를 재구성하거나 초기화한다면 실제입력과 해당시점정답의 대응을 대조한다.
+단순배열순서 또는 userTurns 번호 차이를 의미오류와 구분해 기록한다.
+자료의 존재/자동검증과 실제모델학습/API실행은 각각다른상태다.
+
+이번v37은 기존15개오류를 원문기반 정정 이력 규칙으로 보완한 버전이다. 모델가중치는v36과동일하다.
+새벽12시 같은시간표현은 evidence에 원문을복사하며,실제날짜/시각 정규화와API실행은 백엔드에서 검증해야한다.

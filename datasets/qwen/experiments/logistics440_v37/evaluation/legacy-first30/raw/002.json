@@ -1,0 +1,16 @@
+{
+  "key": "07243dc5efb6fc97ae0f2c1d6de2f9bf216563955a6a492c5e64d95d6c17fa58",
+  "identity": {
+    "freezeSha256": "14d9351b65aa64766b77e997e569fc9d12625f2e77207e09def91daf39f2aab9",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":1,\"text\":\"조건을 정해서\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":1,\"text\":\"일정을 조회할게\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "c57b7d8bcb86df143bf73c9d375f3b29bcbf90c10ed9e62e3f4caed27b271533",
+  "seconds": 7.455321333021857
+}

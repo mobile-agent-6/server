@@ -1,0 +1,16 @@
+{
+  "key": "5d2f780272ffda0e8247c5b9ecde6dbe875e4846bca3d97dfd14fdc74570db21",
+  "identity": {
+    "freezeSha256": "07bfb630c7cec6da7572d9657da328c7aaea072902a2139ce4fbff89c79d4173",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"입고 바코드 판독대 수평 점검\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":2,\"text\":\"완료 처리를 바꿔 주세요\",\"status\":\"adopted\"}],\"task_or_title\":[{\"turn\":2,\"text\":\"일정 삭제인지\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "89de9609f771a025c99882dac9f58439c8e5e00199282cba50bbca7b2f8ec872",
+  "seconds": 8.650996665994171
+}

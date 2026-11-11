@@ -1,0 +1,16 @@
+{
+  "key": "c4aaccc266784428ff89bae93c52a032eb1ef99c6a2a9d86c263e71303e2af1b",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":3,\"text\":\"반품 상품 외관 검사\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":4,\"text\":\"4시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":3,\"text\":\"반품\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "8c1e4c40fa94fe931be727196579a047fa97f3102669ca874e735703b3bf3aa0",
+  "seconds": 9.101991250005085
+}

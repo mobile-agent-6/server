@@ -1,0 +1,58 @@
+[
+  {
+    "name": "full60",
+    "rows": 132,
+    "purpose": "Full60 scenario development pool; includes some trained inputs",
+    "independentTest": false,
+    "apiReplay": false
+  },
+  {
+    "name": "ambiguity24",
+    "rows": 24,
+    "purpose": "Clear12 plus undecided12; opened development data",
+    "independentTest": false,
+    "apiReplay": false
+  },
+  {
+    "name": "resolved24",
+    "rows": 24,
+    "purpose": "Clear12 plus undecided12; opened development data",
+    "independentTest": false,
+    "apiReplay": false
+  },
+  {
+    "name": "legacy-first30",
+    "rows": 30,
+    "purpose": "Training-dialogue-derived development prefixes used for rules",
+    "independentTest": false,
+    "apiReplay": false
+  },
+  {
+    "name": "legacy-second30",
+    "rows": 30,
+    "purpose": "Training-dialogue-derived development prefixes used for rules",
+    "independentTest": false,
+    "apiReplay": false
+  },
+  {
+    "name": "legacy-third30",
+    "rows": 30,
+    "purpose": "Training-dialogue-derived development prefixes used for rules",
+    "independentTest": false,
+    "apiReplay": false
+  },
+  {
+    "name": "paired24",
+    "rows": 24,
+    "purpose": "12 authored two-turn scenarios;used to develop v36",
+    "independentTest": false,
+    "apiReplay": false
+  },
+  {
+    "name": "paired16",
+    "rows": 16,
+    "purpose": "8 authored two-turn scenarios;v36 frozen before authoring;3 first-turn histories repeated",
+    "independentTest": false,
+    "apiReplay": false
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "key": "542b88d36db432af6f359a18bb7d1a34cc39acc706e1166cd360fff22827752c",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":1,\"text\":\"내일 5시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"재고 분류\",\"status\":\"adopted\"}],\"time\":[{\"turn\":3,\"text\":\"5시\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"대신\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"오후 5시\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "906ce82e5618f9b93420fbbfcc5ee5c0e5a2a8ed9abf190b705a841e45c3176c",
+  "seconds": 9.316968166996958
+}

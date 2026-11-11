@@ -1,0 +1,16 @@
+{
+  "key": "d2a6e4b4e979b0dbf56010028c4f2a3c7d866585bde4bbdc852f6b9411ca95c8",
+  "identity": {
+    "freezeSha256": "e06dcd680ad4bc1718721dfa4d24140e29a262fae9017203bc744a71baea3961",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"재고 라벨 보관칸 번호 대조\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":2,\"text\":\"완료로 할지 미완료로 바꿔 주세요\",\"status\":\"adopted\"}],\"ampm\":[{\"turn\":2,\"text\":\"미완료로 바꿔 주세요\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "8bb84ecea8ae279471a598d4c5ab3320cd1251b4a9b1d5dd7dcd97a2a8c12fa6",
+  "seconds": 8.898931416973937
+}
