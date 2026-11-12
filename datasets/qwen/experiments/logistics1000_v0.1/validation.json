@@ -1,0 +1,42 @@
+{
+  "status": "PASS",
+  "createdDate": "2026-11-12",
+  "datasetState": "PROPOSED_UNREVIEWED",
+  "seed": 20261112,
+  "totalRows": 1000,
+  "preservedRows": 440,
+  "addedSyntheticRows": 560,
+  "rowsByFeature": {
+    "create": 200,
+    "list": 200,
+    "update": 200,
+    "delete": 200,
+    "completed_update": 200
+  },
+  "addedByFeature": {
+    "create": 112,
+    "list": 112,
+    "update": 112,
+    "delete": 112,
+    "completed_update": 112
+  },
+  "addedUserTurnCounts": {
+    "1": 283,
+    "2": 238,
+    "3": 30,
+    "5": 3,
+    "4": 6
+  },
+  "uniqueInputs": 1000,
+  "addedNormalizedConversationDuplicates": 0,
+  "addedExactOverlapWithV37ValidationAndDevelopment": 0,
+  "protectedFilesChecked": 10,
+  "contractRoleAndOverlapPasses": 1000,
+  "negativeValidatorChecks": 2,
+  "preservedSafetyQuestionSignatures": 560,
+  "systemPromptSha256": "afc3dab1355cc9d75fe2e73d0bc9957b72da90d6fcfc4783718a00895949a262",
+  "independentReviewPerformed": false,
+  "modelTrainingPerformed": false,
+  "modelEvaluationPerformed": false,
+  "apiDatabaseReplayPerformed": false
+}

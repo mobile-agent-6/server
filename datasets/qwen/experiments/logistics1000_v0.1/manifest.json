@@ -1,0 +1,44 @@
+{
+  "version": "logistics1000-v0.1-proposed",
+  "seed": 20261112,
+  "dependencyHashFormat": "UTF-8 with LF newlines",
+  "dependencies": {
+    "datasets/qwen/experiments/logistics440_v37/data/training/train400.jsonl": "c880e5b3f4c29f63ac7f1b2c570fb208cd881f28347abeeb1c9e79af59323f13",
+    "datasets/qwen/experiments/logistics440_v37/data/training/new-prefix40.jsonl": "b486a8341682fb5adc4ee8ac044af773aaae6cda434e47f90267712e2a632a2b",
+    "datasets/qwen/experiments/logistics440_v37/evaluation/ambiguity24/inputs.jsonl": "71aaf12a1cf60b2f4c70c4f130eab62764e804d8835eb3f043a03fae21bd5895",
+    "datasets/qwen/experiments/logistics440_v37/evaluation/full60/inputs.jsonl": "47443c47f74ea4e772353203a2bb5eec7cfc8d60bfba05c534ec6e06c0b4f49e",
+    "datasets/qwen/experiments/logistics440_v37/evaluation/legacy-first30/inputs.jsonl": "d30256090e61c858a9f412a8e70cf60b8a218c1b50fd5605001f6ac5dc87cf45",
+    "datasets/qwen/experiments/logistics440_v37/evaluation/legacy-second30/inputs.jsonl": "c4fc7805eb8db5b805f37529b093b616ca6fb68f327552a87572a9634a405fe0",
+    "datasets/qwen/experiments/logistics440_v37/evaluation/legacy-third30/inputs.jsonl": "ff1e6103646e7441edc05b9007c179e0b9c1aaa43073290ca65983ac6988e0af",
+    "datasets/qwen/experiments/logistics440_v37/evaluation/paired16/inputs.jsonl": "f7305510fe90c959ebb3afc9c6c789960c893b36e886452153d0383c4223cf11",
+    "datasets/qwen/experiments/logistics440_v37/evaluation/paired24/inputs.jsonl": "2d32542e257ccefc487f8460590916ab429f6113b2d3abb0bb3edc9948f093be",
+    "datasets/qwen/experiments/logistics440_v37/evaluation/resolved24/inputs.jsonl": "9dfacc71b6a98f68300d1dc47a5ab9469ea1a7b01e3388e13cc8c58bc40259ef",
+    "datasets/qwen/experiments/logistics440_v37/data/training/valid20.jsonl": "33fd9404aa2aabc7fa13db5426c035ef173c8a3f5980a1d2dd084fa98cdb1adf",
+    "datasets/qwen/experiments/logistics440_v37/data/training/last-run/valid.jsonl": "21e488b482d12483c504c3cca8dc3c63e194de551b7e75259ae3a05cc08993db",
+    "datasets/qwen/experiments/logistics1000_v0.1/build.py": "990daf2618379204ddfcb9bcae47d8188aab144155ac6780a57fc628f75fa619",
+    "backend/app/modules/assistant/evidence/contract.py": "3809f25eda6efb1fa938634700cf49a3ed487b72d9076f33411fd27efb14a19d",
+    "backend/app/modules/assistant/evidence/gate.py": "20e246ae6a91d8b896a13e9d37baa22b130fce5a73793a4544e03dbad54d69f1",
+    "backend/app/modules/assistant/evidence/safety.py": "40935e67fc1eacaf20cfe48d1f73621bed3890b921cb784af6b78f2a36d14ffc",
+    "backend/app/modules/assistant/evidence/normalize.py": "5c479b53eacf88e711330e9023ed6a9daecd727c1d64f072c9a2af5ed411e5f8",
+    "backend/app/modules/assistant/evidence/role_contract.py": "b6357759c125115b14b44e3562d427364515e60ad5a8c56963c4ec12bc56048b",
+    "backend/app/modules/assistant/evidence/texts.py": "90d4fa7f5d1aedbe464c0b02aa2dcda50ead9a5e640b2a42d38221f2304c5bb8"
+  },
+  "outputs": {
+    "train1000.jsonl": {
+      "bytes": 6728386,
+      "sha256": "88baeb22ca39e4e8ee34950a693318a08af8965cc269fc32988af11e2a416922"
+    },
+    "synthetic560.jsonl": {
+      "bytes": 3768415,
+      "sha256": "f437dc03d9584bb58f0f417ac4855c8df370d1cef13b6814f8f927a212eaba19"
+    },
+    "train1000-index.jsonl": {
+      "bytes": 565137,
+      "sha256": "0dca363e528459440ed7729c6f8430595e2f5921d785bf24e18c933ab7033421"
+    },
+    "validation.json": {
+      "bytes": 1058,
+      "sha256": "74f35bfa84821dcb3a3c9aa4d0c1c735817e0e8c0007b49003b258246b59ef18"
+    }
+  }
+}
