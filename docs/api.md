@@ -631,6 +631,8 @@ ValidationErrorItem
 - 지원 작업은 등록·조회·수정·삭제·완료 상태 변경이다.
 - 정보가 충분한 등록은 추가 승인 없이 실행한다. 수정·삭제·AI를 통한 완료 상태 변경은 대상과 변경 내용을 확인한 뒤 실행한다.
 - 한 Assistant write 성공은 일정 하나만 변경한다. MVP에서 여러 일정을 한 입력으로 일괄 변경하지 않는다.
+- 한 입력에 여러 작업이 있으면 서버는 첫 번째 작업만 처리한다. 나머지 작업은 자동 저장하거나 대기열에 넣지 않고, 후속 입력으로 다시 요청하도록 안내한다.
+- 여러 작업 중 첫 번째가 등록이면 서버는 해당 일정을 먼저 등록할지 확인한 뒤 실행한다.
 - 알림은 제외하며 `reminderMinutesBefore`·`reminderAt`을 만들거나 전달하지 않는다.
 
 처리 상태는 다음 단방향 흐름을 기본으로 한다.
@@ -659,8 +661,11 @@ accepted → processing → completed
 | `confirmation` | `questionId`, `approved` | `approved`는 boolean. false는 해당 변경안 거절이며 대화 전체 삭제가 아님 |
 
 - `conversationId`와 `questionId`는 서버가 발급한다.
+- `requestId`·`conversationId`·`questionId`·`acknowledgedUncertainRequestId`는 하이픈을 포함한 canonical RFC variant UUID v4 형식이다. 영문 대문자를 포함한 유효한 입력도 받지만 서버는 소문자로 정규화해 저장·응답한다.
 - `candidateId`는 불투명 문자열이며 앱이 생성하거나 순번·Schedule ID로 바꾸지 않는다.
-- `text`는 Unicode 코드 포인트 기준 1~500자다. 공백만 있는 입력은 `422 VALIDATION_ERROR`다.
+- `text`는 짝이 맞지 않는 Unicode surrogate를 거절한다. Unicode `Cc` 제어문자 중 탭·LF·CR만 허용하며 나머지는 `422 VALIDATION_ERROR`다.
+- `text`는 trim 전 원문을 Unicode 코드 포인트 기준 1~500자로 검사한다. 검사 후 U+3000을 포함한 Unicode 앞뒤 공백을 제거하며, 공백만 남으면 `422 VALIDATION_ERROR`다.
+- 서버는 정규화한 `text`를 저장하고 같은 `requestId`의 동일 요청 판정에도 사용한다.
 - 전체 JSON 요청 body는 UTF-8 기준 16 KiB 이하다. 초과하면 `413 REQUEST_BODY_TOO_LARGE`다.
 - 잘못된 타입·enum·null·알 수 없는 필드는 거절한다.
 - 앱은 전체 채팅 이력·모델 출력·Schedule 변경 payload를 보내지 않는다.
@@ -705,6 +710,8 @@ accepted → processing → completed
 
 앱은 `GET /api/v1/assistant/requests/{requestId}`로 원래 입력의 상태와 결과를 조회한다. 정상 GET과 동일 요청 재수신의 `200`은 `requestId`·`conversationId`·`status`를 반환한다. `accepted`·`processing`에서는 `result`를 생략하고 `completed`에서만 포함한다.
 
+전체 대화 내역을 조회하는 endpoint는 없다. `conversationId`는 같은 작업의 후속 입력을 연결하지만 대화 transcript를 조회하는 ID가 아니며, 앱은 필요한 개별 요청을 원래 `requestId`로 조회한다.
+
 ```json
 {
   "requestId": "11111111-1111-4111-8111-111111111111",
@@ -741,6 +748,8 @@ accepted → processing → completed
 
 공통 규칙:
 
+- 앱은 `result.text`를 사용자에게 표시하되, 화면과 후속 입력 방식은 문구를 해석하지 않고 `kind`와 각 결과의 `outcome`·`code` 등 구조화 필드로 결정한다.
+- `need_more_info`는 같은 대화에서 연속으로 반환될 수 있다. 후속 답변은 항상 가장 최근 활성 질문의 `questionId`를 사용한다.
 - `expiresAt`은 UTC `Z` datetime string이다. 후보·승인에는 필수이며 기한 없는 정보 보완에서는 생략한다.
 - `candidates`는 2~10개다. 각 항목은 `candidateId`·`title`·`scheduledAt`·`category`를 항상 제공한다.
 - candidate의 `category`는 `INBOUND / INVENTORY / OUTBOUND / RETURN / OTHER` 중 하나다.
@@ -900,11 +909,24 @@ Assistant의 접수 전 거절·GET·취소 오류도 13장의 Problem Details�
 - 상대 날짜는 `Asia/Seoul`과 작업을 시작한 첫 유효 입력의 서버 접수 시각을 기준으로 해석한다.
 - 같은 작업의 후속 답변·재전송·복구에서는 기준 시각과 이미 해석한 날짜를 유지한다.
 - 사용자가 날짜를 명시적으로 고치거나 새 작업을 시작하면 새 기준을 적용한다.
+- 기간을 말하지 않은 일반 일정 조회는 기준 시각부터 92일 뒤까지를 조회한다.
+- 일정 조회·수정·삭제 대상 검색에서 연도를 포함해 명시한 과거 날짜는 해당 과거 날짜를 조회·검색한다. 등록에서 연도까지 명시한 과거 시각은 미래로 바꾸지 않고 기존 Schedule 과거 시각 거절 계약을 따른다.
+- 일정 조회에서 연도 없는 날짜는 기준일 이후 가장 가까운 해당 날짜를 조회한다. 수정·삭제 대상 검색은 올해와 내년의 해당 날짜를 모두 검색한다. 등록에서 연도 없는 날짜가 올해 이미 지났으면 다음 해를 말하는지 다시 묻는다.
+- `이번 주`·`다음 주`·`지난주`는 `Asia/Seoul` 기준 월요일 00:00 이상, 다음 월요일 00:00 미만의 범위다.
+- 날짜를 말하지 않은 수정·삭제 대상 검색은 기준일의 시작을 경계로 과거 92일과 미래 92일을 검색한다. 따라서 과거 일정도 후보가 될 수 있다.
 - 서버 시각을 신뢰할 수 없거나 오래 지나 의미가 애매하면 추측해 write를 실행하지 않고 절대 날짜·시각을 다시 확인한다.
 - 서버 시각은 `POST /api/v1/system/time-sync`가 성공한 뒤부터 신뢰한다. 서버가 다시 시작되거나, 이후 시각 동기화가 503·409로 실패하거나, 시스템 시각이 경과 시간과 60초 넘게 어긋나면 다시 동기화할 때까지 신뢰하지 않는다.
 - Schedule API에는 2.5절의 시간대 포함 datetime을 보내며 UTC 정규화·과거 시각 검증을 그대로 적용한다.
 
-### 16.12 Schedule 목록 동기화
+### 16.12 Assistant 카테고리 해석
+
+- 등록할 일정에서 사용자가 카테고리를 명시하지 않아도 등록할 수 있다. 서버는 제목의 표현으로 카테고리를 판단하고, 판단할 표현이 없으면 `OTHER`를 사용한다.
+- `입고`는 `INBOUND`, `재고`는 `INVENTORY`, `출고`·`피킹`·`포장`은 `OUTBOUND`, `반품`은 `RETURN`으로 해석한다.
+- 등록할 일정에서 `출하`·`납품`만으로는 `OUTBOUND`로 분류하지 않고 `OTHER`를 사용한다. 같은 입력에 `출고`·`피킹`·`포장`이 명시되면 `OUTBOUND`를 사용한다.
+- 등록할 일정에서 서로 다른 카테고리 후보가 함께 있어 하나로 정할 수 없으면 카테고리를 다시 질문한다.
+- 서버가 확정한 최종 카테고리는 Assistant 결과와 이후 Schedule 응답의 `category`로 제공한다.
+
+### 16.13 Schedule 목록 동기화
 
 - Assistant create/update/delete 성공 뒤 앱은 현재 화면에 필요한 Schedule 목록을 기존 Schedule GET으로 다시 조회한다.
 - 목록 조회만 실패하면 GET만 재시도하고 완료된 Assistant write를 다시 실행하지 않는다.
