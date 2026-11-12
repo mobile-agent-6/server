@@ -26,9 +26,7 @@ from app.modules.assistant.evidence.model_client import (
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-EXPERIMENT_ROOT = REPO_ROOT / "datasets/qwen/experiments/logistics400_v17"
-DATASET_PROMPT = EXPERIMENT_ROOT / "runtime/backend/app/modules/assistant/evidence/prompt.txt"
-MODEL_INFO = EXPERIMENT_ROOT / "model-info.json"
+EXPERIMENTS_ROOT = REPO_ROOT / "datasets/qwen/experiments"
 REFERENCE = datetime(2026, 10, 29, 1, 0, tzinfo=timezone.utc)  # 10:00 in Seoul
 
 
@@ -83,10 +81,18 @@ def server() -> Iterator[FakeServer]:
     fake.close()
 
 
-def test_backend_prompt_is_the_training_prompt() -> None:
+@pytest.mark.parametrize(
+    ("experiment", "prompt_hash_key"),
+    [("logistics400_v17", "systemPromptSha256"), ("logistics440_v37", "promptSha256")],
+)
+def test_backend_prompt_is_the_training_prompt(experiment: str, prompt_hash_key: str) -> None:
     assert hashlib.sha256(PROMPT_PATH.read_bytes()).hexdigest() == EXPECTED_TRAINING_PROMPT_SHA256
-    assert PROMPT_PATH.read_bytes() == DATASET_PROMPT.read_bytes()
-    assert json.loads(MODEL_INFO.read_text(encoding="utf-8"))["systemPromptSha256"] == (
+    experiment_root = EXPERIMENTS_ROOT / experiment
+    dataset_prompt = experiment_root / "runtime/backend/app/modules/assistant/evidence/prompt.txt"
+    # Reference snapshots may have Windows checkout line endings. The runtime
+    # prompt itself must still match the exact training bytes checked above.
+    assert PROMPT_PATH.read_bytes() == dataset_prompt.read_bytes().replace(b"\r\n", b"\n")
+    assert json.loads((experiment_root / "model-info.json").read_text(encoding="utf-8"))[prompt_hash_key] == (
         EXPECTED_TRAINING_PROMPT_SHA256
     )
 
@@ -108,6 +114,13 @@ def test_verified_training_prompt_rejects_missing_file(tmp_path: Path) -> None:
         load_verified_training_prompt(tmp_path / "missing.txt")
     assert captured.value.actual_sha256 is None
     assert isinstance(captured.value.__cause__, FileNotFoundError)
+
+
+def test_verified_training_prompt_rejects_crlf_conversion(tmp_path: Path) -> None:
+    prompt = tmp_path / "prompt.txt"
+    prompt.write_bytes(PROMPT_PATH.read_bytes().replace(b"\n", b"\r\n"))
+    with pytest.raises(TrainingPromptIntegrityError):
+        load_verified_training_prompt(prompt)
 
 
 def test_user_message_matches_the_training_rendering() -> None:

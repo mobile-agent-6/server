@@ -104,6 +104,47 @@ def test_model_server_connects_and_creates(database_path: Path) -> None:
         application.state.engine.dispose()
 
 
+@pytest.mark.parametrize("late_start", [False, True])
+def test_model_connection_applies_v37_before_validation(
+    database_path: Path, monkeypatch: pytest.MonkeyPatch, late_start: bool,
+) -> None:
+    from app import main
+
+    # Isolate provider wiring from checkout newline conversion. Production still
+    # calls the strict prompt loader, whose rejection tests remain unchanged.
+    prompt = model_client.PROMPT_PATH.read_text(encoding="utf-8")
+    monkeypatch.setattr(main, "load_verified_training_prompt", lambda: prompt)
+    readiness = iter((False, True) if late_start else (True,))
+    monkeypatch.setattr(ChatCompletionsModel, "is_ready", lambda self: next(readiness))
+    bundle = Path(__file__).resolve().parents[3] / "datasets/qwen/experiments/logistics440_v37"
+    raw = json.loads((bundle / "evaluation/full60/raw/001.json").read_text(encoding="utf-8"))["raw"]
+    server = FakeServer()
+    server.body = {"choices": [{"message": {"content": raw}}]}
+    application = _app(database_path, assistant_model_enabled=True,
+                       assistant_model_base_url=server.url, assistant_trust_server_time=True)
+    try:
+        with TestClient(application) as client:
+            assert application.state.assistant_provider_available is not late_start
+            request_id = str(uuid4())
+            response = client.post("/api/v1/assistant/requests", json={
+                "requestId": request_id,
+                "input": {"type": "text", "text": "입고 팔레트 검수 일정 등록해 줘"},
+            })
+            assert response.status_code == 202
+            result = _wait(client, request_id)["result"]
+            # Raw output mislabels title text as date evidence. v37 removes it
+            # and asks for a date instead of completing MODEL_OUTPUT_INVALID.
+            assert result["kind"] == "need_more_info"
+            assert result["text"] == "며칠로 할까요?"
+            assert application.state.assistant_decision_provider._model.name.endswith("+v37")
+            with application.state.session_factory() as session:
+                assert session.scalar(sa.select(sa.func.count()).select_from(Schedule)) == 0
+        assert len(server.requests) == 1
+    finally:
+        server.close()
+        application.state.engine.dispose()
+
+
 def test_phone_time_sync_lets_the_model_use_relative_dates(database_path: Path) -> None:
     server = FakeServer()
     server.body = {"choices": [{"message": {"content": json.dumps(CREATE_OUTPUT, ensure_ascii=False)}}]}

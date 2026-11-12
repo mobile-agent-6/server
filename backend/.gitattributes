@@ -1,0 +1,2 @@
+# Keep the byte-verified training prompt identical on every checkout.
+app/modules/assistant/evidence/prompt.txt text eol=lf

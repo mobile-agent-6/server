@@ -36,7 +36,7 @@ from app.modules.assistant.evidence.model_client import (
     TrainingPromptIntegrityError,
     load_verified_training_prompt,
 )
-from app.modules.assistant.evidence.provider import EvidenceDecisionProvider
+from app.modules.assistant.evidence.rules.correction_bridge_v37 import make_provider
 from app.modules.assistant.router import router as assistant_router
 from app.modules.assistant.readiness import probe_assistant_schema
 from app.modules.assistant.processor import ProcessOneResult, process_one
@@ -127,7 +127,7 @@ def _model_provider(settings: Settings, application: FastAPI) -> DecisionProvide
             extra={"event": "assistant.model_unavailable"},
         )
         return None
-    return EvidenceDecisionProvider(model, SqlAlchemyScheduleReader(application.state.session_factory))
+    return make_provider(model, SqlAlchemyScheduleReader(application.state.session_factory))
 
 
 def _reconnect_model_provider(settings: Settings, application: FastAPI) -> bool:

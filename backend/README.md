@@ -152,6 +152,19 @@ changes가 완전한 selection/confirmation은 모델 없이 접수되어 backen
 않고 Assistant만 `503 ASSISTANT_UNAVAILABLE` 상태로 유지한다. Schedule API와 health는
 이 prompt 오류 때문에 중단하지 않는다.
 
+`backend/.gitattributes`는 실행용 prompt의 LF 줄바꿈을 고정한다. Windows의
+`core.autocrlf=true` 환경에서도 원래 학습 바이트와 SHA-256을 보존하기 위한 설정이다.
+이미 받은 작업본은 설정 추가만으로 변환되지 않을 수 있다. 기존 prompt에 로컬 수정이
+없는지 확인한 뒤 LF로 저장하고 아래 테스트로 확인한다. 런타임 해시 검사는 유지하며,
+실행 중 자동 줄바꿈 보정이나 잘못된 해시의 허용은 하지 않는다.
+
+```bash
+python -m pytest -q tests/unit/test_assistant_evidence_model_client.py
+```
+
+서버 실행과 전체 테스트는 POSIX `fcntl`이 있는 Linux 또는 macOS 환경을 사용한다.
+Windows 네이티브 실행은 지원하지 않는다.
+
 | 환경변수 | 기본값 | 설명 |
 |---|---|---|
 | `SCHEDULE_ASSISTANT_MODEL_ENABLED` | `false` | `true`면 시작할 때 모델 서버를 연결한다. 아직 준비되지 않았다면 첫 텍스트 요청에서 다시 확인하며, 계속 연결되지 않으면 Assistant만 `503`이고 나머지 API는 정상이다 |
@@ -175,8 +188,31 @@ SCHEDULE_ASSISTANT_MODEL_ENABLED=true SCHEDULE_ASSISTANT_TRUST_SERVER_TIME=true 
 ASSISTANT_SMOKE_MODEL_URL=http://127.0.0.1:8088 python -m pytest tests/integration/test_assistant_model_smoke.py -s
 ```
 
-모델 출력이 형식에 맞지 않으면 다시 묻지 않고 `MODEL_OUTPUT_INVALID`로 끝낸다.
+후처리 후에도 모델 출력이 검사를 통과하지 못하면 모델을 다시 호출하지 않고 `MODEL_OUTPUT_INVALID`로 끝낸다.
 decoding이 고정(temperature 0)이라 같은 입력을 다시 보내도 같은 출력이 나오기 때문이다.
+
+모델 연결 시 Qwen 440예시 모델의 v37 후처리를 적용한 뒤 기존 evidence parser,
+역할·원문 검사와 planner에 전달한다. 후처리가 `ClarificationRequired`를 반환하면
+기존 `need_more_info` 질문으로 전달하고 이전 작업의 evidence·확인 상태를 비운다.
+후처리 결과만으로 일정 쓰기를 승인하지 않으며 후보 선택, 변경 승인과 safe writer의
+검사는 그대로 유지한다. 시작 때의 연결과 늦게 시작된 모델의 재연결 모두 같은 경로를 쓴다.
+
+규칙은 `app/modules/assistant/evidence/rules/`에 포함한다. 출처는
+[`logistics440_v37/runtime/rules`](../datasets/qwen/experiments/logistics440_v37/runtime/rules)이며,
+`correction_bridge_v37`에서 필요한 38개 모듈을 패키지 상대 import로만 바꾼 사본이다.
+실행과 배포 패키지는 `datasets/` 또는 별도의 `PYTHONPATH` 설정에 의존하지 않는다.
+규칙 변경 시 출처 비교 및 저장 출력·대화 회귀 테스트를 함께 확인한다.
+공유 계약의 상태는 기존 문서를 따르며 이 연결 변경만으로 팀 합의나 배포 완료를 뜻하지 않는다.
+
+v37 회귀 검증은 저장된 모델 출력과 임시 SQLite로 수행한다.
+
+```bash
+python -m pytest -q tests/unit/test_assistant_v37_rules.py tests/integration/test_assistant_v37_replay.py tests/integration/test_assistant_model_wiring.py
+```
+
+저장 출력 재생은 실제 모델 추론, 앱 HTTP 통합과 Orange Pi 실행을 대신하지 않는다.
+프롬프트의 고정 SHA-256 검사도 유지하므로 CRLF로 변환된 작업본에서는 모델 연결이
+거절된다. 위 LF 보존 설정과 작업본의 prompt 해시를 함께 확인한다.
 
 모델 호출 제한 시간은 `SCHEDULE_ASSISTANT_MODEL_TIMEOUT_SECONDS`와 요청 처리 마감(300초)까지 남은 시간에서
 안전여유 10초를 뺀 값 중 짧은 쪽이다. 대기열에서 기다리느라 남은 시간이 10초 이하이면 모델을 부르지 않고
