@@ -22,6 +22,7 @@ from app.core.clock import FixedClock, FixedMonotonicClock
 from app.core.config import Settings
 from app.core.database import create_api_engine, create_assistant_engine, create_session_factory
 from app.modules.assistant.errors import AssistantStaleQuestion
+from app.modules.assistant.evidence import texts
 from app.modules.assistant.evidence.model_client import render_user_message
 from app.modules.assistant.evidence.rules.correction_bridge_v37 import make_provider
 from app.modules.assistant.processor import process_one
@@ -248,3 +249,123 @@ def test_v37_unissued_candidate_is_rejected(v37_replay):
             replay.send({"type": "selection", "questionId": question["questionId"], "candidateId": "unissued-candidate"})
         assert replay.snapshot() == before
         assert len(replay.model.calls) == calls
+
+
+def test_v37_missing_query_scope_asks_before_listing(v37_replay):
+    loading_id = "c6acb391-4ae7-4d78-bb17-719ea4d187e5"
+    case = {
+        "referenceTime": "2026-11-14T10:00:00+09:00",
+        "initialSchedules": [
+            {
+                "id": loading_id,
+                "title": "상차 화물 무게 배분 확인",
+                "scheduledAt": "2026-11-15T05:00:00Z",
+                "category": "OTHER",
+                "completed": False,
+            },
+            {
+                "id": "49a1f0e0-c5ea-4775-9fd8-e29afb7dfa05",
+                "title": "입고 검수",
+                "scheduledAt": "2026-11-15T01:00:00Z",
+                "category": "INBOUND",
+                "completed": False,
+            },
+        ],
+    }
+    first_turn = "일정 좀 찾아 줘"
+    second_turn = "제목이 상차 화물 무게 배분 확인인 걸 찾고 있어"
+    first_raw = json.dumps(
+        {
+            "operations": [
+                {
+                    "index": 1,
+                    "kind": "list",
+                    "targetEvidence": {},
+                    "changeEvidence": {},
+                    "filterEvidence": {
+                        "title": [
+                            {
+                                "turn": 1,
+                                "text": first_turn,
+                                "status": "adopted",
+                            }
+                        ]
+                    },
+                    "unsupportedEvidence": [],
+                    "missingInformation": [],
+                }
+            ],
+            "unsupportedEvidence": [],
+            "missingInformation": [],
+        },
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )
+    second_raw = json.dumps(
+        {
+            "operations": [
+                {
+                    "index": 1,
+                    "kind": "list",
+                    "targetEvidence": {},
+                    "changeEvidence": {},
+                    "filterEvidence": {
+                        "title": [
+                            {
+                                "turn": 2,
+                                "text": "상차 화물 무게 배분 확인",
+                                "status": "adopted",
+                            }
+                        ]
+                    },
+                    "unsupportedEvidence": [],
+                    "missingInformation": [],
+                }
+            ],
+            "unsupportedEvidence": [],
+            "missingInformation": [],
+        },
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )
+
+    with v37_replay(case) as replay:
+        replay.model.cache.update(
+            {
+                render_user_message(
+                    [first_turn],
+                    reference_time=replay.now,
+                    server_time_trusted=True,
+                ): first_raw,
+                render_user_message(
+                    [first_turn, second_turn],
+                    reference_time=replay.now,
+                    server_time_trusted=True,
+                ): second_raw,
+            }
+        )
+        before = replay.snapshot()
+
+        question = replay.send({"type": "text", "text": first_turn})
+
+        assert question == {
+            "kind": "need_more_info",
+            "text": texts.ASK_TARGET_TITLE,
+            "questionId": question["questionId"],
+        }
+        assert replay.snapshot() == before
+
+        result = replay.send(
+            {
+                "type": "text",
+                "text": second_turn,
+                "questionId": question["questionId"],
+            }
+        )
+
+        assert result["kind"] == "outcome"
+        assert result["operation"] == "list"
+        assert result["schedulesChanged"] is False
+        assert [item["id"] for item in result["items"]] == [loading_id]
+        assert replay.snapshot() == before
+        assert replay.model.calls == [[first_turn], [first_turn, second_turn]]
