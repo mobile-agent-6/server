@@ -30,6 +30,8 @@ def test_complete_openapi_contract(client: TestClient) -> None:
         "/api/v1/assistant/requests",
         "/api/v1/assistant/requests/{requestId}",
         "/api/v1/assistant/conversations/{conversationId}/cancel",
+        "/api/v1/voice/requests",
+        "/api/v1/voice/requests/{requestId}/speech",
     }
     operations = {
         operation["operationId"]
@@ -47,6 +49,8 @@ def test_complete_openapi_contract(client: TestClient) -> None:
         "createAssistantRequest",
         "getAssistantRequest",
         "cancelAssistantTarget",
+        "createVoiceRequest",
+        "getVoiceRequestSpeech",
     }
 
     components = schema["components"]["schemas"]
@@ -340,6 +344,8 @@ def test_openapi_problem_content_and_headers(client: TestClient) -> None:
         },
         "getAssistantRequest": {"404", "410", "422", "500", "503"},
         "cancelAssistantTarget": {"400", "404", "413", "422", "500", "503"},
+        "createVoiceRequest": {"400", "404", "409", "413", "422", "500", "503"},
+        "getVoiceRequestSpeech": {"404", "409", "410", "422", "500", "503"},
     }
     for path in schema["paths"].values():
         for operation in path.values():
@@ -353,7 +359,7 @@ def test_openapi_problem_content_and_headers(client: TestClient) -> None:
                 if status == "204":
                     assert "content" not in response
                 elif not status.startswith(("4", "5")):
-                    assert set(response["content"]) == {"application/json"}
+                    assert set(response["content"]) <= {"application/json", "audio/wav"}
                     assert "schema" in response["content"]["application/json"]
 
 

@@ -57,6 +57,7 @@ from app.modules.assistant.safe_write import AssistantSafeWriter
 from app.modules.assistant.schedule_read import SqlAlchemyScheduleReader
 from app.modules.schedules.router import router as schedules_router
 from app.modules.system.router import router as system_router
+from app.modules.voice.router import router as voice_router
 from app.modules.system.service import resolve_expected_head
 from app.modules.system.time_sync import DisabledTimeSyncAdapter
 from app.modules.system.time_trust import SyncedTimeSource
@@ -441,6 +442,7 @@ def create_app(
     application.include_router(assistant_router)
     application.include_router(schedules_router)
     application.include_router(system_router)
+    application.include_router(voice_router)
     _install_openapi_contract(application)
     logging.getLogger(__name__).info(
         "application configured",

@@ -46,6 +46,10 @@ PROBLEM_TITLES = {
     "DATABASE_UNAVAILABLE": "Database unavailable",
     "TIME_SYNC_UNAVAILABLE": "Time synchronization unavailable",
     "ASSISTANT_UNAVAILABLE": "Assistant unavailable",
+    "VOICE_BUSY": "Voice pipeline busy",
+    "VOICE_UNAVAILABLE": "Voice service unavailable",
+    "SPEECH_NOT_RECOGNIZED": "Speech not recognized",
+    "VOICE_SPEECH_NOT_READY": "Voice speech not ready",
 }
 
 

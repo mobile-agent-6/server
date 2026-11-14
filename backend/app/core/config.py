@@ -57,6 +57,9 @@ class Settings(BaseSettings):
     # Mac only).  On the Orange Pi keep it off: a successful time-sync makes the
     # clock trusted, so relative dates such as "내일" work.
     assistant_trust_server_time: bool = False
+    voice_enabled: bool = False
+    voice_server_base_url: str = "http://127.0.0.1:8081"
+    voice_server_timeout_seconds: Annotated[float, Field(gt=0, le=120)] = 30
 
     @model_validator(mode="before")
     @classmethod
