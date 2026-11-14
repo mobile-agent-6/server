@@ -19,6 +19,7 @@ from app.modules.assistant.evidence import texts
 from app.modules.assistant.evidence.contract import (
     EvidenceOperation,
     EvidenceOutput,
+    OperationKind,
     Span,
     SpanStatus,
     adopted_texts,
@@ -44,6 +45,7 @@ class EvidenceQuestion(StrEnum):
     TIME = "time"
     DATETIME = "datetime"
     TITLE = "title"
+    QUERY_SCOPE = "query_scope"
     VALUE = "value"
 
     @property
@@ -53,6 +55,7 @@ class EvidenceQuestion(StrEnum):
             EvidenceQuestion.TIME: texts.ASK_TIME_AGAIN,
             EvidenceQuestion.DATETIME: texts.ASK_DATETIME_AGAIN,
             EvidenceQuestion.TITLE: texts.ASK_TITLE,
+            EvidenceQuestion.QUERY_SCOPE: texts.ASK_TARGET_TITLE,
             EvidenceQuestion.VALUE: texts.ASK_RESTATE,
         }[self]
 
@@ -356,6 +359,13 @@ def evidence_question(
     coverage_spans: Sequence[Span] = (),
 ) -> EvidenceQuestion | None:
     """Return a clarification question for conflicting or incomplete evidence."""
+
+    if (
+        operation.kind is OperationKind.LIST
+        and not operation.filter
+        and "query_scope" in operation.missing_information
+    ):
+        return EvidenceQuestion.QUERY_SCOPE
 
     for role, evidence in (
         ("target", operation.target),

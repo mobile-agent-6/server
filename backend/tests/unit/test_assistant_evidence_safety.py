@@ -61,6 +61,24 @@ def test_missing_date_modifier_is_not_silently_dropped() -> None:
     ) is EvidenceQuestion.DATE
 
 
+def test_missing_query_scope_does_not_become_an_unfiltered_list() -> None:
+    operation = EvidenceOperation(
+        index=1,
+        kind=OperationKind.LIST,
+        target={},
+        change={},
+        filter={},
+        unsupported=(),
+        missing_information=("query_scope",),
+    )
+
+    assert evidence_question(
+        operation,
+        turns=["일정 좀 찾아 줘"],
+        reference=REFERENCE,
+    ) is EvidenceQuestion.QUERY_SCOPE
+
+
 @pytest.mark.parametrize(
     ("turn", "evidence"),
     [
