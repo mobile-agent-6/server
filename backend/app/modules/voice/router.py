@@ -133,7 +133,7 @@ def _parse_candidate_selection(transcript: str, candidates: list[object]) -> str
         for match in re.finditer(r"(?<!\d)(10|[1-9])\s*번(?!\d)", transcript)
     }
     for word, number in _ORDINAL_WORDS.items():
-        pattern = rf"(?<![가-힣]){word}\s*(?:번째|번)"
+        pattern = rf"(?<![가-힣]){word}\s*번째"
         if re.search(pattern, transcript):
             found.add(number)
 
@@ -359,6 +359,8 @@ async def create_voice_request(
             raise SpeechNotRecognized(assistant_request_id=request_id) from exc
 
         accepted_at = request.app.state.clock.now()
+        if runtime is not None:
+            runtime.try_lazy_timeout()
         response = admit_assistant_request(
             session_factory,
             data=data,

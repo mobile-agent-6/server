@@ -48,18 +48,21 @@ def _category_label(value: Category | str) -> str:
     return _CATEGORY_LABELS[category]
 
 
-def _schedule_phrase(schedule: object) -> str:
+def _schedule_phrase(schedule: object, *, include_completion: bool = False) -> str:
     title = getattr(schedule, "title")
     scheduled_at = getattr(schedule, "scheduled_at")
     category = _category_label(getattr(schedule, "category"))
-    return f"'{title}', {_spoken_time(scheduled_at)}, {category} 일정"
+    parts = [f"'{title}'", _spoken_time(scheduled_at), category]
+    if include_completion:
+        parts.append("완료" if getattr(schedule, "completed") else "미완료")
+    return f"{', '.join(parts)} 일정"
 
 
 def _confirmation_sentence(result: object) -> str:
     target = getattr(result, "target")
     operation = getattr(result, "operation")
     if operation is AssistantConfirmationOperation.DELETE:
-        return f"{_schedule_phrase(target)}을 삭제할까요?"
+        return f"{_schedule_phrase(target, include_completion=True)}을 삭제할까요?"
 
     changes = getattr(result, "changes")
     descriptions: list[str] = []

@@ -27,6 +27,7 @@ def candidates(count: int = 10) -> list[dict[str, str]]:
         ("11번", None),
         ("열두 번째", None),
         ("첫 번째랑 두 번째", None),
+        ("두 번 말했잖아", None),
         ("이번 거", None),
         ("네", None),
     ],
@@ -206,3 +207,20 @@ def test_tts_write_success_keeps_agreed_short_text() -> None:
         }
     )
     assert generate_tts_sentence(response) == "일정을 변경했어요."
+
+
+def test_tts_delete_confirmation_includes_completion_state() -> None:
+    response = status_with_result(
+        {
+            "kind": "confirmation",
+            "text": "이 일정을 삭제할까요?",
+            "questionId": str(uuid4()),
+            "expiresAt": "2026-11-15T12:10:00+09:00",
+            "operation": "delete",
+            "target": schedule("입고 대조", 14, "INBOUND"),
+        }
+    )
+
+    assert generate_tts_sentence(response) == (
+        "'입고 대조', 11월 16일 오후 2시, 입고, 미완료 일정을 삭제할까요?"
+    )

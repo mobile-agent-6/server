@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import http.client
 import json
 import urllib.error
 import urllib.request
@@ -36,7 +37,12 @@ class LocalVoiceClient:
         try:
             with urllib.request.urlopen(req, timeout=self.timeout_seconds) as resp:
                 payload = json.loads(resp.read().decode("utf-8"))
-                text = str(payload.get("text", "")).strip()
+                if not isinstance(payload, dict):
+                    raise ValueError("STT response must be a JSON object")
+                value = payload.get("text")
+                if not isinstance(value, str):
+                    raise ValueError("STT response text must be a string")
+                text = value.strip()
                 if not text:
                     raise SpeechNotRecognized()
                 return text
@@ -47,6 +53,8 @@ class LocalVoiceClient:
                 raise SpeechNotRecognized() from exc
             raise VoiceUnavailable() from exc
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            raise VoiceUnavailable() from exc
+        except (ValueError, http.client.HTTPException) as exc:
             raise VoiceUnavailable() from exc
 
     def synthesize(self, text: str) -> bytes:
@@ -63,4 +71,6 @@ class LocalVoiceClient:
         except urllib.error.HTTPError as exc:
             raise TtsUnavailable() from exc
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            raise TtsUnavailable() from exc
+        except http.client.HTTPException as exc:
             raise TtsUnavailable() from exc

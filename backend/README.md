@@ -205,8 +205,9 @@ SCHEDULE_VOICE_SERVER_TIMEOUT_SECONDS=30
 백엔드의 가짜 엔진 계약 시험은 다음 명령으로 실행한다.
 
 ```bash
-python -m pytest -q tests/unit/test_voice_audio.py tests/unit/test_voice_router.py \
-  tests/api/test_voice_api.py tests/api/test_openapi_contract.py
+python -m pytest -q tests/unit/test_voice_audio.py tests/unit/test_voice_client.py \
+  tests/unit/test_voice_router.py tests/api/test_voice_api.py \
+  tests/api/test_openapi_contract.py
 ```
 
 후처리 후에도 모델 출력이 검사를 통과하지 못하면 모델을 다시 호출하지 않고 `MODEL_OUTPUT_INVALID`로 끝낸다.
