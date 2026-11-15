@@ -24,6 +24,7 @@ from app.core.config import Settings
 from app.main import create_app
 from app.modules.assistant.evidence import texts
 from app.modules.assistant.evidence.provider import EvidenceDecisionProvider
+from app.modules.assistant.evidence.rules.correction_bridge_v37 import make_provider
 from app.modules.assistant.schedule_read import ScheduleReadPort, SqlAlchemyScheduleReader
 from app.modules.schedules.category import Category
 from app.modules.schedules.model import Schedule
@@ -50,6 +51,89 @@ MULTITURN_FIXTURE = json.loads(
 MULTITURN_CASES = MULTITURN_FIXTURE["cases"]
 SEOUL = timezone(timedelta(hours=9))
 NOW = datetime(2026, 10, 29, 10, 0, tzinfo=SEOUL)
+
+
+def _span(text: str) -> dict[str, object]:
+    return {"turn": 1, "text": text, "status": "adopted"}
+
+
+def _create_model_output(
+    *,
+    target: dict[str, object],
+    change: dict[str, object],
+) -> dict[str, object]:
+    return {
+        "operations": [
+            {
+                "index": 1,
+                "kind": "create",
+                "targetEvidence": target,
+                "changeEvidence": change,
+                "filterEvidence": {},
+                "unsupportedEvidence": [],
+                "missingInformation": [],
+            }
+        ],
+        "unsupportedEvidence": [],
+        "missingInformation": [],
+    }
+
+
+V37_BRIDGE_SAFETY_CASES = [
+    {
+        "caseId": "title-date-overlap",
+        "input": "내일 입고 검수 등록해줘",
+        "unsafe": _create_model_output(
+            target={},
+            change={
+                "title": [_span("내일 입고 검수")],
+                "date": [_span("내일")],
+                "category": [_span("입고")],
+            },
+        ),
+        "baseline": _create_model_output(
+            target={},
+            change={
+                "title": [_span("입고 검수")],
+                "date": [_span("내일")],
+                "category": [_span("입고")],
+            },
+        ),
+        "expectedKind": "need_more_info",
+        "expectedRows": [],
+    },
+    {
+        "caseId": "create-redundant-target-role",
+        "input": "내일 오후 2시에 입고 검수 등록해줘",
+        "unsafe": _create_model_output(
+            target={"title": [_span("입고 검수")]},
+            change={
+                "title": [_span("입고 검수")],
+                "date": [_span("내일")],
+                "time": [_span("오후 2시")],
+                "category": [_span("입고")],
+            },
+        ),
+        "baseline": _create_model_output(
+            target={},
+            change={
+                "title": [_span("입고 검수")],
+                "date": [_span("내일")],
+                "time": [_span("오후 2시")],
+                "category": [_span("입고")],
+            },
+        ),
+        "expectedKind": "outcome",
+        "expectedRows": [
+            {
+                "title": "입고 검수",
+                "scheduledAt": "2026-10-30T05:00:00Z",
+                "category": "INBOUND",
+                "completed": False,
+            }
+        ],
+    },
+]
 
 
 class _Trust:
@@ -141,6 +225,76 @@ def _seed_schedules(application, rows: list[dict[str, object]]) -> None:
                     deleted_at=None,
                 )
             )
+
+
+def _run_v37_bridge_case(
+    *,
+    model_output: dict[str, object],
+    user_input: str,
+    database: Path,
+) -> tuple[dict[str, object], list[dict[str, object]], int]:
+    model = _FixedModel(model_output)
+    reader = _LazyReader()
+    provider = make_provider(model, reader)
+    migrate(database)
+    application = create_app(
+        Settings(_env_file=None, database_url=f"sqlite:///{database}"),
+        _assistant_runtime_ready_for_tests=True,
+        _assistant_decision_provider_for_tests=provider,
+        _assistant_time_trust_source_for_tests=_Trust(),
+        _assistant_uuid_factory_for_tests=uuid4,
+    )
+    application.state.clock = FixedClock(NOW)
+    try:
+        with TestClient(application) as client:
+            reader.inner = SqlAlchemyScheduleReader(application.state.session_factory)
+            request_id = str(uuid4())
+            response = client.post(
+                "/api/v1/assistant/requests",
+                json={
+                    "requestId": request_id,
+                    "input": {"type": "text", "text": user_input},
+                },
+            )
+            assert response.status_code == 202
+            result = _wait(client, request_id)["result"]
+            rows = _schedule_rows(application)
+        return result, rows, model.calls
+    finally:
+        application.state.engine.dispose()
+
+
+@pytest.mark.parametrize(
+    "case",
+    V37_BRIDGE_SAFETY_CASES,
+    ids=[case["caseId"] for case in V37_BRIDGE_SAFETY_CASES],
+)
+def test_restored_v37_bridge_matches_user_grounded_baseline_without_extra_guard(
+    case: dict[str, object],
+    tmp_path: Path,
+) -> None:
+    unsafe_result, unsafe_rows, unsafe_calls = _run_v37_bridge_case(
+        model_output=case["unsafe"],
+        user_input=str(case["input"]),
+        database=tmp_path / f"{case['caseId']}-unsafe.db",
+    )
+    baseline_result, baseline_rows, baseline_calls = _run_v37_bridge_case(
+        model_output=case["baseline"],
+        user_input=str(case["input"]),
+        database=tmp_path / f"{case['caseId']}-baseline.db",
+    )
+
+    def stable_result(result: dict[str, object]) -> dict[str, object]:
+        return {
+            key: value
+            for key, value in result.items()
+            if key not in {"questionId", "affectedScheduleIds"}
+        }
+
+    assert stable_result(unsafe_result) == stable_result(baseline_result)
+    assert unsafe_result["kind"] == case["expectedKind"]
+    assert unsafe_rows == baseline_rows == case["expectedRows"]
+    assert unsafe_calls == baseline_calls == 1
 
 
 @pytest.mark.parametrize("case", CASES, ids=[case["caseId"] for case in CASES])

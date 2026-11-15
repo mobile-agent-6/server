@@ -10,6 +10,7 @@ from urllib.parse import quote
 
 from fastapi import APIRouter, Path, Query, Request, Response, status
 from pydantic import TypeAdapter, ValidationError
+from starlette.concurrency import run_in_threadpool
 from starlette.responses import JSONResponse
 
 from app.core.exceptions import ApplicationError, ValidationFailure
@@ -330,7 +331,11 @@ async def create_voice_request(
         audio_bytes = await _read_audio_body(request)
         content_type = request.headers.get("content-type")
         validate_stt_wav(audio_bytes, content_type=content_type)
-        transcript = client.transcribe(audio_bytes, content_type="audio/wav")
+        transcript = await run_in_threadpool(
+            client.transcribe,
+            audio_bytes,
+            content_type="audio/wav",
+        )
         try:
             transcript = _assistant_text.validate_python(transcript)
         except ValidationError as exc:

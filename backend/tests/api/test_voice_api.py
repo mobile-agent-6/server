@@ -5,6 +5,7 @@ import io
 import logging
 import wave
 from datetime import timedelta
+from threading import Event, Thread
 from uuid import UUID, uuid4
 
 from fastapi.testclient import TestClient
@@ -643,3 +644,45 @@ def test_voice_log_records_transcript_hash_without_raw_text(
     assert record.transcriptSha256 == hashlib.sha256(transcript.encode()).hexdigest()
     assert transcript not in record.getMessage()
     assert transcript not in repr(record.__dict__)
+
+
+def test_slow_stt_does_not_block_health_on_the_application_event_loop(
+    client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    client.app.state.settings.voice_enabled = True
+    client.app.state.assistant_provider_available = True
+    entered = Event()
+    release = Event()
+    response_holder: dict[str, object] = {}
+
+    def transcribe(_self, _audio, content_type="audio/wav"):
+        entered.set()
+        assert release.wait(timeout=2), "health was blocked until the fake STT timed out"
+        return "내일 오후 2시 입고 대조 등록해줘"
+
+    monkeypatch.setattr(LocalVoiceClient, "transcribe", transcribe)
+
+    def post_voice() -> None:
+        response_holder["response"] = client.post(
+            "/api/v1/voice/requests",
+            params={"requestId": str(uuid4())},
+            content=valid_wav(),
+            headers={"Content-Type": "audio/wav"},
+        )
+
+    voice_thread = Thread(target=post_voice, daemon=True)
+    voice_thread.start()
+    assert entered.wait(timeout=2), "voice POST did not reach STT"
+    try:
+        health = client.get("/health")
+        assert health.status_code == 200
+        assert voice_thread.is_alive(), "voice POST ended before fake STT was released"
+        assert not release.is_set()
+    finally:
+        release.set()
+        voice_thread.join(timeout=2)
+
+    assert not voice_thread.is_alive()
+    voice_response = response_holder["response"]
+    assert getattr(voice_response, "status_code") == 202
