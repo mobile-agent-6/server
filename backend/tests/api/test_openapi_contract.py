@@ -76,6 +76,7 @@ def test_complete_openapi_contract(client: TestClient) -> None:
         "AssistantResultUncertain",
         "AssistantCandidate",
         "AssistantScheduleSummary",
+        "VoiceRequestAcceptedResponse",
         "Problem",
         "ValidationErrorItem",
     ):
@@ -184,6 +185,26 @@ def test_complete_openapi_contract(client: TestClient) -> None:
         "selection",
         "confirmation",
     }
+    voice_accepted = components["VoiceRequestAcceptedResponse"]
+    assert voice_accepted["additionalProperties"] is False
+    assert set(voice_accepted["required"]) == {
+        "requestId",
+        "conversationId",
+        "status",
+        "transcript",
+        "input",
+    }
+    assert voice_accepted["properties"]["input"]["discriminator"]["propertyName"] == "type"
+    voice_create = schema["paths"]["/api/v1/voice/requests"]["post"]
+    assert voice_create["requestBody"] == {
+        "required": True,
+        "content": {
+            "audio/wav": {"schema": {"type": "string", "format": "binary"}}
+        },
+    }
+    assert voice_create["responses"]["202"]["content"]["application/json"]["schema"] == {
+        "$ref": "#/components/schemas/VoiceRequestAcceptedResponse"
+    }
     for name in (
         "AssistantResultNeedMoreInfo",
         "AssistantResultCandidateSelection",
@@ -229,6 +250,7 @@ def test_complete_openapi_contract(client: TestClient) -> None:
         "AssistantResultUncertain",
         "AssistantCandidate",
         "AssistantScheduleSummary",
+        "VoiceRequestAcceptedResponse",
     }
     existing_non_assistant_components = {
         "Category",

@@ -8,6 +8,7 @@ from uuid import uuid4
 from app.modules.voice.errors import (
     SpeechAudioTooLarge,
     SpeechNotRecognized,
+    TtsUnavailable,
     VoiceUnavailable,
 )
 
@@ -44,9 +45,9 @@ class LocalVoiceClient:
                 raise SpeechAudioTooLarge() from exc
             if exc.code == 422:
                 raise SpeechNotRecognized() from exc
-            raise VoiceUnavailable(f"STT service returned HTTP {exc.code}.") from exc
+            raise VoiceUnavailable() from exc
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
-            raise VoiceUnavailable("Failed to connect to local STT service.") from exc
+            raise VoiceUnavailable() from exc
 
     def synthesize(self, text: str) -> bytes:
         payload = json.dumps({"text": text}).encode("utf-8")
@@ -60,6 +61,6 @@ class LocalVoiceClient:
             with urllib.request.urlopen(req, timeout=self.timeout_seconds) as resp:
                 return resp.read()
         except urllib.error.HTTPError as exc:
-            raise VoiceUnavailable(f"TTS service returned HTTP {exc.code}.") from exc
+            raise TtsUnavailable() from exc
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
-            raise VoiceUnavailable("Failed to connect to local TTS service.") from exc
+            raise TtsUnavailable() from exc

@@ -55,7 +55,7 @@ for attempt in range(1, 16):
     except urllib.error.HTTPError as e:
         error_body = e.read().decode('utf-8')
         if e.code == 409:
-            print(f"[-] 아직 준비되지 않음 (409 VOICE_SPEECH_NOT_READY), 재시도 대기 중...")
+            print("[-] 아직 준비되지 않음 (409 SPEECH_NOT_READY), 재시도 대기 중...")
         else:
             print(f"[-] TTS 조회 실패 (HTTP Error {e.code}): {error_body}")
             break
