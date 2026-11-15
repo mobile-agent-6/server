@@ -188,6 +188,28 @@ SCHEDULE_ASSISTANT_MODEL_ENABLED=true SCHEDULE_ASSISTANT_TRUST_SERVER_TIME=true 
 ASSISTANT_SMOKE_MODEL_URL=http://127.0.0.1:8088 python -m pytest tests/integration/test_assistant_model_smoke.py -s
 ```
 
+### 음성 연동
+
+공개 음성 입력은 `audio/wav`, PCM S16LE, 16 kHz, mono, 16-bit이며 한 요청은
+최대 15초·1,048,576 bytes다. 백엔드는 기본적으로 음성 기능을 끈 상태로 시작한다.
+로컬 STT/TTS 엔진을 `127.0.0.1:8081`에서 준비한 뒤 다음 설정으로 켠다.
+
+```bash
+SCHEDULE_VOICE_ENABLED=true
+SCHEDULE_VOICE_SERVER_BASE_URL=http://127.0.0.1:8081
+SCHEDULE_VOICE_SERVER_TIMEOUT_SECONDS=30
+```
+
+실제 Whisper·Piper 모델 파일, Orange Pi 성능과 아이폰 전체 연동은 이 저장소의
+백엔드 테스트만으로 검증되지 않는다. 모델 파일과 실제 음성·DB는 Git에 추가하지 않는다.
+백엔드의 가짜 엔진 계약 시험은 다음 명령으로 실행한다.
+
+```bash
+python -m pytest -q tests/unit/test_voice_audio.py tests/unit/test_voice_client.py \
+  tests/unit/test_voice_router.py tests/api/test_voice_api.py \
+  tests/api/test_openapi_contract.py
+```
+
 후처리 후에도 모델 출력이 검사를 통과하지 못하면 모델을 다시 호출하지 않고 `MODEL_OUTPUT_INVALID`로 끝낸다.
 decoding이 고정(temperature 0)이라 같은 입력을 다시 보내도 같은 출력이 나오기 때문이다.
 

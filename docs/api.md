@@ -4,9 +4,9 @@
 >
 > 알림 제거 전환 상태: 알림 제외는 `TEAM-CONFIRMED`, 필드 제거·구형 요청 `422`·유효한 version 1 key의 새 요청 `409`는 `BE-CONFIRMED`. FE·AI 적용 확인과 실제 적용 버전·시점은 각각 `TBD-FE`, `TBD-AI`다.
 >
-> Assistant 계약 상태: 텍스트 Assistant의 앱 공개 계약은 `BE-FE-AGREED`. 서버는 runtime lock, worker, deadline, 안전한 Schedule write, recovery, tombstone 기반과 설정으로 켜는 모델(Qwen) 연결까지 구현됐고, 앱 통합 시험과 Orange Pi 실행은 남아 있다.
+> Assistant 계약 상태: 텍스트·음성 Assistant의 앱 공개 계약은 `BE-FE-AGREED`. 서버는 runtime lock, worker, deadline, 안전한 Schedule write, recovery, tombstone 기반과 설정으로 켜는 모델(Qwen) 연결까지 구현됐고, 실제 STT/TTS 엔진·앱 통합 시험과 Orange Pi 실행은 남아 있다.
 >
-> 범위: MVP Schedule CRUD, 상태 확인, Orange Pi 시각 동기화, 텍스트 Assistant 공개 계약
+> 범위: MVP Schedule CRUD, 상태 확인, Orange Pi 시각 동기화, 텍스트·음성 Assistant 공개 계약
 
 ## 1. 문서 목적과 범위
 
@@ -16,7 +16,7 @@
 - 알림 기능은 제품 범위에서 제외했으며 Schedule 요청·응답에 알림 필드를 제공하지 않는다.
 - 일정 비서 화면은 이 문서의 Assistant API를 호출하고, 서버가 모델 해석·검증 뒤 Schedule API를 실행한다. 앱은 Assistant 결과를 근거로 같은 CRUD를 다시 실행하지 않는다.
 - Assistant endpoint, 영속 상태, runtime과 안전한 Schedule 실행 기반은 구현됐다. 모델 연결은 설정으로 켤 때만 동작한다(`backend/README.md`의 모델 연결). 백엔드보다 모델 서버가 늦게 시작되면 첫 text 입력에서 연결을 다시 확인한다. 그때도 연결되지 않으면 새 text와 자연어 후속 입력은 `503 ASSISTANT_UNAVAILABLE`이며, 저장 정보가 완전한 selection/confirmation과 기존 요청 조회, 취소는 처리할 수 있다.
-- 이번 Assistant 범위는 텍스트 입력이다. STT/TTS 전송 형식과 서버 내부 모델 연결 protocol은 아직 포함하지 않는다.
+- 음성 Assistant의 앱 공개 WAV 형식, 후속 답변, 재전송과 TTS 계약을 포함한다. 백엔드와 STT/TTS 엔진 사이의 내부 배포 protocol은 포함하지 않는다.
 - MVP에는 계정, 사용자별 일정 소유권과 API 인증을 포함하지 않는다.
 - 데이터베이스 구조는 [`erd.md`](erd.md)를 참고한다.
 
@@ -178,6 +178,8 @@ MVP 카테고리는 입고, 재고, 출고, 반품, 기타 5개이며 API 값은
 | `createAssistantRequest` | POST | `/api/v1/assistant/requests` | 202/200 | 새 입력 접수·동일 요청 복구 | 계약 확정, 구현(모델 연결은 설정으로 켤 때만, 미연결 시 새 text 503) |
 | `getAssistantRequest` | GET | `/api/v1/assistant/requests/{requestId}` | 200 | 입력 상태·결과 조회 | 계약 확정·부분 구현(영속 조회·deadline·tombstone 동작) |
 | `cancelAssistantTarget` | POST | `/api/v1/assistant/conversations/{conversationId}/cancel` | 200 | 요청 또는 질문 취소 판정 | 계약 확정·부분 구현(marker-aware 취소 판정 동작) |
+| `createVoiceRequest` | POST | `/api/v1/voice/requests` | 202/200 | WAV 음성 입력 접수·동일 요청 복구 | 공개 계약 구현, 실제 엔진·Pi 미검증 |
+| `getVoiceRequestSpeech` | GET | `/api/v1/voice/requests/{requestId}/speech` | 200 | 완료된 Assistant 결과의 WAV 음성 출력 | 공개 계약 구현, 실제 엔진·Pi 미검증 |
 
 ## 5. 상태 확인
 
@@ -516,18 +518,25 @@ X-Request-ID: {재시도 요청의 새 ID}
 | 409 | `ACKNOWLEDGEMENT_NOT_APPLICABLE` | 지정 ID를 uncertain 인지 대상으로 사용할 수 없음 |
 | 409 | `REQUEST_EXPIRED` | 상세가 정리된 Assistant ID의 POST 재접수 거절 |
 | 409 | `CONVERSATION_EXPIRED` | 만료된 Assistant 대화에 새 입력 |
+| 409 | `VOICE_BUSY` | STT 또는 TTS 처리 슬롯이 이미 사용 중 |
+| 409 | `SPEECH_NOT_READY` | Assistant 결과가 아직 TTS 가능한 완료 상태가 아님 |
 | 410 | `REQUEST_EXPIRED` | Assistant 요청의 상세 결과가 정리됨 |
-| 413 | `REQUEST_BODY_TOO_LARGE` | Assistant JSON body가 UTF-8 16 KiB 초과 |
+| 413 | `REQUEST_BODY_TOO_LARGE` | Assistant JSON body가 UTF-8 16 KiB 초과 또는 음성이 1 MiB·15초 초과 |
 | 422 | `VALIDATION_ERROR` | body/query/header/path 검증 실패 |
 | 422 | `EMPTY_UPDATE` | PATCH body가 빈 객체 |
 | 422 | `SCHEDULE_IN_THE_PAST` | 과거 일정 생성 또는 과거 시각으로 변경 |
 | 422 | `INVALID_DATE_RANGE` | `to <= from` |
 | 422 | `DATE_RANGE_TOO_LARGE` | 조회 기간이 92일 초과 |
 | 422 | `CLOCK_TIME_OUT_OF_RANGE` | time-sync 입력이 허용 범위 밖 |
+| 422 | `SPEECH_NOT_RECOGNIZED` | 빈 음성·0 frame 또는 인식 결과 없음 |
+| 422 | `AUDIO_UNSUPPORTED` | WAV/PCM 규격 또는 `Content-Type` 불일치 |
+| 422 | `VOICE_ANSWER_UNCLEAR` | 후보 번호·승인 답변을 하나로 확정할 수 없음 |
 | 500 | `INTERNAL_ERROR` | 예상하지 못한 서버 오류 |
 | 503 | `DATABASE_UNAVAILABLE` | DB 일시 장애 또는 `/health`의 DB·schema 준비 실패 |
 | 503 | `TIME_SYNC_UNAVAILABLE` | 시각 동기화 lock·권한·명령 실패 |
 | 503 | `ASSISTANT_UNAVAILABLE` | Assistant 서비스 사용 불가 |
+| 503 | `VOICE_UNAVAILABLE` | STT 서비스 또는 음성 기능 사용 불가 |
+| 503 | `TTS_UNAVAILABLE` | TTS 서비스 또는 출력 WAV 사용 불가 |
 
 ### 13.4 필수 응답 헤더
 
@@ -575,7 +584,7 @@ X-Request-ID: {재시도 요청의 새 ID}
 ## 15. OpenAPI 공개 계약
 
 - `/openapi.json`은 OpenAPI `3.1.0`으로 제공한다.
-- 4장의 구현된 endpoint `operationId`를 고정한다. Assistant의 `createAssistantRequest`·`getAssistantRequest`·`cancelAssistantTarget`도 공개 schema에 포함된다.
+- 4장의 구현된 endpoint `operationId`를 고정한다. Assistant와 Voice의 다섯 operation도 공개 schema에 포함된다.
 - 요청 객체는 알 수 없는 필드를 허용하지 않는다.
 - 성공 JSON은 `application/json`, 오류는 `application/problem+json`으로 선언한다.
 - FastAPI 기본 `HTTPValidationError`를 공개 오류 schema로 사용하지 않는다.
@@ -603,16 +612,19 @@ AssistantResultFailure
 AssistantResultUncertain
 AssistantCandidate
 AssistantScheduleSummary
+VoiceRequestAcceptedResponse
 Problem
 ValidationErrorItem
 ```
 
-현재 `/openapi.json`은 다음 Assistant path 3개를 공개한다.
+현재 `/openapi.json`은 다음 Assistant·Voice path 5개를 공개한다.
 
 ```text
 /api/v1/assistant/requests
 /api/v1/assistant/requests/{requestId}
 /api/v1/assistant/conversations/{conversationId}/cancel
+/api/v1/voice/requests
+/api/v1/voice/requests/{requestId}/speech
 ```
 
 위 component 목록은 앱·연동 계약에서 직접 참조하는 주요 schema이며 `components.schemas`의 전체 집합은 아니다. 중첩 객체·enum·union을 표현하는 `AssistantCancelTarget`, `AssistantCancelTargetState`, `AssistantCancelTargetType`, `AssistantConfirmationChanges`, `AssistantConfirmationOperation`, `AssistantFailureCode`, `AssistantFailureNextAction`, `AssistantInputConfirmation`, `AssistantInputSelection`, `AssistantInputText`, `AssistantOutcome`, `AssistantOutcomeOperation`, `AssistantRequestStatus` 보조 component도 OpenAPI에 노출된다.
@@ -932,6 +944,37 @@ Assistant의 접수 전 거절·GET·취소 오류도 13장의 Problem Details�
 - 목록 조회만 실패하면 GET만 재시도하고 완료된 Assistant write를 다시 실행하지 않는다.
 - candidate snapshot이나 모델 응답으로 Schedule 목록을 임의 재구성하지 않는다.
 
+### 16.14 음성 Assistant 공개 계약
+
+> 상태: `BE-FE-AGREED`
+>
+> 구현 경계: 백엔드 공개 계약과 가짜 STT/TTS 시험은 구현됐다. 실제 Whisper·Piper,
+> Orange Pi 성능과 아이폰 전체 연동은 별도 검증 대상이다.
+
+`POST /api/v1/voice/requests`는 raw body로 WAV 음성을 받는다. `requestId`는 필수 query이며
+후속 답변이면 `conversationId`와 `questionId`를 함께 보낸다.
+
+- `Content-Type: audio/wav`
+- RIFF/WAVE, PCM S16LE, 16 kHz, mono, 16-bit
+- 최대 15초, 최대 1,048,576 bytes
+- 정상 신규 접수는 `202`이며 기존 Assistant 접수 필드에 인식된 `transcript`와 실제
+  접수된 `input`을 함께 반환한다.
+- 같은 `requestId`가 이미 있으면 body와 STT를 다시 처리하지 않고 기존 상태를 `200`으로
+  반환한다. 앱은 응답 유실 때 GET-first 정책과 동일 ID 최대 1회 재전송을 유지한다.
+- 활성 후보 질문은 하나의 유효한 번호만 selection으로 접수한다. 활성 승인 질문의
+  명확한 긍정·부정만 confirmation으로 접수하며 불명확한 답은
+  `422 VOICE_ANSWER_UNCLEAR`이다.
+- 무음이나 빈 인식 결과를 임의의 일정 명령으로 바꾸지 않는다.
+
+`GET /api/v1/voice/requests/{requestId}/speech`는 완료된 구조화 결과를 읽을 문장으로
+변환해 `audio/wav`를 반환한다. 조회 결과는 제목·한국어 날짜/시각·카테고리를 읽고,
+후보와 수정·삭제 확인은 선택지 또는 변경 대상을 말한다. 등록·수정·삭제 성공은 상세
+필드가 없으므로 결과의 합의된 짧은 성공 문구를 사용한다.
+
+STT와 TTS는 같은 비차단 단일 처리 슬롯을 사용한다. TTS 실패는 이미 완료된 Assistant
+요청이나 Schedule write를 다시 실행하지 않는다. Voice 오류는 논리 요청 ID를 파싱한
+뒤 발생한 경우 `assistantRequestId`에 앱의 `requestId`를 담는다.
+
 ## 17. 현재 포함하지 않는 계약
 
 다음 항목은 현재 Schedule API와 위 Assistant 공개 계약의 문서 확정을 막지 않으며, 관련 담당자 확인 전 구현 계약으로 임의 추가하지 않는다.
@@ -941,7 +984,7 @@ Assistant의 접수 전 거절·GET·취소 오류도 13장의 Problem Details�
 - Assistant 제어부·모델의 내부 프로세스 분리 방식과 내부 endpoint·port·protocol
 - 모델 구조화 출력 schema와 제어부 검증 경계
 - 제어부가 Schedule 생성에 사용하는 내부 `Idempotency-Key` 생성·재사용 방식
-- STT/TTS 전송 형식과 음성 후속 대화 protocol
+- 백엔드와 STT/TTS 엔진 사이의 내부 endpoint·port·전송 protocol
 - 서버 처리 상한 안의 모델 호출 timeout·내부 retry 세부값
 - Assistant 구현 담당과 제어부·모델 연결 작업 분담
 

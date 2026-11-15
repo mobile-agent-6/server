@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import http.client
 import json
 import urllib.error
 import urllib.request
@@ -8,6 +9,7 @@ from uuid import uuid4
 from app.modules.voice.errors import (
     SpeechAudioTooLarge,
     SpeechNotRecognized,
+    TtsUnavailable,
     VoiceUnavailable,
 )
 
@@ -35,7 +37,12 @@ class LocalVoiceClient:
         try:
             with urllib.request.urlopen(req, timeout=self.timeout_seconds) as resp:
                 payload = json.loads(resp.read().decode("utf-8"))
-                text = str(payload.get("text", "")).strip()
+                if not isinstance(payload, dict):
+                    raise ValueError("STT response must be a JSON object")
+                value = payload.get("text")
+                if not isinstance(value, str):
+                    raise ValueError("STT response text must be a string")
+                text = value.strip()
                 if not text:
                     raise SpeechNotRecognized()
                 return text
@@ -44,9 +51,11 @@ class LocalVoiceClient:
                 raise SpeechAudioTooLarge() from exc
             if exc.code == 422:
                 raise SpeechNotRecognized() from exc
-            raise VoiceUnavailable(f"STT service returned HTTP {exc.code}.") from exc
+            raise VoiceUnavailable() from exc
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
-            raise VoiceUnavailable("Failed to connect to local STT service.") from exc
+            raise VoiceUnavailable() from exc
+        except (ValueError, http.client.HTTPException) as exc:
+            raise VoiceUnavailable() from exc
 
     def synthesize(self, text: str) -> bytes:
         payload = json.dumps({"text": text}).encode("utf-8")
@@ -60,6 +69,8 @@ class LocalVoiceClient:
             with urllib.request.urlopen(req, timeout=self.timeout_seconds) as resp:
                 return resp.read()
         except urllib.error.HTTPError as exc:
-            raise VoiceUnavailable(f"TTS service returned HTTP {exc.code}.") from exc
+            raise TtsUnavailable() from exc
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
-            raise VoiceUnavailable("Failed to connect to local TTS service.") from exc
+            raise TtsUnavailable() from exc
+        except http.client.HTTPException as exc:
+            raise TtsUnavailable() from exc

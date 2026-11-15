@@ -48,8 +48,11 @@ PROBLEM_TITLES = {
     "ASSISTANT_UNAVAILABLE": "Assistant unavailable",
     "VOICE_BUSY": "Voice pipeline busy",
     "VOICE_UNAVAILABLE": "Voice service unavailable",
+    "AUDIO_UNSUPPORTED": "Audio format unsupported",
     "SPEECH_NOT_RECOGNIZED": "Speech not recognized",
-    "VOICE_SPEECH_NOT_READY": "Voice speech not ready",
+    "SPEECH_NOT_READY": "Voice speech not ready",
+    "TTS_UNAVAILABLE": "Text-to-speech unavailable",
+    "VOICE_ANSWER_UNCLEAR": "Voice answer unclear",
 }
 
 
