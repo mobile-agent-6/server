@@ -39,6 +39,7 @@ from app.modules.assistant.evidence.gate import (
     classify_answer,
 )
 from app.modules.assistant.evidence.normalize import mentions_date_or_time, normalize_text
+from app.modules.assistant.evidence.native_clock import split_native_clock_target
 from app.modules.assistant.evidence.operation_cues import find_supported_operation
 from app.modules.assistant.evidence.planner import Ask, Overrides, plan_operation
 from app.modules.assistant.evidence.safety import (
@@ -198,6 +199,11 @@ def _validate_output(
     check_roles(output, reference=reference)
     check_role_span_overlaps(output, user_turns=turns)
     check_turn_prefix(list(turns), len(turns))
+    corrected = split_native_clock_target(output, user_turns=turns)
+    if corrected is not output:
+        check_roles(corrected, reference=reference)
+        check_role_span_overlaps(corrected, user_turns=turns)
+        return corrected
     return output
 
 

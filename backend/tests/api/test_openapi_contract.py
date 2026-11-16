@@ -186,6 +186,10 @@ def test_complete_openapi_contract(client: TestClient) -> None:
         "confirmation",
     }
     voice_accepted = components["VoiceRequestAcceptedResponse"]
+    speech_response = schema["paths"][
+        "/api/v1/voice/requests/{requestId}/speech"
+    ]["get"]["responses"]["200"]
+    assert set(speech_response["content"]) == {"audio/wav"}
     assert voice_accepted["additionalProperties"] is False
     assert set(voice_accepted["required"]) == {
         "requestId",
@@ -382,7 +386,8 @@ def test_openapi_problem_content_and_headers(client: TestClient) -> None:
                     assert "content" not in response
                 elif not status.startswith(("4", "5")):
                     assert set(response["content"]) <= {"application/json", "audio/wav"}
-                    assert "schema" in response["content"]["application/json"]
+                    for media in response["content"].values():
+                        assert "schema" in media
 
 
 def test_assistant_openapi_success_statuses(client: TestClient) -> None:

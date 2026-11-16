@@ -1,6 +1,7 @@
 import glob
 import io
 import os
+import re
 import subprocess
 import tempfile
 import threading
@@ -16,6 +17,7 @@ app = FastAPI(title="OrangePi Local STT/TTS Loopback Server")
 
 STT_MODEL_SIZE = os.getenv("STT_MODEL_SIZE", "base")
 STT_THREADS = int(os.getenv("STT_THREADS", "8"))
+STT_BEAM_SIZE = int(os.getenv("STT_BEAM_SIZE", "3"))
 TTS_ONNX_PATH = glob.glob(
     os.path.join(os.path.dirname(__file__), "models/piper-ko-std/*.onnx")
 )[0]
@@ -27,8 +29,26 @@ infer_lock = threading.Lock()
 LOGISTICS_PROMPT = (
     "물류 입고 검수, 출고 차량 점검, 냉장창고 온도 점검, 재고 실사, "
     "안전 교육, 일정 등록, 조회, 변경, 수정, 삭제, 취소, 승인, 거절, "
-    "오전, 오후, 내일, 모레, 다음 주"
+    "오전, 오후, 내일, 모레, 다음 주. "
+    "네. 아니요. 첫 번째. 두 번째. 1번, 2번, 3번, 4번, 5번."
 )
+
+LOGISTICS_HOTWORDS = (
+    "납품서 수량 대조 최종 제목 일정 삭제해 줘 바꿔 줘 세 시 "
+    "입고 검수 및 재고 실사"
+)
+
+
+def normalize_clock_separator(text: str) -> str:
+    """Remove an ASR comma between a day period and its following hour."""
+    if any(quote in text for quote in ("'", '"', "‘", "’", "“", "”")):
+        return text
+    return re.sub(
+        r"(오전|오후|새벽|아침|저녁|밤)\s*[,，]\s*"
+        r"(?=(?:[0-9]{1,2}|열\s*한|열\s*두|한|두|세|네|다섯|여섯|일곱|여덟|아홉|열)\s*시)",
+        r"\1 ",
+        text,
+    )
 
 
 @app.on_event("startup")
@@ -51,6 +71,7 @@ def health():
         "stt_loaded": stt_model is not None,
         "tts_loaded": tts_voice is not None,
         "stt_model": STT_MODEL_SIZE,
+        "stt_beam_size": STT_BEAM_SIZE,
     }
 
 
@@ -103,11 +124,14 @@ async def transcribe(file: UploadFile = File(...)):
             segments, _ = stt_model.transcribe(
                 wav_path,
                 language="ko",
-                beam_size=1,
+                beam_size=STT_BEAM_SIZE,
+                temperature=0.0,
+                condition_on_previous_text=False,
                 vad_filter=True,
                 initial_prompt=LOGISTICS_PROMPT,
+                hotwords=LOGISTICS_HOTWORDS,
             )
-            text = "".join(s.text for s in segments).strip()
+            text = normalize_clock_separator("".join(s.text for s in segments).strip())
 
     if not text:
         raise HTTPException(status_code=422, detail="Speech was not recognized")
@@ -138,4 +162,4 @@ def synthesize(req: TTSRequest):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8081)
+    uvicorn.run(app, host="127.0.0.1", port=8081)

@@ -638,12 +638,15 @@ def test_voice_log_records_transcript_hash_without_raw_text(
         for record in caplog.records
         if getattr(record, "event", None) == "voice.stage"
     ]
-    assert len(stage_records) == 1
-    record = stage_records[0]
-    assert record.transcriptLength == len(transcript)
-    assert record.transcriptSha256 == hashlib.sha256(transcript.encode()).hexdigest()
-    assert transcript not in record.getMessage()
-    assert transcript not in repr(record.__dict__)
+    assert [record.stage for record in stage_records] == ["stt_completed", "accepted"]
+    assert stage_records[1].durationMs >= stage_records[0].durationMs
+    for record in stage_records:
+        assert record.assistantRequestId == response.json()["requestId"]
+        assert record.durationMs >= 0
+        assert record.transcriptLength == len(transcript)
+        assert record.transcriptSha256 == hashlib.sha256(transcript.encode()).hexdigest()
+        assert transcript not in record.getMessage()
+        assert transcript not in repr(record.__dict__)
 
 
 def test_slow_stt_does_not_block_health_on_the_application_event_loop(

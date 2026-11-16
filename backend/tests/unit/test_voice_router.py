@@ -23,6 +23,11 @@ def candidates(count: int = 10) -> list[dict[str, str]]:
     [
         ("첫 번째", "candidate-1"),
         ("2번", "candidate-2"),
+        ("2번.", "candidate-2"),
+        ("두 번째 일정", "candidate-2"),
+        ("첫 번지랑 두 번째.", None),
+        ("2번 말고", None),
+        ("1번 아니고 2번", None),
         ("열 번째", "candidate-10"),
         ("11번", None),
         ("열두 번째", None),

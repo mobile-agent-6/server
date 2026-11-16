@@ -4,7 +4,7 @@
 >
 > 알림 제거 전환 상태: 알림 제외는 `TEAM-CONFIRMED`, 필드 제거·구형 요청 `422`·유효한 version 1 key의 새 요청 `409`는 `BE-CONFIRMED`. FE·AI 적용 확인과 실제 적용 버전·시점은 각각 `TBD-FE`, `TBD-AI`다.
 >
-> Assistant 계약 상태: 텍스트·음성 Assistant의 앱 공개 계약은 `BE-FE-AGREED`. 서버는 runtime lock, worker, deadline, 안전한 Schedule write, recovery, tombstone 기반과 설정으로 켜는 모델(Qwen) 연결까지 구현됐고, 실제 STT/TTS 엔진·앱 통합 시험과 Orange Pi 실행은 남아 있다.
+> Assistant 계약 상태: 텍스트·음성 Assistant의 앱 공개 계약은 `BE-FE-AGREED`. 서버는 runtime lock, worker, deadline, 안전한 Schedule write, recovery, tombstone 기반과 설정으로 켜는 모델(Qwen) 연결을 포함한다. 2026-11-16 Orange Pi에서 실제 STT/TTS 엔진과 합성 WAV의 HTTP 시험을 수행했으며, 2026-11-17에는 실제 사람 녹음 17개도 재시험했다. 핵심 시나리오와 추가 긴 문장의 모델 해석 실패를 구분하며, iPhone 공동 검증은 별도다. 시험별 통과 여부와 미확정 배포 상태는 배포·시험 결과에서 구분한다.
 >
 > 범위: MVP Schedule CRUD, 상태 확인, Orange Pi 시각 동기화, 텍스트·음성 Assistant 공개 계약
 
@@ -178,8 +178,8 @@ MVP 카테고리는 입고, 재고, 출고, 반품, 기타 5개이며 API 값은
 | `createAssistantRequest` | POST | `/api/v1/assistant/requests` | 202/200 | 새 입력 접수·동일 요청 복구 | 계약 확정, 구현(모델 연결은 설정으로 켤 때만, 미연결 시 새 text 503) |
 | `getAssistantRequest` | GET | `/api/v1/assistant/requests/{requestId}` | 200 | 입력 상태·결과 조회 | 계약 확정·부분 구현(영속 조회·deadline·tombstone 동작) |
 | `cancelAssistantTarget` | POST | `/api/v1/assistant/conversations/{conversationId}/cancel` | 200 | 요청 또는 질문 취소 판정 | 계약 확정·부분 구현(marker-aware 취소 판정 동작) |
-| `createVoiceRequest` | POST | `/api/v1/voice/requests` | 202/200 | WAV 음성 입력 접수·동일 요청 복구 | 공개 계약 구현, 실제 엔진·Pi 미검증 |
-| `getVoiceRequestSpeech` | GET | `/api/v1/voice/requests/{requestId}/speech` | 200 | 완료된 Assistant 결과의 WAV 음성 출력 | 공개 계약 구현, 실제 엔진·Pi 미검증 |
+| `createVoiceRequest` | POST | `/api/v1/voice/requests` | 202/200 | WAV 음성 입력 접수·동일 요청 복구 | Pi 합성 WAV 시험 수행, iPhone 공동 검증 대기 |
+| `getVoiceRequestSpeech` | GET | `/api/v1/voice/requests/{requestId}/speech` | 200 | 완료된 Assistant 결과의 WAV 음성 출력 | Pi 합성 WAV 시험 수행, iPhone 공동 검증 대기 |
 
 ## 5. 상태 확인
 
@@ -948,8 +948,9 @@ Assistant의 접수 전 거절·GET·취소 오류도 13장의 Problem Details�
 
 > 상태: `BE-FE-AGREED`
 >
-> 구현 경계: 백엔드 공개 계약과 가짜 STT/TTS 시험은 구현됐다. 실제 Whisper·Piper,
-> Orange Pi 성능과 아이폰 전체 연동은 별도 검증 대상이다.
+> 구현 경계: 백엔드 계약·가짜 엔진 회귀 테스트와 Pi의 Whisper·Piper 합성 WAV 시험을 구분한다.
+> 아래 실측은 2026-11-16, `080e6f2` 기반의 미커밋 수정 작업본에서 수행했다.
+> 최종 배포 SHA 확정, 실제 사람 음성과 iPhone 전체 연동을 통과했다는 의미는 아니다.
 
 `POST /api/v1/voice/requests`는 raw body로 WAV 음성을 받는다. `requestId`는 필수 query이며
 후속 답변이면 `conversationId`와 `questionId`를 함께 보낸다.
@@ -974,6 +975,109 @@ Assistant의 접수 전 거절·GET·취소 오류도 13장의 Problem Details�
 STT와 TTS는 같은 비차단 단일 처리 슬롯을 사용한다. TTS 실패는 이미 완료된 Assistant
 요청이나 Schedule write를 다시 실행하지 않는다. Voice 오류는 논리 요청 ID를 파싱한
 뒤 발생한 경우 `assistantRequestId`에 앱의 `requestId`를 담는다.
+
+#### 16.14.1 음성 POST 요청과 접수 응답
+
+| 위치 | 이름 | 필수 | 타입·규칙 |
+|---|---|---|---|
+| query | `requestId` | 예 | 앱이 만든 canonical UUID v4. 같은 논리 요청은 같은 ID 유지 |
+| query | `conversationId` | 후속 답변 시 | 이전 응답의 UUID v4 |
+| query | `questionId` | 후속 답변 시 | 서버가 준 현재 활성 질문 UUID v4. `conversationId`와 함께 전송 |
+| header | `Content-Type` | 예 | `audio/wav` |
+| raw body | WAV 바이트 | 예 | RIFF/WAVE, PCM S16LE, 16 kHz, mono, 16-bit, 15초·1,048,576 bytes 이하 |
+
+PCM fmt tag 1과 PCM EXTENSIBLE `0xFFFE`를 허용한다. EXTENSIBLE은 PCM subformat과 유효한 16-bit header여야 한다. 정확히 15초·1,048,576 bytes는 허용 경계이며, 초과하면 413이다. 빈 body와 유효한 무음은 422 `SPEECH_NOT_RECOGNIZED`다. 공개 endpoint는 m4a·aac·압축 WAV를 받지 않는다.
+
+```bash
+curl -i -X POST "$BASE_URL/api/v1/voice/requests?requestId=$REQUEST_ID" \
+  -H 'Content-Type: audio/wav' --data-binary '@input.wav'
+```
+
+신규 접수는 202 JSON이며 다음 다섯 필드가 필수다. 아래는 실제 Pi 합성 WAV 시험의 응답이다.
+
+```json
+{
+  "requestId": "7e71513f-be91-44b2-a0de-1d8f92845f0e",
+  "conversationId": "63e919b4-d1e0-4b50-b6f5-fa7e0cef6d85",
+  "status": "accepted",
+  "transcript": "모레 입고 수량 대조 등록해줘.",
+  "input": {"type": "text", "text": "모레 입고 수량 대조 등록해줘."}
+}
+```
+
+`transcript`는 STT 결과이고 `input`은 실제 Assistant 접수 입력이다. 앱은 이를 다시 텍스트 Assistant POST로 보내지 않는다. `input.type`은 일반·정보 보충의 `text`, 후보 선택의 `selection`, 승인·거절의 `confirmation` 중 하나다. 후속 입력의 schema는 §16.2와 같다. `X-Transcript` 헤더는 URL 인코딩된 보조 값이며 응답 body를 우선한다.
+
+후속 답변은 새 requestId와 기존 conversationId·현재 questionId를 사용한다.
+
+```bash
+curl -i -X POST \
+  "$BASE_URL/api/v1/voice/requests?requestId=$NEW_REQUEST_ID&conversationId=$CONVERSATION_ID&questionId=$QUESTION_ID" \
+  -H 'Content-Type: audio/wav' --data-binary '@answer.wav'
+```
+
+후보 선택은 `첫 번째`, `2번`, `두 번째 일정` 같은 완전한 단일 선택 표현을 받는다. 복수 번호, 범위 밖 번호, 다른 말 속의 부분 번호는 422이며 현재 질문을 유지한다. 승인 중 정정 요청도 승인으로 처리하지 않고 422를 반환한다. 거절 뒤 새 요청으로 정정한다.
+
+#### 16.14.2 polling, replay와 TTS
+
+상태는 `GET /api/v1/assistant/requests/{requestId}`로 조회한다. `accepted`·`processing`에는 result가 없고 `completed`에 §16.4의 구조화 결과가 있다. 직전 응답부터 2초 뒤 다시 조회하며 요청을 겹치지 않는다. 최초 POST 시도부터 자동 조회 한도는 120초다.
+
+이미 접수된 ID를 같은 음성 POST에 쓰면 body와 STT를 다시 처리하지 않고 200을 반환한다. 200 body는 Assistant GET과 같으며 `transcript`, `input`이 없다. STT가 진행 중이어서 아직 Assistant에 접수되지 않은 같은 ID는 409 `VOICE_BUSY`다.
+
+완료된 요청의 TTS는 다음과 같이 header와 WAV를 따로 받는다.
+
+```bash
+curl -sS -D response.headers \
+  "$BASE_URL/api/v1/voice/requests/$REQUEST_ID/speech" -o response.wav
+```
+
+200 응답은 `audio/wav` 바이너리다. 입력 WAV 규격을 출력에 강제하지 말고 실제 RIFF/PCM header로 재생한다. 이번 Pi 출력은 22,050 Hz·mono·16-bit였다. TTS GET은 읽기 전용이며 Assistant나 Schedule write를 재실행하지 않는다. 별도 TTS cache를 전제하지 않는다.
+
+현재 앱 실행에서 음성으로 시작한 요청과 후속 응답만 TTS를 자동 재생한다. 텍스트 Assistant, 수동 Schedule CRUD, 앱 재실행·서버 변경 후 GET-only로 복구한 결과는 자동 재생하지 않는다. 재생 실패 시 기존 화면 결과를 유지하고 일정 작업을 다시 요청하지 않는다.
+
+#### 16.14.3 음성 오류와 복구
+
+| HTTP | code | 처리 |
+|---:|---|---|
+| 422 | `AUDIO_UNSUPPORTED` | 지원하는 WAV로 다시 녹음 |
+| 413 | `REQUEST_BODY_TOO_LARGE` | 길이·크기를 줄여 다시 녹음 |
+| 422 | `SPEECH_NOT_RECOGNIZED` | 인식 실패. 일정 write 없음 |
+| 503 | `VOICE_UNAVAILABLE` | 음성 기능·STT 사용 불가 또는 timeout. 텍스트 입력 유지 |
+| 409 | `VOICE_BUSY` | 대기 후 같은 ID의 Assistant GET부터 재확인 |
+| 409 | `STALE_QUESTION` | 현재 질문 재조회. 과거 답변 자동 재전송 금지 |
+| 409 | `QUESTION_EXPIRED` | 만료 질문을 재사용하지 않고 새 요청 시작 |
+| 422 | `VOICE_ANSWER_UNCLEAR` | 기존 질문 유지. 명확한 단일 답변 재요청 |
+| 409 | `SPEECH_NOT_READY` | 결과 준비 중. 일정 작업 재실행 금지 |
+| 503 | `TTS_UNAVAILABLE` | 화면 결과 유지. 일정 작업 재실행 금지 |
+| 410 | `REQUEST_EXPIRED` | 상세 보관이 끝난 요청을 음성으로 재접수하지 않음 |
+| 404 | `ASSISTANT_REQUEST_NOT_FOUND` | 아래 재전송 조건을 모두 충족할 때만 제한적으로 재전송 |
+
+Problem body는 §13.1과 같으며 `requestId`는 HTTP 추적 ID, `assistantRequestId`는 앱의 논리 요청 ID다. 기존 Assistant 오류도 §13.3의 code를 유지한다.
+
+응답 유실 시 먼저 같은 ID로 Assistant GET을 호출한다. 같은 앱 실행·같은 Base URL·최초 전송 후 120초 이내·같은 원본 녹음 보유·GET이 정확히 404 `ASSISTANT_REQUEST_NOT_FOUND`인 조건을 모두 충족할 때만 같은 ID와 같은 WAV를 최대 1회 재전송한다. 이후에는 GET polling만 한다. VOICE_BUSY일 때 새 ID를 만들거나 즉시 반복하지 않는다. 앱 재실행 또는 서버를 변경했다가 돌아온 뒤에는 과거 POST를 자동 재전송하지 않고 GET-only로 복구한다.
+
+후보·승인 질문은 발급부터 10분이며 expiresAt을 우선한다. GET·replay는 수명을 연장하지 않는다. 정보 보충에는 일률 10분을 적용하지 않는다. 완료 결과의 최소 24시간 보관, 24시간 무활동 대화 만료와 서버 재시작 복구는 §16.8~16.9를 따른다.
+
+#### 16.14.4 Pi 실측에 따른 운영 권장값
+
+Microsoft Heami 합성 WAV(3초, 16 kHz mono PCM)를 실제 Pi에 전송한 10회 측정이다. Whisper small·CPU int8·beam 3·물류 hotwords, backend·RKLLM·STT/TTS 동시 실행 조건이며 사람 음성의 정확도 평가가 아니다. p95는 10개 원본값에 nearest-rank를 적용해 최댓값과 같다.
+
+| 항목 | 평균 | p95·최대 |
+|---|---:|---:|
+| 음성 POST | 5.874초 | 6.102초 |
+| TTS GET | 0.187초 | 0.225초 |
+| POST부터 TTS 수신까지 | 34.323초 | 34.542초 |
+
+2026-11-17 실제 사람 녹음 재시험에서는 최종 최소 hotwords 적용 이후의 정상 접수·TTS 요청10개를 집계했다. 서로 다른 길이의 발화와 후보 선택·거절·등록 등 결과 종류가 섞여 있어 위 합성 단일 파일10회와 같은 분포의 비교가 아니다. 격리 backend(동일 소스·venv)와 실제 NPU/Whisper/Piper를 사용했다.
+
+| 항목 | 평균 | p95·최대 |
+| --- | --- | --- |
+| 실제 녹음 음성 POST | 5.966초 | 7.350초 |
+| 실제 녹음 TTS GET | 0.749초 | 1.796초 |
+| 실제 녹음 POST부터 TTS수신 | 23.124초 | 54.855초 |
+
+실제 녹음의 상세 결과와 남은 오류는 [배포·시험 가이드 §19](DRAFT_orangepi-final-guide.md)를 따른다. 17개 문장 전체가 정확히 해석·등록됐다는 의미가 아니다.
+
+운영 권장은 음성 POST 35초, TTS GET 35초, VOICE_BUSY 재확인 2초다. 정상 실측에 더해 내부 음성 서버 timeout 30초의 503을 클라이언트가 받을 여유 5초를 둔 값이다. 최대 15초 음원의 모든 발화에 대한 지연 상한을 보장하지 않는다. 프론트 적용과 iPhone 공동 확인은 별도다. Assistant GET의 기존 2초 polling과 최초 시도부터 120초 자동 조회 한도는 유지한다.
 
 ## 17. 현재 포함하지 않는 계약
 

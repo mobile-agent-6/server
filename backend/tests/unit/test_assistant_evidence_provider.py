@@ -1069,6 +1069,38 @@ def test_ambiguous_target_time_keeps_morning_and_afternoon_candidates() -> None:
     }
 
 
+@pytest.mark.parametrize(("clock", "hour", "minute"), [("세 시", 3, 0), ("두 시 반", 2, 30), ("열두 시", 0, 0)])
+def test_native_clock_in_postprocessed_delete_title_keeps_both_candidates(clock, hour, minute) -> None:
+    title = "입고 납품서 대조"
+    morning = schedule(title, datetime(2026, 10, 30, hour, minute, tzinfo=SEOUL))
+    afternoon = schedule(title, datetime(2026, 10, 30, hour + 12, minute, tzinfo=SEOUL))
+    other = schedule(title, datetime(2026, 10, 30, 17, 0, tzinfo=SEOUL))
+    evidence = output(op("delete", target={
+        "date": [span("내일")], "title": [span(f"{clock} {title}")],
+    }))
+    model = ScriptedModel(evidence)
+    _, decision = decide(
+        EvidenceDecisionProvider(model, FakeReader([other, afternoon, morning])),
+        f"내일 {clock} {title} 일정 삭제해 줘.",
+    )
+    assert decision["kind"] == "select_candidate"
+    assert {c["scheduleId"] for c in decision["candidates"]} == {str(morning.id), str(afternoon.id)}
+    assert len(model.seen) == 1
+
+
+def test_quoted_native_clock_title_is_not_reinterpreted_as_time() -> None:
+    from app.modules.assistant.evidence.provider import _validate_output
+
+    title = "세 시 입고 납품서 대조"
+    evidence = output(op("delete", target={"date": [span("내일")], "title": [span(title)]}))
+    parsed = _validate_output(
+        json.dumps(evidence, ensure_ascii=False),
+        turns={1: f"내일 '{title}' 일정 삭제해 줘."}, reference=REFERENCE,
+    )
+    assert "time" not in parsed.operations[0].target
+    assert parsed.operations[0].target["title"][0].text == title
+
+
 def test_list_time_is_converted_to_backend_clock_filter() -> None:
     evidence = output(
         op(
