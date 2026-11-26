@@ -194,6 +194,7 @@ ASSISTANT_SMOKE_MODEL_URL=http://127.0.0.1:8088 python -m pytest tests/integrati
 - 후처리 결과만으로 일정 쓰기를 승인하지 않으며, 후보 선택, 변경 승인, safe writer 검사는 그대로 유지.
 - 후처리 후에도 검사를 통과하지 못하면 모델을 다시 호출하지 않고 `MODEL_OUTPUT_INVALID`로 종료. decoding이 고정(temperature 0)이라 같은 입력은 같은 출력을 내기 때문.
 - 규칙은 `app/modules/assistant/evidence/rules/`에 포함. 출처는 [`logistics440_v37/runtime/rules`](../datasets/qwen/experiments/logistics440_v37/runtime/rules)이며, `correction_bridge_v37`에 필요한 38개 모듈을 패키지 상대 import로만 바꾼 사본. 실행과 배포는 `datasets/`나 별도 `PYTHONPATH`에 의존하지 않음. 규칙 변경 시 출처 비교와 저장 출력, 대화 회귀 테스트를 함께 확인.
+- 실제 Pi STT가 출력한 `내일 세 시 입고 납품서 대조 일정 삭제해 줘`에서 v37 후처리가 `세 시`를 제목에 합치는 경우는 `evidence/native_clock.py`에서 보정. 단일 삭제, 단일 turn의 원문 전체가 정해진 형태와 일치하고 기존 date/title 근거도 원문과 일치할 때만 원문의 시간과 제목을 분리. 인용된 제목, 정정과 불확실 표현, 복수 작업은 보정하지 않음. 기존 38개 출처 규칙과 prompt는 수정하지 않고 역할과 겹침 검사, 후보 선택과 삭제 승인을 유지. 이 보정과 실제 두 후보 삭제 시나리오는 합성 WAV로 두 번 검증.
 - 모델 호출 제한 시간은 `SCHEDULE_ASSISTANT_MODEL_TIMEOUT_SECONDS`와 "요청 처리 마감(300초)까지 남은 시간에서 안전 여유 10초를 뺀 값" 중 짧은 쪽. 대기열에서 남은 시간이 10초 이하가 되면 모델을 부르지 않고 `MODEL_TIMEOUT`으로 종료. 마감을 넘긴 모델 호출이 남으면 runtime이 unhealthy가 되기 때문.
 
 ### 음성 서버

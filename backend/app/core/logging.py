@@ -18,6 +18,10 @@ LOG_FILE_MODE = 0o640
 _OWNED_HANDLER = "_schedule_api_handler"
 _JSON_FIELDS = (
     "requestId",
+    "assistantRequestId",
+    "stage",
+    "transcriptLength",
+    "transcriptSha256",
     "method",
     "path",
     "status",

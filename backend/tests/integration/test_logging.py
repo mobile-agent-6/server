@@ -156,3 +156,29 @@ def test_internal_error_json_does_not_emit_exception_message_or_traceback() -> N
     assert "exception" not in payload
     assert "privateDetail" not in payload
     assert "사용자 원문" not in json.dumps(payload, ensure_ascii=False)
+
+
+def test_json_formatter_emits_voice_stage_fields_without_transcript() -> None:
+    record = logging.LogRecord("app.modules.voice.router", logging.INFO, __file__, 1, "voice pipeline stage completed", (), None)
+    record.event = "voice.stage"
+    record.assistantRequestId = "voice-request-id"
+    record.stage = "accepted"
+    record.durationMs = 125.5
+    record.status = 202
+    record.errorCode = "OK"
+    record.transcriptLength = 3
+    record.transcriptSha256 = "a" * 64
+    record.transcript = "private spoken input"
+
+    payload = json.loads(JsonFormatter().format(record))
+
+    assert payload["event"] == "voice.stage"
+    assert payload["assistantRequestId"] == "voice-request-id"
+    assert payload["stage"] == "accepted"
+    assert payload["durationMs"] == 125.5
+    assert payload["status"] == 202
+    assert payload["errorCode"] == "OK"
+    assert payload["transcriptLength"] == 3
+    assert payload["transcriptSha256"] == "a" * 64
+    assert "transcript" not in payload
+    assert "private spoken input" not in json.dumps(payload)

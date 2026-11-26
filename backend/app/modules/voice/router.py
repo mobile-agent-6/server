@@ -127,20 +127,21 @@ def _log_stage(
 
 
 def _parse_candidate_selection(transcript: str, candidates: list[object]) -> str | None:
-    """Map one unambiguous spoken ordinal to a persisted candidate ID."""
+    """Accept one complete selection phrase, never a number inside other speech."""
 
-    found: set[int] = {
-        int(match.group(1))
-        for match in re.finditer(r"(?<!\d)(10|[1-9])\s*번(?!\d)", transcript)
-    }
-    for word, number in _ORDINAL_WORDS.items():
-        pattern = rf"(?<![가-힣]){word}\s*번째"
-        if re.search(pattern, transcript):
-            found.add(number)
+    text = transcript.strip().rstrip(".!?。！？").strip()
+    numeric = re.fullmatch(r"(10|[1-9])\s*번(?:째)?(?:\s*일정)?", text)
+    if numeric is not None:
+        number = int(numeric.group(1))
+    else:
+        ordinal = re.fullmatch(
+            r"(첫|두|세|네|다섯|여섯|일곱|여덟|아홉|열)\s*번째(?:\s*일정)?",
+            text,
+        )
+        if ordinal is None:
+            return None
+        number = _ORDINAL_WORDS[ordinal.group(1)]
 
-    if len(found) != 1:
-        return None
-    number = next(iter(found))
     if not 1 <= number <= len(candidates):
         return None
     candidate = candidates[number - 1]
@@ -331,6 +332,7 @@ async def create_voice_request(
         audio_bytes = await _read_audio_body(request)
         content_type = request.headers.get("content-type")
         validate_stt_wav(audio_bytes, content_type=content_type)
+        stt_started_at = time.monotonic()
         transcript = await run_in_threadpool(
             client.transcribe,
             audio_bytes,
@@ -340,6 +342,15 @@ async def create_voice_request(
             transcript = _assistant_text.validate_python(transcript)
         except ValidationError as exc:
             raise SpeechNotRecognized(assistant_request_id=request_id) from exc
+
+        _log_stage(
+            request_id=request_id,
+            stage="stt_completed",
+            started_at=stt_started_at,
+            status_code=200,
+            code="OK",
+            transcript=transcript,
+        )
 
         active_question = (
             _active_question(session_factory, conversation_id, request_id)
@@ -439,6 +450,7 @@ async def create_voice_request(
 @router.get(
     "/requests/{requestId}/speech",
     operation_id="getVoiceRequestSpeech",
+    response_class=Response,
     responses={
         200: {
             "content": {"audio/wav": {"schema": {"type": "string", "format": "binary"}}},
