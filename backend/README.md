@@ -40,30 +40,29 @@
 | Python | 3.11 |
 | 운영체제 | Linux 또는 macOS (POSIX `fcntl` 사용). Windows 네이티브 실행은 미지원 |
 | DB | SQLite (별도 설치 불필요) |
-| 의존성 | `requirements.lock` 기준 설치 |
+| 의존성 | `requirements/development.lock` 기준 설치 |
 | 선택 | Assistant 사용 시 OpenAI 호환 모델 서버, Voice 사용 시 로컬 STT/TTS 음성 서버 필요 |
 
 모델 서버와 음성 서버 없이도 일정 관리와 `/health`는 동작.
 
 ## 빠른 시작
 
-개발 기준 브랜치는 `develop`. `backend/` 폴더에서 실행.
+저장소의 `backend/` 폴더에서 실행.
 
 ```bash
-git switch develop
 cd backend
 
 # 1. 가상 환경 생성 및 의존성 설치
 python3.11 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements.lock
+python -m pip install -r requirements/development.lock
 
 # 2. 환경 변수 파일과 DB 폴더 준비
-cp .env.example .env
+cp config/env.example .env
 mkdir -p data
 
 # 3. DB를 최신 구조로 변경
-python -m alembic upgrade head
+python -m alembic -c config/alembic.ini upgrade head
 
 # 4. 서버 실행
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
@@ -76,7 +75,7 @@ python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 
 ## 환경 변수
 
-[`.env.example`](.env.example)을 `.env`로 복사한 뒤 필요한 값만 변경. 모든 변수는 `SCHEDULE_` 접두사 사용.
+[`config/env.example`](config/env.example)을 `.env`로 복사한 뒤 필요한 값만 변경. 모든 변수는 `SCHEDULE_` 접두사 사용.
 
 | 묶음 | 주요 변수 | 기본값 |
 |---|---|---|
@@ -104,15 +103,18 @@ backend/
 │       │   └── evidence/    # 모델 호출, 출력 검증, 후처리 규칙(v37), 실행 계획
 │       └── voice/           # WAV 검사, 음성 서버 연결
 ├── alembic/                 # DB migration (현재 head: 20261017_0004)
+├── config/                  # 환경 변수 예시와 Alembic 설정
+│   ├── env.example
+│   └── alembic.ini
+├── requirements/            # 개발 및 Orange Pi 실행 의존성 잠금 파일
+│   ├── development.lock
+│   └── runtime-linux-aarch64.lock
 ├── tests/                   # unit, api, integration 테스트
-├── scripts/                 # API 계약 smoke, 배포용 lock, wheelhouse 생성
-├── test_scenario_e2e.py     # 시나리오 종단 간 시험
-├── test_voice_e2e.py        # 음성 종단 간 시험
-├── pyproject.toml
-├── requirements.lock                       # 개발 환경 의존성
-├── requirements-runtime-linux-aarch64.lock # Orange Pi(ARM64) 실행 환경 의존성
-├── alembic.ini
-└── .env.example             # 공유용 환경 변수 예시
+├── scripts/                 # API 계약 smoke와 배포 도구
+│   └── manual/              # 수동 종단 간 시험 스크립트
+│       ├── assistant_voice_scenario.py
+│       └── voice_smoke.py
+└── pyproject.toml
 ```
 
 ## 테스트
@@ -162,7 +164,7 @@ python -m pytest --cov=app --cov-branch --cov-report=term-missing
 
 - OpenAI 호환 `/v1/chat/completions` endpoint면 연결 가능. Orange Pi에서는 RKLLM 웹 런타임, 개발 Mac에서는 `mlx_lm.server` 사용.
 - 시스템 prompt는 학습 때와 같은 `app/modules/assistant/evidence/prompt.txt` 사용. 시작과 재연결 시 학습 prompt의 고정 SHA-256을 검사하고, 파일이 없거나 해시가 다르면 모델을 호출하지 않고 Assistant만 `503 ASSISTANT_UNAVAILABLE` 유지. Schedule API와 `/health`는 영향 없음.
-- `backend/.gitattributes`로 prompt의 LF 줄바꿈 고정. Windows `core.autocrlf=true` 환경에서도 학습 바이트와 SHA-256을 보존하기 위한 설정. 이미 받은 작업본은 자동 변환되지 않을 수 있으므로, 로컬 수정이 없는지 확인 후 LF로 저장하고 테스트로 확인. 실행 중 자동 줄바꿈 보정이나 잘못된 해시 허용은 하지 않음.
+- 저장소 루트의 `.gitattributes`로 prompt의 LF 줄바꿈 고정. Windows `core.autocrlf=true` 환경에서도 학습 바이트와 SHA-256을 보존하기 위한 설정. 이미 받은 작업본은 자동 변환되지 않을 수 있으므로, 로컬 수정이 없는지 확인 후 LF로 저장하고 테스트로 확인. 실행 중 자동 줄바꿈 보정이나 잘못된 해시 허용은 하지 않음.
 
 | 환경 변수 | 기본값 | 설명 |
 |---|---|---|
@@ -282,7 +284,7 @@ SCHEDULE_VOICE_SERVER_TIMEOUT_SECONDS=30
 
 1. 서비스를 중지하고 대상 DB 경로와 현재 revision 확인.
 2. SQLite online backup을 만들고 `integrity_check`와 revision 검증.
-3. `python -m alembic upgrade head` 실행.
+3. `python -m alembic -c config/alembic.ini upgrade head` 실행.
 4. 적용 후 `/health`, 일정 CRUD, 기존 일정 수와 필드, `alembic current` 확인.
 
 복구는 **migration 전 검증 backup과 그 revision에 맞는 코드를 함께 복원**하는 것이 기본. downgrade는 schema만 되돌릴 뿐 데이터와 구버전 코드 호환을 보장하지 않음.
@@ -294,7 +296,7 @@ SCHEDULE_VOICE_SERVER_TIMEOUT_SECONDS=30
 - 변환이 승인된 `MEETING`만 있고 ID가 모두 확인됐으면, 정확한 ID 전체를 쉼표로 이어 `CONFIRMED_MEETING_IDS`로 전달.
 
 ```bash
-python -m alembic -x "confirmed_meeting_ids=${CONFIRMED_MEETING_IDS}" upgrade head
+python -m alembic -c config/alembic.ini -x "confirmed_meeting_ids=${CONFIRMED_MEETING_IDS}" upgrade head
 ```
 
 - 전달한 ID 집합이 DB의 기존 `MEETING` ID 집합과 정확히 같을 때만 해당 행을 `OTHER`로 변경. 다른 필드, soft-delete 행, 인덱스, 멱등성 기록은 보존. 적용 후 카테고리별 CRUD도 확인.
@@ -313,7 +315,7 @@ python -m alembic -x "confirmed_meeting_ids=${CONFIRMED_MEETING_IDS}" upgrade he
 - schema만 되돌릴 때:
 
 ```bash
-python -m alembic downgrade 20261008_0002
+python -m alembic -c config/alembic.ini downgrade 20261008_0002
 ```
 
 - downgrade는 알림 컬럼을 nullable로 다시 만들지만 모든 값은 `null`. 구버전 코드로 안전하게 돌아간다는 보장이 아니며, 제거 전 알림 값도 복원하지 않음.
@@ -324,7 +326,7 @@ python -m alembic downgrade 20261008_0002
 - 반드시 Assistant runtime을 포함한 서버를 먼저 중지하고, 대상 DB, revision, 검증 backup을 확인한 상태에서 수행.
 
 ```bash
-python -m alembic downgrade 20261017_0003
+python -m alembic -c config/alembic.ini downgrade 20261017_0003
 ```
 
 - accepted나 processing 요청, 또는 outcome이나 failure로 확정되지 않은 uncertain 기록이 있으면 첫 DDL 전에 거절됨.
@@ -337,7 +339,7 @@ python -m alembic downgrade 20261017_0003
 |---|---|
 | [`docs/api.md`](../docs/api.md) | 공개 API 계약 (요청, 응답, 오류 코드) |
 | [`docs/erd.md`](../docs/erd.md) | DB 구조 |
-| [`.env.example`](.env.example) | 공유용 환경 변수 예시 |
+| [`config/env.example`](config/env.example) | 공유용 환경 변수 예시 |
 | [`ai/README.md`](../ai/README.md) | 모델 및 음성 서버 |
 | [`datasets/README.md`](../datasets/README.md) | 학습 및 평가 데이터 |
 | [`TEAM_GUIDELINES.md`](../TEAM_GUIDELINES.md) | 저장소 협업 기준 |

@@ -21,7 +21,7 @@ def main():
     repo = args.repo_root.resolve()
     destination = (args.environment_root or repo).resolve()
     environments = [
-        ("backend", "backend", "backend/requirements-runtime-linux-aarch64.lock",
+        ("backend", "backend", "backend/requirements/runtime-linux-aarch64.lock",
          "import alembic, fastapi, greenlet, pydantic_settings, sqlalchemy, uvicorn; from app.main import app; assert app is not None"),
         ("voice", "ai/voice_server", "ai/voice_server/requirements.lock",
          "from faster_whisper import WhisperModel; from piper.voice import PiperVoice; import fastapi, uvicorn, multipart"),

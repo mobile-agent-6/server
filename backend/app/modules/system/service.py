@@ -46,7 +46,7 @@ def _utc(value: datetime) -> datetime:
 
 def resolve_expected_head(
     *,
-    config_path: Path = SERVICE_ROOT / "alembic.ini",
+    config_path: Path = SERVICE_ROOT / "config" / "alembic.ini",
     scripts: ScriptDirectory | None = None,
 ) -> str:
     script_directory = scripts or ScriptDirectory.from_config(Config(str(config_path)))

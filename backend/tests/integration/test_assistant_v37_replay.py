@@ -55,7 +55,7 @@ def v37_cache():
 @pytest.fixture(scope="module")
 def v37_empty_database(tmp_path_factory):
     path = tmp_path_factory.mktemp("v37-template") / "empty.db"
-    config = Config(str(BACKEND / "alembic.ini"))
+    config = Config(str(BACKEND / "config" / "alembic.ini"))
     config.attributes["database_url"] = f"sqlite:///{path.as_posix()}"
     command.upgrade(config, "head")
     return path

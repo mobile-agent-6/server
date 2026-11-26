@@ -82,7 +82,10 @@ server
 │   │       ├── voice/              # Voice API와 음성 서버 연동
 │   │       └── system/             # /health와 시간 동기화
 │   ├── alembic/                    # SQLite 스키마 마이그레이션
+│   ├── config/                     # 환경 변수 예시와 Alembic 설정
+│   ├── requirements/               # 개발 및 Orange Pi 실행 의존성
 │   ├── scripts/                    # API 계약, 런타임 잠금 파일과 wheelhouse 검증
+│   │   └── manual/                 # 수동 종단 간 시험 도구
 │   └── tests/                      # API, 단위 및 통합 테스트
 ├── ai/
 │   ├── deploy/                     # Orange Pi 설치, systemd 서비스와 재배포 도구
@@ -130,7 +133,7 @@ SQLite는 일정, 중복 요청 방지, Assistant 대화와 요청 상태를 여
    - 자연어 일정 요청 해석
    - 빠진 날짜, 시간과 제목 추가 질문
    - 여러 일정 중 변경 대상을 선택하는 멀티턴 대화
-   - 일정 수정과 삭제 전 사용자 확인
+   - 일정 수정, 삭제와 완료 상태 변경 전 사용자 확인
 
 3. **음성 인식과 합성 (Voice API)**
    - 모바일 앱에서 녹음한 WAV 파일 수신
@@ -148,7 +151,7 @@ SQLite는 일정, 중복 요청 방지, Assistant 대화와 요청 상태를 여
    - 멱등성 키를 이용한 중복 일정 등록 방지
    - Assistant 요청, 질문과 처리 상태 저장
    - 통신 단절이나 서버 재시작 후 기존 요청 조회
-   - 사용자 승인 전 수정과 삭제 실행 차단
+   - 사용자 승인 전 수정, 삭제와 완료 상태 변경 실행 차단
 
 6. **Orange Pi 배포와 운영**
    - 백엔드, NPU 및 음성 서버의 3개 systemd 서비스 구성
@@ -172,16 +175,15 @@ SQLite는 일정, 중복 요청 방지, Assistant 대화와 요청 상태를 여
 ```bash
 git clone https://github.com/mobile-agent-6/server.git
 cd server
-git switch develop
 
 cd backend
 python3.11 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements.lock
+python -m pip install -r requirements/development.lock
 
-cp .env.example .env
+cp config/env.example .env
 mkdir -p data
-python -m alembic upgrade head
+python -m alembic -c config/alembic.ini upgrade head
 
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
@@ -236,11 +238,11 @@ python -m unittest discover -s datasets/qwen/tests
 
 | 검증 항목 | 결과 |
 | --- | --- |
-| 백엔드 전체 자동화 테스트 | 1,515건 통과, 1건 건너뜀 |
-| v37 개발 자료 재평가 | 멀티턴 고유 모델 입력 132건 중 132건 일치 |
-| Orange Pi 실제 음성 시나리오 반복 검증 | 핵심 시나리오 3개를 각 10회, 총 30회 통과 |
-| Orange Pi 배포와 재부팅 검증 | 재부팅 후 백엔드, NPU 및 음성 서버 자동 시작과 `/health` 200 응답 확인 |
-| iOS / Orange Pi 음성 통합 검증 | 8/8 통과 |
+| 백엔드 전체 자동화 테스트 | 1,515건 통과, 1건 건너뜀 ([검증 기록](docs/orangepi-voice-validation-20261117.md)) |
+| v37 개발 자료 재평가 | 멀티턴 고유 모델 입력 132건 중 132건 일치 ([검증 기록](docs/qwen_logistics440_v37_handoff.md)) |
+| Orange Pi 실제 음성 시나리오 반복 검증 | 핵심 시나리오 3개를 각 10회, 총 30회 통과 ([검증 기록](docs/final-integration-validation.md)) |
+| Orange Pi 배포와 재부팅 검증 | 재부팅 후 백엔드, NPU 및 음성 서버 자동 시작과 `/health` 200 응답 확인 ([검증 기록](docs/orangepi-voice-validation-20261117.md)) |
+| iOS / Orange Pi 음성 통합 검증 | 8/8 통과 ([검증 기록](docs/final-integration-validation.md)) |
 
 ---
 
@@ -260,12 +262,11 @@ CI는 Python 3.11 환경에서 실행됩니다. 자세한 내용은 [CI 워크�
 | --- | --- |
 | `main` | 최종 시연 및 배포용 안정 브랜치 |
 | `develop` | 기본 개발 통합 브랜치 |
-| `feature/<이름>` | 기능 개발과 개선 |
-| `fix/<이름>` | 버그 수정 |
-| `docs/<이름>` | 문서 작업 |
-| `test/<이름>` | 테스트 추가와 검증 |
-| `chore/<이름>` | 의존성, 설정과 관리 작업 |
-| `hotfix/<이름>` | 안정 브랜치의 긴급 수정 |
+| `feature/<번호>-<이름>` | 기능 개발 및 개선 |
+| `fix/<번호>-<이름>` | 버그 수정 |
+| `chore/<번호>-<이름>` | 프로젝트 설정 |
+| `docs/<번호>-<이름>` | 문서 작업 |
+| `refactor/<번호>-<이름>` | 리팩터링 |
 
 Issue, 커밋, Pull Request 및 병합 규칙은 [TEAM_GUIDELINES.md](TEAM_GUIDELINES.md)를 참고하세요.
 

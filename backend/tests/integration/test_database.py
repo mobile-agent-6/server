@@ -219,7 +219,7 @@ def test_alembic_requires_explicit_environment_without_override(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.delenv("SCHEDULE_APP_ENV", raising=False)
-    alembic = Config("alembic.ini")
+    alembic = Config("config/alembic.ini")
     with pytest.raises(RuntimeError, match="SCHEDULE_APP_ENV"):
         command.current(alembic)
 

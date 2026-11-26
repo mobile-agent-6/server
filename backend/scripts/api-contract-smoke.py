@@ -90,7 +90,15 @@ def choose_loopback_port() -> int:
 
 def run_migrations(environment: dict[str, str]) -> None:
     completed = subprocess.run(
-        [sys.executable, "-m", "alembic", "-c", "alembic.ini", "upgrade", "head"],
+        [
+            sys.executable,
+            "-m",
+            "alembic",
+            "-c",
+            "config/alembic.ini",
+            "upgrade",
+            "head",
+        ],
         cwd=BACKEND_ROOT,
         env=environment,
         capture_output=True,

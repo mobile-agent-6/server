@@ -13,8 +13,8 @@ SCRIPTS = (
     BACKEND_ROOT / "scripts" / "generate-runtime-lock.sh",
     BACKEND_ROOT / "scripts" / "build-verify-wheelhouse.sh",
 )
-RUNTIME_LOCK = BACKEND_ROOT / "requirements-runtime-linux-aarch64.lock"
-DEVELOPMENT_LOCK = BACKEND_ROOT / "requirements.lock"
+RUNTIME_LOCK = BACKEND_ROOT / "requirements" / "runtime-linux-aarch64.lock"
+DEVELOPMENT_LOCK = BACKEND_ROOT / "requirements" / "development.lock"
 
 
 def _locked_packages(lock_path: Path) -> dict[str, str]:

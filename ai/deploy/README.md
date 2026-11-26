@@ -15,7 +15,7 @@ python3.11 ai/deploy/bootstrap_runtime.py \
 
 별도 검증 경로에 재현할 때는 `--environment-root "$STAGING_ROOT"`를 추가한다. 2026-11-16 실제 Pi에서 새 경로의 세 환경을 오프라인 방식으로 설치·검증했다. 음성 환경은 `ai/voice_server/requirements.lock`, NPU 웹 런타임은 `ai/rkllm_runtime/requirements.txt`를 사용한다. 모델·RKLLM native runtime과 음성 모델 cache는 별도 전달·설치 대상이며 부팅 중 다운로드하지 않는다.
 
-backend 환경은 [Pi 예시](orangepi.env.example)를 검토해 `backend/.env`에 설정한다. DB 최초 생성은 backend에서 명시적인 관리 환경으로 `SCHEDULE_APP_ENV=development .venv/bin/python -m alembic upgrade head`를 실행한다. 실사용 DB에 적용할 때는 [백엔드 migration 지침](../../backend/README.md)을 따른다.
+backend 환경은 [Pi 예시](orangepi.env.example)를 검토해 `backend/.env`에 설정한다. DB 최초 생성은 backend에서 명시적인 관리 환경으로 `SCHEDULE_APP_ENV=development .venv/bin/python -m alembic -c config/alembic.ini upgrade head`를 실행한다. 실사용 DB에 적용할 때는 [백엔드 migration 지침](../../backend/README.md)을 따른다.
 
 다음 변수에는 해당 장비에서 확인한 경로·사용자를 넣는다. 실행 사용자와 실제 접속 정보는 Git 예시에 고정하지 않는다.
 

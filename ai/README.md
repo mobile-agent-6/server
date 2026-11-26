@@ -1,31 +1,56 @@
-# AI action → Schedule API 로컬 시범 구현
+# AI
 
-`TBD-AI` 공유 계약을 검토하기 위한 **AI 영역 내부 제안 구현**이다. 백엔드 공개 API나 DB를 변경하지 않는다. 한 프로세스가 대화 한 개를 메모리에 보관하고, Qwen의 JSON action을 검증한 뒤 기존 Schedule HTTP API에 연결한다.
+이 디렉터리는 **너만의 비서**의 온디바이스 AI 실행 환경을 관리합니다. Orange Pi에서 사용하는 RKLLM 모델 서버, STT와 TTS 음성 서버, 배포 도구와 로컬 시범 구현을 포함합니다.
 
-```powershell
-python ai/run_local.py --model qwen3:4b --schedule-url http://127.0.0.1:8000
-```
+## 구성
 
-Ollama와 백엔드가 먼저 실행돼 있어야 한다. 위 명령은 지정한 Schedule API에 실제로 등록·수정·삭제를 요청한다. 종료 시 대화 상태가 사라진다. `/reset`은 이력과 수정·삭제 확인 대기를 지우지만, 결과가 불확실한 등록의 키와 본문은 보관한다. 의존성은 Python 표준 라이브러리뿐이다.
+| 경로 | 역할 |
+| --- | --- |
+| [`deploy/`](deploy/README.md) | Orange Pi 실행 환경 구성, systemd 서비스 설치와 재배포 |
+| [`rkllm_runtime/`](rkllm_runtime/README.md) | RKLLM NPU 모델 서버의 Python 실행 환경 |
+| [`voice_server/`](voice_server/README.md) | faster-whisper 기반 STT와 Piper 기반 TTS 실행 환경 |
+| [`schedule_assistant/`](schedule_assistant/README.md) | Qwen action과 Schedule API 연동을 검증하기 위해 사용한 로컬 시범 구현 |
+| [`tests/`](tests/) | 배포 도구, 로컬 시범 구현과 음성 서버의 자동 시험 |
+| [`run_local.py`](run_local.py) | 로컬 시범 구현 실행 진입점 |
 
-| action             | 검증 뒤 처리                                                                            |
-| ------------------ | --------------------------------------------------------------------------------------- |
-| `ASK`            | 짧은 추가 질문만 표시                                                                   |
-| `LIST`           | `GET /api/v1/schedules` 후 결과를 문맥으로 넣고 모델을 다시 호출                      |
-| `CREATE`         | 유효한 필수값에 대해 `Idempotency-Key`를 붙여 `POST /api/v1/schedules`              |
-| `SELECT_TARGET`  | 조회 후보가 2~10건이면 ID 없이 번호 선택을 요청; 선택한 대상·변경값을 확인하기 전에는 쓰지 않음 |
-| `CONFIRM_UPDATE` | 조회 후보가 1건이면 해당 ID·변경값을 확인; 승인 시 재조회 후 `PATCH`                 |
-| `CONFIRM_DELETE` | 조회 후보가 1건이면 해당 ID를 확인; 승인 시 재조회 후 `DELETE`                       |
-| `ANSWER`         | `message=null`. 조회 결과가 있으면 API 응답에서 안내를 만들고, 그 외에는 고정 안내 표시 |
+## 최종 실행 구조
 
-모델 출력은 `action`, `message`, `request`의 세 키만 허용한다. `ASK.message`에는 질문을 넣고 `SELECT_TARGET.message`와 `ANSWER.message`는 `null`이다. 상세 필드와 다섯 category는 [검증 코드](schedule_assistant/actions.py), 지시문은 [프롬프트](schedule_assistant/prompt.txt)에 있다. 위치 필드는 없다. 현행 Schedule API에 없는 알림 필드는 생성·수정 요청에서 거절한다. 알림만 요청하면 지원하지 않는다고 안내하고, 일정 작업과 함께 요청하면 알림 없이 진행할지 확인한 뒤 일정 작업만 처리한다. 수정·삭제 조회 결과가 0건이면 없음을 안내하고, 1건이면 해당 UUID로 확인을 시작한다. 2~10건이면 `SELECT_TARGET`에 `targetId` 없이 번호 선택을 요구하며, 10건 초과면 날짜·제목으로 범위를 좁히도록 묻는다. 선택한 대상·변경값을 사용자에게 확인받기 전이나 거절 뒤에는 쓰지 않는다. 확인 문구에 모델의 `message`를 사용하지 않는다. 등록과 수정·삭제 성공 문구는 API 성공 뒤에만 표시한다. 확인 중 승인·거절 외 새 발화는 기존 확인을 취소하고 새 요청으로 처리한다.
+모바일 앱은 백엔드의 공개 API만 호출합니다. 백엔드는 같은 Orange Pi 안에서 모델 서버와 음성 서버를 호출합니다.
 
-등록 결과가 불확실하면 새 생성 요청을 막고, 사용자가 `재시도`라고 입력했을 때 같은 본문·키로만 다시 요청한다. 24시간이 지났으면 자동 재시도를 막고 서버 확인을 안내한다. 이 보관은 프로세스 메모리에서만 유효하므로 재시작 뒤 중복 등록 위험은 남는다.
+1. 음성 요청은 백엔드가 음성 서버에 전달하고 STT 결과를 받습니다.
+2. 백엔드는 텍스트 요청을 RKLLM 모델 서버에 전달합니다.
+3. 모델 출력에 v37 후처리와 구조 검사를 적용합니다.
+4. 백엔드가 후보 조회, 사용자 확인과 안전 검사를 거쳐 Schedule API 작업을 수행합니다.
+5. 음성 응답이 필요하면 음성 서버에서 TTS WAV를 생성하고 백엔드가 앱에 제공합니다.
 
-등록·변경할 시각이 이미 지났으면 다음 날로 넘기지 않고 새 시각을 묻는다. 수정·삭제 응답이 불확실하면 성공이라고 말하지 않고 대상 일정을 다시 조회해 현재 상태를 안내한다. 이후 변경은 새 요청과 확인이 필요하다. [과거 멀티턴 시범 자료](../datasets/qwen/experiments/multiturn_pilot/README.md)는 당시 제어부의 보존본으로 재생한다.
+RKLLM 모델 서버와 음성 서버는 Orange Pi 내부 주소로만 연결하고, 앱에는 백엔드의 포트 `8000`만 공개합니다. 상세 연결과 환경 변수는 [백엔드 README](../backend/README.md#다른-구성-요소와-연결)를 참고하세요.
 
-```powershell
+`schedule_assistant/`는 현재 백엔드 Assistant 구현 이전에 action 형식과 Schedule API 연결을 확인하기 위해 만든 로컬 시범 구현입니다. 최종 공개 Assistant API와 대화 상태 관리는 `backend/`에서 담당합니다.
+
+## 모델과 데이터
+
+최종 모델은 440개 학습 예시와 v37 후처리를 사용합니다. 구성과 평가 결과는 [v37 전달 안내](../docs/qwen_logistics440_v37_handoff.md)와 [데이터셋 README](../datasets/README.md)를 참고하세요.
+
+모델 가중치, tokenizer와 장비별 native runtime은 Git에 포함하지 않습니다. 전달받은 파일의 식별자와 해시를 확인한 뒤 장비에 별도로 설치합니다.
+
+## 검증
+
+저장소 루트에서 AI 영역의 자동 시험을 실행합니다.
+
+```bash
 python -m unittest discover -s ai/tests -v
 ```
 
-현재 한계: 대화 상태가 메모리에만 있고 프로세스별 한 세션이다. 조회와 PATCH/DELETE 사이의 동시 변경을 막는 조건부 쓰기 계약은 백엔드에 아직 없다. 네트워크 실패 후 변경 결과가 불확실하면 성공으로 표시하지 않는다. 모델 응답의 의미 정확도와 멀티턴 평가 지표는 별도 데이터셋/평가기에서 검증해야 한다. 공유 AI endpoint, 상태 보관, 오류·재시도와 action schema의 확정은 `TBD-AI`로 남는다.
+음성 의존성이 없는 환경에서는 실제 STT와 TTS 엔진 시험이 건너뛰어질 수 있습니다. 자동 시험 결과는 실제 모델 추론, Orange Pi 배포와 모바일 앱 통합시험 결과와 구분합니다.
+
+실행 환경 설치, 서비스 상태 확인과 재배포 명령은 각 구성요소의 README를 참고하세요.
+
+## Git에 포함하지 않는 파일
+
+- 모델 가중치, adapter, tokenizer와 checkpoint
+- STT와 TTS 모델 파일 및 다운로드 cache
+- 실제 음성 파일과 생성된 WAV
+- 장비별 절대 경로, IP, 계정과 인증정보
+- 가상환경, 실행 로그와 임시 시험 결과
+
+공개 예시에는 비밀값과 실제 접속정보 대신 안전한 예시 값을 사용합니다.

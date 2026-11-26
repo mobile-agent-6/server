@@ -25,7 +25,7 @@ FIXED_NOW = datetime(2026, 9, 13, 4, 30, tzinfo=timezone.utc)
 
 
 def alembic_config(database_path: Path) -> Config:
-    config = Config(str(BACKEND_ROOT / "alembic.ini"))
+    config = Config(str(BACKEND_ROOT / "config" / "alembic.ini"))
     config.attributes["database_url"] = f"sqlite:///{database_path.as_posix()}"
     return config
 

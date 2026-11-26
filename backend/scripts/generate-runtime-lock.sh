@@ -6,13 +6,14 @@ readonly TARGET_PLATFORM="linux/aarch64"
 readonly PYTHON_MINOR="3.11"
 readonly PYTHON_IMAGE="python:3.11-slim-bookworm"
 readonly PIP_TOOLS_VERSION="7.6.1"
-readonly LOCK_NAME="requirements-runtime-linux-aarch64.lock"
+readonly LOCK_NAME="runtime-linux-aarch64.lock"
+readonly LOCK_RELATIVE_PATH="requirements/${LOCK_NAME}"
 
 usage() {
     cat <<EOF
 Usage: $(basename "$0")
 
-Generate ${LOCK_NAME} from pyproject.toml base dependencies in a clean
+Generate ${LOCK_RELATIVE_PATH} from pyproject.toml base dependencies in a clean
 ${TARGET_PLATFORM} Docker container using Python ${PYTHON_MINOR},
 ${PYTHON_IMAGE}, and pip-tools==${PIP_TOOLS_VERSION}.
 EOF
@@ -46,7 +47,7 @@ fi
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 backend_dir="$(cd "${script_dir}/.." && pwd -P)"
-lock_path="${backend_dir}/${LOCK_NAME}"
+lock_path="${backend_dir}/${LOCK_RELATIVE_PATH}"
 output_dir="$(mktemp -d "${TMPDIR:-/tmp}/schedule-api-runtime-lock.XXXXXX")"
 trap 'rm -rf "$output_dir"' EXIT
 

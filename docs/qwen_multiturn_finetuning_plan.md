@@ -1,9 +1,11 @@
-# Qwen 멀티턴 데이터셋·파인튜닝·전후 평가 계획
+# Qwen 멀티턴 데이터셋, 파인튜닝과 전후 평가 계획 (과거 기록)
 
 > 작성일: 2026-10-10
 > 현황 확인: 2026-10-16. **평가·학습 계획은 제안 상태**다. 기존 Qwen validation 31/40은 미검수 정답에 대한 잠정 측정이다. 후속 MLX 시험 학습 결과는 별도 보고서에 기록하며 잠근 test의 전체 대화 평가와 구분한다.
 > 범위: 이정민 페르소나의 일정 비서, 맥북 로컬 Qwen 실험, 이후 Orange Pi 적용성 확인.
 > 관련 계약: AI 출력·대화 상태·Schedule API 연동은 `TBD-AI`, 평가 데이터 세부 schema와 검수 방식은 `TBD-DATA`, 최종 데이터 위치는 `TBD-TEAM`이다. 이 문서만으로 공유 계약을 확정하지 않는다.
+>
+> 보존 기록 안내 (2026-11-26): 이 문서는 최종 모델과 공개 API가 확정되기 전 작성한 계획이다. 본문의 알림 필드, 미확정 상태와 당시 실험 경로는 현재 계약으로 사용하지 않는다. 현재 기준은 [API 문서](api.md), [데이터셋 안내](../datasets/README.md), [v37 인계 문서](qwen_logistics440_v37_handoff.md)를 따른다.
 
 ## 1. 목표와 비교선
 
@@ -26,7 +28,7 @@
 
 ## 2. 현재 출발점
 
-- 현재 [100문항](../datasets/qwen/experiments/api_categories/cases_100.jsonl), [프롬프트](../datasets/qwen/experiments/api_categories/prompt.txt), [실행기](../datasets/qwen/tools/run_qwen_eval.py), [채점기](../datasets/qwen/tools/qwen_eval.py)는 **단일 발화 → 6필드 JSON**을 평가한다. 정답은 `proposed_unreviewed` 상태다.
+- 당시 100문항, 프롬프트, 실행기와 채점기는 **단일 발화 → 6필드 JSON**을 평가했다. 실행 파일은 현재 작업 트리에서 제거했고 결과 CSV는 [초기 평가 자료](../datasets/qwen/v0.1_initial/README.md)에 보존한다. 정답은 `proposed_unreviewed` 상태였다.
 - 이 100문항을 새 멀티턴 LoRA에 **6필드 출력 그대로 넣지 않는다**. 재사용할 사례는 새 action 출력으로 다시 정답을 만들고 검수·분리한다. 멀티턴 test와 겹치는 발화·시나리오는 학습에 넣지 않는다.
 - 단일 발화 데이터에는 `location`이 있으나 Schedule API에는 독립 위치 필드가 없다. 새 멀티턴 출력·평가에서는 별도 위치 데이터를 만들지 않는다. “B구역 재고 확인”처럼 **대화에서 구역을 언급하는 것은 허용**한다. 구역명을 일정 제목에 자동 삽입하는 규칙도 두지 않는다.
 - [Schedule API](api.md)는 조회·생성·수정·삭제와 `INBOUND`, `INVENTORY`, `OUTBOUND`, `RETURN`, `OTHER`를 정의한다. 생성 요청에는 `title`, `scheduledAt`, `category`, `reminderMinutesBefore`가 필요하고, `10`은 10분 전 알림이다. POST에는 `Idempotency-Key`가 필요하다.
@@ -156,7 +158,7 @@ Qwen은 HTTP를 직접 호출하지 않고 **다음 행동과 필요한 값만 �
 
 `CREATE`·수정·삭제의 성공 안내는 **API 성공 응답을 확인한 뒤** 사용자에게 보여준다. Qwen이 실행을 제안한 순간의 `message`를 완료 메시지로 표시하지 않는다. 실패 시에는 실패 사실을 알리고 모의 일정 상태도 변경하지 않는다.
 
-이 표는 구현 계약이 아니다. AI 출력의 정확한 JSON schema, 확인 대기 수명, 상대 날짜 해석, AI 서비스 endpoint, API 오류·재시도, POST idempotency key의 생성·재사용은 `TBD-AI`로 관련 담당 영역이 정해야 한다. 현재 [API 문서의 TBD-AI](api.md#16-현재-포함하지-않는-계약)를 따른다.
+이 표는 구현 계약이 아니다. AI 출력의 정확한 JSON schema, 확인 대기 수명, 상대 날짜 해석, AI 서비스 endpoint, API 오류·재시도, POST idempotency key의 생성·재사용은 당시 미확정 사항이었다. 현재 계약은 [텍스트 Assistant API 공개 계약](api.md#16-텍스트-assistant-api-공개-계약)을 따른다.
 
 ## 6. 프롬프트 고정과 멀티턴 실행기
 
@@ -261,6 +263,5 @@ Qwen은 HTTP를 직접 호출하지 않고 **다음 행동과 필요한 값만 �
 ## 11. 저장·공유와 참고 자료
 
 - 작은 예시 데이터·검수된 평가 기준만 팀 규칙에 맞춰 Git 공유를 검토한다. 모델, 어댑터/checkpoint, 실제 음성·사용자 기록, 로컬 실행 로그, 실제 DB와 비밀값은 Git에 넣지 않는다. 결과 공개·제출용 집계는 개인정보를 제거한다. [팀 가이드](../TEAM_GUIDELINES.md)
-- 시각 요약은 [큰 그림 HTML](qwen_multiturn_finetuning_plan.html)이다. 이 Markdown이 세부 실행·평가 계획이며 HTML은 빠른 탐색용이다.
-- 프로젝트 맥락: [페르소나와 Qwen 검토](persona_and_qwen_review.md), [Schedule API](api.md), [현행 단일 발화 실험](../datasets/qwen/experiments/api_categories/README.md), [이전 평가 기록](dataset_evaluation.md).
+- 프로젝트 맥락: [페르소나와 Qwen 검토](persona_and_qwen_review.md), [Schedule API](api.md), [초기 단일 발화 평가 자료](../datasets/qwen/v0.1_initial/README.md), [멀티턴 400건 초안](../datasets/qwen/experiments/multiturn_400_v0.1/README.md), [이전 평가 기록](dataset_evaluation.md).
 - 도구 근거: [MLX LM LoRA·데이터 형식](https://github.com/ml-explore/mlx-lm/blob/main/mlx_lm/LORA.md), [Ollama chat·계측 필드](https://docs.ollama.com/api/chat), [Ollama 모델 가져오기](https://docs.ollama.com/import).

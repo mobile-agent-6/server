@@ -29,7 +29,7 @@ def test_development_defaults_are_safe_and_paths_are_stable() -> None:
 
 
 def test_shared_env_example_loads_as_development_configuration() -> None:
-    settings = load_settings(env_file=SERVICE_ROOT / ".env.example")
+    settings = load_settings(env_file=SERVICE_ROOT / "config" / "env.example")
 
     assert settings.app_env == "development"
     assert settings.log_file is None

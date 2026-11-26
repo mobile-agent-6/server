@@ -1,17 +1,16 @@
-DRAFT / 미확정 / 연동 기준으로 사용 금지
+# Orange Pi 음성 연동 검증 기록
 
-# Orange Pi 배포·시험 결과
+> 이 문서는 2026-11-16부터 17일까지 수행한 Orange Pi 배포 및 음성 연동 시험의 당시 상태를 보존한 기록이다. 이후 수행한 최종 통합시험 결과는 포함하지 않는다.
 
-- 작성일·사전 시험 종료: 2026-11-17 KST (시험은 11/16~17)
-- 작성: Codex, 실제 Orange Pi 원격 실행 근거
-- 시험 당시 기준 HEAD: `080e6f2309a9ddd4622f8afc0d381b979f193c30` + 아래 기록한 미커밋 수정본
-- 전달 묶음: `DRAFT_OrangePi_최종인계.zip`
-- Git 기록 브랜치: `fix/orangepi-voice-deploy-validation-20261117`. 본문의 미커밋·080e6f2 표기는 시험을 수행한 당시 기준이며, 수정 소스는 이 브랜치의 커밋으로 보존한다.
-- 전체 연동 완료본이 아니다. 17번 실패와 공동 시험을 해소한 뒤 PI_AI_FINAL/FINAL 여부를 판단한다.
-- 초기 시험은 Microsoft Heami 합성 음성으로 수행했고, 2026-11-17 사용자가 제공한 **실제 사람 녹음17개로 재시험**했다. 최신 실제 녹음 결과는 §19, 기존 합성 결과는 §1~18에 보존한다.
-- 실제 녹음 최신 요약: 핵심3시나리오 각2회 PASS, 후속 답변 PASS, 추가17번 모델 해석 FAIL(미해결),15번은 재질문. AI36 PASS. 최종 인계 확정·전체 연동 완료 상태가 아니다.
+- 기록일: 2026-11-17 KST
+- 시험 당시 기준: `080e6f2309a9ddd4622f8afc0d381b979f193c30`과 아래에 기록한 당시 미커밋 수정본
+- 당시 전달 묶음: `DRAFT_OrangePi_최종인계.zip`
+- Git 기록 브랜치: `fix/orangepi-voice-deploy-validation-20261117`. 본문의 미커밋과 `080e6f2` 표기는 시험 수행 당시 기준이며 수정 소스는 이후 이 브랜치의 커밋으로 보존했다.
+- 당시에는 전체 연동을 완료하지 않았으며 17번 실패와 공동 시험이 남아 있었다.
+- 초기 시험은 Microsoft Heami 합성 음성으로 수행했고, 2026-11-17 사용자가 제공한 실제 사람 녹음 17개로 재시험했다. 실제 녹음 결과는 19장, 기존 합성 결과는 1장부터 18장에 보존한다.
+- 당시 실제 녹음 요약은 핵심 시나리오 3개 각 2회 통과, 후속 답변 통과, 추가 17번 모델 해석 실패, 15번 재질문과 AI 시험 36건 통과였다.
 
-## 1. 최종 판정
+## 1. 당시 판정
 
 최신 develop 기준 코드는 반영했고, 수정본을 실제 Pi에서 실행했다. Git HEAD는 origin/develop과 일치하지만 작업 트리가 변경되어 있으므로 최종 배포 commit 확정은 미완료다. 자동 시험은 backend **1515 PASS / 1 SKIP**, AI **34 PASS**다. SKIP은 별도 환경변수로 켜는 실제 모델 pytest smoke이며, 실제 NPU 호출은 아래 HTTP 시험에서 별도로 수행했다.
 
@@ -96,10 +95,10 @@ journalctl -u schedule-backend.service --no-pager -o cat | grep "$REQUEST_ID"
 
 | 자료 | 확정 여부 | Git 경로 | ZIP 내부 |
 | --- | --- | --- | --- |
-| 이 가이드 | DRAFT | docs/DRAFT_orangepi-final-guide.md | DRAFT_orangepi-final-guide.md |
-| API 설명 | 미커밋 배포 기준 | docs/api.md | api.md |
-| OpenAPI | 실제 서버 전체 원본; 미커밋 배포 기준 | docs/openapi.json | openapi.json |
-| 배포 도구·환경 예시 | 실제 검증; 미커밋 | ai/deploy/ 및 각 README | Git 작업본에서 검토 |
+| 이 기록 | 2026-11-17 중간 검증 기록 | docs/orangepi-voice-validation-20261117.md | DRAFT_orangepi-final-guide.md |
+| API 설명 | 당시 미커밋 배포 기준 | docs/api.md | api.md |
+| OpenAPI | 실제 서버 전체 원본, 당시 미커밋 배포 기준 | docs/openapi.json | openapi.json |
+| 배포 도구와 환경 예시 | 실제 검증, 당시 미커밋 | ai/deploy/ 및 각 README | Git 작업본에서 검토 |
 | STT/TTS 샘플 | 합성 입력/실제 Pi 출력; 별도 전달 | Git 제외 | samples/ |
 
 공동 시험 순서: 배포 SHA 확정→별도 접속 정보 수신→Settings IP 저장→health/time-sync→raw WAV202→GET2초 polling→현재 실행의 음성 요청만 speech재생→오프라인/재시작/오류 복구 확인.
@@ -419,16 +418,16 @@ curl -fsS "$BASE_URL/api/v1/voice/requests/$REQUEST_ID/speech" -o speech.wav
 | backend/tests/unit/test_voice_router.py | cc9689ebe0fdca234b5d8a622df5394c5cde06c484d445abf4476b6083dbee2d |
 
 
-## 18. 최종 파일·체크섬
+## 18. 당시 전달 파일과 체크섬
 
 | 파일 | 위치·상태 |
 | --- | --- |
-| DRAFT_orangepi-final-guide.md | 이 묶음의 미확정 결과; 자체 해시는 ZIP 밖 checksum |
+| orangepi-voice-validation-20261117.md | 저장소에 보존한 당시 검증 기록. 전달 ZIP에는 이전 이름으로 포함 |
 | api.md | 전체 공개 계약·실측 권장값; docs/api.md와 동일 |
 | openapi.json | 실행 서버에서 받은 전체 원본, 편집 없음; docs/openapi.json과 동일 |
 | samples/ | 합성 STT입력17개 + 실제 사람 녹음 WAV17개 + Pi TTS출력30개 + README |
-| ZIP | DRAFT_OrangePi_최종인계.zip; 아직 최종 인계본 아님 |
-| 외부 checksum | DRAFT_OrangePi_최종인계.sha256; ZIP·guide 자신 해시 |
+| ZIP | `DRAFT_OrangePi_최종인계.zip`, 당시 중간 인계 묶음 |
+| 외부 checksum | `DRAFT_OrangePi_최종인계.sha256`, 당시 ZIP과 가이드 해시 |
 | 별도 전달 | 접속 정보 파일, 비공개 백업·시험 근거, 모델·wheelhouse는 ZIP 밖 |
 
 실제 IP·SSH 사용자·Wi-Fi 암호·계정·key·token·환경 원본·DB·운영 로그·모델 본체는 ZIP에 포함하지 않는다. 시험 당시에는 commit·push를 보류했으며, 이후 사용자의 명시적 커밋·푸시 지시에 따라 상단 브랜치로 기록한다.

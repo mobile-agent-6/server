@@ -1,6 +1,5 @@
 # Schedule 및 Assistant 데이터베이스 ERD
 
-> 상태: `BE-CONFIRMED`
 > 범위: MVP Schedule 및 Assistant 영속 데이터
 > 기준 Alembic revision: `20261017_0004`
 

@@ -1,10 +1,8 @@
-# Schedule 및 Assistant API 설계
+# 너만의 비서 API 설계
 
-> 계약 상태: 기존 Schedule 백엔드 계약은 `BE-CONFIRMED`, 기존 프론트 연동 항목은 `BE-FE-AGREED`
+> 기준: 현재 System, Schedule, Assistant와 Voice API 구현 및 [`openapi.json`](openapi.json)
 >
-> 알림 제거 전환 상태: 알림 제외는 `TEAM-CONFIRMED`, 필드 제거·구형 요청 `422`·유효한 version 1 key의 새 요청 `409`는 `BE-CONFIRMED`. FE·AI 적용 확인과 실제 적용 버전·시점은 각각 `TBD-FE`, `TBD-AI`다.
->
-> Assistant 계약 상태: 텍스트·음성 Assistant의 앱 공개 계약은 `BE-FE-AGREED`. 서버는 runtime lock, worker, deadline, 안전한 Schedule write, recovery, tombstone 기반과 설정으로 켜는 모델(Qwen) 연결을 포함한다. 2026-11-16 Orange Pi에서 실제 STT/TTS 엔진과 합성 WAV의 HTTP 시험을 수행했으며, 2026-11-17에는 실제 사람 녹음 17개도 재시험했다. 핵심 시나리오와 추가 긴 문장의 모델 해석 실패를 구분하며, iPhone 공동 검증은 별도다. 시험별 통과 여부와 미확정 배포 상태는 배포·시험 결과에서 구분한다.
+> 서버는 runtime lock, worker, deadline, 안전한 Schedule write, recovery, tombstone 기반과 설정으로 활성화하는 Qwen 연결을 포함한다. 2026-11-16 Orange Pi에서 실제 STT와 TTS 엔진 및 합성 WAV의 HTTP 시험을 수행했고, 2026-11-17에는 실제 사람 녹음 17개를 재시험했다. API 계약, 자동 시험, Orange Pi 시험과 모바일 통합시험 결과는 구분해 기록한다.
 >
 > 범위: MVP Schedule CRUD, 상태 확인, Orange Pi 시각 동기화, 텍스트·음성 Assistant 공개 계약
 
@@ -95,7 +93,7 @@ YYYY-MM-DDTHH:MM:SS[.fraction](Z|±HH:MM)
 ### 3.1 Category
 
 MVP 카테고리는 입고, 재고, 출고, 반품, 기타 5개이며 API 값은 아래 표를
-따른다(`BE-FE-AGREED`).
+따른다.
 
 | 화면 표시 | API 값 | 포함할 일정의 대표 예시 |
 |---|---|---|
@@ -401,8 +399,6 @@ Content-Type: application/json
 
 ### 변경 후 목록 동기화
 
-> 상태: `BE-FE-AGREED`
-
 - 일정 생성·수정·완료 상태 변경·삭제 요청이 성공하면 프론트는 현재 사용 중인 `from`, `to`, `category`, `completed` 조건으로 일정 목록 API를 다시 호출한다.
 - `POST`, `PATCH`, `DELETE`의 성공 응답을 받은 뒤 목록 재조회만 실패한 경우, 이미 성공한 변경 요청을 다시 전송하지 않는다.
 - 이 경우 변경 작업 자체는 성공한 상태로 유지하며, 프론트는 목록 갱신에 실패했음을 사용자에게 안내하고 일정 목록 `GET` 요청만 다시 시도한다.
@@ -546,9 +542,9 @@ X-Request-ID: {재시도 요청의 새 ID}
 - `405 METHOD_NOT_ALLOWED`: 해당 경로의 정확한 `Allow`
 - `204 No Content`: 본문 없음
 
-### 13.5 임시 timeout과 retry
+### 13.5 timeout과 retry 정책
 
-다음 값은 Orange Pi 실기기 측정 전 사용하는 `BE-FE-AGREED` 임시 기준이다.
+다음 값은 앱과 공개 API 사이의 요청 제한 시간 및 자동 재시도 정책이다.
 
 | 요청 | timeout | 자동 재시도 |
 |---|---:|---|
@@ -563,21 +559,15 @@ X-Request-ID: {재시도 요청의 새 ID}
 - Assistant 오류의 재조회·재전송은 16.9절을 따른다. 같은 앱 실행·120초 안의 `404 ASSISTANT_REQUEST_NOT_FOUND`에 같은 ID·같은 body를 보내는 경우만 제한된 예외다.
 - 자동 재시도를 반복하지 않는다.
 - Assistant 정상 polling은 직전 GET 응답 뒤 2초를 기다리며 요청을 겹치지 않는다. 최초 POST 시도부터 120초가 지나면 자동 조회와 재전송을 중단하되 로컬 복구 정보를 자동 삭제하지 않는다.
-- 최종 timeout 값과 재시도 세부 조정은 Orange Pi 응답 시간 실측 후 확정한다(`TBD-TEAM`).
+- 음성 POST와 TTS GET의 운영 권장값은 16.14.4의 Orange Pi 실측 결과를 따른다.
 
 ## 14. 알림 제거와 구형 클라이언트 호환성
 
-- 상태를 구분한다. 알림 제외 자체는 팀 결정이고, 아래 필드 제거·구형 요청 `422`·
-  유효한 version 1 key의 새 요청 `409`는 백엔드가 채택·구현한 전환 규칙이다.
-  FE·AI가 이 전환 규칙을 적용했는지와 실제 적용 버전·시점은 아직 확인 대기다.
 - 제품 범위에서 알림을 제외했으며 백엔드는 알림 설정을 저장·계산·응답하지 않는다.
 - 생성·수정 요청의 `reminderMinutesBefore`와 읽기 전용 `reminderAt`은 알 수 없는
   필드로 처리한다.
 - 새 API 응답에는 두 필드가 없으므로 구형 클라이언트·AI 제어부·평가 도구는 새
   서버 버전에 맞게 조정한 뒤 연동한다.
-- `ai/`의 로컬 시범 제어부와 `datasets/qwen/experiments/multiturn_400_v0.1/`의
-  미검수 초안은 알림 필드를 제거한 형식으로 조정했다. 이는 production
-  DecisionProvider 연결이나 FE·AI 적용 확인(`TBD-FE`, `TBD-AI`)의 완료를 뜻하지 않는다.
 - 과거 migration과 기존 멱등성 응답 snapshot에는 재현·보존 목적으로 알림 필드가
   남을 수 있다. 이를 현재 API가 알림을 지원한다는 뜻으로 해석하지 않는다.
 
@@ -631,9 +621,7 @@ ValidationErrorItem
 
 ## 16. 텍스트 Assistant API 공개 계약
 
-> 상태: `BE-FE-AGREED`
->
-> 구현: 계약 확정·부분 구현. DB별 runtime lock, 단일 worker, 300초 deadline, gate·marker 기반 Schedule 안전 write, idempotent create recovery, atomic update/delete, uncertain acknowledge와 bounded tombstone cleanup이 연결됐다. 모델(Qwen) 연결은 설정으로 켤 때만 동작하며, 시작 때 준비되지 않으면 첫 text 입력에서 한 번 더 연결을 확인한다. 그때도 연결되지 않으면 새 text와 자연어 후속 POST는 insert 없이 `503 ASSISTANT_UNAVAILABLE`이고, 저장 정보가 완전한 selection/confirmation과 기존 GET, cancel은 동작한다.
+> 구현: DB별 runtime lock, 단일 worker, 300초 deadline, gate와 marker 기반 Schedule 안전 write, idempotent create recovery, atomic update/delete, uncertain acknowledge와 bounded tombstone cleanup을 포함한다. 모델(Qwen) 연결은 설정으로 활성화하며, 시작할 때 준비되지 않으면 첫 text 입력에서 한 번 더 연결을 확인한다. 그때도 연결되지 않으면 새 text와 자연어 후속 POST는 insert 없이 `503 ASSISTANT_UNAVAILABLE`이고, 저장 정보가 완전한 selection/confirmation과 기존 GET, cancel은 동작한다.
 
 ### 16.1 역할과 기본 흐름
 
@@ -946,11 +934,9 @@ Assistant의 접수 전 거절·GET·취소 오류도 13장의 Problem Details�
 
 ### 16.14 음성 Assistant 공개 계약
 
-> 상태: `BE-FE-AGREED`
->
-> 구현 경계: 백엔드 계약·가짜 엔진 회귀 테스트와 Pi의 Whisper·Piper 합성 WAV 시험을 구분한다.
-> 아래 실측은 2026-11-16, `080e6f2` 기반의 미커밋 수정 작업본에서 수행했다.
-> 최종 배포 SHA 확정, 실제 사람 음성과 iPhone 전체 연동을 통과했다는 의미는 아니다.
+> 구현 경계: 백엔드 계약과 가짜 엔진 회귀 테스트는 Orange Pi의 Whisper, Piper 및 WAV 실기기 시험과 구분한다.
+> 아래 실측은 2026-11-16 Orange Pi 시험 기록을 기준으로 한다.
+> 이 절의 실측은 Orange Pi 음성 처리 시험이며 모바일 앱 통합시험 결과와 구분한다.
 
 `POST /api/v1/voice/requests`는 raw body로 WAV 음성을 받는다. `requestId`는 필수 query이며
 후속 답변이면 `conversationId`와 `questionId`를 함께 보낸다.
@@ -1075,31 +1061,13 @@ Microsoft Heami 합성 WAV(3초, 16 kHz mono PCM)를 실제 Pi에 전송한 10�
 | 실제 녹음 TTS GET | 0.749초 | 1.796초 |
 | 실제 녹음 POST부터 TTS수신 | 23.124초 | 54.855초 |
 
-실제 녹음의 상세 결과와 남은 오류는 [배포·시험 가이드 §19](DRAFT_orangepi-final-guide.md)를 따른다. 17개 문장 전체가 정확히 해석·등록됐다는 의미가 아니다.
+실제 녹음의 상세 결과와 당시 남은 오류는 [Orange Pi 음성 연동 검증 기록 19장](orangepi-voice-validation-20261117.md)을 따른다. 17개 문장 전체가 정확히 해석 및 등록됐다는 의미가 아니다.
 
-운영 권장은 음성 POST 35초, TTS GET 35초, VOICE_BUSY 재확인 2초다. 정상 실측에 더해 내부 음성 서버 timeout 30초의 503을 클라이언트가 받을 여유 5초를 둔 값이다. 최대 15초 음원의 모든 발화에 대한 지연 상한을 보장하지 않는다. 프론트 적용과 iPhone 공동 확인은 별도다. Assistant GET의 기존 2초 polling과 최초 시도부터 120초 자동 조회 한도는 유지한다.
+운영 권장은 음성 POST 35초, TTS GET 35초, VOICE_BUSY 재확인 2초다. 정상 실측에 더해 내부 음성 서버 timeout 30초의 503을 클라이언트가 받을 여유 5초를 둔 값이다. 최대 15초 음원의 모든 발화에 대한 지연 상한을 보장하지 않는다. 앱 적용 결과는 별도 통합시험 기록으로 관리한다. Assistant GET의 기존 2초 polling과 최초 시도부터 120초 자동 조회 한도는 유지한다.
 
-## 17. 현재 포함하지 않는 계약
+## 17. 제외 범위와 향후 확장
 
-다음 항목은 현재 Schedule API와 위 Assistant 공개 계약의 문서 확정을 막지 않으며, 관련 담당자 확인 전 구현 계약으로 임의 추가하지 않는다.
-
-### `TBD-AI`
-
-- Assistant 제어부·모델의 내부 프로세스 분리 방식과 내부 endpoint·port·protocol
-- 모델 구조화 출력 schema와 제어부 검증 경계
-- 제어부가 Schedule 생성에 사용하는 내부 `Idempotency-Key` 생성·재사용 방식
-- 백엔드와 STT/TTS 엔진 사이의 내부 endpoint·port·전송 protocol
-- 서버 처리 상한 안의 모델 호출 timeout·내부 retry 세부값
-- Assistant 구현 담당과 제어부·모델 연결 작업 분담
-
-### `TBD-TEAM`
-
-- 각자 집에서 수행할 원격 시험 경로·접근 제한·암호화 방식
-- Pi·실제 모델·단말 측정 뒤 Assistant 5초·2초·120초·300초 값의 조정 여부
-- 다중 단말 시험 시 `UNRESOLVED_UNCERTAIN` 보류 범위
-- MVP 이후 최소 ID 기록과 미해소 uncertain의 장기 폐기 정책
-
-### `POST-MVP`
+다음 항목은 현재 MVP API 범위에 포함하지 않는다.
 
 - 반복 일정, 종일 일정과 종료 시각
 - 알림 기능 재도입과 구체적인 알림 시점
@@ -1108,4 +1076,6 @@ Microsoft Heami 합성 WAV(3초, 16 kHz mono PCM)를 실제 Pi에 전송한 10�
 - 제목 검색, 정렬 parameter와 pagination
 - HTTPS, rate limiting과 외부 공개 production
 - 변경분 동기화와 server push
+- 다중 단말 동시 사용 정책
+- 미해소 uncertain 요청의 장기 보관과 폐기 정책
 - 재고·폐기·작업 기록 도메인

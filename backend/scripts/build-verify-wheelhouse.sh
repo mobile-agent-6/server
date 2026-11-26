@@ -5,7 +5,8 @@ set -Eeuo pipefail
 readonly TARGET_PLATFORM="linux/aarch64"
 readonly PYTHON_MINOR="3.11"
 readonly PYTHON_IMAGE="python:3.11-slim-bookworm"
-readonly LOCK_NAME="requirements-runtime-linux-aarch64.lock"
+readonly LOCK_NAME="runtime-linux-aarch64.lock"
+readonly LOCK_RELATIVE_PATH="requirements/${LOCK_NAME}"
 
 usage() {
     cat <<EOF
@@ -58,7 +59,7 @@ fi
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 backend_dir="$(cd "${script_dir}/.." && pwd -P)"
 repository_dir="$(cd "${backend_dir}/.." && pwd -P)"
-lock_path="${backend_dir}/${LOCK_NAME}"
+lock_path="${backend_dir}/${LOCK_RELATIVE_PATH}"
 
 if [[ ! -s "$lock_path" ]]; then
     printf 'error: runtime lock not found: %s\n' "$lock_path" >&2
@@ -117,7 +118,7 @@ docker run --rm \
             --only-binary=:all: \
             --requirement "/source/$2" \
             --dest /wheelhouse
-    ' sh "$PYTHON_MINOR" "$LOCK_NAME"
+    ' sh "$PYTHON_MINOR" "$LOCK_RELATIVE_PATH"
 
 wheel_count=0
 while IFS= read -r -d '' wheel_path; do
@@ -178,7 +179,7 @@ from app.main import app
 
 assert app is not None
 '\''
-    ' sh "$PYTHON_MINOR" "$LOCK_NAME"
+    ' sh "$PYTHON_MINOR" "$LOCK_RELATIVE_PATH"
 
 if [[ "$temporary_output" == true ]]; then
     printf 'Verified %s wheels in a temporary wheelhouse; it will now be removed.\n' \

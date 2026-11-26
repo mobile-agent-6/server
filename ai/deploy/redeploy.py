@@ -15,7 +15,7 @@ import time
 import urllib.request
 
 SERVICES = ["rkllm-npu.service", "voice-server.service", "schedule-backend.service"]
-DEPENDENCIES = ["backend/pyproject.toml", "backend/requirements-runtime-linux-aarch64.lock", "ai/voice_server/requirements.txt", "ai/voice_server/requirements.lock", "ai/rkllm_runtime/requirements.txt"]
+DEPENDENCIES = ["backend/pyproject.toml", "backend/requirements/runtime-linux-aarch64.lock", "ai/voice_server/requirements.txt", "ai/voice_server/requirements.lock", "ai/rkllm_runtime/requirements.txt"]
 
 
 def main():
