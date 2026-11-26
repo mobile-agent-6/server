@@ -1,0 +1,49 @@
+{
+  "status": "PASS",
+  "rows": 16,
+  "dialogues": 8,
+  "byFeature": {
+    "completed_update": 8,
+    "list": 4,
+    "update": 4
+  },
+  "byPrefixLength": {
+    "1": 8,
+    "2": 8
+  },
+  "historyOverlapIgnoringReference": [
+    {
+      "caseId": "v36-paired-completed-a-r1",
+      "dialogueId": "completed-a",
+      "round": 1,
+      "feature": "completed_update"
+    },
+    {
+      "caseId": "v36-paired-completed-b-r1",
+      "dialogueId": "completed-b",
+      "round": 1,
+      "feature": "completed_update"
+    },
+    {
+      "caseId": "v36-paired-completed-c-r1",
+      "dialogueId": "completed-c",
+      "round": 1,
+      "feature": "completed_update"
+    }
+  ],
+  "secondPrefixHistoryOverlap": 0,
+  "labelsAuthoredWithoutCandidateOutputs": true,
+  "futureTurnGoldLeakage": false,
+  "independentTest": false,
+  "sameAuthorFocusedDiagnostic": true,
+  "sourceHashes": {
+    "<SOURCE_WORKSPACE>/qwen-legacy184-prefix-20261111-001/source/train400.jsonl": "c880e5b3f4c29f63ac7f1b2c570fb208cd881f28347abeeb1c9e79af59323f13",
+    "<SOURCE_WORKSPACE>/qwen-multiturn-train60-20261110/prepared/train.jsonl": "1444127f7dfd58a7b6ced04de6bb3a55b077ac3be752f4ee002f57c7e7c85490",
+    "<SOURCE_WORKSPACE>/qwen-legacy184-eval30-v31-20261111/inputs30.jsonl": "d30256090e61c858a9f412a8e70cf60b8a218c1b50fd5605001f6ac5dc87cf45",
+    "<SOURCE_WORKSPACE>/qwen-legacy184-eval30-v33-20261111/inputs30.jsonl": "c4fc7805eb8db5b805f37529b093b616ca6fb68f327552a87572a9634a405fe0",
+    "<SOURCE_WORKSPACE>/qwen-legacy184-eval30-v34-20261111/inputs30.jsonl": "ff1e6103646e7441edc05b9007c179e0b9c1aaa43073290ca65983ac6988e0af",
+    "<SOURCE_WORKSPACE>/qwen-multiturn-paired24-v35-20261111/inputs24.jsonl": "2d32542e257ccefc487f8460590916ab429f6113b2d3abb0bb3edc9948f093be"
+  },
+  "newTraining": false,
+  "modelInferencePerformed": false
+}

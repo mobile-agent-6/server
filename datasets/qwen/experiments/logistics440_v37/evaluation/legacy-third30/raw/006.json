@@ -1,0 +1,16 @@
+{
+  "key": "d623dfa844422d8eb768df858b751d43a9206cdf32c60f48b0e0cb90c5e607f6",
+  "identity": {
+    "freezeSha256": "c3ec03a58f880d92ae94aeffa816940216f98bc8d4f763fb9fa63abbfd9a7c51",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"포장 샘플 상자 회수\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"모레\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"포장\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "cc520e7faea5885f1680fab13d5a6ec8394cd7998d9b0b2b61c7cec2f999bd93",
+  "seconds": 8.156341666996013
+}

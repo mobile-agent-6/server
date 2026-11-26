@@ -1,0 +1,16 @@
+{
+  "key": "bc5d49640293d129667f8e50ddbcac83e6be489e8105cdfaa4015780445eff4f",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":2,\"text\":\"입고 인수증 정리\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"입고 라벨 누락 확인\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":3,\"text\":\"7시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":3,\"text\":\"대신\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"오후 7시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"입고\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "e676896020bc17e6f752cabb9dd89f52a9f9c4c4f341c5ec28d1de90d530388c",
+  "seconds": 11.414645915996516
+}

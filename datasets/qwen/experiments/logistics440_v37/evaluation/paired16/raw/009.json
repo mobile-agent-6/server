@@ -1,0 +1,16 @@
+{
+  "key": "12834cd3a3794d9f31238ce3be8a82c6a0af83e61572a9e325e7137cb7dc8f1d",
+  "identity": {
+    "freezeSha256": "f81142e91acc8ea29423099dd67e472ac31b55890bf1007a3dd1f736960f18c4",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":1,\"text\":\"일정을 좀 찾아줘\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "1fc54d976f22b8c7d3493e6b9ee9d51b9782fe9afcdf3cf93fb2911cd7aac33f",
+  "seconds": 6.735988708038349
+}

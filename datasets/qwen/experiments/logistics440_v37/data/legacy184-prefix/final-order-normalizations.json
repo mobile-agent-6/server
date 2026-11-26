@@ -1,0 +1,1849 @@
+[
+  {
+    "sourceRow": 44,
+    "changes": [
+      {
+        "role": "changeEvidence",
+        "slot": "title",
+        "before": [
+          {
+            "turn": 2,
+            "text": "반품 검사 용기 확인",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "포장 검사 용기 확인",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "포장 검사 용기 확인",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "반품 검사 용기 확인",
+            "status": "adopted"
+          }
+        ]
+      },
+      {
+        "role": "changeEvidence",
+        "slot": "category",
+        "before": [
+          {
+            "turn": 2,
+            "text": "반품",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "포장",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "포장",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "반품",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 45,
+    "changes": [
+      {
+        "role": "changeEvidence",
+        "slot": "date",
+        "before": [
+          {
+            "turn": 2,
+            "text": "글피",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "모레",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "모레",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "글피",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 51,
+    "changes": [
+      {
+        "role": "changeEvidence",
+        "slot": "time",
+        "before": [
+          {
+            "turn": 2,
+            "text": "오전 8시 30분",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "오전 7시 30분",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "오전 7시 30분",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "오전 8시 30분",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 52,
+    "changes": [
+      {
+        "role": "changeEvidence",
+        "slot": "title",
+        "before": [
+          {
+            "turn": 2,
+            "text": "반품 샘플 상자 회수",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "포장 샘플 상자 회수",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "포장 샘플 상자 회수",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "반품 샘플 상자 회수",
+            "status": "adopted"
+          }
+        ]
+      },
+      {
+        "role": "changeEvidence",
+        "slot": "category",
+        "before": [
+          {
+            "turn": 2,
+            "text": "반품",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "포장",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "포장",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "반품",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 80,
+    "changes": [
+      {
+        "role": "filterEvidence",
+        "slot": "title",
+        "before": [
+          {
+            "turn": 2,
+            "text": "자재 분류표 부착 검사",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "자재 분류표 인쇄 검사",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "자재 분류표 인쇄 검사",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "자재 분류표 부착 검사",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 114,
+    "changes": [
+      {
+        "role": "targetEvidence",
+        "slot": "date",
+        "before": [
+          {
+            "turn": 2,
+            "text": "12월 9일",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "12월 7일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "12월 7일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "12월 9일",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 130,
+    "changes": [
+      {
+        "role": "changeEvidence",
+        "slot": "date",
+        "before": [
+          {
+            "turn": 2,
+            "text": "2월 27일",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "2월 25일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "2월 25일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "2월 27일",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 131,
+    "changes": [
+      {
+        "role": "changeEvidence",
+        "slot": "title",
+        "before": [
+          {
+            "turn": 2,
+            "text": "집품 구역 담당자 배정",
+            "status": "adopted"
+          },
+          {
+            "turn": 2,
+            "text": "주문서와 집품 목록 대조",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "말고",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 2,
+            "text": "주문서와 집품 목록 대조",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "말고",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "집품 구역 담당자 배정",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 135,
+    "changes": [
+      {
+        "role": "changeEvidence",
+        "slot": "date",
+        "before": [
+          {
+            "turn": 2,
+            "text": "7월 15일",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "7월 13일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "7월 13일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "7월 15일",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 139,
+    "changes": [
+      {
+        "role": "changeEvidence",
+        "slot": "title",
+        "before": [
+          {
+            "turn": 2,
+            "text": "배송 기사 인계 서류 확인",
+            "status": "adopted"
+          },
+          {
+            "turn": 2,
+            "text": "배송 기사 인계 수량 확인",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "말고",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 2,
+            "text": "배송 기사 인계 수량 확인",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "말고",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "배송 기사 인계 서류 확인",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 141,
+    "changes": [
+      {
+        "role": "changeEvidence",
+        "slot": "title",
+        "before": [
+          {
+            "turn": 2,
+            "text": "회수 상품 운송장 대조",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "회수 상품 도착 수량 확인",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "회수 상품 도착 수량 확인",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "회수 상품 운송장 대조",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 150,
+    "changes": [
+      {
+        "role": "filterEvidence",
+        "slot": "date",
+        "before": [
+          {
+            "turn": 2,
+            "text": "4월 9일",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "4월 7일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "4월 7일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "4월 9일",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 156,
+    "changes": [
+      {
+        "role": "filterEvidence",
+        "slot": "date",
+        "before": [
+          {
+            "turn": 2,
+            "text": "8월 13일",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "8월 12일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "8월 12일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "8월 13일",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 157,
+    "changes": [
+      {
+        "role": "filterEvidence",
+        "slot": "title",
+        "before": [
+          {
+            "turn": 2,
+            "text": "연락처 누락 주문 확인",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "도서 지역 배송 조건 확인",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "도서 지역 배송 조건 확인",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "연락처 누락 주문 확인",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 176,
+    "changes": [
+      {
+        "role": "changeEvidence",
+        "slot": "title",
+        "before": [
+          {
+            "turn": 2,
+            "text": "미등록 상품 코드 확인",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "상품 중량 정보 확인",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "상품 중량 정보 확인",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "미등록 상품 코드 확인",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 190,
+    "changes": [
+      {
+        "role": "targetEvidence",
+        "slot": "title",
+        "before": [
+          {
+            "turn": 2,
+            "text": "집품 중 바코드 오류 확인",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "집품 중 상품 부족 확인",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "집품 중 상품 부족 확인",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "집품 중 바코드 오류 확인",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 197,
+    "changes": [
+      {
+        "role": "targetEvidence",
+        "slot": "date",
+        "before": [
+          {
+            "turn": 2,
+            "text": "8월 17일",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "8월 16일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "8월 16일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "8월 17일",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 198,
+    "changes": [
+      {
+        "role": "targetEvidence",
+        "slot": "title",
+        "before": [
+          {
+            "turn": 2,
+            "text": "하차 상품 유통기한 확인",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "혼적 화물 구분 작업",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "혼적 화물 구분 작업",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "하차 상품 유통기한 확인",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 215,
+    "changes": [
+      {
+        "role": "targetEvidence",
+        "slot": "title",
+        "before": [
+          {
+            "turn": 2,
+            "text": "오배송 상품 식별표 정리",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "고객 미수령 상품 확인",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "고객 미수령 상품 확인",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "오배송 상품 식별표 정리",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 216,
+    "changes": [
+      {
+        "role": "changeEvidence",
+        "slot": "completed",
+        "before": [
+          {
+            "turn": 2,
+            "text": "미완료로 변경해 줘",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "완료로 표시해 줘",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "완료로 표시해 줘",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "미완료로 변경해 줘",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 219,
+    "changes": [
+      {
+        "role": "targetEvidence",
+        "slot": "date",
+        "before": [
+          {
+            "turn": 2,
+            "text": "12월 21일",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "12월 20일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "12월 20일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "12월 21일",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 228,
+    "changes": [
+      {
+        "role": "changeEvidence",
+        "slot": "date",
+        "before": [
+          {
+            "turn": 2,
+            "text": "8월 5일",
+            "status": "adopted"
+          },
+          {
+            "turn": 2,
+            "text": "7월 5일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 2,
+            "text": "7월 5일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "8월 5일",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 239,
+    "changes": [
+      {
+        "role": "filterEvidence",
+        "slot": "date",
+        "before": [
+          {
+            "turn": 2,
+            "text": "8월 7일",
+            "status": "adopted"
+          },
+          {
+            "turn": 2,
+            "text": "7월 7일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 2,
+            "text": "7월 7일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "8월 7일",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 251,
+    "changes": [
+      {
+        "role": "filterEvidence",
+        "slot": "date",
+        "before": [
+          {
+            "turn": 2,
+            "text": "9월 25일",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "9월 22일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "9월 22일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "9월 25일",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 253,
+    "changes": [
+      {
+        "role": "filterEvidence",
+        "slot": "date",
+        "before": [
+          {
+            "turn": 2,
+            "text": "8월 13일",
+            "status": "adopted"
+          },
+          {
+            "turn": 2,
+            "text": "7월 13일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 2,
+            "text": "7월 13일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "8월 13일",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 263,
+    "changes": [
+      {
+        "role": "changeEvidence",
+        "slot": "time",
+        "before": [
+          {
+            "turn": 2,
+            "text": "오후 6시 40분",
+            "status": "adopted"
+          },
+          {
+            "turn": 2,
+            "text": "오전 8시 25분",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 2,
+            "text": "오전 8시 25분",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "오후 6시 40분",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 264,
+    "changes": [
+      {
+        "role": "targetEvidence",
+        "slot": "date",
+        "before": [
+          {
+            "turn": 2,
+            "text": "8월 10일",
+            "status": "adopted"
+          },
+          {
+            "turn": 2,
+            "text": "7월 10일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 2,
+            "text": "7월 10일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "8월 10일",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 286,
+    "changes": [
+      {
+        "role": "changeEvidence",
+        "slot": "time",
+        "before": [
+          {
+            "turn": 2,
+            "text": "오후 6시 40분",
+            "status": "adopted"
+          },
+          {
+            "turn": 2,
+            "text": "오전 8시 25분",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 2,
+            "text": "오전 8시 25분",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "오후 6시 40분",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 287,
+    "changes": [
+      {
+        "role": "targetEvidence",
+        "slot": "date",
+        "before": [
+          {
+            "turn": 2,
+            "text": "8월 21일",
+            "status": "adopted"
+          },
+          {
+            "turn": 2,
+            "text": "7월 21일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 2,
+            "text": "7월 21일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "8월 21일",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 293,
+    "changes": [
+      {
+        "role": "changeEvidence",
+        "slot": "date",
+        "before": [
+          {
+            "turn": 2,
+            "text": "11월 3일",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "11월 2일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "11월 2일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "11월 3일",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 300,
+    "changes": [
+      {
+        "role": "changeEvidence",
+        "slot": "time",
+        "before": [
+          {
+            "turn": 2,
+            "text": "오전 9시 5분",
+            "status": "adopted"
+          },
+          {
+            "turn": 1,
+            "text": "오전 8시",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 1,
+            "text": "오전 8시",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "아니",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "오전 9시 5분",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 315,
+    "changes": [
+      {
+        "role": "targetEvidence",
+        "slot": "title",
+        "before": [
+          {
+            "turn": 2,
+            "text": "예약 주문 처리일 확인 후속 점검",
+            "status": "adopted"
+          },
+          {
+            "turn": 2,
+            "text": "예약 주문 처리일 확인",
+            "status": "superseded",
+            "occurrence": 1
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 2,
+            "text": "예약 주문 처리일 확인",
+            "status": "superseded",
+            "occurrence": 1
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "예약 주문 처리일 확인 후속 점검",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 317,
+    "changes": [
+      {
+        "role": "targetEvidence",
+        "slot": "date",
+        "before": [
+          {
+            "turn": 2,
+            "text": "8월 10일",
+            "status": "adopted"
+          },
+          {
+            "turn": 2,
+            "text": "7월 10일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 2,
+            "text": "7월 10일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "8월 10일",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 333,
+    "changes": [
+      {
+        "role": "targetEvidence",
+        "slot": "title",
+        "before": [
+          {
+            "turn": 2,
+            "text": "주문 취소 건 작업 중지 확인 후속 점검",
+            "status": "adopted"
+          },
+          {
+            "turn": 2,
+            "text": "주문 취소 건 작업 중지 확인",
+            "status": "superseded",
+            "occurrence": 1
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 2,
+            "text": "주문 취소 건 작업 중지 확인",
+            "status": "superseded",
+            "occurrence": 1
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "주문 취소 건 작업 중지 확인 후속 점검",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 341,
+    "changes": [
+      {
+        "role": "targetEvidence",
+        "slot": "date",
+        "before": [
+          {
+            "turn": 2,
+            "text": "8월 19일",
+            "status": "adopted"
+          },
+          {
+            "turn": 2,
+            "text": "7월 19일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 2,
+            "text": "7월 19일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "8월 19일",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 357,
+    "changes": [
+      {
+        "role": "changeEvidence",
+        "slot": "completed",
+        "before": [
+          {
+            "turn": 2,
+            "text": "미완료로 되돌려 줘",
+            "status": "adopted"
+          },
+          {
+            "turn": 2,
+            "text": "완료로 표시해 주세요",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 2,
+            "text": "완료로 표시해 주세요",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "미완료로 되돌려 줘",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 361,
+    "changes": [
+      {
+        "role": "targetEvidence",
+        "slot": "title",
+        "before": [
+          {
+            "turn": 2,
+            "text": "해외 배송 서류 확인 재확인",
+            "status": "adopted"
+          },
+          {
+            "turn": 2,
+            "text": "해외 배송 서류 확인",
+            "status": "superseded",
+            "occurrence": 1
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 2,
+            "text": "해외 배송 서류 확인",
+            "status": "superseded",
+            "occurrence": 1
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "해외 배송 서류 확인 재확인",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 364,
+    "changes": [
+      {
+        "role": "targetEvidence",
+        "slot": "date",
+        "before": [
+          {
+            "turn": 2,
+            "text": "8월 9일",
+            "status": "adopted"
+          },
+          {
+            "turn": 2,
+            "text": "7월 9일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 2,
+            "text": "7월 9일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "8월 9일",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 380,
+    "changes": [
+      {
+        "role": "changeEvidence",
+        "slot": "completed",
+        "before": [
+          {
+            "turn": 2,
+            "text": "미완료로 되돌려 줘",
+            "status": "adopted"
+          },
+          {
+            "turn": 2,
+            "text": "완료로 표시해 주세요",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 2,
+            "text": "완료로 표시해 주세요",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "미완료로 되돌려 줘",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 382,
+    "changes": [
+      {
+        "role": "targetEvidence",
+        "slot": "title",
+        "before": [
+          {
+            "turn": 2,
+            "text": "낱개 상품 단위 확인 재확인",
+            "status": "adopted"
+          },
+          {
+            "turn": 2,
+            "text": "낱개 상품 단위 확인",
+            "status": "superseded",
+            "occurrence": 1
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 2,
+            "text": "낱개 상품 단위 확인",
+            "status": "superseded",
+            "occurrence": 1
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "낱개 상품 단위 확인 재확인",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceRow": 384,
+    "changes": [
+      {
+        "role": "targetEvidence",
+        "slot": "date",
+        "before": [
+          {
+            "turn": 2,
+            "text": "8월 21일",
+            "status": "adopted"
+          },
+          {
+            "turn": 2,
+            "text": "7월 21일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          }
+        ],
+        "after": [
+          {
+            "turn": 2,
+            "text": "7월 21일",
+            "status": "superseded"
+          },
+          {
+            "turn": 2,
+            "text": "대신",
+            "status": "correction_marker"
+          },
+          {
+            "turn": 2,
+            "text": "8월 21일",
+            "status": "adopted"
+          }
+        ]
+      }
+    ]
+  }
+]

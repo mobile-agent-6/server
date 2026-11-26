@@ -1,0 +1,16 @@
+{
+  "key": "9760c1df0af0de187a050139a58a5b2173d7f077ffc8ac036e95fdc718b6bc60",
+  "identity": {
+    "freezeSha256": "e06dcd680ad4bc1718721dfa4d24140e29a262fae9017203bc744a71baea3961",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"출고 이동대 고정브래킷 점검\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 표시해 주세요\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "b2e46428ce8de2b3fb1dd26c00b7a7181d2ac2100858dac0948602efd31889f2",
+  "seconds": 9.39036095800111
+}

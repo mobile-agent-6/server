@@ -1,0 +1,16 @@
+{
+  "key": "beb81e947a17179c88b72f11c9c491325afe6bb69218990a4f8be423c033013c",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":2,\"text\":\"보냉 운반함 세척\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "afa53f7a2d9fddb73d86f5df04a0e949b507bb23e23bc26a8c244a4833302c20",
+  "seconds": 7.878193874988938
+}

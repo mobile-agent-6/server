@@ -1,0 +1,24 @@
+model: <SOURCE_WORKSPACE>/qwen-c-first-20261104-001/model
+data: <SOURCE_WORKSPACE>/qwen-logistics-complete400-v13-20261107-001/prepared
+train: true
+test: false
+fine_tune_type: lora
+resume_adapter_file: <SOURCE_WORKSPACE>/qwen-logistics400-20261107-001/run_01/adapters/adapters.safetensors
+mask_prompt: true
+batch_size: 1
+num_layers: 16
+learning_rate: 0.00005
+iters: 178
+max_seq_length: 2048
+grad_checkpoint: true
+steps_per_report: 1
+steps_per_eval: 178
+val_batches: -1
+save_every: 50
+seed: 42
+adapter_path: <SOURCE_WORKSPACE>/qwen-logistics-complete400-v13-20261107-001/run_01/adapters
+grad_accumulation_steps: 1
+lora_parameters:
+  rank: 8
+  scale: 20.0
+  dropout: 0.0

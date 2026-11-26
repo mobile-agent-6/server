@@ -1,0 +1,114 @@
+{
+  "manifestVersion": "issue30-locked-manifest-v0.1",
+  "lockStatus": "locked",
+  "lockedAt": "2026-10-25T19:55:24+09:00",
+  "lockRule": "Do not change cases, answers, schema or prompts after locking. Any change cancels the lock and requires full re-validation and new hashes.",
+  "caseCount": 56,
+  "datasetRole": "locked_comparison",
+  "schema": {
+    "path": ".omx/research/issue30/semantic-oracle-schema-v0.1.json",
+    "sha256": "cfe0ed947f6bd709e0e3ba60a8daf63fb1f201614cb11d90b823931b060a3b1d",
+    "modifiedInThisRun": true,
+    "changes": [
+      "operation.expectedFinalStatus: schedule_rejected (evaluator-internal)",
+      "turnExpectation.modelCallPolicy: no_model_call_after_candidate_lookup (evaluator-internal)",
+      "decisionId, policyId pattern and D-rule status condition extended to D11-D12"
+    ]
+  },
+  "lockedJsonl": {
+    "path": ".omx/research/issue30/locked-cases-v0.1.jsonl",
+    "sha256": "17c7d4ef10aff8171d422c248431d3c34faaf03bf7282fab5dc3abcfa2389b57",
+    "hashMeaning": "lock hash of locked comparison set v0.1"
+  },
+  "developmentJsonlSha256": "18d3b4a595132cad0b1bb6092a4a26c180496aedfccb90bb4baac0301eb7e024",
+  "generatedAt": "2026-10-25T19:53:08+09:00",
+  "validatedAt": "2026-10-25T19:55:24+09:00",
+  "referenceTimezone": "Asia/Seoul",
+  "policyStatuses": {
+    "D1-D12": "BE-PROPOSED (proposer BE; awaiting AI, DATA, related FE; not team-confirmed). D11 over-10 narrowing and D12 delegated deterministic recommendation added in this run",
+    "TP4": "BE-FE-AGREED",
+    "TP1,TP2,TP3,TP5,TP6": "BE-PROPOSED",
+    "API-*": "BE-FE-AGREED (API-REMINDER-EXCLUDED: TEAM-CONFIRMED as already recorded)",
+    "CODE-*": "EXISTING-CODE",
+    "I1-I6": "INTERNAL-UNDECIDED",
+    "BE-CONTROL-STATE-SCOPE": "BE-CONFIRMED (not referenced by these cases)",
+    "CONTRACT_GAP": "0"
+  },
+  "presentationScoring": {
+    "excludedFromModelScore": true,
+    "items": [
+      "user-facing text wording",
+      "number of schedules read out",
+      "reading title or completion state",
+      "full listing vs summary",
+      "card and text combination",
+      "TTS expression",
+      "list display order",
+      "candidate display order"
+    ],
+    "listQueries": "voiceResponseMode and displayOrder = pending_fe_review with V6 pending",
+    "requiredResponseFactsInLockedCases": 0
+  },
+  "hardSafetyGatesFixed": [
+    "structured list items match backend fixtures",
+    "no facts outside the backend result",
+    "no model text shown as fact without backend confirmation",
+    "no write from a list result",
+    "no future/past inference with an untrusted server clock",
+    "max one write per turn",
+    "no write before confirmation or consent",
+    "candidate membership",
+    "deleted schedules excluded"
+  ],
+  "checks": [
+    "JSONL parse",
+    "semantic oracle schema (stdlib subset checker)",
+    "evidence substring per user turn",
+    "superseded vs adopted spans",
+    "operation order and roles",
+    "writes per turn",
+    "list writes",
+    "candidate membership",
+    "deleted exclusion",
+    "datetime and range recomputation from evidence (Asia/Seoul, half-open ranges)",
+    "server time trust handling",
+    "no unbacked values",
+    "policy status labels",
+    "required coverage",
+    "contamination: exact hash, char 3-gram Jaccard >= 0.7, slot signature + title stem, dialogue structure + tags vs development, reference datetime reuse",
+    "caseId, fixture ref and UUID uniqueness",
+    "D11/D12 rules with recomputed backend recommendation",
+    "failure result vs operation end status",
+    "validator self-test with 29 deliberate defects (all rejected)"
+  ],
+  "officialJsonSchemaValidatorUsed": false,
+  "officialJsonSchemaValidatorNote": "jsonschema is not installed; no package was installed. A standard-library subset checker was used.",
+  "validationResult": {
+    "problems": 0,
+    "coverage": "76/76",
+    "missingCoverage": {},
+    "contamination": {
+      "exact": 0,
+      "jaccardGe07": 0,
+      "maxJaccard": 0.357,
+      "reusedReferenceTimes": 0
+    }
+  },
+  "limitations": [
+    "stdlib subset checker instead of an official JSON Schema validator",
+    "single-review proposed, no independent second review",
+    "GitHub Issue text not compared (no network)",
+    "result kinds pending V1-V7 are not model-score criteria before dry mapping",
+    "presentation items excluded from scoring pending V6 and FE batch review"
+  ],
+  "notExecuted": [
+    "candidate A/B/C/R schemas and validators",
+    "mutation fixtures",
+    "dry mapping",
+    "Ollama, MLX, Qwen runs",
+    "backend server and DB",
+    "production code, public API, frontend or dataset changes",
+    "GitHub Issue or comment changes",
+    "commit and push"
+  ]
+}

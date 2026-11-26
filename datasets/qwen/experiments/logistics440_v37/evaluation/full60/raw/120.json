@@ -1,0 +1,16 @@
+{
+  "key": "07544248b751385624ad7dc0b91b30a5827289840617b0ec0908e558b797beb6",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"title\":[{\"turn\":3,\"text\":\"반품 회수품 접수\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"category\":[{\"turn\":3,\"text\":\"반품\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "d1ace4a02b733ba1f3698906c65a08b6ae109b9838ae84e01c929311cbb34fef",
+  "seconds": 9.251767749985447
+}

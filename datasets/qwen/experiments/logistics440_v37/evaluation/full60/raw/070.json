@@ -1,0 +1,16 @@
+{
+  "key": "e84548edd7e7ab7a07f948f6c04f3935e3a80488a2fa2037cb51a14a63d80895",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":3,\"text\":\"출고 도크 대기품 정리\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"title\":[{\"turn\":2,\"text\":\"새 제목은 출고 기사 인수증 대조\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "decf8c65b1144a06f2846a5849bcff8ad4f577c0fc67bca6a467c55380014af0",
+  "seconds": 8.209710374998394
+}

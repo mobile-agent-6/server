@@ -1,0 +1,276 @@
+{
+  "status": "PASS",
+  "rows": 30,
+  "byFeature": {
+    "create": 6,
+    "list": 6,
+    "update": 6,
+    "delete": 6,
+    "completed_update": 6
+  },
+  "byPrefixLength": {
+    "2": 5,
+    "1": 25
+  },
+  "sourceDialogues": 30,
+  "selectedFromNewIntermediateOnly": true,
+  "sourceTextRepairIncluded": false,
+  "prior30ExactInputOverlap": 0,
+  "prior30SourceRowOverlap": 0,
+  "prior30FirstUserTextOverlap": 0,
+  "exactTrainingInputOverlap": 0,
+  "trainingRelatedSourceDialogues": true,
+  "independentTest": false,
+  "sampling": "Seed 2026111133; 6 per feature; prioritize up to 2 second prefixes; exclude previous30 source rows and same first-user text; random within remaining strata. No candidate output used for selection. Training-derived, not population-representative.",
+  "sourceHashes": {
+    "<SOURCE_WORKSPACE>/qwen-legacy184-prefix-20261111-001/prefix-all381-candidate.jsonl": "96c360db9e4581e3c3d9c8dc3aabec638180ca49165e9cd1f37e21537dfab26f",
+    "<SOURCE_WORKSPACE>/qwen-legacy184-prefix-20261111-001/prefix-all381-index.jsonl": "21007116597c76168f3f0c5bd16ff9e5f765e1313662c77691a47635bfd285ff",
+    "<SOURCE_WORKSPACE>/qwen-legacy184-prefix-20261111-001/verification.json": "a6a6a57ce30e13475f1d830190e8c89f35b6be846b490c5337f15a489c17bec2",
+    "<SOURCE_WORKSPACE>/qwen-legacy184-prefix-20261111-001/source/train400.jsonl": "c880e5b3f4c29f63ac7f1b2c570fb208cd881f28347abeeb1c9e79af59323f13",
+    "<SOURCE_WORKSPACE>/qwen-multiturn-train60-20261110/prepared/train.jsonl": "1444127f7dfd58a7b6ced04de6bb3a55b077ac3be752f4ee002f57c7e7c85490"
+  },
+  "selections": [
+    {
+      "caseId": "legacy184-row050-prefix2",
+      "sourceRow": 50,
+      "round": 2,
+      "feature": "create",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 3
+    },
+    {
+      "caseId": "legacy184-row252-prefix1",
+      "sourceRow": 252,
+      "round": 1,
+      "feature": "list",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row182-prefix2",
+      "sourceRow": 182,
+      "round": 2,
+      "feature": "update",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 3
+    },
+    {
+      "caseId": "legacy184-row117-prefix2",
+      "sourceRow": 117,
+      "round": 2,
+      "feature": "delete",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 3
+    },
+    {
+      "caseId": "legacy184-row400-prefix2",
+      "sourceRow": 400,
+      "round": 2,
+      "feature": "completed_update",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 3
+    },
+    {
+      "caseId": "legacy184-row131-prefix1",
+      "sourceRow": 131,
+      "round": 1,
+      "feature": "create",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row254-prefix1",
+      "sourceRow": 254,
+      "round": 1,
+      "feature": "list",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row180-prefix1",
+      "sourceRow": 180,
+      "round": 1,
+      "feature": "update",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row189-prefix1",
+      "sourceRow": 189,
+      "round": 1,
+      "feature": "delete",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row388-prefix2",
+      "sourceRow": 388,
+      "round": 2,
+      "feature": "completed_update",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 3
+    },
+    {
+      "caseId": "legacy184-row048-prefix1",
+      "sourceRow": 48,
+      "round": 1,
+      "feature": "create",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row238-prefix1",
+      "sourceRow": 238,
+      "round": 1,
+      "feature": "list",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row173-prefix1",
+      "sourceRow": 173,
+      "round": 1,
+      "feature": "update",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row198-prefix1",
+      "sourceRow": 198,
+      "round": 1,
+      "feature": "delete",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row361-prefix1",
+      "sourceRow": 361,
+      "round": 1,
+      "feature": "completed_update",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row227-prefix1",
+      "sourceRow": 227,
+      "round": 1,
+      "feature": "create",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row082-prefix1",
+      "sourceRow": 82,
+      "round": 1,
+      "feature": "list",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row181-prefix1",
+      "sourceRow": 181,
+      "round": 1,
+      "feature": "update",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row342-prefix1",
+      "sourceRow": 342,
+      "round": 1,
+      "feature": "delete",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row399-prefix1",
+      "sourceRow": 399,
+      "round": 1,
+      "feature": "completed_update",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row125-prefix1",
+      "sourceRow": 125,
+      "round": 1,
+      "feature": "create",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row250-prefix1",
+      "sourceRow": 250,
+      "round": 1,
+      "feature": "list",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row300-prefix1",
+      "sourceRow": 300,
+      "round": 1,
+      "feature": "update",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row193-prefix1",
+      "sourceRow": 193,
+      "round": 1,
+      "feature": "delete",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row398-prefix1",
+      "sourceRow": 398,
+      "round": 1,
+      "feature": "completed_update",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row225-prefix1",
+      "sourceRow": 225,
+      "round": 1,
+      "feature": "create",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row083-prefix1",
+      "sourceRow": 83,
+      "round": 1,
+      "feature": "list",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row260-prefix1",
+      "sourceRow": 260,
+      "round": 1,
+      "feature": "update",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row338-prefix1",
+      "sourceRow": 338,
+      "round": 1,
+      "feature": "delete",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    },
+    {
+      "caseId": "legacy184-row356-prefix1",
+      "sourceRow": 356,
+      "round": 1,
+      "feature": "completed_update",
+      "selectionReason": "seeded_stratified_unopened_prefix",
+      "sourceModelTurnCount": 2
+    }
+  ],
+  "newTraining": false,
+  "modelInferencePerformed": false
+}

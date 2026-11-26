@@ -1,0 +1,16 @@
+{
+  "key": "ecb0e9111726ec8ca91020369a845f262a63570a1461922d8a0e1abb4f15d940",
+  "identity": {
+    "freezeSha256": "f7ca24d3253ce76f14bcfc7ed1b3e96e1359c1ff0793092acd2e8148ee958474",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"혼적 화물 구분 작업\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "120c59556ecff5fd95fdd29d7b0100d953281b054bbe29e777061cd867a9dcd7",
+  "seconds": 6.893090415978804
+}

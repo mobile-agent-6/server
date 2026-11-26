@@ -1,0 +1,16 @@
+{
+  "key": "6863fe617554c3d6e9e357ddb22839e452920ab4969e898cd179802dcf7755b5",
+  "identity": {
+    "freezeSha256": "07bfb630c7cec6da7572d9657da328c7aaea072902a2139ce4fbff89c79d4173",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"출고 운반대 미스드라\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":2,\"text\":\"완료 취소\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "9f4445487a203cb7bcc87d523359ebebe42f3c3e6f83d33522d5b8e5d15c8aa3",
+  "seconds": 7.727265291963704
+}

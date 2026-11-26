@@ -1,0 +1,153 @@
+{
+  "model": "selected440+v31",
+  "overall": {
+    "rows": 30,
+    "raw": {
+      "exact": 10,
+      "contract": 18,
+      "missingInformationExact": 10,
+      "evidenceOnlyExact": 17
+    },
+    "v31": {
+      "exact": 21,
+      "contract": 22,
+      "missingInformationExact": 21,
+      "evidenceOnlyExact": 21,
+      "clarifications": 0,
+      "errors": 0
+    }
+  },
+  "byFeature": {
+    "completed_update": {
+      "rows": 6,
+      "raw": {
+        "exact": 3,
+        "contract": 5,
+        "missingInformationExact": 3,
+        "evidenceOnlyExact": 4
+      },
+      "v31": {
+        "exact": 4,
+        "contract": 5,
+        "missingInformationExact": 4,
+        "evidenceOnlyExact": 4,
+        "clarifications": 0,
+        "errors": 0
+      }
+    },
+    "create": {
+      "rows": 6,
+      "raw": {
+        "exact": 0,
+        "contract": 3,
+        "missingInformationExact": 0,
+        "evidenceOnlyExact": 3
+      },
+      "v31": {
+        "exact": 4,
+        "contract": 4,
+        "missingInformationExact": 4,
+        "evidenceOnlyExact": 4,
+        "clarifications": 0,
+        "errors": 0
+      }
+    },
+    "delete": {
+      "rows": 6,
+      "raw": {
+        "exact": 2,
+        "contract": 2,
+        "missingInformationExact": 2,
+        "evidenceOnlyExact": 2
+      },
+      "v31": {
+        "exact": 3,
+        "contract": 3,
+        "missingInformationExact": 3,
+        "evidenceOnlyExact": 3,
+        "clarifications": 0,
+        "errors": 0
+      }
+    },
+    "list": {
+      "rows": 6,
+      "raw": {
+        "exact": 3,
+        "contract": 3,
+        "missingInformationExact": 3,
+        "evidenceOnlyExact": 3
+      },
+      "v31": {
+        "exact": 4,
+        "contract": 4,
+        "missingInformationExact": 4,
+        "evidenceOnlyExact": 4,
+        "clarifications": 0,
+        "errors": 0
+      }
+    },
+    "update": {
+      "rows": 6,
+      "raw": {
+        "exact": 2,
+        "contract": 5,
+        "missingInformationExact": 2,
+        "evidenceOnlyExact": 5
+      },
+      "v31": {
+        "exact": 6,
+        "contract": 6,
+        "missingInformationExact": 6,
+        "evidenceOnlyExact": 6,
+        "clarifications": 0,
+        "errors": 0
+      }
+    }
+  },
+  "byPrefixLength": {
+    "1": {
+      "rows": 24,
+      "raw": {
+        "exact": 7,
+        "contract": 12,
+        "missingInformationExact": 7,
+        "evidenceOnlyExact": 12
+      },
+      "v31": {
+        "exact": 16,
+        "contract": 16,
+        "missingInformationExact": 16,
+        "evidenceOnlyExact": 16,
+        "clarifications": 0,
+        "errors": 0
+      }
+    },
+    "2": {
+      "rows": 6,
+      "raw": {
+        "exact": 3,
+        "contract": 6,
+        "missingInformationExact": 3,
+        "evidenceOnlyExact": 5
+      },
+      "v31": {
+        "exact": 5,
+        "contract": 6,
+        "missingInformationExact": 5,
+        "evidenceOnlyExact": 5,
+        "clarifications": 0,
+        "errors": 0
+      }
+    }
+  },
+  "diagnosticBuckets": {
+    "exact": 21,
+    "contract_failure": 8,
+    "evidence_and_missing_information_error": 1
+  },
+  "trainingStarted": false,
+  "selectedModelChanged": false,
+  "independentTest": false,
+  "apiDatabaseReplayPerformed": false,
+  "scope": "30 manually selected intermediate snapshots from existing training dialogues. Same input payloads were not in the checked training data; dialogue-derived overlap remains. Not an independent test or API success. Missing/evidence diagnostics require contract pass."
+}

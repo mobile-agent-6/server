@@ -1,0 +1,16 @@
+{
+  "key": "57c227cc9562f981a1510a383d97aae1c525d8f1015689557155319fe02be5e6",
+  "identity": {
+    "freezeSha256": "e0ac9aba89edee1cb6318fb07376860dcc6d3c4b5073f7c591bcc4415acd3265",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"바코드 리더 거치대 고정 확인\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"11월 24일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":2,\"text\":\"오전 9시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"바코드 리더\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "e964f8408ee91a7b5c5b40b58497903be158a75ffaa08e97bb9ac566978b4489",
+  "seconds": 9.188582750037313
+}

@@ -1,0 +1,11 @@
+{
+  "releaseTag": "qwen-logistics440-v37-20261111",
+  "releasePage": "https://github.com/mobile-agent-6/server/releases/tag/qwen-logistics440-v37-20261111",
+  "assetName": "qwen440-v37-backend-review.zip",
+  "bytes": 32213823,
+  "sha256": "4890be2f6213d62cf5d156aef8d0af98859cb8b322f00d29b0e032c328b0e497",
+  "assetPurpose": "440-example trained MLX LoRA, exact tokenizer/template, v37 rules, candidate data and cached evaluations",
+  "baseWeightsIncluded": false,
+  "baseWeightSha256": "e240c0bdc0ebb0681bf0da0f98d9719fd6ebe269a3633f81542c13e81345651d",
+  "publicationStatus": "See GitHub Release for availability;local manifest does not certify upload."
+}

@@ -1,0 +1,16 @@
+{
+  "key": "c1216d77ae3420920b5deebb58e53b12800c8914c72dd28dfc59400149078c01",
+  "identity": {
+    "freezeSha256": "f81142e91acc8ea29423099dd67e472ac31b55890bf1007a3dd1f736960f18c4",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"completedState\":[{\"turn\":1,\"text\":\"완료된\",\"status\":\"adopted\"}],\"title\":[{\"turn\":1,\"text\":\"물류 이동 통로 턱 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "b06b006985626f6fb17e8ddff937e03a7abd9f242458b3577bcd22fc5b39eb0f",
+  "seconds": 7.618851416977122
+}

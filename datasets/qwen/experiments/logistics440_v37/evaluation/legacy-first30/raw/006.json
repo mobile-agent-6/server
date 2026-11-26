@@ -1,0 +1,16 @@
+{
+  "key": "9b7857edd402c9394f07f6e69b62cdf6a2f6de36af0252cbd02613f16bdd8912",
+  "identity": {
+    "freezeSha256": "14d9351b65aa64766b77e997e569fc9d12625f2e77207e09def91daf39f2aab9",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"출고 라인 점검\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"오후 4시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"출고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "d992a517910497a02f68cb5c3675cf5687a9b41ec84bc6a37c45cbb921b5642c",
+  "seconds": 8.225862083025277
+}

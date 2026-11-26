@@ -1,0 +1,16 @@
+{
+  "key": "c09165633f982ec30a0301c129a3ba18e7ffaf5c0300d12f0ac95ae0ecebb2a0",
+  "identity": {
+    "freezeSha256": "f7ca24d3253ce76f14bcfc7ed1b3e96e1359c1ff0793092acd2e8148ee958474",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"복수 상품 주문 구성 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"date\":[{\"turn\":1,\"text\":\"오전 9시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "e50e28a2aead8c22fc1d99a93f17dddf4cfece4d69d14ba4d1dd9fe843a66d89",
+  "seconds": 7.586595041968394
+}

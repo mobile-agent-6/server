@@ -1,0 +1,16 @@
+{
+  "key": "c2ef09cf92f86a89346b197d1ab317d56bbff15f01dca47ec45de118e38cf9f5",
+  "identity": {
+    "freezeSha256": "f81142e91acc8ea29423099dd67e472ac31b55890bf1007a3dd1f736960f18c4",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":2,\"text\":\"운반 카트 손잡이 고정 확인\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":1,\"text\":\"미완료로 바꿔줘\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "2342b333d97ab54d89aabaf095f6911481a1ea02a496088412473c3e15d30210",
+  "seconds": 7.824311458971351
+}

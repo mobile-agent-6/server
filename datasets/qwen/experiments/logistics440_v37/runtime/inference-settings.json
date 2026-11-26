@@ -1,0 +1,6 @@
+{
+  "temperature": 0.0,
+  "seed": 29,
+  "maxTokens": 1024,
+  "enableThinking": false
+}

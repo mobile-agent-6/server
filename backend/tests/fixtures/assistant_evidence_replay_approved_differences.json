@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "baselineCommit": "3b0f937",
+  "approver": "backend-owner",
+  "note": "Only intentional replay differences approved by the backend owner belong here. Entries are handwritten and must include case, turn, baseline, new behavior, reason, and decision basis.",
+  "baselineRecheck": {
+    "goldTargetRows": 849,
+    "batch6MarkerlessCases": [
+      "c3-create-b6-056",
+      "c3-create-b6-057",
+      "c3-create-b6-058",
+      "c3-create-b6-059",
+      "c3-create-b6-060"
+    ],
+    "approvedDifferencesAtBaseline": 0,
+    "note": "The earlier handoff mentioned four extra confirmations before the follow-up fixes. At baseline commit 3b0f937, all five markerless batch 6 families match this frozen replay, so no legacy difference is allowlisted."
+  },
+  "differences": [
+    {
+      "case": "c3-create-b3-002",
+      "turn": 1,
+      "baseline": "{\"category\":\"INVENTORY\",\"kind\":\"create_intent\",\"scheduledAt\":\"2028-04-06T01:00:00Z\",\"text\":\"일정을 등록할게요.\",\"timeInterpretation\":\"relative\",\"title\":\"사무용품 재고 정리\"}",
+      "new": "{\"kind\":\"ask\",\"text\":\"2028년 4월 6일 오전 10시에 '사무용품 재고 정리' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요.\"}",
+      "reason": "학습 후보 행의 출력 target은 유지하되, 등록 의도가 명시적인 등록 동사로 표현되지 않아 backend가 저장 전에 확인한다.",
+      "decisionBasis": "2026-11-04 backend 소유자가 데이터 target을 바꾸지 않고 backend 재생 차이만 승인했다. 이 행은 training_candidate이면서 model score에서 제외된 development_probe이다."
+    },
+    {
+      "case": "c3-create-b3-053",
+      "turn": 2,
+      "baseline": "{\"category\":\"OTHER\",\"kind\":\"create_intent\",\"scheduledAt\":\"2028-04-20T05:00:00Z\",\"text\":\"일정을 등록할게요.\",\"timeInterpretation\":\"relative\",\"title\":\"창고 방역 작업\"}",
+      "new": "{\"kind\":\"ask\",\"text\":\"2028년 4월 20일 오후 2시에 '창고 방역 작업' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요.\"}",
+      "reason": "이전 turn의 제안형 문장과 현재 turn의 제목 답변을 합쳐 새 일정을 바로 저장하지 않고 backend가 절대 날짜와 시각을 보여 준 뒤 확인한다.",
+      "decisionBasis": "2026-11-04 backend 소유자가 데이터 target을 바꾸지 않고 backend 재생 차이만 승인했다. 명시적인 등록 동사가 현재 turn에 없는 다중 turn 등록은 인적 확인을 거친다."
+    }
+  ]
+}

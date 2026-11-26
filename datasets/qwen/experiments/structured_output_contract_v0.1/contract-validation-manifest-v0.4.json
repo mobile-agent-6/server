@@ -1,0 +1,37 @@
+{
+  "manifestVersion": "issue30-contract-validation-v0.4",
+  "status": "DETERMINISTIC_VALIDATION_COMPLETE",
+  "authoredOn": "2026-10-26",
+  "commonGateVersion": "issue30-common-gate-v0.4",
+  "scope": "trusted policy turn-prefix completeness only",
+  "newProductPolicy": false,
+  "modelEvaluationRun": false,
+  "tests": {
+    "ran": 92,
+    "failed": 0,
+    "command": "PYTHONDONTWRITEBYTECODE=1 ../server/backend/.venv/bin/python -B -m unittest discover -s .omx/research/issue30 -p 'test_*.py'"
+  },
+  "inputCompletenessChecks": {
+    "currentTurnRequired": true,
+    "uniqueTurnNumbers": true,
+    "ascendingTurnOrder": true,
+    "completePrefixFromOne": true,
+    "developmentAndLockedTextTurnPrefixesAccepted": true
+  },
+  "protectedV03": {
+    "common_gate_v0_3.py": "7d72b31cbcd98cd021380fb72dde0f2da6b6d03254319d0f87ab25c8fbb97bd4",
+    "contract-validation-manifest-v0.3.json": "383299544c257825aa3175ffc26981c3dbc5204ef0b015a3986b493bfe7c3d6d",
+    "ollama-eval-manifest-v0.3.json": "8f4f2bb09d6eb7074f131e75474864295f95e7ae60a0e9cee2818585be339939"
+  },
+  "artifacts": {
+    ".omx/research/issue30/common_gate_v0_4.py": "7185baf7f7bde15359d17d76b3aa659587c0127f1e792549d2c11d873291963b",
+    ".omx/research/issue30/test_common_gate_v0_4.py": "b31e7baf4efeafc67fd0e849730207352ef38bb439676767a25faa097da5d256",
+    ".omx/research/issue30/contract-validation-summary-v0.4.md": "b273dfcff33516764b16883e034a6ac4b27b78fd96bca57c0529f6f002b7a363"
+  },
+  "notExecuted": [
+    "Ollama or model evaluation with v0.4",
+    "production backend integration",
+    "backend server, database, Schedule API or write",
+    "shared schema or public API change"
+  ]
+}

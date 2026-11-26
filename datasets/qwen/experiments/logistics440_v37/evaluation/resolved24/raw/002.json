@@ -1,0 +1,16 @@
+{
+  "key": "70347fb2c4fd0b304d4778b22038b556aabdf25a377d455cb1aa499d03cbc5bf",
+  "identity": {
+    "freezeSha256": "07bfb630c7cec6da7572d9657da328c7aaea072902a2139ce4fbff89c79d4173",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"출고 적재장 덮개 잠금쇠 대조\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":2,\"text\":\"미완료로 할지 완료로 할지 고민했지만 완료로 바꿔 주세요\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":2,\"text\":\"완료로 바꿔 주세요\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "973c8367884776414d7a8c173589b3298fc29e4cbb5df819013587d5131031fc",
+  "seconds": 9.334690832998604
+}

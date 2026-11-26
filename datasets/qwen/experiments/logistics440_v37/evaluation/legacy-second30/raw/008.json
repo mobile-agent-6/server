@@ -1,0 +1,16 @@
+{
+  "key": "821176be25a025c8680950249a3f21d8d31810972cb1ccef7c7fc8aa0e4ea7a4",
+  "identity": {
+    "freezeSha256": "f7ca24d3253ce76f14bcfc7ed1b3e96e1359c1ff0793092acd2e8148ee958474",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"completedState\":[{\"turn\":1,\"text\":\"완료된 파손 상품 수량 집계\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "a2c1e8f06bd205bfeaaf9a8461465d032faf11d7cb8f338765a778f971a8fc8e",
+  "seconds": 7.023036875005346
+}

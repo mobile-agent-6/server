@@ -1,0 +1,16 @@
+{
+  "key": "91d50fc945fcf0f87fb296d053eda32e60b0a23177646956788faf6dd124878e",
+  "identity": {
+    "freezeSha256": "c3ec03a58f880d92ae94aeffa816940216f98bc8d4f763fb9fa63abbfd9a7c51",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"입고 차량 예약 확인\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"2028년 2월 22일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"3시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"입고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "92294476a3da893a309e123c9ece3c8dac445e01583669169dee76944c307d55",
+  "seconds": 8.999879125040025
+}

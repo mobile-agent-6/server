@@ -1,0 +1,16 @@
+{
+  "key": "bc57c63c0546d7de8a965b2754a1011ab15bfab6d4a542c9a67e456af7673b86",
+  "identity": {
+    "freezeSha256": "14d9351b65aa64766b77e997e569fc9d12625f2e77207e09def91daf39f2aab9",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"반품 봉투 치수 측정\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"4월 3일\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"반품\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "b791110caf3b665e9c8198fa23d74699a0eed412065710b54d36e52ccf089812",
+  "seconds": 8.43411491700681
+}

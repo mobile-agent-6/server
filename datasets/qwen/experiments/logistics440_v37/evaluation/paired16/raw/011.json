@@ -1,0 +1,16 @@
+{
+  "key": "1e7522e5d52ae7f7c2b56e7b640c7b7f121e180847cf313c8278192c82fc2fe4",
+  "identity": {
+    "freezeSha256": "f81142e91acc8ea29423099dd67e472ac31b55890bf1007a3dd1f736960f18c4",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":1,\"text\":\"일정 목록을 보고 싶어요\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "61669fda38cba51ecd2b08ee60511294a9cd7d7f33a4f51c929d7d5f283b392c",
+  "seconds": 6.881226832978427
+}

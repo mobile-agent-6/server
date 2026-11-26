@@ -1,0 +1,16 @@
+{
+  "key": "6e6169107650795ec3774bbab745a5289016f2b8fbaaba7578127a8f64576c07",
+  "identity": {
+    "freezeSha256": "f7ca24d3253ce76f14bcfc7ed1b3e96e1359c1ff0793092acd2e8148ee958474",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"상차 완료 서명 확인\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":1,\"text\":\"완료\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "90621e65357a7c85ca61ec82b0c36a43d0795080ab9a1b9b95ad2d95ef7e42da",
+  "seconds": 7.425985541951377
+}

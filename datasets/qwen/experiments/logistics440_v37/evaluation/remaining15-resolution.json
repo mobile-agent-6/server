@@ -1,0 +1,612 @@
+{
+  "rows": 15,
+  "resolved": 15,
+  "v36": {
+    "exact": 117,
+    "contract": 119,
+    "clarifications": 13
+  },
+  "v37": {
+    "exact": 132,
+    "contract": 132,
+    "clarifications": 0
+  },
+  "twoNonQuestionIssues": {
+    "row113": "Correction old-time source turn/occurrence wrong;adopted time was already correct.",
+    "row120": "Unrequested target category inferred from title;removed."
+  },
+  "cases": [
+    {
+      "row": 9,
+      "origins": [
+        {
+          "caseId": "mt60-create-r3-v3",
+          "round": 1,
+          "familyId": "mt60-create-flow3",
+          "split": "development_selection_pool",
+          "trainingUsed": false,
+          "apiReplayVerified": false,
+          "feature": "create"
+        }
+      ],
+      "old": {
+        "key": "2eaa47cd19adc6cc345b79a57c91b7b154595f96bbfc7fb7882665726a72d3be",
+        "postRaw": null,
+        "score": null,
+        "clarification": {
+          "reason": "non_unique_source_title",
+          "question": "일정 제목이나 시간을 원문과 정확히 연결하지 못했어요. 최종 일정 제목과 날짜·시간, 원하는 작업을 한 문장으로 다시 말씀해 주세요."
+        }
+      },
+      "new": {
+        "key": "2eaa47cd19adc6cc345b79a57c91b7b154595f96bbfc7fb7882665726a72d3be",
+        "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"재고 유통기한 확인\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"재고\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"새벽 12시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+        "score": {
+          "parser": true,
+          "roles": true,
+          "overlap": true,
+          "exact": true,
+          "kind": true,
+          "safety_questions": [],
+          "contract_pass": true
+        },
+        "clarification": null
+      },
+      "resolvedExact": true
+    },
+    {
+      "row": 10,
+      "origins": [
+        {
+          "caseId": "mt60-create-r3-v3",
+          "round": 3,
+          "familyId": "mt60-create-flow3",
+          "split": "development_selection_pool",
+          "trainingUsed": true,
+          "apiReplayVerified": false,
+          "feature": "create"
+        }
+      ],
+      "old": {
+        "key": "be24dd72307972c5abd797419cf01ccc8347c8ae81ac84d80ebda5a4b7d7f479",
+        "postRaw": null,
+        "score": null,
+        "clarification": {
+          "reason": "invalid_or_unresolved_correction",
+          "question": "정정할 대상이나 값이 명확하지 않아요. 최종 일정 제목과 바꿀 내용, 원하는 작업을 한 문장으로 다시 말씀해 주세요."
+        }
+      },
+      "new": {
+        "key": "be24dd72307972c5abd797419cf01ccc8347c8ae81ac84d80ebda5a4b7d7f479",
+        "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"재고 유통기한 확인\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"재고\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":2,\"text\":\"새벽 12시\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"오후 5시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+        "score": {
+          "parser": true,
+          "roles": true,
+          "overlap": true,
+          "exact": true,
+          "kind": true,
+          "safety_questions": [],
+          "contract_pass": true
+        },
+        "clarification": null
+      },
+      "resolvedExact": true
+    },
+    {
+      "row": 12,
+      "origins": [
+        {
+          "caseId": "mt60-list-r3-v0",
+          "round": 2,
+          "familyId": "mt60-list-flow0",
+          "split": "development_selection_pool",
+          "trainingUsed": false,
+          "apiReplayVerified": false,
+          "feature": "list"
+        }
+      ],
+      "old": {
+        "key": "5ff7ed962f52e09cf328ff00250104b5751f9a8d473d9e0adfa15e0a89461b12",
+        "postRaw": null,
+        "score": null,
+        "clarification": {
+          "reason": "invalid_or_unresolved_correction",
+          "question": "정정할 대상이나 값이 명확하지 않아요. 최종 일정 제목과 바꿀 내용, 원하는 작업을 한 문장으로 다시 말씀해 주세요."
+        }
+      },
+      "new": {
+        "key": "5ff7ed962f52e09cf328ff00250104b5751f9a8d473d9e0adfa15e0a89461b12",
+        "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"3시\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+        "score": {
+          "parser": true,
+          "roles": true,
+          "overlap": true,
+          "exact": true,
+          "kind": true,
+          "safety_questions": [],
+          "contract_pass": true
+        },
+        "clarification": null
+      },
+      "resolvedExact": true
+    },
+    {
+      "row": 13,
+      "origins": [
+        {
+          "caseId": "mt60-list-r3-v0",
+          "round": 3,
+          "familyId": "mt60-list-flow0",
+          "split": "development_selection_pool",
+          "trainingUsed": false,
+          "apiReplayVerified": false,
+          "feature": "list"
+        }
+      ],
+      "old": {
+        "key": "f20a754de85662b8c174cbd6c69c967e1c3744ab45359e6a2c9e5a502c659c38",
+        "postRaw": null,
+        "score": null,
+        "clarification": {
+          "reason": "multiple_corrections_need_restatement",
+          "question": "정정할 대상이나 값이 명확하지 않아요. 최종 일정 제목과 바꿀 내용, 원하는 작업을 한 문장으로 다시 말씀해 주세요."
+        }
+      },
+      "new": {
+        "key": "f20a754de85662b8c174cbd6c69c967e1c3744ab45359e6a2c9e5a502c659c38",
+        "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":3,\"text\":\"3시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":3,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"오후 3시\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+        "score": {
+          "parser": true,
+          "roles": true,
+          "overlap": true,
+          "exact": true,
+          "kind": true,
+          "safety_questions": [],
+          "contract_pass": true
+        },
+        "clarification": null
+      },
+      "resolvedExact": true
+    },
+    {
+      "row": 57,
+      "origins": [
+        {
+          "caseId": "mt60-list-r4-v0",
+          "round": 3,
+          "familyId": "mt60-list-flow0",
+          "split": "development_selection_pool",
+          "trainingUsed": false,
+          "apiReplayVerified": false,
+          "feature": "list"
+        },
+        {
+          "caseId": "mt60-list-r5-v0",
+          "round": 3,
+          "familyId": "mt60-list-flow0",
+          "split": "development_selection_pool",
+          "trainingUsed": false,
+          "apiReplayVerified": false,
+          "feature": "list"
+        }
+      ],
+      "old": {
+        "key": "6e56ead2a2e30f8ca9adc9731aefb4d0ba986a56888f4b2ad435fbd5cc5b317c",
+        "postRaw": null,
+        "score": null,
+        "clarification": {
+          "reason": "invalid_or_unresolved_correction",
+          "question": "정정할 대상이나 값이 명확하지 않아요. 최종 일정 제목과 바꿀 내용, 원하는 작업을 한 문장으로 다시 말씀해 주세요."
+        }
+      },
+      "new": {
+        "key": "6e56ead2a2e30f8ca9adc9731aefb4d0ba986a56888f4b2ad435fbd5cc5b317c",
+        "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"3시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":2,\"text\":\"입고 바코드 검수\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+        "score": {
+          "parser": true,
+          "roles": true,
+          "overlap": true,
+          "exact": true,
+          "kind": true,
+          "safety_questions": [],
+          "contract_pass": true
+        },
+        "clarification": null
+      },
+      "resolvedExact": true
+    },
+    {
+      "row": 58,
+      "origins": [
+        {
+          "caseId": "mt60-list-r4-v0",
+          "round": 4,
+          "familyId": "mt60-list-flow0",
+          "split": "development_selection_pool",
+          "trainingUsed": false,
+          "apiReplayVerified": false,
+          "feature": "list"
+        }
+      ],
+      "old": {
+        "key": "235f882a6aa7dcf8e6943d1d56538e16897edd818cf393c63b059fd46d648b5e",
+        "postRaw": null,
+        "score": null,
+        "clarification": {
+          "reason": "multiple_corrections_need_restatement",
+          "question": "정정할 대상이나 값이 명확하지 않아요. 최종 일정 제목과 바꿀 내용, 원하는 작업을 한 문장으로 다시 말씀해 주세요."
+        }
+      },
+      "new": {
+        "key": "235f882a6aa7dcf8e6943d1d56538e16897edd818cf393c63b059fd46d648b5e",
+        "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":4,\"text\":\"3시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":4,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":4,\"text\":\"오후 3시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":2,\"text\":\"입고 바코드 검수\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+        "score": {
+          "parser": true,
+          "roles": true,
+          "overlap": true,
+          "exact": true,
+          "kind": true,
+          "safety_questions": [],
+          "contract_pass": true
+        },
+        "clarification": null
+      },
+      "resolvedExact": true
+    },
+    {
+      "row": 88,
+      "origins": [
+        {
+          "caseId": "mt60-create-r5-v0",
+          "round": 3,
+          "familyId": "mt60-create-flow0",
+          "split": "development_selection_pool",
+          "trainingUsed": false,
+          "apiReplayVerified": false,
+          "feature": "create"
+        }
+      ],
+      "old": {
+        "key": "d35b79846ccbe00d930f416673b010b9c8d10b1a775d56af327e9c6d9e0ee01d",
+        "postRaw": null,
+        "score": null,
+        "clarification": {
+          "reason": "invalid_or_unresolved_correction",
+          "question": "정정할 대상이나 값이 명확하지 않아요. 최종 일정 제목과 바꿀 내용, 원하는 작업을 한 문장으로 다시 말씀해 주세요."
+        }
+      },
+      "new": {
+        "key": "d35b79846ccbe00d930f416673b010b9c8d10b1a775d56af327e9c6d9e0ee01d",
+        "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"입고 팔레트 검수\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"입고 파손 상자 확인\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}],\"category\":[{\"turn\":3,\"text\":\"입고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"time\"]}",
+        "score": {
+          "parser": true,
+          "roles": true,
+          "overlap": true,
+          "exact": true,
+          "kind": true,
+          "safety_questions": [],
+          "contract_pass": true
+        },
+        "clarification": null
+      },
+      "resolvedExact": true
+    },
+    {
+      "row": 89,
+      "origins": [
+        {
+          "caseId": "mt60-create-r5-v0",
+          "round": 4,
+          "familyId": "mt60-create-flow0",
+          "split": "development_selection_pool",
+          "trainingUsed": true,
+          "apiReplayVerified": false,
+          "feature": "create"
+        }
+      ],
+      "old": {
+        "key": "d21f90b6d62e0fa5ef1d583e0960d72757ce72c0526578a5e9587e3736665eaf",
+        "postRaw": null,
+        "score": null,
+        "clarification": {
+          "reason": "invalid_or_unresolved_correction",
+          "question": "정정할 대상이나 값이 명확하지 않아요. 최종 일정 제목과 바꿀 내용, 원하는 작업을 한 문장으로 다시 말씀해 주세요."
+        }
+      },
+      "new": {
+        "key": "d21f90b6d62e0fa5ef1d583e0960d72757ce72c0526578a5e9587e3736665eaf",
+        "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"입고 팔레트 검수\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"입고 파손 상자 확인\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}],\"category\":[{\"turn\":3,\"text\":\"입고\",\"status\":\"adopted\"}],\"time\":[{\"turn\":4,\"text\":\"새벽 12시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+        "score": {
+          "parser": true,
+          "roles": true,
+          "overlap": true,
+          "exact": true,
+          "kind": true,
+          "safety_questions": [],
+          "contract_pass": true
+        },
+        "clarification": null
+      },
+      "resolvedExact": true
+    },
+    {
+      "row": 103,
+      "origins": [
+        {
+          "caseId": "mt60-list-r5-v0",
+          "round": 4,
+          "familyId": "mt60-list-flow0",
+          "split": "development_selection_pool",
+          "trainingUsed": true,
+          "apiReplayVerified": false,
+          "feature": "list"
+        }
+      ],
+      "old": {
+        "key": "4b750703a3b23678c438340c37a29ab04933837159dc84f397afb891fa823d06",
+        "postRaw": null,
+        "score": null,
+        "clarification": {
+          "reason": "multiple_corrections_need_restatement",
+          "question": "정정할 대상이나 값이 명확하지 않아요. 최종 일정 제목과 바꿀 내용, 원하는 작업을 한 문장으로 다시 말씀해 주세요."
+        }
+      },
+      "new": {
+        "key": "4b750703a3b23678c438340c37a29ab04933837159dc84f397afb891fa823d06",
+        "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"3시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":4,\"text\":\"입고 바코드 검수\",\"status\":\"superseded\"},{\"turn\":4,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":4,\"text\":\"출고 운송장 대조\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"ampm\"]}",
+        "score": {
+          "parser": true,
+          "roles": true,
+          "overlap": true,
+          "exact": true,
+          "kind": true,
+          "safety_questions": [],
+          "contract_pass": true
+        },
+        "clarification": null
+      },
+      "resolvedExact": true
+    },
+    {
+      "row": 106,
+      "origins": [
+        {
+          "caseId": "mt60-list-r5-v1",
+          "round": 5,
+          "familyId": "mt60-list-flow1",
+          "split": "development_selection_pool",
+          "trainingUsed": true,
+          "apiReplayVerified": false,
+          "feature": "list"
+        }
+      ],
+      "old": {
+        "key": "b08b12a70acc592709d4cab2b577a2434d4927fc669322a47e6697b4810d491b",
+        "postRaw": null,
+        "score": null,
+        "clarification": {
+          "reason": "multiple_corrections_need_restatement",
+          "question": "정정할 대상이나 값이 명확하지 않아요. 최종 일정 제목과 바꿀 내용, 원하는 작업을 한 문장으로 다시 말씀해 주세요."
+        }
+      },
+      "new": {
+        "key": "b08b12a70acc592709d4cab2b577a2434d4927fc669322a47e6697b4810d491b",
+        "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":3,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":5,\"text\":\"5시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":5,\"text\":\"대신\",\"status\":\"correction_marker\"},{\"turn\":5,\"text\":\"오후 5시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"재고 분류\",\"status\":\"adopted\"}],\"title\":[{\"turn\":4,\"text\":\"재고 보관 구역 점검\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+        "score": {
+          "parser": true,
+          "roles": true,
+          "overlap": true,
+          "exact": true,
+          "kind": true,
+          "safety_questions": [],
+          "contract_pass": true
+        },
+        "clarification": null
+      },
+      "resolvedExact": true
+    },
+    {
+      "row": 113,
+      "origins": [
+        {
+          "caseId": "mt60-update-r5-v0",
+          "round": 3,
+          "familyId": "mt60-update-flow0",
+          "split": "development_selection_pool",
+          "trainingUsed": false,
+          "apiReplayVerified": false,
+          "feature": "update"
+        }
+      ],
+      "old": {
+        "key": "892e3189edb8155ebb7155a83ebb27ed543f51188c332a216a12076dbe17e127",
+        "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":3,\"text\":\"재고 순환 실사\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"time\":[{\"turn\":1,\"text\":\"3시\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"오후 3시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+        "score": {
+          "parser": true,
+          "roles": true,
+          "overlap": true,
+          "exact": false,
+          "kind": true,
+          "safety_questions": [],
+          "contract_pass": true
+        },
+        "clarification": null
+      },
+      "new": {
+        "key": "892e3189edb8155ebb7155a83ebb27ed543f51188c332a216a12076dbe17e127",
+        "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":3,\"text\":\"재고 순환 실사\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"time\":[{\"turn\":2,\"text\":\"3시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":2,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"오후 3시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+        "score": {
+          "parser": true,
+          "roles": true,
+          "overlap": true,
+          "exact": true,
+          "kind": true,
+          "safety_questions": [],
+          "contract_pass": true
+        },
+        "clarification": null
+      },
+      "resolvedExact": true
+    },
+    {
+      "row": 119,
+      "origins": [
+        {
+          "caseId": "mt60-delete-r5-v0",
+          "round": 2,
+          "familyId": "mt60-delete-flow0",
+          "split": "development_selection_pool",
+          "trainingUsed": true,
+          "apiReplayVerified": false,
+          "feature": "delete"
+        }
+      ],
+      "old": {
+        "key": "bc7e7979e20c9c3940ce354a8e29cab970862209048e20002ca41476610e0b8a",
+        "postRaw": null,
+        "score": null,
+        "clarification": {
+          "reason": "invalid_or_unresolved_correction",
+          "question": "정정할 대상이나 값이 명확하지 않아요. 최종 일정 제목과 바꿀 내용, 원하는 작업을 한 문장으로 다시 말씀해 주세요."
+        }
+      },
+      "new": {
+        "key": "bc7e7979e20c9c3940ce354a8e29cab970862209048e20002ca41476610e0b8a",
+        "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+        "score": {
+          "parser": true,
+          "roles": true,
+          "overlap": true,
+          "exact": true,
+          "kind": true,
+          "safety_questions": [],
+          "contract_pass": true
+        },
+        "clarification": null
+      },
+      "resolvedExact": true
+    },
+    {
+      "row": 120,
+      "origins": [
+        {
+          "caseId": "mt60-delete-r5-v0",
+          "round": 3,
+          "familyId": "mt60-delete-flow0",
+          "split": "development_selection_pool",
+          "trainingUsed": true,
+          "apiReplayVerified": false,
+          "feature": "delete"
+        }
+      ],
+      "old": {
+        "key": "07544248b751385624ad7dc0b91b30a5827289840617b0ec0908e558b797beb6",
+        "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"title\":[{\"turn\":3,\"text\":\"반품 회수품 접수\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"category\":[{\"turn\":3,\"text\":\"반품\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+        "score": {
+          "parser": true,
+          "roles": true,
+          "overlap": true,
+          "exact": false,
+          "kind": true,
+          "safety_questions": [],
+          "contract_pass": true
+        },
+        "clarification": null
+      },
+      "new": {
+        "key": "07544248b751385624ad7dc0b91b30a5827289840617b0ec0908e558b797beb6",
+        "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"title\":[{\"turn\":3,\"text\":\"반품 회수품 접수\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+        "score": {
+          "parser": true,
+          "roles": true,
+          "overlap": true,
+          "exact": true,
+          "kind": true,
+          "safety_questions": [],
+          "contract_pass": true
+        },
+        "clarification": null
+      },
+      "resolvedExact": true
+    },
+    {
+      "row": 121,
+      "origins": [
+        {
+          "caseId": "mt60-delete-r5-v2",
+          "round": 2,
+          "familyId": "mt60-delete-flow2",
+          "split": "development_selection_pool",
+          "trainingUsed": false,
+          "apiReplayVerified": false,
+          "feature": "delete"
+        }
+      ],
+      "old": {
+        "key": "563c1448776c3f16789e7eb7a4a36539c8209c1838397bf981d5eeb10174a5f1",
+        "postRaw": null,
+        "score": null,
+        "clarification": {
+          "reason": "invalid_or_unresolved_correction",
+          "question": "정정할 대상이나 값이 명확하지 않아요. 최종 일정 제목과 바꿀 내용, 원하는 작업을 한 문장으로 다시 말씀해 주세요."
+        }
+      },
+      "new": {
+        "key": "563c1448776c3f16789e7eb7a4a36539c8209c1838397bf981d5eeb10174a5f1",
+        "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"3시\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}],\"unsupportedEvidence\":[],\"missingInformation\":[\"task_or_title\"]}",
+        "score": {
+          "parser": true,
+          "roles": true,
+          "overlap": true,
+          "exact": true,
+          "kind": true,
+          "safety_questions": [],
+          "contract_pass": true
+        },
+        "clarification": null
+      },
+      "resolvedExact": true
+    },
+    {
+      "row": 122,
+      "origins": [
+        {
+          "caseId": "mt60-delete-r5-v2",
+          "round": 3,
+          "familyId": "mt60-delete-flow2",
+          "split": "development_selection_pool",
+          "trainingUsed": false,
+          "apiReplayVerified": false,
+          "feature": "delete"
+        }
+      ],
+      "old": {
+        "key": "aa1f3eee6310f14ed25528f4fc6f0cd22b171640db986504993fa76932d82df0",
+        "postRaw": null,
+        "score": null,
+        "clarification": {
+          "reason": "invalid_or_unresolved_correction",
+          "question": "정정할 대상이나 값이 명확하지 않아요. 최종 일정 제목과 바꿀 내용, 원하는 작업을 한 문장으로 다시 말씀해 주세요."
+        }
+      },
+      "new": {
+        "key": "aa1f3eee6310f14ed25528f4fc6f0cd22b171640db986504993fa76932d82df0",
+        "postRaw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"3시\",\"status\":\"adopted\"}],\"title\":[{\"turn\":3,\"text\":\"입고 납품서 대조\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+        "score": {
+          "parser": true,
+          "roles": true,
+          "overlap": true,
+          "exact": true,
+          "kind": true,
+          "safety_questions": [],
+          "contract_pass": true
+        },
+        "clarification": null
+      },
+      "resolvedExact": true
+    }
+  ],
+  "newModelInference": false,
+  "apiReplay": false,
+  "usedToDevelopRules": true
+}

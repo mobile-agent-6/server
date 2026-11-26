@@ -1,0 +1,16 @@
+{
+  "key": "c4040c1e87d46eab51161da7a4ebd69d7283b1ff366f1fcc9ecfbfd409e81052",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":2,\"text\":\"출고 상차 순서 점검\",\"status\":\"adopted\"}],\"date\":[{\"turn\":3,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":4,\"text\":\"새벽 12시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"출고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "83ff97e0b5c589593a13685005580215f9cbf92b4c12c2af1475dc0217adbffe",
+  "seconds": 8.9487311670091
+}

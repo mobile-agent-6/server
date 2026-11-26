@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "baselineCommit": "3b0f937",
+  "total": 849,
+  "note": "Frozen read-only replay hashes from commit 3b0f937. Approved per-case differences are substituted with their baseline signatures before these group hashes are checked.",
+  "groups": {
+    "pilot": {
+      "count": 42,
+      "sha256": "cd7b3440ae8a379d1867e7d20e5900e395f3e75d761dbbd371b4c609b84bae8b"
+    },
+    "batch1": {
+      "count": 140,
+      "sha256": "07a457ffca673afca5d3c853c6dbe0e1be9da65a71a879b3587ac4340093fe04"
+    },
+    "batch2": {
+      "count": 137,
+      "sha256": "179093835b148e3770ef573f167413e0e5346a9399f78143583cca1358a0663d"
+    },
+    "batch3": {
+      "count": 239,
+      "sha256": "b71f60e57059c94827ba049a1fb260d073141053609255cf3cdf4e2fcabae51a"
+    },
+    "batch4": {
+      "count": 50,
+      "sha256": "0a58b5e646245e3ecb8bd349fe000c0e9f476d9b2613dfa6e2eb7a36a09b5002"
+    },
+    "batch5": {
+      "count": 37,
+      "sha256": "95c8b1a0f0a89b6d677ba34e979236a77479c65a2212ecb4ab3bbc085dc8c902"
+    },
+    "batch6": {
+      "count": 135,
+      "sha256": "ef8a1f20f64a3adfde07894cc5a0b5c035205d5b4d18585d1ef92a9ae68557b6"
+    },
+    "test50": {
+      "count": 69,
+      "sha256": "831c8c912de475eba14d12fdca46d3d5023ad1c24b44329173e67686b4009981"
+    }
+  }
+}

@@ -1,0 +1,364 @@
+{
+  "full60": {
+    "evidence": {
+      "rows": 132,
+      "postExact": 132,
+      "postContract": 132,
+      "clarifications": 0,
+      "rawExact": 26,
+      "rawContract": 74
+    },
+    "ambiguity": {},
+    "byFeatureSnapshots": {
+      "completed_update": {
+        "rows": 29,
+        "exact": 29,
+        "contract": 29,
+        "clarifications": 0
+      },
+      "create": {
+        "rows": 41,
+        "exact": 41,
+        "contract": 41,
+        "clarifications": 0
+      },
+      "delete": {
+        "rows": 30,
+        "exact": 30,
+        "contract": 30,
+        "clarifications": 0
+      },
+      "list": {
+        "rows": 48,
+        "exact": 48,
+        "contract": 48,
+        "clarifications": 0
+      },
+      "update": {
+        "rows": 31,
+        "exact": 31,
+        "contract": 31,
+        "clarifications": 0
+      }
+    },
+    "dialoguesWithAllScoredEvidenceCorrect": 60,
+    "evidenceDialogueCount": 60,
+    "apiSuccessRate": null
+  },
+  "ambiguity24": {
+    "evidence": {
+      "rows": 12,
+      "postExact": 12,
+      "postContract": 12,
+      "clarifications": 0,
+      "rawExact": 3,
+      "rawContract": 5
+    },
+    "ambiguity": {
+      "rows": 12,
+      "explicitClarifications": 12
+    },
+    "byFeatureSnapshots": {
+      "completed_update": {
+        "rows": 8,
+        "exact": 8,
+        "contract": 8,
+        "clarifications": 0
+      },
+      "create": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0
+      },
+      "delete": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0
+      },
+      "list": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0
+      },
+      "update": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0
+      }
+    },
+    "dialoguesWithAllScoredEvidenceCorrect": 9,
+    "evidenceDialogueCount": 9,
+    "apiSuccessRate": null
+  },
+  "resolved24": {
+    "evidence": {
+      "rows": 12,
+      "postExact": 12,
+      "postContract": 12,
+      "clarifications": 0,
+      "rawExact": 3,
+      "rawContract": 4
+    },
+    "ambiguity": {
+      "rows": 12,
+      "explicitClarifications": 12
+    },
+    "byFeatureSnapshots": {
+      "completed_update": {
+        "rows": 8,
+        "exact": 8,
+        "contract": 8,
+        "clarifications": 0
+      },
+      "create": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0
+      },
+      "delete": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0
+      },
+      "list": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0
+      },
+      "update": {
+        "rows": 1,
+        "exact": 1,
+        "contract": 1,
+        "clarifications": 0
+      }
+    },
+    "dialoguesWithAllScoredEvidenceCorrect": 8,
+    "evidenceDialogueCount": 8,
+    "apiSuccessRate": null
+  },
+  "legacy-first30": {
+    "evidence": {
+      "rows": 30,
+      "postExact": 30,
+      "postContract": 30,
+      "clarifications": 0,
+      "rawExact": 10,
+      "rawContract": 18
+    },
+    "ambiguity": {},
+    "byFeatureSnapshots": {
+      "completed_update": {
+        "rows": 6,
+        "exact": 6,
+        "contract": 6,
+        "clarifications": 0
+      },
+      "create": {
+        "rows": 6,
+        "exact": 6,
+        "contract": 6,
+        "clarifications": 0
+      },
+      "delete": {
+        "rows": 6,
+        "exact": 6,
+        "contract": 6,
+        "clarifications": 0
+      },
+      "list": {
+        "rows": 6,
+        "exact": 6,
+        "contract": 6,
+        "clarifications": 0
+      },
+      "update": {
+        "rows": 6,
+        "exact": 6,
+        "contract": 6,
+        "clarifications": 0
+      }
+    },
+    "dialoguesWithAllScoredEvidenceCorrect": 28,
+    "evidenceDialogueCount": 28,
+    "apiSuccessRate": null
+  },
+  "legacy-second30": {
+    "evidence": {
+      "rows": 30,
+      "postExact": 30,
+      "postContract": 30,
+      "clarifications": 0,
+      "rawExact": 13,
+      "rawContract": 19
+    },
+    "ambiguity": {},
+    "byFeatureSnapshots": {
+      "completed_update": {
+        "rows": 6,
+        "exact": 6,
+        "contract": 6,
+        "clarifications": 0
+      },
+      "create": {
+        "rows": 6,
+        "exact": 6,
+        "contract": 6,
+        "clarifications": 0
+      },
+      "delete": {
+        "rows": 6,
+        "exact": 6,
+        "contract": 6,
+        "clarifications": 0
+      },
+      "list": {
+        "rows": 6,
+        "exact": 6,
+        "contract": 6,
+        "clarifications": 0
+      },
+      "update": {
+        "rows": 6,
+        "exact": 6,
+        "contract": 6,
+        "clarifications": 0
+      }
+    },
+    "dialoguesWithAllScoredEvidenceCorrect": 30,
+    "evidenceDialogueCount": 30,
+    "apiSuccessRate": null
+  },
+  "legacy-third30": {
+    "evidence": {
+      "rows": 30,
+      "postExact": 30,
+      "postContract": 30,
+      "clarifications": 0,
+      "rawExact": 9,
+      "rawContract": 25
+    },
+    "ambiguity": {},
+    "byFeatureSnapshots": {
+      "completed_update": {
+        "rows": 6,
+        "exact": 6,
+        "contract": 6,
+        "clarifications": 0
+      },
+      "create": {
+        "rows": 6,
+        "exact": 6,
+        "contract": 6,
+        "clarifications": 0
+      },
+      "delete": {
+        "rows": 6,
+        "exact": 6,
+        "contract": 6,
+        "clarifications": 0
+      },
+      "list": {
+        "rows": 6,
+        "exact": 6,
+        "contract": 6,
+        "clarifications": 0
+      },
+      "update": {
+        "rows": 6,
+        "exact": 6,
+        "contract": 6,
+        "clarifications": 0
+      }
+    },
+    "dialoguesWithAllScoredEvidenceCorrect": 30,
+    "evidenceDialogueCount": 30,
+    "apiSuccessRate": null
+  },
+  "paired24": {
+    "evidence": {
+      "rows": 24,
+      "postExact": 24,
+      "postContract": 24,
+      "clarifications": 0,
+      "rawExact": 3,
+      "rawContract": 12
+    },
+    "ambiguity": {},
+    "byFeatureSnapshots": {
+      "completed_update": {
+        "rows": 8,
+        "exact": 8,
+        "contract": 8,
+        "clarifications": 0
+      },
+      "create": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0
+      },
+      "delete": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0
+      },
+      "list": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0
+      },
+      "update": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0
+      }
+    },
+    "dialoguesWithAllScoredEvidenceCorrect": 12,
+    "evidenceDialogueCount": 12,
+    "apiSuccessRate": null
+  },
+  "paired16": {
+    "evidence": {
+      "rows": 16,
+      "postExact": 16,
+      "postContract": 16,
+      "clarifications": 0,
+      "rawExact": 2,
+      "rawContract": 10
+    },
+    "ambiguity": {},
+    "byFeatureSnapshots": {
+      "completed_update": {
+        "rows": 8,
+        "exact": 8,
+        "contract": 8,
+        "clarifications": 0
+      },
+      "list": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0
+      },
+      "update": {
+        "rows": 4,
+        "exact": 4,
+        "contract": 4,
+        "clarifications": 0
+      }
+    },
+    "dialoguesWithAllScoredEvidenceCorrect": 8,
+    "evidenceDialogueCount": 8,
+    "apiSuccessRate": null
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "priorContext": {
+    "kind": "none"
+  },
+  "serverTimeTrusted": true,
+  "stage": "EVIDENCE",
+  "taskReferenceTime": "2029-06-04T09:00:00+09:00",
+  "timezone": "Asia/Seoul",
+  "userTurns": [
+    {
+      "text": "7월 2일 오전 10시에 동부센터 입고 거래명세 대조 등록해 줘",
+      "turn": 1
+    }
+  ]
+}

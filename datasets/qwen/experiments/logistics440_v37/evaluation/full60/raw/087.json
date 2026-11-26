@@ -1,0 +1,16 @@
+{
+  "key": "bfb97fb201c4b98c7948a3d6fcd37648892c605d2653539ef42c14870635a677",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"completedState\":[{\"turn\":1,\"text\":\"완료 처리를 취소해 줘\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}],\"title\":[{\"turn\":3,\"text\":\"재고 적치 높이 점검\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료 처리를 취소해 줘\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "3cb66eb03d2b473a840654e7e65ee98f4dd6a035b9a9efe0c263afc74a34619f",
+  "seconds": 11.62573220898048
+}

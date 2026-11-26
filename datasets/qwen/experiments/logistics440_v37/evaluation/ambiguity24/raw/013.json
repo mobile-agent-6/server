@@ -1,0 +1,16 @@
+{
+  "key": "1933f26e06c9b68608de90ff447cbee4f97af654bd4c5480738d475b16984c6b",
+  "identity": {
+    "freezeSha256": "e06dcd680ad4bc1718721dfa4d24140e29a262fae9017203bc744a71baea3961",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"입고 검수대 발판 높이 점검\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":2,\"text\":\"완료 취소\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "eea8480088b94d46e57aed979214b8d6ea462d36222ed74e8320a938af1f6cf6",
+  "seconds": 7.9018058750079945
+}

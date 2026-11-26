@@ -1,0 +1,20 @@
+{
+  "status": "PREPARED",
+  "dialogues": 60,
+  "uniqueInferenceInputs": 132,
+  "mappedCallSnapshots": 179,
+  "nonModelRoundsExcluded": 61,
+  "trainingMembership": {
+    "trained_exact_input": 40,
+    "not_trained_exact_input": 92
+  },
+  "untrainedIsIndependentTest": false,
+  "apiDatabaseReplayPerformed": false,
+  "sourceFileHashes": {
+    "<SOURCE_WORKSPACE>/qwen-multiturn60-20261110/unique-prefix-candidate.jsonl": "fd1dcef25032b671439587052bc8631df5110a74885a852ba0fd996c32647b77",
+    "<SOURCE_WORKSPACE>/qwen-multiturn60-20261110/unique-prefix-index.jsonl": "dbb8c740984cd637ec6eb0d16f296d8aacdc37c1138513e1f968341f67c6788d",
+    "<SOURCE_WORKSPACE>/server-qwen-logistics1000-draft/datasets/qwen/experiments/logistics400_v17/data/train400.jsonl": "c880e5b3f4c29f63ac7f1b2c570fb208cd881f28347abeeb1c9e79af59323f13",
+    "<SOURCE_WORKSPACE>/qwen-multiturn-train60-20261110/prepared/train.jsonl": "1444127f7dfd58a7b6ced04de6bb3a55b077ac3be752f4ee002f57c7e7c85490"
+  },
+  "trainingPerformed": false
+}

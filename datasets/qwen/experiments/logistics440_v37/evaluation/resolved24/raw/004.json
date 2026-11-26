@@ -1,0 +1,16 @@
+{
+  "key": "d5dc95b2844bb1c887b94c276b23833dbfc7f76cd2efa3f1637ee1db0d6d35af",
+  "identity": {
+    "freezeSha256": "07bfb630c7cec6da7572d9657da328c7aaea072902a2139ce4fbff89c79d4173",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"입고 기록대 서랍 레일 점검\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":2,\"text\":\"완료로 할지 미완료로 할지 고민했지만\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"입고\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "4e16ff15b7f37b74b53559680721c1918bcb5e1351906578352cba08f852311b",
+  "seconds": 8.806148540985305
+}

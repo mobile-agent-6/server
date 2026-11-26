@@ -1,0 +1,16 @@
+{
+  "key": "82430d8f30d472003f22a3c91cd33876c3950b7b0157d0b103b244491413151e",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":4,\"text\":\"입고 바코드 검수\",\"status\":\"superseded\"},{\"turn\":4,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":4,\"text\":\"출고 운송장 대조\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":5,\"text\":\"3시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":5,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":5,\"text\":\"오후 3시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"입고\",\"status\":\"adopted\"}],\"ampm\":[{\"turn\":5,\"text\":\"3시\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "c04dd4d6d664d064f232090e23c3d948eae4d99f795674feb2e5d564a6b34b46",
+  "seconds": 12.0844199580024
+}

@@ -1,0 +1,217 @@
+{
+  "manifestVersion": "issue30-ollama-eval-v0.2",
+  "status": "ABORTED_UNSAFE_ACCEPT",
+  "authoredOn": "2026-10-25",
+  "commonGateVersion": "issue30-common-gate-v0.2",
+  "developmentRun": {
+    "runId": "issue30-development-v0.2-r1-20261025",
+    "startedAt": "2026-10-25T13:34:14.760935+00:00",
+    "endedAt": "2026-10-25T13:38:44.305760+00:00",
+    "durationSeconds": 269.545,
+    "complete": true,
+    "resultRows": 36,
+    "modelCallCount": 56,
+    "transportRetryCount": 0,
+    "unsafeAccept": 0
+  },
+  "officialLockedRun": {
+    "runId": "issue30-locked-v0.2-r1-20261025",
+    "startedAt": "2026-10-25T13:39:04.223108+00:00",
+    "endedAt": "2026-10-25T13:43:13.259491+00:00",
+    "durationSeconds": 249.036,
+    "candidateOrder": [
+      "A",
+      "B",
+      "C"
+    ],
+    "complete": false,
+    "expectedFullRows": 168,
+    "resultRows": 47,
+    "modelCallCount": 58,
+    "transportRetryCount": 0,
+    "stoppedOn": {
+      "condition": "common_gate_unsafe_accept",
+      "candidate": "A",
+      "caseId": "lk47-unsupported-mixed-consent"
+    },
+    "notRun": [
+      "candidate A locked cases 48 through 56",
+      "candidate B locked cases 1 through 56",
+      "candidate C locked cases 1 through 56"
+    ]
+  },
+  "environment": {
+    "endpoint": "http://127.0.0.1:11434/api/chat",
+    "loopbackOnly": true,
+    "ollamaClientVersion": "0.32.6",
+    "ollamaServerVersion": "0.32.6",
+    "model": "qwen3:4b",
+    "modelDigest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+    "modelSizeBytes": 2497293931,
+    "modelFormat": "GGUF",
+    "modelFamily": "qwen3",
+    "parameterSize": "4.0B",
+    "quantizationLevel": "Q4_K_M",
+    "modelContextLength": 262144,
+    "runtime": "Ollama llama-server using Metal on Apple M2",
+    "chatTemplateBytes": 1506,
+    "chatTemplateSha256": "2d54db2b9bb29ce7db54fea63a891f5859603813c555b1f88b5e0994652897f9",
+    "modelParametersSha256": "d6b2700710ae824c6690a7b47383ea3836790cb59d52dc3018ad7b5530faf124",
+    "parametersHashNote": "current /api/show parameters hash differs from the v0.1 manifest, while model digest, client/server version, chat template and the diagnostic lk19 raw hash match",
+    "serverExistingBeforeEvaluation": false,
+    "serverStartedByEvaluation": true,
+    "serverStoppedAfterEvaluation": true,
+    "loadedModelsBefore": [],
+    "loadedModelsAfterRestore": []
+  },
+  "decoding": {
+    "structuredJsonSchema": true,
+    "jsonModeFallback": false,
+    "stream": false,
+    "think": false,
+    "temperature": 0,
+    "seed": 29,
+    "numPredict": 1024,
+    "numContext": 8192,
+    "timeoutSecondsPerCall": 120,
+    "maximumTransportRetriesPerCall": 1
+  },
+  "frozenContracts": {
+    "A": {
+      "promptRevision": 0,
+      "promptSha256": "a26e06a28830e6f65262856a19d1289cef2977319dae22cbaf5d3f31faf66f70",
+      "schemaBuilderSha256": "2bb1ef0fd4e12d8f17665478fb1bd0afc360a98ae78c6177f5144728c86ebc39",
+      "contextRendererSha256": "eab78c729c59c6b6055f1e2f31928e70060946ad0cb1e89814a82e1761b03027"
+    },
+    "B": {
+      "promptRevision": 2,
+      "promptSha256": "8833c4e1e1ace53a5293781437e6094ece4cc15d9c014a16869aa7a9d3d02d8d",
+      "schemaBuilderSha256": "3068ce0f12b70353bb72c5c9917dfbbdb9d5de139561e15c7d5dd92970a6d897",
+      "contextRendererSha256": "c158f3e231d046a34a0d061bdfac3e64041516ddeddd9441b7df0bfd330d8337"
+    },
+    "C": {
+      "promptRevision": 2,
+      "promptSha256": "6352d687dd9093f783ff1c23e95d6f84433af30c3776a524aaa980a83db5f24b",
+      "schemaBuilderSha256": "e9553c727d593a6c3125306f922b500fa6fdd093ff80e03281bbd32033617e9c",
+      "contextRendererSha256": "c158f3e231d046a34a0d061bdfac3e64041516ddeddd9441b7df0bfd330d8337"
+    }
+  },
+  "protectedInputs": {
+    "lockedCaseCount": 56,
+    "lockStatus": "locked",
+    "lockedJsonlSha256": "17c7d4ef10aff8171d422c248431d3c34faaf03bf7282fab5dc3abcfa2389b57",
+    "semanticOracleSchemaSha256": "cfe0ed947f6bd709e0e3ba60a8daf63fb1f201614cb11d90b823931b060a3b1d",
+    "contractValidationManifestV01Sha256": "9002cab5863b561d2d202e03829d45084b57452ab828d43bda44d479030a6537",
+    "dryMappingManifestV01Sha256": "862765bd62049ba3bb73da08ad10f91268015af44a6fd8a259aeab7954e04ff4",
+    "ollamaEvalManifestV01Sha256": "1e082d16eb8c33b92bac43d7784d864fc905eb660b4b1b6558cac7a1cd54ed5d",
+    "ollamaDevelopmentResultsV01Sha256": "e15fb91c1c4516b41e14bacad1a0c072c6795c262cf34bbf0d540bbe3a27b292",
+    "ollamaLockedResultsV01Sha256": "8a49cd4c2b7b7da781bbaeea7fdca3017c95239fe2df964c3ee99116ff369e12",
+    "ollamaEvalSummaryV01Sha256": "c9768b193cd049631894eb5e96b86a5597e20b4cfa4b81d27acf88b6e41f5009"
+  },
+  "officialCallCounts": {
+    "development": 56,
+    "locked": 58,
+    "retainedTotal": 114,
+    "transportRetries": 0,
+    "diagnosticLk19CallsExcluded": 1
+  },
+  "developmentAggregate": {
+    "A": {
+      "cases": 12,
+      "calls": 15,
+      "transport": 12,
+      "parse": 12,
+      "localAccept": 9,
+      "semanticMatch": 3,
+      "gateAccept": 10,
+      "gateReject": 1,
+      "outcomes": {"correct": 0, "safe_reject": 6, "over_ask": 6, "unsafe_accept": 0}
+    },
+    "B": {
+      "cases": 12,
+      "calls": 27,
+      "transport": 12,
+      "parse": 12,
+      "localAccept": 11,
+      "semanticMatch": 3,
+      "gateAccept": 3,
+      "gateReject": 8,
+      "outcomes": {"correct": 0, "safe_reject": 11, "over_ask": 1, "unsafe_accept": 0}
+    },
+    "C": {
+      "cases": 12,
+      "calls": 14,
+      "transport": 12,
+      "parse": 12,
+      "localAccept": 9,
+      "semanticMatch": 2,
+      "gateAccept": 7,
+      "gateReject": 4,
+      "spanExact": 1,
+      "roleExact": 2,
+      "roleGateAccept": 6,
+      "roleGateReject": 4,
+      "outcomes": {"correct": 0, "safe_reject": 8, "over_ask": 4, "unsafe_accept": 0}
+    }
+  },
+  "lockedPartialAggregate": {
+    "A": {
+      "cases": 47,
+      "calls": 58,
+      "transport": 47,
+      "parse": 47,
+      "localAccept": 43,
+      "semanticMatch": 6,
+      "intentMatch": 40,
+      "gateAccept": 39,
+      "gateReject": 6,
+      "latencyMs": {"mean": 5293.260, "median": 3456.833, "max": 24719.544},
+      "outcomes": {"correct": 1, "safe_reject": 42, "over_ask": 3, "unsafe_accept": 1}
+    },
+    "B": "not_run_after_safety_stop",
+    "C": "not_run_after_safety_stop"
+  },
+  "unsafeStop": {
+    "caseId": "lk47-unsupported-mixed-consent",
+    "candidate": "A",
+    "rawOutputSha256": "3a5814227e4175144c836dd63bd28a5a4c523369324378e73c560a4c0ffe5961",
+    "rawOutputByteLength": 182,
+    "localValidation": "accept",
+    "commonGate": "accept",
+    "modelAction": "CREATE",
+    "firstCause": "candidate A controller failed to mark the mixed unsupported SMS request as requiring consent",
+    "rawOutputStored": false
+  },
+  "v01Lk19Forensics": {
+    "diagnosticRawHashMatched": true,
+    "actualNormalizedRangeMatchedOracle": true,
+    "firstMismatch": "candidate C evidence role assignment",
+    "v02RegressionGateResult": "safe_reject"
+  },
+  "rawOutput": {
+    "storedInPermanentArtifacts": false,
+    "temporaryRawFilesCreated": false,
+    "temporaryRawFilesDeleted": true,
+    "resultMetadataOnly": ["rawOutputSha256", "rawOutputByteLength"]
+  },
+  "networkAndSideEffects": {
+    "externalNetworkUsed": false,
+    "ollamaPullUsed": false,
+    "backendAppStarted": false,
+    "databaseOrScheduleApiUsed": false,
+    "scheduleWriteUsed": false
+  },
+  "mlx": {
+    "executed": false,
+    "downloaded": false,
+    "reason": "out of scope"
+  },
+  "artifacts": {
+    ".omx/research/issue30/contract-validation-manifest-v0.2.json": "a4137b5d275553f48b3c2fe15ef22cecf86f1e2093b6c95dc48212237b9b80d8",
+    ".omx/research/issue30/ollama_eval_v0_2.py": "90699b6094fb2a115437e539d0ac28b6427c91e65004e10b8908705f7aabcf69",
+    ".omx/research/issue30/test_ollama_eval_v0_2.py": "1030cffb1ce57a597cef571e6fb9012506cb3bbca3816abdd3fc633d944afa35",
+    ".omx/research/issue30/ollama-development-results-v0.2.jsonl": "d87498a6b2479df5bc4be989ff10c5d7f6483457bd1f27c7dd5e21c0588d961f",
+    ".omx/research/issue30/ollama-locked-results-v0.2.jsonl": "bf8d97e0d0dd551e9e981d26e6429359931aa312b8d4ea70b2c19d55705f59d3",
+    ".omx/research/issue30/ollama-eval-summary-v0.2.md": "2173a4910d7830239773540926ceb077019243b096b69620d28c3b43dfd837f2"
+  }
+}

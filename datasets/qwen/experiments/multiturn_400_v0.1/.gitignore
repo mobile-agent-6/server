@@ -1,0 +1,15 @@
+/runs/
+/reviewed/
+/manifest.json
+/verification_failures.json
+/verification_summary.json
+/case_manifest.jsonl
+/*/review_cases.jsonl
+/*/row_map.jsonl
+/*/review_decisions_TEMPLATE.jsonl
+/*/검수표.md
+/train/training_UNREVIEWED.jsonl
+/validation/validation_UNREVIEWED.jsonl
+/test/reference_actions_DO_NOT_TRAIN.jsonl
+__pycache__/
+*.pyc

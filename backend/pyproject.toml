@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools==84.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "schedule-api"
+version = "0.1.0"
+description = "Offline Schedule API backend"
+requires-python = ">=3.11,<4.0"
+dependencies = [
+    "alembic==1.20.0",
+    "fastapi==0.141.1",
+    "pydantic-settings==2.15.0",
+    "sqlalchemy==2.0.54",
+    "uvicorn==0.54.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "httpx2==2.13.1",
+    "pip-tools==7.6.1",
+    "pytest==9.1.1",
+    "pytest-cov==7.1.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+
+[tool.setuptools.package-data]
+"app.modules.assistant.evidence" = ["prompt.txt"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = [
+    "integration: tests using file I/O or external process boundaries",
+    "race: tests exercising deliberate concurrency",
+    "slow: tests with relatively expensive I/O",
+    "pi: tests requiring an Orange Pi",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["app"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true

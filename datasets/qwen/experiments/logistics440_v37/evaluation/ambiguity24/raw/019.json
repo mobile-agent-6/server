@@ -1,0 +1,16 @@
+{
+  "key": "dfd9e97cf751c33eda39da7c2f971fa1d45f53e7e582fec2177ccd421f32da50",
+  "identity": {
+    "freezeSha256": "e06dcd680ad4bc1718721dfa4d24140e29a262fae9017203bc744a71baea3961",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"반품 계수대 저울판 세척\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":2,\"text\":\"미완료로 할지\",\"status\":\"adopted\"}],\"ampm\":[{\"turn\":1,\"text\":\"오후\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":2,\"text\":\"완료로 할지\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "b2a99f810ff176e3cfe44a3b3b7eb5582b124e366f7ba72fb6392e4870374382",
+  "seconds": 9.05860908300383
+}

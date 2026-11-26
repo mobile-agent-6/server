@@ -1,0 +1,173 @@
+{
+  "manifestVersion": "issue30-contract-validation-v0.3",
+  "status": "PROPOSED",
+  "policyBasis": "D5 (BE-PROPOSED) only; no new product policy",
+  "commonGateVersion": "issue30-common-gate-v0.3",
+  "policyAnalyzerVersion": "issue30-trusted-policy-analyzer-v0.3",
+  "authoredOn": "2026-10-26",
+  "scope": "research-only trusted policy context (backend conversation state) and candidate-neutral policy gate layered before the unchanged v0.2 gate",
+  "oracleComparedByGate": false,
+  "caseIdUsedByGate": false,
+  "candidateOutputTrustedForPolicy": false,
+  "boundedDetector": {
+    "features": [
+      "reminder/notification (알림, 리마인더, 리마인드, 푸시)",
+      "text message (문자)",
+      "offset reminder (N분/시간 전에 알려/문자/연락...)"
+    ],
+    "unknownCueFailsClosed": true,
+    "titleNounNotACommand": true,
+    "limits": [
+      "Korean lexical grammar only; paraphrases outside the grammar are not detected",
+      "sensor/other unsupported features (e.g. lk45) and unrelated requests (e.g. lk46) are out of scope of this detector",
+      "consent classification is lexical; unclassifiable answers stay pending (possible over-ask)"
+    ]
+  },
+  "rules": [
+    "unsupported + supported request: no executable effect before explicit consent (CONSENT_REQUIRED_BEFORE_EFFECT)",
+    "consent counts only when it answers the latest backend question of the same task",
+    "decline: no executable effect (CONSENT_DECLINED)",
+    "unsupported-only: no schedule effect (UNSUPPORTED_ONLY_NO_SCHEDULE_EFFECT)",
+    "unknown cue expression fails closed (UNSUPPORTED_EXPRESSION_UNKNOWN)",
+    "missing / invalid / tampered policy context fails closed",
+    "candidate policy or consent claims rejected (CANDIDATE_POLICY_CLAIM)",
+    "ASK, questions and incomplete views are not executable effects",
+    "same rule for candidates A, B and C"
+  ],
+  "fixtureValidation": {
+    "fixtureCount": 31,
+    "mutationFixtures": 19,
+    "mutationLocalAccept": 19,
+    "mutationV02Accept": 18,
+    "mutationV02AcceptNote": "M3-19 is rejected by v0.2 as UNGROUNDED_TITLE because the fixture carries no oracle; not a v0.2 safety property",
+    "mutationV03Reject": 19,
+    "mutationV03Codes": {
+      "CANDIDATE_POLICY_CLAIM": 1,
+      "CONSENT_DECLINED": 2,
+      "CONSENT_REQUIRED_BEFORE_EFFECT": 10,
+      "POLICY_CONTEXT_INVALID": 1,
+      "POLICY_CONTEXT_MISSING": 1,
+      "POLICY_CONTEXT_TAMPERED": 1,
+      "UNSUPPORTED_EXPRESSION_UNKNOWN": 1,
+      "UNSUPPORTED_ONLY_NO_SCHEDULE_EFFECT": 2
+    },
+    "positiveFixtures": 12,
+    "positiveV03Accept": 12,
+    "candidates": {
+      "A": 4,
+      "B": 12,
+      "C": 15
+    },
+    "finalUnsafeAccept": 0,
+    "finalFalseReject": 0
+  },
+  "idealFlowValidation": {
+    "policyCases": 68,
+    "executableTurns": 60,
+    "policyFalseReject": 0,
+    "candidateCEquivalenceCases": 68,
+    "candidateCTurns": 75,
+    "candidateCAddedRejectionByV03": 0,
+    "candidateCPreexistingV02Rejections": 20,
+    "candidateCPreexistingV02Codes": {
+      "EMPTY_CHANGES": 3,
+      "PAST_CREATE": 1,
+      "UNGROUNDED_TITLE": 16
+    }
+  },
+  "v02Regression": {
+    "fixtureRegression": {
+      "count": 12,
+      "sameCodes": 12
+    },
+    "v02ValidatorRerun": {
+      "finalUnsafeAccept": 0,
+      "mutationFixtureCount": 12,
+      "positiveRoleCases": 68
+    }
+  },
+  "tests": {
+    "files": [
+      "test_contracts.py",
+      "test_dry_mapping.py",
+      "test_ollama_eval.py",
+      "test_common_gate_v0_2.py",
+      "test_ollama_eval_v0_2.py",
+      "test_common_gate_v0_3.py",
+      "test_ollama_eval_v0_3.py"
+    ],
+    "ran": 85,
+    "failed": 0,
+    "python": "backend venv Python 3.11.16, -B, PYTHONDONTWRITEBYTECODE=1"
+  },
+  "gateHashes": {
+    "commonGateV02FileSha256": "82252c72f8c20bb4103b427e65c272d878a8b885393fbfbc987cb63519470f7a",
+    "commonGateV03FileSha256": "7d72b31cbcd98cd021380fb72dde0f2da6b6d03254319d0f87ab25c8fbb97bd4",
+    "evaluatorAdapterSha256": "9bb5afd6a3ea74fb70e3753d7015788d845e4a6427a65ae432b6e6e284e3760d",
+    "policyAnalyzerSourceSha256": "86263d71c3c17f90e1f05ceb10c784358b929c0b7c49f3265b5736731f9f28ec",
+    "policyGateSourceSha256": "dc5ec42baf1eedd06e9ae7421b471834a833c7f34f79da890537b5ea5aa27fd9"
+  },
+  "inputs": {
+    "developmentSha256": "18d3b4a595132cad0b1bb6092a4a26c180496aedfccb90bb4baac0301eb7e024",
+    "fixturesSha256": "c013594c0b5ee13dec54825e85f53856e84a55d071b9e980f77ca073c31b9ff4",
+    "lockedSha256": "17c7d4ef10aff8171d422c248431d3c34faaf03bf7282fab5dc3abcfa2389b57",
+    "protectedV02": {
+      "common_gate_v0_2.py": "82252c72f8c20bb4103b427e65c272d878a8b885393fbfbc987cb63519470f7a",
+      "contract-validation-results-v0.2.jsonl": "57462b983492b7e6a35666aab821d15d3c7ec1bc59166ab6618840ff4adf4ec1",
+      "contract-validation-summary-v0.2.md": "bf3f76ba51f45c029b4a786fb5f216d535e8de9ad744b4e95dbffb15a31e9414",
+      "mutation-fixtures-v0.2.jsonl": "542106cf47a965cb0807e38a76832e9e6b7a61a842571763762288d53b6b8ada",
+      "test_common_gate_v0_2.py": "f3d41817c4270e6a71f3c177ba29f24f03674fb8d63f4e0beba1fd48a592e4a3",
+      "validate_contracts_v0_2.py": "a1ad50d77f8d655c75a105ce7aac9b7405e57ac6cc145184f43263faf35c8932"
+    },
+    "semanticSchemaSha256": "cfe0ed947f6bd709e0e3ba60a8daf63fb1f201614cb11d90b823931b060a3b1d"
+  },
+  "protectedV01": {
+    "ollama_eval.py": "aeb43250fdcfd0e5ec38687b39b78b902c52489bba4b16f5888e8e8f69e98b70",
+    "test_ollama_eval.py": "936dc8f6d29b128daf954366814919a2106b66beceaf522df63bc7b53b5d507c",
+    "candidate-b-prompt-v0.1.txt": "8833c4e1e1ace53a5293781437e6094ece4cc15d9c014a16869aa7a9d3d02d8d",
+    "candidate-c-prompt-v0.1.txt": "6352d687dd9093f783ff1c23e95d6f84433af30c3776a524aaa980a83db5f24b",
+    "ollama-development-results-v0.1.jsonl": "e15fb91c1c4516b41e14bacad1a0c072c6795c262cf34bbf0d540bbe3a27b292",
+    "ollama-locked-results-v0.1.jsonl": "8a49cd4c2b7b7da781bbaeea7fdca3017c95239fe2df964c3ee99116ff369e12",
+    "ollama-eval-summary-v0.1.md": "c9768b193cd049631894eb5e96b86a5597e20b4cfa4b81d27acf88b6e41f5009",
+    "ollama-eval-manifest-v0.1.json": "1e082d16eb8c33b92bac43d7784d864fc905eb660b4b1b6558cac7a1cd54ed5d",
+    "contracts.py": "d68469a7e5a71ebdeb3ea693d895d1faecc8aa959125cfc94e15766dc82b5f62",
+    "validate_contracts.py": "31fc4faac3f950cb03a21b01f9fac94edd69ac286d9ff7355b4c0aeb252ef7e2",
+    "mutation-fixtures-v0.1.jsonl": "4f333dd03d55e1f53211cc1f76114f0125acc983967ff7c9395b8324268c8355",
+    "contract-validation-results-v0.1.jsonl": "2a2810a2475263d7e1b014a688b094421acda8c9d30b178c8672f57282bf0916",
+    "contract-validation-summary-v0.1.md": "b1936ffd117d83f5fc3293583d8413a105b2927400da4071f6e019564a783814",
+    "contract-validation-manifest-v0.1.json": "9002cab5863b561d2d202e03829d45084b57452ab828d43bda44d479030a6537",
+    "dry_mapping.py": "ecf7f23d8248c2562973ab8b4c98cf7506bbf287cd454f6d814cd128d9322bb0",
+    "dry-mapping-results-v0.1.jsonl": "e8a202762b4d9f288e7da01b2b8e4c3c14cb119dbfdf8f65e4fc22ac1b78388f",
+    "dry-mapping-summary-v0.1.md": "9955178c050cdef505cc1303bddd233cf05679bab19c14d58b4904a9fa1b6981",
+    "dry-mapping-manifest-v0.1.json": "862765bd62049ba3bb73da08ad10f91268015af44a6fd8a259aeab7954e04ff4",
+    "locked-cases-v0.1.jsonl": "17c7d4ef10aff8171d422c248431d3c34faaf03bf7282fab5dc3abcfa2389b57",
+    "semantic-oracle-schema-v0.1.json": "cfe0ed947f6bd709e0e3ba60a8daf63fb1f201614cb11d90b823931b060a3b1d"
+  },
+  "protectedV01Verified": true,
+  "protectedV02": {
+    "common_gate_v0_2.py": "82252c72f8c20bb4103b427e65c272d878a8b885393fbfbc987cb63519470f7a",
+    "contract-validation-results-v0.2.jsonl": "57462b983492b7e6a35666aab821d15d3c7ec1bc59166ab6618840ff4adf4ec1",
+    "contract-validation-summary-v0.2.md": "bf3f76ba51f45c029b4a786fb5f216d535e8de9ad744b4e95dbffb15a31e9414",
+    "mutation-fixtures-v0.2.jsonl": "542106cf47a965cb0807e38a76832e9e6b7a61a842571763762288d53b6b8ada",
+    "test_common_gate_v0_2.py": "f3d41817c4270e6a71f3c177ba29f24f03674fb8d63f4e0beba1fd48a592e4a3",
+    "validate_contracts_v0_2.py": "a1ad50d77f8d655c75a105ce7aac9b7405e57ac6cc145184f43263faf35c8932"
+  },
+  "protectedV02Verified": true,
+  "modelCalls": 0,
+  "serverCalls": 0,
+  "databaseCalls": 0,
+  "artifacts": {
+    ".omx/research/issue30/common_gate_v0_3.py": "7d72b31cbcd98cd021380fb72dde0f2da6b6d03254319d0f87ab25c8fbb97bd4",
+    ".omx/research/issue30/validate_contracts_v0_3.py": "1ad7916943cf2f6364c5e82aeb9b4ec3c6f4837cc1e5655ad658ff9c2748dae0",
+    ".omx/research/issue30/test_common_gate_v0_3.py": "f9f149edbb4dcb4ce9c84704d0127789cc8b1c11df5584d1576575755627cc2f",
+    ".omx/research/issue30/mutation-fixtures-v0.3.jsonl": "c013594c0b5ee13dec54825e85f53856e84a55d071b9e980f77ca073c31b9ff4",
+    ".omx/research/issue30/contract-validation-results-v0.3.jsonl": "c782833e0dbfa1a7cde682247ab3554e44b3e9ab3753dba2c7d85ad22147e2a1",
+    ".omx/research/issue30/contract-validation-summary-v0.3.md": "187d714995f82453daccfe1403502d91637d445b8d7c10a9edaa59ed92cdb97a"
+  },
+  "notExecuted": [
+    "production backend integration",
+    "shared schema change",
+    "FE/TTS presentation review",
+    "candidate A detector (datasets guards.py) improvement — out of scope by instruction"
+  ]
+}

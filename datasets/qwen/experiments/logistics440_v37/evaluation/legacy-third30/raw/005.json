@@ -1,0 +1,16 @@
+{
+  "key": "94036c800713b347c150cfe210687f039848b5430ef2bf6d7c95718dad3643cf",
+  "identity": {
+    "freezeSha256": "c3ec03a58f880d92ae94aeffa816940216f98bc8d4f763fb9fa63abbfd9a7c51",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":2,\"text\":\"회수 상품 폐기 대상 구분\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "e16a63979b235e933958709a20fff78dfc27e5f9d93c140a98c53935befe5e87",
+  "seconds": 7.907511999947019
+}

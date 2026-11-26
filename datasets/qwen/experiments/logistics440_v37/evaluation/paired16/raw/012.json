@@ -1,0 +1,16 @@
+{
+  "key": "ccec6864f6c25acc37c24c7792081bbba33d22da09ac6acf96c9e3de2fa60e83",
+  "identity": {
+    "freezeSha256": "f81142e91acc8ea29423099dd67e472ac31b55890bf1007a3dd1f736960f18c4",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":2,\"text\":\"글피\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"오후 10시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":2,\"text\":\"글피\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "336bcaa34709ee08a750de003dbaa56672b23bc8386829d653f772f31c4a3ef2",
+  "seconds": 8.032980499963742
+}

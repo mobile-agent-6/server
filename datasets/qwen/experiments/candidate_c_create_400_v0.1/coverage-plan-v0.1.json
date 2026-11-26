@@ -1,0 +1,30 @@
+{
+  "status": "BE-PROPOSED",
+  "targetConversations": 400,
+  "buckets": {
+    "direct_create": 90,
+    "missing_and_followup": 100,
+    "correction": 80,
+    "time_safety": 80,
+    "mixed_unsupported_consent": 50
+  },
+  "pilot": {
+    "total": 30,
+    "perBucket": 6,
+    "containsTestCandidate": false
+  },
+  "separateBoundarySet": {
+    "developmentMinimum": 20,
+    "lockedMinimum": 20,
+    "excludedFromTraining": true
+  },
+  "reuse": {
+    "existingCreateTotal": 119,
+    "existingTestExcluded": 30,
+    "existingTrainUpperBound": 74,
+    "existingValidationUpperBound": 9,
+    "reuseUpperBound": 83,
+    "newMinimum": 317,
+    "note": "lineage 감사 결과에 따라 재사용 수는 더 줄 수 있다"
+  }
+}

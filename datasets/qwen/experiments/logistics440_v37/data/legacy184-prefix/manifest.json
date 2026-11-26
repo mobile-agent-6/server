@@ -1,0 +1,129 @@
+{
+  "purpose": "Data conversion candidate, no training or new model inference",
+  "files": {
+    "README.txt": {
+      "bytes": 4376,
+      "sha256": "8dd66afabddae515e7dcf348498a0bbc69e85caa1b49369386fc302a2ee5ffce"
+    },
+    "annotations.tsv": {
+      "bytes": 12018,
+      "sha256": "e17f6aad4f64c5e2e8778e681f12d513f6787d93e3043c9ae4ba4e1ce912012b"
+    },
+    "build-checks.json": {
+      "bytes": 575,
+      "sha256": "61eaa21856eadc6bd43f4b642ec9cc7dfb11b241ea1b9fc99a78560b5d389d87"
+    },
+    "build.py": {
+      "bytes": 7734,
+      "sha256": "c544185a02dae579c18a559606c8ad27e42da7ee92afc1b5736d2de7f5bda0a6"
+    },
+    "final-order-normalizations.json": {
+      "bytes": 39910,
+      "sha256": "b14d541a969c0369a70fabef9784199a2fa4e26e4dae9e3512088f3f67ce6941"
+    },
+    "final184-reviewed-candidate.jsonl": {
+      "bytes": 1245435,
+      "sha256": "890766832550d2f5ed7ec79af699b2a731dbc0de7ded7ba85f615f945c55b879"
+    },
+    "new-intermediate197-candidate.jsonl": {
+      "bytes": 1298307,
+      "sha256": "7e47300542a7a2872136c9547fbb3e1deffe73567faecfd0ef515d2785c138e4"
+    },
+    "prefix-all381-candidate.jsonl": {
+      "bytes": 2543742,
+      "sha256": "96c360db9e4581e3c3d9c8dc3aabec638180ca49165e9cd1f37e21537dfab26f"
+    },
+    "prefix-all381-index.jsonl": {
+      "bytes": 186072,
+      "sha256": "21007116597c76168f3f0c5bd16ff9e5f765e1313662c77691a47635bfd285ff"
+    },
+    "runtime/backend/app/modules/assistant/evidence/__init__.py": {
+      "bytes": 265,
+      "sha256": "c7add66d2a4a4fdd42ab548e69db2cfd8d92b06fb61b7eb8d470a376fd82e3d2"
+    },
+    "runtime/backend/app/modules/assistant/evidence/contract.py": {
+      "bytes": 10811,
+      "sha256": "3809f25eda6efb1fa938634700cf49a3ed487b72d9076f33411fd27efb14a19d"
+    },
+    "runtime/backend/app/modules/assistant/evidence/gate.py": {
+      "bytes": 16318,
+      "sha256": "fdc640f96bf200e62884b494371508e26d485328f6f97255d9c219f9f0c83b09"
+    },
+    "runtime/backend/app/modules/assistant/evidence/model_client.py": {
+      "bytes": 5783,
+      "sha256": "aa29795c6b536aa66573ce630c6841d8e7b6efda17bd5e3a9f02cbda69190cbb"
+    },
+    "runtime/backend/app/modules/assistant/evidence/normalize.py": {
+      "bytes": 29499,
+      "sha256": "5c479b53eacf88e711330e9023ed6a9daecd727c1d64f072c9a2af5ed411e5f8"
+    },
+    "runtime/backend/app/modules/assistant/evidence/planner.py": {
+      "bytes": 24602,
+      "sha256": "176b5f17fcd289bb6f727978c706e7d0da9538c6ff0e37d5b29c448906896094"
+    },
+    "runtime/backend/app/modules/assistant/evidence/prompt.txt": {
+      "bytes": 5664,
+      "sha256": "afc3dab1355cc9d75fe2e73d0bc9957b72da90d6fcfc4783718a00895949a262"
+    },
+    "runtime/backend/app/modules/assistant/evidence/provider.py": {
+      "bytes": 30462,
+      "sha256": "2f8ff33629f968e5d9acbb203de21eea1949087488198043c932598715ea40e6"
+    },
+    "runtime/backend/app/modules/assistant/evidence/role_contract.py": {
+      "bytes": 1371,
+      "sha256": "b6357759c125115b14b44e3562d427364515e60ad5a8c56963c4ec12bc56048b"
+    },
+    "runtime/backend/app/modules/assistant/evidence/safety.py": {
+      "bytes": 18805,
+      "sha256": "40935e67fc1eacaf20cfe48d1f73621bed3890b921cb784af6b78f2a36d14ffc"
+    },
+    "runtime/backend/app/modules/assistant/evidence/texts.py": {
+      "bytes": 4029,
+      "sha256": "1a708f98af99d849af01e07255eed5598bff0615a5f6919a6ae10b1bfcbaa05f"
+    },
+    "source/train400.jsonl": {
+      "bytes": 2689753,
+      "sha256": "c880e5b3f4c29f63ac7f1b2c570fb208cd881f28347abeeb1c9e79af59323f13"
+    },
+    "source/데이터셋_제작_가이드.txt": {
+      "bytes": 45504,
+      "sha256": "02f7198e9854e1023ccc0846d6c8c9de8716a265faf3c8e199a4a81bcbf4d0f8"
+    },
+    "source-text-repair-proposal.json": {
+      "bytes": 1082,
+      "sha256": "bc12ed7e37616b1537a91bd7b4212865598e81adcdfd4720ea3bfc4e6f14075e"
+    },
+    "split-policy.json": {
+      "bytes": 3653,
+      "sha256": "fc43a637940410561ab2f11b617d7a9193ec35d7c68d6107dad621cf323a2fda"
+    },
+    "tools/common.py": {
+      "bytes": 4234,
+      "sha256": "0788ffde6bedded67c028e684aa74dd45f0ce7e4ec82b4a71b36cd589d0d7937"
+    },
+    "transition-review.json": {
+      "bytes": 123112,
+      "sha256": "47fc91459d91037de8062c4fdf9b959dc35dfe53ebc5106c691e132fdbefa525"
+    },
+    "unique-prefix-candidate.jsonl": {
+      "bytes": 2381267,
+      "sha256": "1a619ea0d632b61f53db49d50a5ff59bc14545b236830e980b816944b86f4792"
+    },
+    "unique-prefix-index.jsonl": {
+      "bytes": 220985,
+      "sha256": "7906c58ea7c718297e6bf41ae22dd54627194f2fe9e5f008f4be929fc7d1fb17"
+    },
+    "verification.json": {
+      "bytes": 751,
+      "sha256": "a6a6a57ce30e13475f1d830190e8c89f35b6be846b490c5337f15a489c17bec2"
+    },
+    "verify.py": {
+      "bytes": 8839,
+      "sha256": "2f95992b723bd750dfc8463625a7b4fba14a4b8cf0fdd2fa79510d3fd4ce5077"
+    },
+    "턴별정답_눈검수.txt": {
+      "bytes": 210531,
+      "sha256": "d870e0d93e71b827dd31b093a243374b8b375fbda2eec3fb6bf946b1583a0828"
+    }
+  }
+}

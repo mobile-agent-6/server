@@ -1,0 +1,16 @@
+{
+  "key": "26b850932309090f894755e5a102d55ea6ef3798200a161c5b5e80eab0936d59",
+  "identity": {
+    "freezeSha256": "e0ac9aba89edee1cb6318fb07376860dcc6d3c4b5073f7c591bcc4415acd3265",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":2,\"text\":\"적재대 하단 안전망 확인\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":1,\"text\":\"완료로 바꿔 주세요\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "188929caa9b1e7ae46ede5f822cfdaf9c9bdc4da34511a8114f909ff17acea50",
+  "seconds": 7.729281082982197
+}

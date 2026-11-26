@@ -1,0 +1,16 @@
+{
+  "key": "8c47de2121f1607840a33e4332bb9c5c1449afa836cf1938bba7f20b4b17f582",
+  "identity": {
+    "freezeSha256": "07bfb630c7cec6da7572d9657da328c7aaea072902a2139ce4fbff89c79d4173",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"출고 서류대 고무받침 교체\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":2,\"text\":\"완료로 할지 미완료로 할지\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "4e43c86d30c29f769d4bc943b3526b597230ee0d685eeaef926a90058a7beb01",
+  "seconds": 7.950429582968354
+}

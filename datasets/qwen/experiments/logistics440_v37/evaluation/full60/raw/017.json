@@ -1,0 +1,16 @@
+{
+  "key": "5e52abc62f5b0c2637f873ee4ccd3ccd3669feed337cc0f267634467784259fb",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":1,\"text\":\"반품 수량 확인\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"6시\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"반품\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "403d7b1455c0b0f87f5198c3a29d5a18d2e948903d0cb44e758c80e19f120746",
+  "seconds": 8.564138875022763
+}

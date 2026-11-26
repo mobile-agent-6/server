@@ -1,0 +1,16 @@
+{
+  "key": "5931bb8752dfa7f25f2ffc6834f2546e783990defbe9ff229ab3ff4963946417",
+  "identity": {
+    "freezeSha256": "14d9351b65aa64766b77e997e569fc9d12625f2e77207e09def91daf39f2aab9",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"8월 16일\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"8월 16일\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"일정\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "90c6300d11bc06881891329840cb245d27f321cacf34f43223f7c8f2486fb788",
+  "seconds": 8.13478533300804
+}

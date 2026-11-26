@@ -1,0 +1,16 @@
+{
+  "key": "3e8ab8a72094e6fc9ed48971a26be4f0fbbe00224d1247318a89d3bc783c351b",
+  "identity": {
+    "freezeSha256": "f7ca24d3253ce76f14bcfc7ed1b3e96e1359c1ff0793092acd2e8148ee958474",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":1,\"text\":\"10월 11일\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":1,\"text\":\"조회할게\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "780b8d43affb1a72b384121747aa9d9eb6dcf75bbc433496330d2cc7f013c2a6",
+  "seconds": 7.544098374957684
+}

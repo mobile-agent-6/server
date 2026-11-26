@@ -1,0 +1,16 @@
+{
+  "key": "159e949f971da5f3886d5a3b7aee254266f3e04df9a52f8449e509c2bf6c78bd",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"completedState\":[{\"turn\":1,\"text\":\"완료로 표시해 줘\",\"status\":\"adopted\"}],\"ampm\":[{\"turn\":2,\"text\":\"아니\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"완료 처리를 취소해 줘\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"대신\",\"status\":\"adopted\"}],\"title\":[{\"turn\":3,\"text\":\"보냉 운반함 세척\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":1,\"text\":\"완료 처리를 표시해 줘\",\"status\":\"adopted\"}],\"ampm\":[{\"turn\":2,\"text\":\"아니\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"대신\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "387b7f4363467609cdfe1a627bdf1b2337bdaa93e5963588b2a0488c7e43e82b",
+  "seconds": 11.757088249985827
+}

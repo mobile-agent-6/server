@@ -1,0 +1,16 @@
+{
+  "key": "15b198c19cb4d256e663fbcff9c388ca56057899ed7112597d8a1b1b87870390",
+  "identity": {
+    "freezeSha256": "c3ec03a58f880d92ae94aeffa816940216f98bc8d4f763fb9fa63abbfd9a7c51",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"훼손된 바코드 재부착\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "d58ef667ae2275f45d3d1a59861ddb17e8e520e3d3b866064b7bfcd15483ca3a",
+  "seconds": 6.912891458952799
+}

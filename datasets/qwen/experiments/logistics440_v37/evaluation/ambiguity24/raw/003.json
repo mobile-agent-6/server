@@ -1,0 +1,16 @@
+{
+  "key": "02caffa2b5d89e0b359c30177917bad4aac21ab89d9f92e388750c7ff98530ed",
+  "identity": {
+    "freezeSha256": "e06dcd680ad4bc1718721dfa4d24140e29a262fae9017203bc744a71baea3961",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"재고 서류대 바닥받임\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"청소\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "73e4f93006fcde9b9232dde11c1c7ff86cece539cc3f42e9cf8f95a72b2eea10",
+  "seconds": 7.524689915997442
+}

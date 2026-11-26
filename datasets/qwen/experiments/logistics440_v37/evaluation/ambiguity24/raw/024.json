@@ -1,0 +1,16 @@
+{
+  "key": "3f2d98c0b8b3b6afe4e62b9f73e3698a20bc14c192e967c4d2c9486a797c67ca",
+  "identity": {
+    "freezeSha256": "e06dcd680ad4bc1718721dfa4d24140e29a262fae9017203bc744a71baea3961",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"재고 물품함 손잡이 체결 점검\",\"status\":\"adopted\"}],\"completedState\":[{\"turn\":2,\"text\":\"완료 또는 미완료 중\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "d14863f5535594fe5c7e31fb397eb5e47149b4037c8b9acbcab664798384efde",
+  "seconds": 7.992875875032041
+}

@@ -1,0 +1,16 @@
+{
+  "key": "e731d95753bdd766f16c74570bdce352b395ecea68823bbc5bdf9cd8ba7f3ebb",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"create\",\"targetEvidence\":{},\"changeEvidence\":{\"title\":[{\"turn\":1,\"text\":\"새\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"내일\",\"status\":\"adopted\"}],\"category\":[{\"turn\":1,\"text\":\"등록\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "c1f00409d9d2bd157d5653e93e8a8c2591c9e75907bc886153fdf15062f2dbe1",
+  "seconds": 8.123054874973604
+}

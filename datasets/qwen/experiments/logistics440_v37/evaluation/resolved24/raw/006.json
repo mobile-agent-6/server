@@ -1,0 +1,16 @@
+{
+  "key": "1535c5dfc7cf4298ce92b98beca790eaae648af5755147681cf58c75faacf886",
+  "identity": {
+    "freezeSha256": "07bfb630c7cec6da7572d9657da328c7aaea072902a2139ce4fbff89c79d4173",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"반품 검수대 포장끈 수거\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"completed\":[{\"turn\":2,\"text\":\"미완료로 할지\",\"status\":\"adopted\"}],\"ampm\":[{\"turn\":2,\"text\":\"아직 못 정했어\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "f8ec5ec5459af7c0275880fc1f68a2d065b5f35e0fe42407b1522d740e86fd61",
+  "seconds": 8.511576833960135
+}

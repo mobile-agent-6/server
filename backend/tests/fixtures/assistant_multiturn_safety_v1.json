@@ -1,0 +1,396 @@
+{
+  "version": 1,
+  "note": "Human-authored multi-turn expectations. Model calls, result subsets, and complete Schedule rows are fixed independently of production normalization and planning helpers.",
+  "cases": [
+    {
+      "caseId": "update-public-confirmation-approved",
+      "referenceTime": "2026-10-29T10:00:00+09:00",
+      "initialSchedules": [
+        {
+          "id": "11111111-1111-4111-8111-111111111111",
+          "title": "회의",
+          "scheduledAt": "2026-10-30T06:00:00Z",
+          "category": "OTHER",
+          "completed": false
+        }
+      ],
+      "modelOutputs": [
+        {
+          "operations": [
+            {
+              "index": 1,
+              "kind": "update",
+              "targetEvidence": {
+                "title": [{"turn": 1, "text": "회의", "status": "adopted"}],
+                "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+                "time": [{"turn": 1, "text": "오후 3시", "status": "adopted"}]
+              },
+              "changeEvidence": {
+                "time": [{"turn": 1, "text": "오후 4시", "status": "adopted"}]
+              },
+              "filterEvidence": {},
+              "unsupportedEvidence": [],
+              "missingInformation": []
+            }
+          ],
+          "unsupportedEvidence": [],
+          "missingInformation": []
+        }
+      ],
+      "turns": [
+        {
+          "inputType": "text",
+          "text": "내일 오후 3시 회의를 오후 4시로 옮겨 줘",
+          "expectedResult": {
+            "kind": "confirmation",
+            "operation": "update",
+            "changes": {"scheduledAt": "2026-10-30T07:00:00Z"}
+          },
+          "expectedModelCalls": 1,
+          "expectedSchedules": [
+            {
+              "title": "회의",
+              "scheduledAt": "2026-10-30T06:00:00Z",
+              "category": "OTHER",
+              "completed": false
+            }
+          ]
+        },
+        {
+          "inputType": "confirmation",
+          "approved": true,
+          "expectedResult": {
+            "kind": "outcome",
+            "outcome": "success",
+            "operation": "update",
+            "schedulesChanged": true
+          },
+          "expectedModelCalls": 1,
+          "expectedSchedules": [
+            {
+              "title": "회의",
+              "scheduledAt": "2026-10-30T07:00:00Z",
+              "category": "OTHER",
+              "completed": false
+            }
+          ]
+        }
+      ],
+      "expectedModelTurns": [["내일 오후 3시 회의를 오후 4시로 옮겨 줘"]]
+    },
+    {
+      "caseId": "new-create-confirmation-approved",
+      "referenceTime": "2026-10-29T10:00:00+09:00",
+      "initialSchedules": [],
+      "modelOutputs": [
+        {
+          "operations": [
+            {
+              "index": 1,
+              "kind": "create",
+              "targetEvidence": {},
+              "changeEvidence": {
+                "title": [{"turn": 1, "text": "회의", "status": "adopted"}],
+                "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+                "time": [{"turn": 1, "text": "오후 3시", "status": "adopted"}]
+              },
+              "filterEvidence": {},
+              "unsupportedEvidence": [],
+              "missingInformation": []
+            }
+          ],
+          "unsupportedEvidence": [],
+          "missingInformation": []
+        }
+      ],
+      "turns": [
+        {
+          "inputType": "text",
+          "text": "내일 오후 3시 회의 있어요?",
+          "expectedResult": {
+            "kind": "need_more_info",
+            "text": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+          },
+          "expectedModelCalls": 1,
+          "expectedSchedules": []
+        },
+        {
+          "inputType": "text",
+          "text": "응",
+          "answersPreviousQuestion": true,
+          "expectedResult": {
+            "kind": "outcome",
+            "outcome": "success",
+            "operation": "create",
+            "schedulesChanged": true
+          },
+          "expectedModelCalls": 1,
+          "expectedSchedules": [
+            {
+              "title": "회의",
+              "scheduledAt": "2026-10-30T06:00:00Z",
+              "category": "OTHER",
+              "completed": false
+            }
+          ]
+        }
+      ],
+      "expectedModelTurns": [["내일 오후 3시 회의 있어요?"]]
+    },
+    {
+      "caseId": "morning-midnight-confirmation-approved",
+      "referenceTime": "2026-10-29T10:00:00+09:00",
+      "initialSchedules": [],
+      "modelOutputs": [
+        {
+          "operations": [
+            {
+              "index": 1,
+              "kind": "create",
+              "targetEvidence": {},
+              "changeEvidence": {
+                "title": [{"turn": 1, "text": "재고 실사", "status": "adopted"}],
+                "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+                "time": [{"turn": 1, "text": "아침 12시 30분", "status": "adopted"}]
+              },
+              "filterEvidence": {},
+              "unsupportedEvidence": [],
+              "missingInformation": []
+            }
+          ],
+          "unsupportedEvidence": [],
+          "missingInformation": []
+        }
+      ],
+      "turns": [
+        {
+          "inputType": "text",
+          "text": "내일 아침 12시 30분에 재고 실사 등록해 줘",
+          "expectedResult": {
+            "kind": "need_more_info",
+            "text": "10월 30일 0시 30분(자정) 말씀이세요?"
+          },
+          "expectedModelCalls": 1,
+          "expectedSchedules": []
+        },
+        {
+          "inputType": "text",
+          "text": "응",
+          "answersPreviousQuestion": true,
+          "expectedResult": {
+            "kind": "outcome",
+            "outcome": "success",
+            "operation": "create",
+            "schedulesChanged": true
+          },
+          "expectedModelCalls": 1,
+          "expectedSchedules": [
+            {
+              "title": "재고 실사",
+              "scheduledAt": "2026-10-29T15:30:00Z",
+              "category": "INVENTORY",
+              "completed": false
+            }
+          ]
+        }
+      ],
+      "expectedModelTurns": [["내일 아침 12시 30분에 재고 실사 등록해 줘"]]
+    },
+    {
+      "caseId": "midnight-confirmation-declined",
+      "referenceTime": "2026-10-29T10:00:00+09:00",
+      "initialSchedules": [],
+      "modelOutputs": [
+        {
+          "operations": [
+            {
+              "index": 1,
+              "kind": "create",
+              "targetEvidence": {},
+              "changeEvidence": {
+                "title": [{"turn": 1, "text": "서버 점검", "status": "adopted"}],
+                "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+                "time": [{"turn": 1, "text": "새벽 12시", "status": "adopted"}]
+              },
+              "filterEvidence": {},
+              "unsupportedEvidence": [],
+              "missingInformation": []
+            }
+          ],
+          "unsupportedEvidence": [],
+          "missingInformation": []
+        }
+      ],
+      "turns": [
+        {
+          "inputType": "text",
+          "text": "내일 새벽 12시에 서버 점검 등록해 줘",
+          "expectedResult": {
+            "kind": "need_more_info",
+            "text": "10월 30일 0시(자정) 말씀이세요?"
+          },
+          "expectedModelCalls": 1,
+          "expectedSchedules": []
+        },
+        {
+          "inputType": "text",
+          "text": "아니",
+          "answersPreviousQuestion": true,
+          "expectedResult": {
+            "kind": "need_more_info",
+            "text": "시간을 '오후 3시'처럼 다시 말씀해 주세요."
+          },
+          "expectedModelCalls": 1,
+          "expectedSchedules": []
+        }
+      ],
+      "expectedModelTurns": [["내일 새벽 12시에 서버 점검 등록해 줘"]]
+    },
+    {
+      "caseId": "declined-create-does-not-leak-into-new-request",
+      "referenceTime": "2026-10-29T10:00:00+09:00",
+      "initialSchedules": [],
+      "modelOutputs": [
+        {
+          "operations": [
+            {
+              "index": 1,
+              "kind": "create",
+              "targetEvidence": {},
+              "changeEvidence": {
+                "title": [{"turn": 1, "text": "회의", "status": "adopted"}],
+                "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+                "time": [{"turn": 1, "text": "오후 3시", "status": "adopted"}]
+              },
+              "filterEvidence": {},
+              "unsupportedEvidence": [],
+              "missingInformation": []
+            }
+          ],
+          "unsupportedEvidence": [],
+          "missingInformation": []
+        },
+        {
+          "operations": [
+            {
+              "index": 1,
+              "kind": "create",
+              "targetEvidence": {},
+              "changeEvidence": {
+                "title": [{"turn": 1, "text": "점검", "status": "adopted"}],
+                "date": [{"turn": 1, "text": "내일", "status": "adopted"}],
+                "time": [{"turn": 1, "text": "오후 5시", "status": "adopted"}]
+              },
+              "filterEvidence": {},
+              "unsupportedEvidence": [],
+              "missingInformation": []
+            }
+          ],
+          "unsupportedEvidence": [],
+          "missingInformation": []
+        }
+      ],
+      "turns": [
+        {
+          "inputType": "text",
+          "text": "내일 오후 3시 회의 있나요?",
+          "expectedResult": {
+            "kind": "need_more_info",
+            "text": "2026년 10월 30일 오후 3시에 '회의' 일정을 새로 등록할까요? 기존 일정을 바꾸시려면 '아니'라고 말씀해 주세요."
+          },
+          "expectedModelCalls": 1,
+          "expectedSchedules": []
+        },
+        {
+          "inputType": "text",
+          "text": "아니",
+          "answersPreviousQuestion": true,
+          "expectedResult": {
+            "kind": "need_more_info",
+            "text": "원하시는 내용을 다시 말씀해 주세요."
+          },
+          "expectedModelCalls": 1,
+          "expectedSchedules": []
+        },
+        {
+          "inputType": "text",
+          "text": "내일 오후 5시 점검 등록해 줘",
+          "answersPreviousQuestion": true,
+          "expectedResult": {
+            "kind": "outcome",
+            "outcome": "success",
+            "operation": "create",
+            "schedulesChanged": true
+          },
+          "expectedModelCalls": 2,
+          "expectedSchedules": [
+            {
+              "title": "점검",
+              "scheduledAt": "2026-10-30T08:00:00Z",
+              "category": "OTHER",
+              "completed": false
+            }
+          ]
+        }
+      ],
+      "expectedModelTurns": [
+        ["내일 오후 3시 회의 있나요?"],
+        ["내일 오후 5시 점검 등록해 줘"]
+      ]
+    },
+    {
+      "caseId": "unsupported-span-does-not-cover-date-modifier",
+      "referenceTime": "2026-11-03T10:00:00+09:00",
+      "initialSchedules": [],
+      "modelOutputs": [
+        {
+          "operations": [
+            {
+              "index": 1,
+              "kind": "create",
+              "targetEvidence": {},
+              "changeEvidence": {
+                "title": [{"turn": 1, "text": "재고 회의", "status": "adopted"}],
+                "date": [{"turn": 1, "text": "5일", "status": "adopted"}],
+                "time": [{"turn": 1, "text": "오후 2시", "status": "adopted"}]
+              },
+              "filterEvidence": {},
+              "unsupportedEvidence": [
+                {"turn": 1, "text": "두 달 뒤", "status": "adopted"}
+              ],
+              "missingInformation": []
+            }
+          ],
+          "unsupportedEvidence": [],
+          "missingInformation": []
+        }
+      ],
+      "turns": [
+        {
+          "inputType": "text",
+          "text": "두 달 뒤 5일 오후 2시 재고 회의 등록해 줘",
+          "expectedResult": {
+            "kind": "need_more_info",
+            "text": "알림과 문자 기능은 지원하지 않아요. 알림 없이 일정만 진행할까요?"
+          },
+          "expectedModelCalls": 1,
+          "expectedSchedules": []
+        },
+        {
+          "inputType": "text",
+          "text": "응",
+          "answersPreviousQuestion": true,
+          "expectedResult": {
+            "kind": "need_more_info",
+            "text": "날짜를 '11월 3일'이나 '내일'처럼 다시 말씀해 주세요."
+          },
+          "expectedModelCalls": 1,
+          "expectedSchedules": []
+        }
+      ],
+      "expectedModelTurns": [
+        ["두 달 뒤 5일 오후 2시 재고 회의 등록해 줘"]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "key": "3db9586ff12e55543c1303a5bb05efadddb9f5d9e78897515be8436ec5072f31",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"재고 순환 실사\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"time\":[{\"turn\":2,\"text\":\"오후 3시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "4706cb046259baf7ace5c0864dae42947636c8d03bc77bb710aa604465aca17f",
+  "seconds": 7.587270249990979
+}

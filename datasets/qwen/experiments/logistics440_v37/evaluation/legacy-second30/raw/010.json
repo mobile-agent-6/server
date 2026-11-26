@@ -1,0 +1,16 @@
+{
+  "key": "536fc33e578b8134f97e7d217eb2a256994f54b009514c9d794b8cb20e4785e2",
+  "identity": {
+    "freezeSha256": "f7ca24d3253ce76f14bcfc7ed1b3e96e1359c1ff0793092acd2e8148ee958474",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"로케이션별 상품 수량 확인\",\"status\":\"adopted\"}],\"date\":[{\"turn\":2,\"text\":\"7월 3일\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "dc80346ac5588ea95fd7ec9c5f8e14b2028c858210f262f317c2e4c3264bbe5d",
+  "seconds": 7.673688500013668
+}

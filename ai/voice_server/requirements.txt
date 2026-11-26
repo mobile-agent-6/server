@@ -1,0 +1,8 @@
+# Versions observed in the validated Python 3.11 voice environment.
+fastapi==0.162.7
+uvicorn==0.54.0
+faster-whisper==1.2.1
+piper-tts==1.8.0
+python-multipart==0.0.33
+ctranslate2==4.9.0
+onnxruntime==1.32.0

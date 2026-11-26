@@ -1,0 +1,16 @@
+{
+  "key": "6029db2a48639b1be460e1890d88e296b48a7c955422afafc377ae3fc410d55f",
+  "identity": {
+    "freezeSha256": "e06dcd680ad4bc1718721dfa4d24140e29a262fae9017203bc744a71baea3961",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"출고 완충지 거치대 청소\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"time\":[{\"turn\":1,\"text\":\"오후 4시\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "95b931841c842e81d96170f007ed065c1f41c71283aed70e86e757cd4e5b9744",
+  "seconds": 7.737731209024787
+}

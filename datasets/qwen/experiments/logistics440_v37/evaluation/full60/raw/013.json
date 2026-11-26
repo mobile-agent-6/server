@@ -1,0 +1,16 @@
+{
+  "key": "f20a754de85662b8c174cbd6c69c967e1c3744ab45359e6a2c9e5a502c659c38",
+  "identity": {
+    "freezeSha256": "7bb1b8ad6ccd1f082a901dff0cd29c3d7ba8b8254d227f05fac22bcc1e283523",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"list\",\"targetEvidence\":{},\"changeEvidence\":{},\"filterEvidence\":{\"title\":[{\"turn\":3,\"text\":\"3시\",\"status\":\"adopted\"}],\"date\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"superseded\"},{\"turn\":2,\"text\":\"아니\",\"status\":\"correction_marker\"},{\"turn\":2,\"text\":\"모레\",\"status\":\"adopted\"}],\"time\":[{\"turn\":3,\"text\":\"3시\",\"status\":\"superseded\",\"occurrence\":1},{\"turn\":3,\"text\":\"말고\",\"status\":\"correction_marker\"},{\"turn\":3,\"text\":\"오후 3시\",\"status\":\"adopted\"}],\"completedState\":{},\"futureScope\":[{\"turn\":1,\"text\":\"내일\",\"status\":\"adopted\"}]},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "ca73c2b5f3ec5ebf52d120daff9fd75aed6a18e2b36f37f9c39db56fac1a1e77",
+  "seconds": 11.166756332997466
+}

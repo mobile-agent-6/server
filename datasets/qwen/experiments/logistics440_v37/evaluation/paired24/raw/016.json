@@ -1,0 +1,16 @@
+{
+  "key": "46614e660debc9aaaa716f7311886a96b6447f17f7e10f7b69da057fae91f385",
+  "identity": {
+    "freezeSha256": "e0ac9aba89edee1cb6318fb07376860dcc6d3c4b5073f7c591bcc4415acd3265",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"delete\",\"targetEvidence\":{\"title\":[{\"turn\":2,\"text\":\"화물 이동 수레 바퀴 고정 확인\",\"status\":\"adopted\"}],\"time\":[{\"turn\":1,\"text\":\"오후 2시\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "5bbc84a0e797ce08a697ca55c8c56bb20ca80d7b88ad82d4e5897fa127b5039f",
+  "seconds": 7.74635066697374
+}

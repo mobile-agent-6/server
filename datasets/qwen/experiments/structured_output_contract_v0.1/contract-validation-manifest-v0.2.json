@@ -1,0 +1,72 @@
+{
+  "manifestVersion": "issue30-contract-validation-v0.2",
+  "status": "PROPOSED",
+  "commonGateVersion": "issue30-common-gate-v0.2",
+  "authoredOn": "2026-10-25",
+  "scope": "research-only deterministic evidence-role gate layered after the immutable v0.1 local validators and effect gate",
+  "oracleComparedByGate": false,
+  "positiveRoleValidation": {
+    "developmentCases": 12,
+    "lockedCases": 56,
+    "accepted": 68,
+    "rejected": 0
+  },
+  "mutationValidation": {
+    "fixtureCount": 12,
+    "localAccept": 12,
+    "commonGateReject": 12,
+    "unsafeAccept": 0,
+    "gateCodes": {
+      "C_DATE_EVIDENCE_UNSUPPORTED": 4,
+      "C_FUTURE_SCOPE_EVIDENCE_UNSUPPORTED": 1,
+      "C_CATEGORY_EVIDENCE_UNSUPPORTED": 1,
+      "C_ROLE_NOT_ALLOWED_FOR_OPERATION": 1,
+      "C_EVIDENCE_EFFECT_MISMATCH": 4,
+      "QUERY_ITEMS_MISMATCH": 1
+    }
+  },
+  "rules": [
+    "operation-specific target/change/filter role matrix",
+    "deterministic supported date and month-range parsing",
+    "deterministic supported time parsing including multiple same-role spans",
+    "explicit future-scope cue validation",
+    "completed and category cue meaning validation",
+    "same-operation cross-role evidence conflict rejection",
+    "superseded and correction-marker spans excluded from execution",
+    "proposal effect recomputation from adopted evidence and trusted backend snapshot",
+    "unknown expressions fail closed",
+    "unchanged v0.1 ID, confirmation, query-result, write and range gate"
+  ],
+  "v01Forensics": {
+    "caseId": "lk19-list-seoul-day-boundary-untrusted",
+    "rawOutputSha256": "b82c2bb545c21c195702eba2ae211ba8421b73aa764ded9ca2abfa997c0e1905",
+    "rawOutputByteLength": 1145,
+    "diagnosticReproductionMatchedHash": true,
+    "rawOutputStored": false,
+    "firstMismatch": "candidate C evidence role assignment",
+    "normalizedQueryRangeMatchedOracle": true,
+    "v01UnsafeClassificationWasActualWrongRange": false
+  },
+  "protectedV01": {
+    "ollamaEvalManifestSha256": "1e082d16eb8c33b92bac43d7784d864fc905eb660b4b1b6558cac7a1cd54ed5d",
+    "contractValidationManifestSha256": "9002cab5863b561d2d202e03829d45084b57452ab828d43bda44d479030a6537",
+    "dryMappingManifestSha256": "862765bd62049ba3bb73da08ad10f91268015af44a6fd8a259aeab7954e04ff4",
+    "lockedJsonlSha256": "17c7d4ef10aff8171d422c248431d3c34faaf03bf7282fab5dc3abcfa2389b57",
+    "semanticOracleSchemaSha256": "cfe0ed947f6bd709e0e3ba60a8daf63fb1f201614cb11d90b823931b060a3b1d"
+  },
+  "artifacts": {
+    ".omx/research/issue30/common_gate_v0_2.py": "82252c72f8c20bb4103b427e65c272d878a8b885393fbfbc987cb63519470f7a",
+    ".omx/research/issue30/test_common_gate_v0_2.py": "f3d41817c4270e6a71f3c177ba29f24f03674fb8d63f4e0beba1fd48a592e4a3",
+    ".omx/research/issue30/validate_contracts_v0_2.py": "a1ad50d77f8d655c75a105ce7aac9b7405e57ac6cc145184f43263faf35c8932",
+    ".omx/research/issue30/mutation-fixtures-v0.2.jsonl": "542106cf47a965cb0807e38a76832e9e6b7a61a842571763762288d53b6b8ada",
+    ".omx/research/issue30/contract-validation-results-v0.2.jsonl": "57462b983492b7e6a35666aab821d15d3c7ec1bc59166ab6618840ff4adf4ec1",
+    ".omx/research/issue30/contract-validation-summary-v0.2.md": "bf3f76ba51f45c029b4a786fb5f216d535e8de9ad744b4e95dbffb15a31e9414"
+  },
+  "notExecuted": [
+    "backend application",
+    "database or ORM",
+    "Schedule API or write",
+    "external network",
+    "MLX"
+  ]
+}

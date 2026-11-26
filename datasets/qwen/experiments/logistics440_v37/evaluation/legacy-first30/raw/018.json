@@ -1,0 +1,16 @@
+{
+  "key": "99a0701481509587ef3cb3f0bc41549373bf014dc9be028aef14847f0f2dfd49",
+  "identity": {
+    "freezeSha256": "14d9351b65aa64766b77e997e569fc9d12625f2e77207e09def91daf39f2aab9",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"배송 거절 화물 확인\",\"status\":\"adopted\"}]},\"changeEvidence\":{\"date\":[{\"turn\":2,\"text\":\"5월 2일\",\"status\":\"adopted\"}]},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "9028f36819031160af4840f30895e97e22a8b4b170ad932146ea490be08a85e3",
+  "seconds": 7.562623541045468
+}

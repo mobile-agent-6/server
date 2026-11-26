@@ -1,0 +1,39 @@
+{
+  "status": "EXPLICIT_REPAIR_PROPOSAL",
+  "sourceRow": 124,
+  "modelPrefixLength": 2,
+  "reason": "Original final gold silently drops prior2pm when user says 아4pm. For a guide-consistent correction example, make the correction marker explicit instead of guessing an implicit correction convention.",
+  "originalUserText": "파손 주의 표지 부착 확인이야, 아 오후 4시로",
+  "proposedUserText": "파손 주의 표지 부착 확인이야, 아니 오후 4시로",
+  "goldChange": {
+    "role": "changeEvidence",
+    "slot": "time",
+    "before": [
+      {
+        "turn": 2,
+        "text": "오후 4시",
+        "status": "adopted"
+      }
+    ],
+    "after": [
+      {
+        "turn": 1,
+        "text": "오후 2시",
+        "status": "superseded"
+      },
+      {
+        "turn": 2,
+        "text": "아니",
+        "status": "correction_marker"
+      },
+      {
+        "turn": 2,
+        "text": "오후 4시",
+        "status": "adopted"
+      }
+    ]
+  },
+  "originalSourceUnchanged": true,
+  "inputChangedForCandidateOnly": true,
+  "newTraining": false
+}

@@ -1,0 +1,16 @@
+{
+  "key": "bf20f2e1185ee82f487faa978e1489036e1a9658e290aeb1ffb809ba38d92deb",
+  "identity": {
+    "freezeSha256": "14d9351b65aa64766b77e997e569fc9d12625f2e77207e09def91daf39f2aab9",
+    "adapterSha256": "6c7f24280429adf51cd5282619f7053b43aa0eb28a0ad0599ba4a5a6c0a4d8b7",
+    "inference": {
+      "temperature": 0.0,
+      "seed": 29,
+      "maxTokens": 1024,
+      "enableThinking": false
+    }
+  },
+  "raw": "{\"operations\":[{\"index\":1,\"kind\":\"update\",\"targetEvidence\":{\"title\":[{\"turn\":1,\"text\":\"포장 완충지 탄성 시험\",\"status\":\"adopted\"}]},\"changeEvidence\":{},\"filterEvidence\":{},\"unsupportedEvidence\":[],\"missingInformation\":[]}],\"unsupportedEvidence\":[],\"missingInformation\":[]}",
+  "rawSha256": "4f1ce2b1d4dbbc839c7a270eff71d0b3e57bfdc54d4d52e6090edd183853978f",
+  "seconds": 6.997354207967874
+}

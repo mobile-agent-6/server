@@ -1,0 +1,20 @@
+{
+  "diagnostic-create-commit-response-lost": {
+    "1": "time"
+  },
+  "diagnostic-create-post-rejected": {
+    "1": "time"
+  },
+  "diagnostic-update-stale-before-approval": {},
+  "diagnostic-delete-eleven-candidates": {
+    "1": "scope"
+  },
+  "diagnostic-update-category-explicit": {},
+  "diagnostic-delete-select-two-candidates": {
+    "1": "selection"
+  },
+  "diagnostic-patch-reject-before-commit": {},
+  "diagnostic-patch-commit-then-timeout": {},
+  "diagnostic-delete-reject-before-commit": {},
+  "diagnostic-delete-commit-then-timeout": {}
+}
